@@ -19,52 +19,53 @@ function Products(){
 		<div>
 			<p className="text-3xl font-bold m-7">Products</p>
 			<div className=''>
-					<input type="text" className="border-2 mx-10 my-2" placeholder="Search Product"/>
+				<input type="text" className="border-2 mx-10 my-2" style={{borderRadius: "10px", padding:"20px"}} placeholder="Search Product"/>
+			</div>
+
+			<div className="flex flex-row relative m-10">
+				<div style={{marginRight:"5%"}}>
+				<Table className="rounded-2xl" style={{backgroundColor:"white"}}>
+					<TableHeader>
+						<TableRow>
+							<TableHead className="text-xl">Product Name</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody className="border-none">
+						{Object.keys(products).map((product, index)=>{
+							return (
+								<TableRow>
+									<TableCell className="text-lg	tableCell" onClick={()=>{setSelected(index)}}>{product}</TableCell>
+								</TableRow>
+						)})}
+					</TableBody>
+					</Table>
 				</div>
 
-				<div className="flex flex-row relative ml-5">
-					<div style={{marginRight:"5%"}}>
-					<Table className="border-2 rounded-3xl">
-							<TableHeader>
+				<div className="grow mr-10">
+					<Table className="flex-none rounded-2xl" style={{backgroundColor:"white"}}>
+						<TableHeader>
+							<TableRow>
+								<TableHead className="text-xl">
+									{//@ts-ignore
+									Object.keys(products)[selected]}
+								</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
+							{//@ts-ignore
+							products[Object.keys(products)[selected]].map((product)=>{
+								return (
 								<TableRow>
-									<TableHead className="text-xl">Product Name</TableHead>
-									</TableRow>
-							</TableHeader>
-							<TableBody className="border-none">
-								{Object.keys(products).map((product)=>{
-									return (
-										<TableRow>
-											<TableCell className="text-lg	">{product}</TableCell>
-										</TableRow>
-									)})}
-							</TableBody>
-						</Table>
-					</div>
-
-					<div className="grow mr-10">
-						<Table>
-							<TableCaption>A list of your recent invoices.</TableCaption>
-							<TableHeader>
-								<TableRow>
-									<TableHead className="w-[100px]">Invoice</TableHead>
-									<TableHead>Status</TableHead>
-									<TableHead>Method</TableHead>
-									<TableHead className="text-right">Amount</TableHead>
+									<TableCell className="text-lg	">{product}</TableCell>
 								</TableRow>
-							</TableHeader>
-							<TableBody>
-								<TableRow>
-									<TableCell className="font-medium">INV001</TableCell>
-									<TableCell>Paid</TableCell>
-									<TableCell>Credit Card</TableCell>
-									<TableCell className="text-right">$250.00</TableCell>
-								</TableRow>
-							</TableBody>
-						</Table>
-					</div>
+								)
+							})}
+						</TableBody>
+					</Table>
 				</div>
-		</div>
-		
+			</div>
+	</div>
+	
 	)
 }
 
