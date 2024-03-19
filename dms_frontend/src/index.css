@@ -1,3 +1,13 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+body{
+    background-color: rgba(240, 237, 237, 0.815);
+}
+
+.tableCell:hover{
+    color: blue;
+    background-color: rgb(230, 219, 206);
+    cursor:pointer
+}
