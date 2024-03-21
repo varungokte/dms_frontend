@@ -11,3 +11,8 @@ body{
     background-color: rgb(230, 219, 206);
     cursor:pointer
 }
+
+.pageLink:hover{
+    color:slateblue;
+    background-color: white;
+}

@@ -1,7 +1,5 @@
 import useGlobalContext from "../../GlobalContext";
 
-
-
 function Dashboard() {
 
     const { isLoggedIn } = useGlobalContext();
