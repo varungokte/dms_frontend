@@ -8,7 +8,7 @@ const secret = "beacondms"
 const bcrypt = require('bcryptjs')
 
 router.post('/register', async (req, res) => {
-    console.log(req.body);
+
     try {
         const newPassword = await bcrypt.hash(req.body.password, 10)
         const user = await User.create(
@@ -20,14 +20,13 @@ router.post('/register', async (req, res) => {
         );
         res.json({ "status": "ok" });
     } catch (err) {
-        res.send({ error: err })
+        res.status(500).send({ status: 'error', error: err })
     }
 })
 router.post('/login', async (req, res) => {
     try {
 
         const user = await User.findOne({ email: req.body.email });
-        console.log(req.body)
         if (!user) {
             return { status: 'error', error: 'Invalid login' }
         }

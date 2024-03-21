@@ -1,6 +1,13 @@
+import useGlobalContext from "../../GlobalContext";
+
+
+
 function Dashboard() {
-    return(
-        <div>This is the Dashboard</div>
+
+    const { isLoggedIn } = useGlobalContext();
+
+    return (
+        <div>This is the Dashboard {isLoggedIn() ? <>Logged In</> : <>Logged Out</>}</div>
     )
 }
 
