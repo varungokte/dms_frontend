@@ -9,34 +9,39 @@ import useGlobalContext from "../GlobalContext";
 
 
 function App() {
-  const [logged, setLogged] = useState(false);
+  const { isLoggedIn } = useGlobalContext();
 
-  useEffect(()=>{
-    const token = localStorage.getItem("Beacon-DMS-token");
-    const { isLoggedIn } = useGlobalContext();
-    if (isLoggedIn()){
-      setLogged(true)
-    }
-  },[])
-/* 
-  if (!logged)
+  useEffect(() => {
+    isLoggedIn();
+  }, [])
+
+  if (!isLoggedIn())
     return (
-    <BrowserRouter>
-      <Link to="/login">LOGIN PAGE</Link>
-      <Routes>
-        <Route path="/register" element={<RegistrationPage />} />
-        <Route path='/login' element={<LoginPage />} />
-      </Routes>
-    </BrowserRouter>
-    ); */
+      <BrowserRouter>
+        {/* <Link to="/login">LOGIN PAGE</Link> */}
+        <Routes>
+          <Route path="/register" element={<RegistrationPage />} />
+          <Route path='/login' element={<LoginPage />} />
+        </Routes>
+      </BrowserRouter>
+    );
 
   return (
     <BrowserRouter>
       <Routes>
         <Route path='/*' element={<MenuRouter />} />
       </Routes>
-    </BrowserRouter> 
+    </BrowserRouter>
   )
 }
 
 export default App;
+
+
+//can the same person be a maker in a certain transation and checker in another 
+
+// enter the name of zone 
+
+// enter the name of product 
+
+// is a transaction assigned to a person or a document 

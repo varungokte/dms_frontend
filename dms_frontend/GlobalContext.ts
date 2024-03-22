@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useJwt } from "react-jwt";
+import { decodeToken } from "react-jwt";
 
 const Base_Url = "http://localhost:5500/api/"
 
@@ -28,7 +28,7 @@ const LoginUser = async (data: object) => {
 const isLoggedIn = () => {
     const token = localStorage.getItem('Beacon-DMS-token')
     if (token) {
-        const { decodedToken } = useJwt(token);
+        const decodedToken = decodeToken(token);
         if (decodedToken) {
             return true;
         }

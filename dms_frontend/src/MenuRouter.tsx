@@ -13,16 +13,16 @@ import { useState } from 'react';
 export const MenuRouter = () => {
 	const token = localStorage.getItem("Beacon-DMS-token");
 
-	const [hover, setHover]= useState("text-white")
+	const [hover, setHover] = useState("text-white")
 	return (
 		<div className='relative'>
 			<div style={{ width: "15%", float: "left", height: "100vh", position: "fixed", backgroundColor: "slateblue" }} >
 				<div className='m-8'>
 					<b className='text-lg'>{`<Company Name/Logo>`}</b>
 					<div className='mt-36 ml-2'>
-						
+
 						<Link className="my-28 text-xl text-white pageLink pr-28 py-3 rounded-xl" to="/">Dashboard</Link>
-						<br/>
+						<br />
 						<Link className='my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl' to="/products">Products</Link>
 
 						<div className='my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl'>
@@ -32,11 +32,11 @@ export const MenuRouter = () => {
 						<div className="my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl">
 							<Link to="/team">Team Members</Link>
 						</div>
-						
+
 						<div className='my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl'>
-							<Link to="/tasks">Team Tasks</Link>	
+							<Link to="/tasks">Team Tasks</Link>
 						</div>
-						</div>
+					</div>
 				</div>
 			</div>
 			<div style={{ width: "85%", margin: "auto", paddingLeft: "0%", paddingRight: "1%", float: "right" }}>
