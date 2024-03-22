@@ -1,7 +1,7 @@
 import './App.css';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route, Link, NavLink } from 'react-router-dom';
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu"
 
 import TeamMembers from './components/TeamMembers';
 import Dashboard from './components/Dashboard';
@@ -11,31 +11,39 @@ import TeamTasks from './components/TeamTasks';
 import { useState } from 'react';
 
 export const MenuRouter = () => {
-	const token = localStorage.getItem("Beacon-DMS-token");
 
-	const [hover, setHover]= useState("text-white")
+	const [currLink, setCurrLink] = useState("Dashboard");
+	const [currColor, setCurrColor] = useState("slateblue");
+
 	return (
 		<div className='relative'>
 			<div style={{ width: "15%", float: "left", height: "100vh", position: "fixed", backgroundColor: "slateblue" }} >
 				<div className='m-8'>
 					<b className='text-lg'>{`<Company Name/Logo>`}</b>
-					<div className='mt-36 ml-2'>
+					<div className='mt-36 ml-2' >
+						<NavLink to="/" style={({isActive,})=>{
+							if (isActive)setCurrColor("white")
+							else setCurrColor("slateblue");
+							return isActive?{ color:"slateblue"}:{color:"white"}
+						}}>
+							<div className='p-3 text-xl pageLink pr-10 py-3 rounded-xl' style={{backgroundColor: currColor}}>Dashboard</div>
+						</NavLink>
 						
-						<Link className="my-28 text-xl text-white pageLink pr-28 py-3 rounded-xl" to="/">Dashboard</Link>
-						<br/>
-						<Link className='my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl' to="/products">Products</Link>
-
-						<div className='my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl'>
-							<Link to="/zones">Zone/City</Link>
-						</div>
-
-						<div className="my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl">
-							<Link to="/team">Team Members</Link>
-						</div>
+						<Link to="/products">
+							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Products</div>
+						</Link>
 						
-						<div className='my-3 text-xl text-white pageLink pr-28 py-3 rounded-xl'>
-							<Link to="/tasks">Team Tasks</Link>	
-						</div>
+						<Link to="/zones">
+							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Zone/City</div>
+						</Link>
+						
+						<Link to="/team">
+							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Team Members</div>
+						</Link>
+						
+							<Link to="/tasks">
+								<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Team Tasks</div>
+							</Link>	
 						</div>
 				</div>
 			</div>
