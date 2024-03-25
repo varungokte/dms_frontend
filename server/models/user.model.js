@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-import settingsModel from "./settings.model"
+const SettingsData = require('./settings.model');
 
 const User = new mongoose.Schema({
 	name: {
@@ -16,8 +16,8 @@ const User = new mongoose.Schema({
 		type: String,
 		required: true
 	},
-	settings:{
-		type: settingsModel
+	settings: {
+		type: SettingsData.schema
 	}
 }, {
 	collection: 'user-data'
