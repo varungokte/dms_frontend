@@ -25,23 +25,23 @@ function TeamMembers() {
 				</div>
 				
 				<div className=''>
-				<NavigationMenu>
-					<NavigationMenuList>
-						<NavigationMenuItem>
-							<NavigationMenuTrigger>{Object.keys(members)[0]}</NavigationMenuTrigger>
-							<NavigationMenuContent>
-								{Object.keys(members).map((designation)=>{
-									return (
-										<div>
-											<NavigationMenuLink className="w-5">{designation}</NavigationMenuLink>
-											<br/>
-										</div>
-										)
-								})}	
-							</NavigationMenuContent>
-						</NavigationMenuItem>
-					</NavigationMenuList>
-				</NavigationMenu>	
+					<NavigationMenu>
+						<NavigationMenuList>
+							<NavigationMenuItem>
+								<NavigationMenuTrigger>{Object.keys(members)[0]}</NavigationMenuTrigger>
+								<NavigationMenuContent>
+									{Object.keys(members).map((designation)=>{
+										return (
+											<div>
+												<NavigationMenuLink className="w-5">{designation}</NavigationMenuLink>
+												<br/>
+											</div>
+											)
+									})}	
+								</NavigationMenuContent>
+							</NavigationMenuItem>
+						</NavigationMenuList>
+					</NavigationMenu>	
 				</div>
 
 				<div className="absolute top-0 right-0">

@@ -36,11 +36,11 @@ function Zones() {
 				<p className="text-3xl font-bold m-7">{currentZone===-1?"Zones":Object.keys(zones)[currentZone]}</p>
 				<div className="flex flex-row">
 					<div className=''>
-						<input type="text" className="border-2 mx-10 my-2" style={{borderRadius: "10px", padding:"20px"}} placeholder="Search"/>
+						<input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search"/>
 					</div>
 					
 					<div>
-						<select style={{backgroundColor:"white", padding:"20px", marginTop:"10px", borderRadius: "10px"}}>
+						<select className="bg-white border-2 p-6 mt-1 rounded-xl">
 							<option value="def">All Zones</option>
 							{Object.keys(zones).map((zone)=>{
 								return (
@@ -85,7 +85,7 @@ function Zones() {
 								
 							</CardContent>
 							<CardFooter>	
-								<button style={{color:"slateblue", margin:"auto"}} onClick={()=>{setCurrentZone(index); /* setZoneDetails(Fetch Zone Details) */}}>View All {`->`}</button>	
+								<button className="text-violet-800 m-auto" onClick={()=>{setCurrentZone(index); /* setZoneDetails(Fetch Zone Details) */}}>View All {`->`}</button>	
 							</CardFooter>
 						</Card>
 					)

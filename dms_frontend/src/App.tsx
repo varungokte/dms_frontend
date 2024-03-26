@@ -15,20 +15,21 @@ function App() {
     isLoggedIn();
   }, [])
 
-  if (!isLoggedIn())
+  /* if (!isLoggedIn())
     return (
       <BrowserRouter>
-        {/* <Link to="/login">LOGIN PAGE</Link> */}
         <Routes>
           <Route path="/register" element={<RegistrationPage />} />
           <Route path='/login' element={<LoginPage />} />
         </Routes>
       </BrowserRouter>
-    );
+  ); */
 
   return (
     <BrowserRouter>
       <Routes>
+          <Route path="/register" element={<RegistrationPage />} />
+          <Route path='/login' element={<LoginPage />} />
         <Route path='/*' element={<MenuRouter />} />
       </Routes>
     </BrowserRouter>

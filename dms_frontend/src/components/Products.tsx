@@ -19,12 +19,12 @@ function Products(){
 		<div>
 			<p className="text-3xl font-bold m-7">Products</p>
 			<div className=''>
-				<input type="text" className="border-2 mx-10 my-2" style={{borderRadius: "10px", padding:"20px"}} placeholder="Search Product"/>
+				<input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search Product"/>
 			</div>
 
 			<div className="flex flex-row relative m-10">
-				<div style={{marginRight:"5%"}}>
-				<Table className="rounded-2xl" style={{backgroundColor:"white"}}>
+				<div className="mr-9">
+				<Table className="rounded-2xl bg-white">
 					<TableHeader>
 						<TableRow>
 							<TableHead className="text-xl">Product Name</TableHead>
@@ -42,7 +42,7 @@ function Products(){
 				</div>
 
 				<div className="grow mr-10">
-					<Table className="flex-none rounded-2xl" style={{backgroundColor:"white"}}>
+					<Table className="flex-none rounded-2xl bg-white">
 						<TableHeader>
 							<TableRow>
 								<TableHead className="text-xl">
