@@ -21,30 +21,30 @@ export const MenuRouter = () => {
 				<div className='m-8'>
 					<b className='text-lg'>{`<Company Name/Logo>`}</b>
 					<div className='mt-36 ml-2' >
-						<NavLink to="/" style={({isActive,})=>{
-							if (isActive)setCurrColor("white")
+						<NavLink to="/" style={({ isActive, }) => {
+							if (isActive) setCurrColor("white")
 							else setCurrColor("slateblue");
-							return isActive?{ color:"slateblue"}:{color:"white"}
+							return isActive ? { color: "slateblue" } : { color: "white" }
 						}}>
-							<div className='p-3 text-xl pageLink pr-10 py-3 rounded-xl' style={{backgroundColor: currColor}}>Dashboard</div>
+							<div className='p-3 text-xl pageLink pr-10 py-3 rounded-xl' style={{ backgroundColor: currColor }}>Dashboard</div>
 						</NavLink>
-						
+
 						<Link to="/products">
 							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Products</div>
 						</Link>
-						
+
 						<Link to="/zones">
 							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Zone/City</div>
 						</Link>
-						
+
 						<Link to="/team">
 							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Team Members</div>
 						</Link>
-						
-							<Link to="/tasks">
-								<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Team Tasks</div>
-							</Link>	
-						</div>
+
+						<Link to="/tasks">
+							<div className='p-3 text-xl text-white pageLink pr-10 py-3 rounded-xl'>Team Tasks</div>
+						</Link>
+					</div>
 				</div>
 			</div>
 			<div style={{ width: "85%", margin: "auto", paddingLeft: "0%", paddingRight: "1%", float: "right" }}>

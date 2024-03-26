@@ -30,4 +30,3 @@ mongoose
         console.log(error);
     });
 
-app.listen(PORT, ()=>{console.log("Connected")})
