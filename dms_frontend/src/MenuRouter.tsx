@@ -1,16 +1,17 @@
-import './App.css';
 import { Routes, Route, Link, NavLink } from 'react-router-dom';
+import { useState } from 'react';
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
 import TeamMembers from './components/TeamMembers';
 import Dashboard from './components/Dashboard';
 import Products from './components/Products';
 import Zones from './components/Zones';
 import TeamTasks from './components/TeamTasks';
-import { useState } from 'react';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
+import Default from './components/Default';
+import CreateLoanAccount from './components/CreateLoanAccount';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -37,7 +38,7 @@ export const MenuRouter = () => {
 
 	return (
 		<div className='relative'>
-			<div style={{ width: "15%", float: "left", height: "100vh", position: "fixed"}} className='bg-violet-800' >
+			<div style={{ width: "17%", float: "left", height: "100vh", position: "fixed", overflowY:"scroll"}} className='bg-violet-800' >
 				<div className='m-8'>
 					<b className='text-lg'>{`<Company Name/Logo>`}</b>
 					<div className='mt-36 ml-2' >
@@ -46,7 +47,15 @@ export const MenuRouter = () => {
 								setCurrLink("dash");
 							return "";
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${(currLink==="dash")?"bg-white text-violet-800":"text-white"}`}>Dashboard</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${(currLink==="dash")?"bg-white text-violet-800":"text-white"}`}>Dashboard</div>
+						</NavLink>
+
+						<NavLink to="/create" className={({ isActive, }) => {
+							if (isActive)
+								setCurrLink("create");
+							return ""; 
+						}}>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="create"?"bg-white text-violet-800":"text-white"}`}>Create Loan Account</div>
 						</NavLink>
 
 						<NavLink to="/products" className={({ isActive, }) => {
@@ -54,7 +63,7 @@ export const MenuRouter = () => {
 								setCurrLink("prod");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="prod"?"bg-white text-violet-800":"text-white"}`}>Products</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="prod"?"bg-white text-violet-800":"text-white"}`}>Products</div>
 						</NavLink>
 
 						<NavLink to="/transaction" className={({ isActive, }) => {
@@ -62,7 +71,7 @@ export const MenuRouter = () => {
 								setCurrLink("transaction");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="transaction"?"bg-white text-violet-800":"text-white"}`}>Transaction Documents</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="transaction"?"bg-white text-violet-800":"text-white"}`}>Transaction Documents</div>
 						</NavLink>
 
 						<NavLink to="/compliance" className={({ isActive, }) => {
@@ -70,7 +79,7 @@ export const MenuRouter = () => {
 								setCurrLink("compliance");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="compliance"?"bg-white text-violet-800":"text-white"}`}>Compliance Documents</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="compliance"?"bg-white text-violet-800":"text-white"}`}>Compliance Documents</div>
 						</NavLink>
 
 						<NavLink to="/covenants" className={({ isActive, }) => {
@@ -78,7 +87,7 @@ export const MenuRouter = () => {
 								setCurrLink("covenants");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="covenants"?"bg-white text-violet-800":"text-white"}`}>Covenants</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="covenants"?"bg-white text-violet-800":"text-white"}`}>Covenants</div>
 						</NavLink>
 
 						<NavLink to="/precedent" className={({ isActive, }) => {
@@ -86,7 +95,7 @@ export const MenuRouter = () => {
 								setCurrLink("precedent");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="precedent"?"bg-white text-violet-800":"text-white"}`}>Conditions Precedent</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="precedent"?"bg-white text-violet-800":"text-white"}`}>Conditions Precedent</div>
 						</NavLink>
 
 						<NavLink to="/subsequent" className={({ isActive, }) => {
@@ -94,7 +103,7 @@ export const MenuRouter = () => {
 								setCurrLink("subsequent");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="subsequent"?"bg-white text-violet-800":"text-white"}`}>Conditions Subsequent</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="subsequent"?"bg-white text-violet-800":"text-white"}`}>Conditions Subsequent</div>
 						</NavLink>
 
 						<NavLink to="/zones" className={({ isActive, }) => {
@@ -102,7 +111,7 @@ export const MenuRouter = () => {
 								setCurrLink("zone");
 							return ""; 
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="zone"?"bg-white text-violet-800":"text-white"}`}>Zone/City</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="zone"?"bg-white text-violet-800":"text-white"}`}>Zone/City</div>
 						</NavLink>
 
 						<NavLink to="/team" className={({ isActive, }) => {
@@ -110,7 +119,7 @@ export const MenuRouter = () => {
 								setCurrLink("team");
 							return "";
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="team"?"bg-white text-violet-800":"text-white"}`}>Team Members</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="team"?"bg-white text-violet-800":"text-white"}`}>Team Members</div>
 						</NavLink>
 
 						<NavLink to="/users" className={({ isActive, }) => {
@@ -118,7 +127,7 @@ export const MenuRouter = () => {
 								setCurrLink("users");
 							return "";
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="users"?"bg-white text-violet-800":"text-white"}`}>User Management</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="users"?"bg-white text-violet-800":"text-white"}`}>User Management</div>
 						</NavLink>
 
 						<NavLink to="/tasks" className={({ isActive, }) => {
@@ -126,12 +135,20 @@ export const MenuRouter = () => {
 								setCurrLink("tasks");
 							return "";
 						}}>
-							<div className={`p-3 text-xl pageLink pr-10 py-3 rounded-xl ${currLink==="tasks"?"bg-white text-violet-800":"text-white"}`}>Team Tasks</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="tasks"?"bg-white text-violet-800":"text-white"}`}>Team Tasks</div>
+						</NavLink>
+
+						<NavLink to="/default" className={({ isActive, }) => {
+							if (isActive)
+								setCurrLink("default");
+							return "";
+						}}>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="default"?"bg-white text-violet-800":"text-white"}`}>Default</div>
 						</NavLink>
 					</div>
 				</div>
 			</div>
-			<div style={{ width: "85%", margin: "auto", paddingLeft: "0%", paddingRight: "1%", float: "right" }}>
+			<div style={{ width: "83%", float: "right" }}>
 				<div className='relative h-20 w-100 bg-white'>
 					<div className=' absolute inset-y-5 right-0 w-50'>
 						<DropdownMenu>
@@ -149,6 +166,7 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					<Route path="/" element={<Dashboard/>} />
+					<Route path="/create/*" element={<CreateLoanAccount/>} />
 					<Route path="/products" element={<Products/>} />
 					<Route path='/transaction' element={<DocumentList label={"Transaction Documents"} docData={txnTestData} />}/>
 					<Route path='/compliance' element={<DocumentList label={"Compliance Documents"} docData={txnTestData} />}/>
@@ -159,6 +177,7 @@ export const MenuRouter = () => {
 					<Route path="/team" element={<TeamMembers/>} />
 					<Route path="/users" element={<UserManagement/>} />
 					<Route path="/tasks" element={<TeamTasks/>} />
+					<Route path='/default' element={<Default/>} />
 					<Route path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

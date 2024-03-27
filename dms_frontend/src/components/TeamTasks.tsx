@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 
 
 function TeamTasks() {
@@ -60,7 +60,12 @@ function TeamTasks() {
 			<p className="text-3xl font-bold m-7">Team Tasks</p>
 			<div className="flex flex-row">
         <div className=''>
-          <input type="text" className="border-2 mx-10 p-5 rounded-xl my-2" onChange={(e)=>setSearchString(e.target.value)} placeholder="Search"/>
+          <input type="text" className="border-2 mx-10 p-5 rounded-xl my-2" 
+            onChange={(e)=>{
+              const val = e.target.value+"";
+              setSearchString(val.replace("\\", "/\\/"))
+            }} 
+            placeholder="Search"/>
         </div>
         
         <div className="flex-auto"> 
@@ -115,11 +120,11 @@ function TeamTasks() {
                       </div>
 
                       <div>
-                        <label htmlFor="date" className="text-lg" onChange={(e:any)=>{setNewAssignee(e.target.value+"")}}>Due Date</label>
+                        <label htmlFor="date" className="text-lg">Due Date</label>
                       </div>                      
 
                       <div>
-                        <input type="date" className="w-4/5 h-10 bg-white border p-3"/>
+                        <input type="date" className="w-4/5 h-10 bg-white border p-3" onChange={(e:any)=>{setNewAssignee(e.target.value+"")}}/>
                       </div>
                     </div>
                     <button type="submit" className="float-right mr-16 h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add Task</button>
@@ -128,7 +133,7 @@ function TeamTasks() {
               </DialogHeader>
             </DialogContent>
           </Dialog>
-      </div>  
+        </div>  
       </div>
 
     <div className="m-7">
