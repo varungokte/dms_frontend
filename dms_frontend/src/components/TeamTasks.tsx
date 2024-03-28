@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 
 
 function TeamTasks() {
-
   //An array which contains many tasks; each task is an array
   //Task array has: [task_name, person_to_whom_it_is_assigned, due_date, priority, status]
   //priority has 3 values: Low, Medium, High
@@ -111,7 +110,7 @@ function TeamTasks() {
                       </div>
 
                       <div>
-                        <select id="priority" required className="border-2  w-4/5 h-10 bg-white" onChange={(e:any)=>{setNewPriority(e.target.value)}}>
+                        <select id="priority" required className="border-2 w-4/5 h-10 bg-white" onChange={(e:any)=>{setNewPriority(e.target.value)}}>
                           <option value={""}>Select a priority</option>
                           <option value={0}>Low</option>
                           <option value={1}>Medium</option>
@@ -137,7 +136,7 @@ function TeamTasks() {
       </div>
 
     <div className="m-7">
-    <Table className="border-2 rounded-3xl">
+    <Table className="rounded-3xl bg-white">
       <TableHeader>
         <TableRow>
           <TableHead>Task</TableHead>
@@ -154,7 +153,7 @@ function TeamTasks() {
           if ((priority==-1 || task[3]==priority) && (searchString=="" || (task[0]+"").search(regEx)!==-1 || (task[1]+"").search(regEx)!==-1))
             return (
             <TableRow>
-              <TableCell >{task[0]}</TableCell>
+              <TableCell>{task[0]}</TableCell>
               <TableCell>{task[1]}</TableCell>
               <TableCell>{task[2]}</TableCell>
               <TableCell>

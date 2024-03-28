@@ -8,7 +8,7 @@ body{
 
 .tableCell:hover{
     color: blue;
-    background-color: rgb(230, 219, 206);
+    background-color: rgb(238, 238, 245);
     cursor:pointer
 }
 

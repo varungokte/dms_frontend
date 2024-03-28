@@ -30,18 +30,17 @@ function Zones() {
 		])
 
 		const [currentZone, setCurrentZone] = useState(-1);
-
     return (
 			<div>
-				<p className="text-3xl font-bold m-7">{currentZone===-1?"Zones":Object.keys(zones)[currentZone]}</p>
+				<p className="text-3xl font-bold m-7">{currentZone==-1?"Zones":currentZone}</p>
 				<div className="flex flex-row">
 					<div className=''>
 						<input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search"/>
 					</div>
 					
 					<div>
-						<select className="bg-white border-2 p-6 mt-1 rounded-xl">
-							<option value="def">All Zones</option>
+						<select className="bg-white border-2 p-6 mt-1 rounded-xl" onChange={(e:any)=>setCurrentZone(e.target.value)}>
+							<option value="-1">All Zones</option>
 							{Object.keys(zones).map((zone)=>{
 								return (
 									<option value={`${zone}`}>{zone}</option>
@@ -52,7 +51,7 @@ function Zones() {
 				</div>
 
 				<div className="flex flex-row flex-wrap mx-10">
-					{currentZone===-1?
+					{currentZone==-1?
 					Object.keys(zones).map((zone,index)=>{
 					return(
 						<Card style={{width:"48vh", marginRight:"5%", marginBottom:"3%", borderRadius:"20px", backgroundColor:"white"}}>

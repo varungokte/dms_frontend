@@ -2,17 +2,17 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 
 
-function Default() {
-  //An array of default cases
-  //Each default case is an array where: [Deal Name, Default Type, Date]
+function CriticalCases() {
+  //An array of critical cases
+  //Each critical case is an array where: [Document Name, Document Type, Date, Priority(will always be HIGH)]
   const [defaultData, setDefaultData] = useState([
-    ["Mortgage", "Payment", "01/01/01"],
-    ["Home Loan", "Covenant", "02/02/02"],
-    ["Business Loan", "Bankrupcy", "03/03/03"]
+    ["Lender's Agent Agreeement", "PDF", "01/01/01"],
+    ["Lender's Agent Agreeement", "PNG", "02/02/02"],
+    ["Power Purchase Agreement", "PDF", "03/03/03"]
   ])
   return(
     <div>
-			<p className="text-3xl font-bold m-7">Default Cases</p>
+			<p className="text-3xl font-bold m-7">Critical Cases</p>
 
       <div className='flex flex-row relative'>
         <div className=''>
@@ -28,9 +28,10 @@ function Default() {
         <TableHeader className="">
           <TableRow>
             <TableHead className="w-[100px]">Sr. No.</TableHead>
-            <TableHead>Deal</TableHead>
-            <TableHead>Default Type</TableHead>
+            <TableHead>Document Name</TableHead>
+            <TableHead>Document Type</TableHead>
             <TableHead>Date</TableHead>
+            <TableHead>Priority</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -42,6 +43,7 @@ function Default() {
                 <TableCell>{val[0]}</TableCell>
                 <TableCell>{val[1]}</TableCell>
                 <TableCell>{val[2]}</TableCell>
+                <TableCell><div className="text-red-600 bg-red-100 rounded-lg text-center">High</div></TableCell>
                 <TableCell>Action</TableCell>
               </TableRow>
             )
@@ -54,4 +56,4 @@ function Default() {
   )
 }
 
-export default Default;
+export default CriticalCases;

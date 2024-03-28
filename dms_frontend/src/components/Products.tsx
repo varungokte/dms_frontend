@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 
 function Products(){
 
@@ -33,7 +33,7 @@ function Products(){
 					<TableBody className="border-none">
 						{Object.keys(products).map((product, index)=>{
 							return (
-								<TableRow>
+								<TableRow className="border-none">
 									<TableCell className="text-lg	tableCell" onClick={()=>{setSelected(index)}}>{product}</TableCell>
 								</TableRow>
 						)})}
@@ -55,7 +55,7 @@ function Products(){
 							{//@ts-ignore
 							products[Object.keys(products)[selected]].map((product)=>{
 								return (
-								<TableRow>
+								<TableRow className="border-none">
 									<TableCell className="text-lg	">{product}</TableCell>
 								</TableRow>
 								)

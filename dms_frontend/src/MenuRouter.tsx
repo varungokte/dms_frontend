@@ -12,6 +12,7 @@ import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
 import Default from './components/Default';
 import CreateLoanAccount from './components/CreateLoanAccount';
+import CriticalCases from './components/CriticalCases';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -41,7 +42,7 @@ export const MenuRouter = () => {
 			<div style={{ width: "17%", float: "left", height: "100vh", position: "fixed", overflowY:"scroll"}} className='bg-violet-800' >
 				<div className='m-8'>
 					<b className='text-lg'>{`<Company Name/Logo>`}</b>
-					<div className='mt-36 ml-2' >
+					<div className='mt-20 ml-2' >
 						<NavLink to="/" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("dash");
@@ -50,12 +51,12 @@ export const MenuRouter = () => {
 							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${(currLink==="dash")?"bg-white text-violet-800":"text-white"}`}>Dashboard</div>
 						</NavLink>
 
-						<NavLink to="/create" className={({ isActive, }) => {
+						<NavLink to="/loan" className={({ isActive, }) => {
 							if (isActive)
-								setCurrLink("create");
+								setCurrLink("loan");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="create"?"bg-white text-violet-800":"text-white"}`}>Create Loan Account</div>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="loan"?"bg-white text-violet-800":"text-white"}`}>Create Loan Account</div>
 						</NavLink>
 
 						<NavLink to="/products" className={({ isActive, }) => {
@@ -145,6 +146,14 @@ export const MenuRouter = () => {
 						}}>
 							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="default"?"bg-white text-violet-800":"text-white"}`}>Default</div>
 						</NavLink>
+
+						<NavLink to="/critical" className={({ isActive, }) => {
+							if (isActive)
+								setCurrLink("critical");
+							return "";
+						}}>
+							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="critical"?"bg-white text-violet-800":"text-white"}`}>Critical Cases</div>
+						</NavLink>
 					</div>
 				</div>
 			</div>
@@ -166,7 +175,7 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					<Route path="/" element={<Dashboard/>} />
-					<Route path="/create/*" element={<CreateLoanAccount/>} />
+					<Route path="/loan/*" element={<CreateLoanAccount/>} />
 					<Route path="/products" element={<Products/>} />
 					<Route path='/transaction' element={<DocumentList label={"Transaction Documents"} docData={txnTestData} />}/>
 					<Route path='/compliance' element={<DocumentList label={"Compliance Documents"} docData={txnTestData} />}/>
@@ -178,6 +187,7 @@ export const MenuRouter = () => {
 					<Route path="/users" element={<UserManagement/>} />
 					<Route path="/tasks" element={<TeamTasks/>} />
 					<Route path='/default' element={<Default/>} />
+					<Route path='/critical' element={<CriticalCases/>} />
 					<Route path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

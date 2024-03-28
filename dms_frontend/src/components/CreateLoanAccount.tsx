@@ -5,6 +5,7 @@ import ContactDetails from "./LoanAccountComponents/Contact Details";
 import Ratings from "./LoanAccountComponents/Ratings";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 import Covenants from "./LoanAccountComponents/Covenants";
+import LoanAccount from "./LoanAccountComponents/LoanAccount";
 
 function CreateLoanAccount() {
 	const [currLink, setCurrLink] = useState("");
@@ -14,6 +15,14 @@ function CreateLoanAccount() {
 			<p className="text-3xl font-bold m-7">Create Loan Account</p>
 
       <div className="flex flex-row flex-wrap mx-10 mr-2">
+        <NavLink to="" className={({ isActive, }) => {
+          if (isActive)
+            setCurrLink("");
+          return "m-3 w-56";
+        }}>
+          <div className={`p-5 rounded-xl border-2 ${(currLink==="")?"bg-violet-800 text-white":"bg-white text-black"}`}>Loan Account</div>
+        </NavLink>
+
         <NavLink to="contact" className={({ isActive, }) => {
           if (isActive)
             setCurrLink("contact");
@@ -85,13 +94,13 @@ function CreateLoanAccount() {
         }}>
           <div className={`p-5 rounded-xl border-2 ${(currLink==="schedule")?"bg-violet-800 text-white":"bg-white text-black"}`}>Payment Schedule</div>
         </NavLink>
-
       </div>
 
     <div className="m-10">
       <Routes>
+        <Route path="" element={<LoanAccount/>}/>
         <Route path="contact" element={<ContactDetails/>}/>
-        <Route path="mapping" element={<p>Relationsipo MApoepong</p>}/>
+        <Route path="mapping" element={<br/>}/>
         <Route path="transaction" element={<LoanDocuments label={"Transaction Documents"}/>}/>
         <Route path="compliance" element={<LoanDocuments label={"Compliance Documents"}/>}/>
         <Route path="covenants" element={<Covenants/>}/>

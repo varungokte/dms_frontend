@@ -1,7 +1,10 @@
 import { useState } from "react";
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
+import { Ellipsis } from "lucide-react";
 
 function UserManagement(){
   //userData is an array of users
@@ -54,7 +57,7 @@ function UserManagement(){
   return(
     <div>
 			<p className="text-3xl font-bold m-7">User Management</p>
-      <div className="flex flex-row relative">
+      <div className="flex flex-row">
         <div className=''>
           <input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search" 
             onChange={e=>{
@@ -67,7 +70,7 @@ function UserManagement(){
           <select className="bg-white border-2 p-6 mt-1 rounded-xl" onChange={(e:any)=>{setCompanyFilter(e.target.value)}}>
             <option value="-1">Company Name</option>
             {
-            companyList.map((company,index)=>{
+            companyList.map((company)=>{
               return(
                 <option value={company}>{company}</option>
               )
@@ -75,7 +78,7 @@ function UserManagement(){
             </select>
         </div>
 
-        <div>
+        <div className="flex-auto">
           <select className="bg-white border-2 p-6 mt-1 rounded-xl" onChange={(e:any)=>{setRoleFilter(e.target.value)}}>
             <option value="-1">Role</option>
             {
@@ -87,27 +90,27 @@ function UserManagement(){
           </select>
         </div>
 
-        <div className="absolute top-0 right-0">
+        <div className="">
           <Dialog>
-            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-violet-800">Add Task</DialogTrigger>
+            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-violet-800">+ Add User</DialogTrigger>
             <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
               <DialogHeader>
-                <DialogTitle className="text-2xl">Add Team Task</DialogTitle>
+                <DialogTitle className="text-2xl">Add User</DialogTitle>
                 <hr/>
                 <DialogDescription>
                   <form onSubmit={createUser}>
                     <label htmlFor="name" className="text-lg">Name</label>
                     <br/>
-                    <input id="name" onChange={(e)=>setNewName(e.target.value)} className="border w-5/6 h-10 rounded-lg p-3"/>
+                    <input id="name" onChange={(e)=>setNewName(e.target.value)} className="border-2 rounded-xl w-full h-10 p-3"/>
                     <br/>
                     <br/>
-                    <div className="grid grid-rows-2 grid-flow-col">
+                    <div className="grid grid-rows-2 grid-flow-col w-full">
                       <div>
                         <label htmlFor="email" className="text-lg">Email Address</label>
                       </div>
 
                       <div>
-                        <input type="email" onChange={e=>setNewEmail(e.target.value)}/>  
+                        <input type="email" onChange={e=>setNewEmail(e.target.value)} className="border-2 rounded-xl w-4/5 p-3"/>  
                       </div>
 
                       <div>
@@ -115,7 +118,7 @@ function UserManagement(){
                       </div>                      
 
                       <div>
-                        <select id="role" onChange={(e:any)=>setNewRole(e.target.value)}>
+                        <select id="role" onChange={(e:any)=>setNewRole(e.target.value)} className="bg-white border-2 rounded-xl w-4/5 p-3">
                           <option value={2}>Admin</option>
                           <option value={0}>Maker</option>
                           <option value={1}>Checker</option>
@@ -125,28 +128,29 @@ function UserManagement(){
                     <br/>
                     <br/>
 
-                    <div className="grid grid-rows-2 grid-flow-col">
+                    <div className="grid grid-rows-2 grid-flow-col w-full">
                       <div>
                         <label htmlFor="password" className="text-lg">Password</label>
                       </div>
 
                       <div>
-                        <input type="password" onChange={e=>setNewPassword(e.target.value)}/>
+                        <input type="password" onChange={e=>setNewPassword(e.target.value)} className="border-2 rounded-xl w-4/5 p-3"/>
                       </div>
 
-                      <div>
-                        <label htmlFor="permission" className="text-lg">Permission</label>
+                      <div className="ml-9">
+                        <label htmlFor="permission" className="text-lg">Permissions</label>
                       </div>                      
 
-                      <div>
-                        <select id="permission" multiple onChange={(e:any)=>{console.log("E",e.target.value);setNewPermission(e.target.value)}}>
-                          <option value={1}>Verify</option>
-                          <option value={0}>Maker</option>
-                          <option value={1}>Checker</option>
-                        </select>
-                      </div>
+                      <div className="flex m-auto">
+                        <div className="mx-5">
+                          <input type="checkbox" id="verify" className="mr-1"/><label htmlFor="verify">Verify</label>
+                        </div>
+                        <div className="mx-5">
+                          <input type="checkbox" id="read" className="mr-1"/><label htmlFor="read">Read</label>
+                        </div>
+                        </div>
                     </div>
-                    <button type="submit" className="float-right mr-16 h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add Task</button>
+                    <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add User</button>
                   </form>
                 </DialogDescription>
               </DialogHeader>
@@ -155,7 +159,7 @@ function UserManagement(){
         </div>
       </div>
       <div className="m-7">
-        <Table>
+        <Table className="bg-white border-2 rounded-xl">
           <TableHeader>
             <TableRow>
               <TableHead>Name</TableHead>
@@ -177,7 +181,73 @@ function UserManagement(){
                     <TableCell>{user[2]}</TableCell>
                     <TableCell>{Roles[Number(user[3])]}</TableCell>
                     <TableCell><div className={`${StatusStyling[Number(user[4])]} text-center rounded-lg`}>{Status[Number(user[4])]}</div></TableCell>
-                    <TableCell>Ellipsis</TableCell>
+                    <TableCell>
+                      <Dialog>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger><Ellipsis className="ml-5"/></DropdownMenuTrigger>
+                          <DropdownMenuContent className="bg-white">
+                            <DropdownMenuItem>
+                              <DialogTrigger>Edit User</DialogTrigger>
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                        <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
+                          <DialogHeader>
+                            <DialogTitle className="text-2xl">Edit User</DialogTitle>
+                            <hr/>
+                            <DialogDescription>
+                              <form onSubmit={createUser}>
+                                <label htmlFor="name" className="text-lg">Name</label>
+                                <br/>
+                                <input id="name" onChange={(e)=>setNewName(e.target.value)} className="border-2 rounded-xl w-full h-10 p-3"/>
+                                <br/>
+                                <br/>
+                                <div className="grid grid-rows-2 grid-flow-col w-full">
+                                  <div>
+                                    <label htmlFor="email" className="text-lg">Email Address</label>
+                                  </div>
+
+                                  <div>
+                                    <input type="email" onChange={e=>setNewEmail(e.target.value)} className="border-2 rounded-xl w-4/5 p-3"/>  
+                                  </div>
+
+                                  <div>
+                                    <label htmlFor="role" className="text-lg">User Role</label>
+                                  </div>                      
+
+                                  <div>
+                                    <select id="role" onChange={(e:any)=>setNewRole(e.target.value)} className="bg-white border-2 rounded-xl w-4/5 p-3">
+                                      <option value={2}>Admin</option>
+                                      <option value={0}>Maker</option>
+                                      <option value={1}>Checker</option>
+                                    </select>
+                                  </div>
+                                </div>
+                                <br/>
+                                <br/>
+
+                                <div className="grid grid-rows-2 grid-flow-col w-full">
+                                  <div className="ml-9">
+                                    <label htmlFor="permission" className="text-lg">Permissions</label>
+                                  </div>                      
+
+                                  <div className="flex">
+                                    <div className="mx-5">
+                                      <input type="checkbox" id="verify" className="mr-1"/><label htmlFor="verify">Verify</label>
+                                    </div>
+                                    <div className="mx-5">
+                                      <input type="checkbox" id="read" className="mr-1"/><label htmlFor="read">Read</label>
+                                    </div>
+                                    </div>
+                                </div>
+                                <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add User</button>
+                              </form>
+                            </DialogDescription>
+                          </DialogHeader>
+                        </DialogContent>
+                      </Dialog>
+
+                    </TableCell>
                 </TableRow>
                 )
               })}

@@ -1,7 +1,6 @@
 import { useState } from "react";
 
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem,	NavigationMenuLink,	NavigationMenuList,	NavigationMenuTrigger,} from "./ui/navigation-menu"
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card"
+import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
 
 
@@ -21,55 +20,45 @@ function TeamMembers() {
 
 			<div className='flex flex-row relative'>
 				<div className=''>
-					<input type="text" className="border-2 mx-10 my-2" placeholder="Search"/>
+					<input type="text" className="border-2 mx-10 my-2 p-3 w-72 rounded-xl" placeholder="Search"/>
 				</div>
 				
-				<div className=''>
-					<NavigationMenu>
-						<NavigationMenuList>
-							<NavigationMenuItem>
-								<NavigationMenuTrigger>{Object.keys(members)[0]}</NavigationMenuTrigger>
-								<NavigationMenuContent>
-									{Object.keys(members).map((designation)=>{
-										return (
-											<div>
-												<NavigationMenuLink className="w-5">{designation}</NavigationMenuLink>
-												<br/>
-											</div>
-											)
-									})}	
-								</NavigationMenuContent>
-							</NavigationMenuItem>
-						</NavigationMenuList>
-					</NavigationMenu>	
+				<div className='flex-auto'>
+					<select className="mt-2 p-4 bg-white border-2 w-72 rounded-xl">
+					{Object.keys(members).map((designation)=>{
+						return (
+							<option value={designation}>{designation}</option>
+							)
+					})}
+					</select>	
 				</div>
 
-				<div className="absolute top-0 right-0">
-					<span>{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
+				<div className="">
+					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
 					<Dialog >
-						<DialogTrigger className="m-5">Add new Member</DialogTrigger>
+						<DialogTrigger className="m-5 p-3 bg-violet-800 text-white rounded-xl"><span className="text-xl">+</span> Add Member</DialogTrigger>
 						<DialogContent className="bg-white">
 							<DialogHeader>
-								<DialogTitle>Add a Team Member</DialogTitle>
+								<DialogTitle className="text-xl">Add Team Member</DialogTitle>
 								<DialogDescription>
 									<div>
 										<label htmlFor="name">Name</label>
 										<br/>
-										<input id="name" className="border-2 mb-5"/>
+										<input id="name" className="border-2 rounded-xl mb-5 p-3 w-full"/>
 									</div>
 									
 									<div>
 										<label htmlFor="role">Role</label>
 										<br/>
-										<select id="role">
+										<select id="role" className="bg-white border-2 rounded-xl mb-5 p-3 w-full" >
 											<option value="maker">Maker</option>
 											<option value="checker">Checker</option>
 										</select>
 									</div>
 
-									<div>
-										<button>Cancel</button>
-										<button>Add</button>
+									<div className="flex">
+										<div className="flex-auto"></div>
+										<button className="bg-violet-800 text-white rounded-xl p-3 w-28">Add</button>
 									</div>
 									
 								</DialogDescription>
@@ -79,22 +68,25 @@ function TeamMembers() {
 				</div>
 			</div>
 
-			<div className="mx-10 mt-8">
+			<div className="mx-10 mt-5">
 				{Object.keys(members).map((category: string)=>{
 					return(
 						<div>
-							<p>{category}</p>
+							<p className="text-lg font-semibold">{category}</p>
 							<div className="flex flex-row">
 								{//@ts-ignore
 								members[category].map((member)=>{
 									return (
-										<div className="m-2">
+										<div className="m-5 rounded-xl bg-white w-72">
 											<Card>
 												<CardHeader>
-													<CardTitle>{member}</CardTitle>
+													<CardTitle className="m-auto">
+														<div style={{height:"100px", width:"100px", lineHeight:"100px", borderRadius:"50%", textAlign:"center", fontSize:"30px", backgroundColor: "goldenrod", color:"white"}}>{member.split(" ").map((name:String)=>{return name[0]})}</div>
+													</CardTitle>
 												</CardHeader>
 												<CardContent>
-													<p>{category}</p>
+													<p className="text-center font-medium">{member}</p>
+													<p className="text-center font-light">{category}</p>
 												</CardContent>
 											</Card>
 									</div>
@@ -106,8 +98,6 @@ function TeamMembers() {
 				})}
 
 			</div>
-			
-
 		</div>
 	)
 }
