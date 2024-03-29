@@ -78,7 +78,7 @@ function TeamTasks() {
 
         <div>
           <Dialog>
-            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-violet-800">Add Task</DialogTrigger>
+            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-custom-1">Add Task</DialogTrigger>
             <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
               <DialogHeader>
                 <DialogTitle className="text-2xl">Add Team Task</DialogTitle>
@@ -126,7 +126,7 @@ function TeamTasks() {
                         <input type="date" className="w-4/5 h-10 bg-white border p-3" onChange={(e:any)=>{setNewAssignee(e.target.value+"")}}/>
                       </div>
                     </div>
-                    <button type="submit" className="float-right mr-16 h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add Task</button>
+                    <button type="submit" className="float-right mr-16 h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add Task</button>
                   </form>
                 </DialogDescription>
               </DialogHeader>

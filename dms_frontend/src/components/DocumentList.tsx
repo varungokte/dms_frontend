@@ -16,7 +16,7 @@ function DocumentList(props:any) {
 
   const [searchString, setSearchString] = useState("");
   const [chevronToggle, setChevronToggle] = useState(Array(props.docData.length).fill(false));
-  const [priority, setPriority] = useState(2);
+  const [priority, setPriority] = useState(Array(props.docData.length).fill(2));
 
   enum PriorityValues {
     "Low",
@@ -81,10 +81,20 @@ function DocumentList(props:any) {
                       </div>
                       <div className="float-right">
                         <div className="text-base">Priority:{` `}             
-                          <select className="p-3 rounded-xl" onChange={(e:any)=>setPriority(e.target.value)}>
-                            <option value={2}>High</option>
-                            <option value={1}>Medium</option>
-                            <option value={0}>Low</option>
+                          <select className="p-3 rounded-xl" 
+                            onChange={(e:any)=>{
+                            const arr = [...priority];
+                            arr[ind]=e.target.value;
+                            setPriority(arr);
+                          }}>
+                            {Object.keys(PriorityValues).filter(v=>!isNaN(Number(v))).map(val=>{
+                              console.log(Object.keys(PriorityValues).filter(v=>!isNaN(Number(v))))
+                              if (Number(val)===priority[ind])
+                              {console.log("IT IS EQUAL", val)
+                                return <option value={val} selected>{PriorityValues[Number(val)]}</option>
+                              }else
+                              return <option value={val}>{PriorityValues[Number(val)]}</option>
+                            })}
                           </select>
                         </div>
                       <br/> 
@@ -105,7 +115,7 @@ function DocumentList(props:any) {
                         <TableBody>
                           {//@ts-ignore
                           txn[3].map(doc => {
-                            if (doc[2]==priority)
+                            if (doc[2]==priority[ind])
                             return(
                               <TableRow>
                                 <TableCell>{doc[0]}</TableCell>

@@ -63,7 +63,7 @@ function Login() {
         <img src={login_img} width={"80%"} style={{float:"right", paddingRight:"5%"}}/>
       </div>
       <div className="m-3" style={{marginTop:"7%", marginLeft:"5%", width:"35%"}}>
-        <p className="text-4xl font-bold mb-7 mx-12 bg-violet-800">Welcome Back!</p>
+        <p className="text-4xl font-bold mb-7 mx-12 bg-custom-1">Welcome Back!</p>
         <form onSubmit={signin}>
           <label htmlFor="email" className="font-light">Email Address</label>
           <br/>
@@ -92,7 +92,7 @@ function Login() {
           <br/>
           {errorMessage}
           <br/>
-          <button type="submit"  style={{width:"100%", height:"50px"}}  className="bg-violet-800 text-white rounded-xl self-center">Sign In</button>
+          <button type="submit"  style={{width:"100%", height:"50px"}}  className="bg-custom-1 text-white rounded-xl self-center">Sign In</button>
         </form>
       </div>
     </div>

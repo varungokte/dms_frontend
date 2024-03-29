@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { Ellipsis } from "lucide-react";
 
 
 function Default() {
@@ -9,14 +10,22 @@ function Default() {
     ["Mortgage", "Payment", "01/01/01"],
     ["Home Loan", "Covenant", "02/02/02"],
     ["Business Loan", "Bankrupcy", "03/03/03"]
-  ])
+  ]);
+
+  const [searchString, setSearchString] = useState("");
+
   return(
     <div>
 			<p className="text-3xl font-bold m-7">Default Cases</p>
 
       <div className='flex flex-row relative'>
         <div className=''>
-          <input type="text" className="border-2 mx-10 my-2 p-4 rounded-xl" placeholder="Search"/>
+          <input type="text" className="border-2 mx-10 my-2 p-4 rounded-xl" placeholder="Search" 
+            onChange={(e)=>{
+              const val = e.target.value+"";
+              setSearchString(val.replace("\\", "/\\/"))
+            }} 
+          />
         </div>
 
         <div>
@@ -36,13 +45,15 @@ function Default() {
         </TableHeader>
         <TableBody>
           {defaultData.map((val,ind)=>{
+            const regEx = new RegExp(searchString, "i");
+            if (searchString=="" || (val[0]+"").search(regEx)!==-1)
             return(
               <TableRow>
                 <TableCell className="font-medium">{ind+1}</TableCell>
                 <TableCell>{val[0]}</TableCell>
                 <TableCell>{val[1]}</TableCell>
                 <TableCell>{val[2]}</TableCell>
-                <TableCell>Action</TableCell>
+                <TableCell><Ellipsis/></TableCell>
               </TableRow>
             )
           })}

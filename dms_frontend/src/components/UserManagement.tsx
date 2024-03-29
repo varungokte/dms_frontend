@@ -92,7 +92,7 @@ function UserManagement(){
 
         <div className="">
           <Dialog>
-            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-violet-800">+ Add User</DialogTrigger>
+            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-custom-1">+ Add User</DialogTrigger>
             <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
               <DialogHeader>
                 <DialogTitle className="text-2xl">Add User</DialogTitle>
@@ -150,7 +150,7 @@ function UserManagement(){
                         </div>
                         </div>
                     </div>
-                    <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add User</button>
+                    <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add User</button>
                   </form>
                 </DialogDescription>
               </DialogHeader>
@@ -240,7 +240,7 @@ function UserManagement(){
                                     </div>
                                     </div>
                                 </div>
-                                <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-violet-800 text-white">Add User</button>
+                                <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add User</button>
                               </form>
                             </DialogDescription>
                           </DialogHeader>

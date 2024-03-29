@@ -67,7 +67,7 @@ function LoanDocuments(props: any) {
         </div>
       
         <div className="mr-3">
-          <button className="p-3 w-36 bg-violet-800 text-white mt-2 rounded-xl">Add</button>
+          <button className="p-3 w-36 bg-custom-1 text-white mt-2 rounded-xl">Add</button>
         </div>        
       </div>
       <div className="m-5">

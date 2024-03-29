@@ -8,11 +8,15 @@ body{
 
 .tableCell:hover{
     color: blue;
-    background-color: rgb(238, 238, 245);
+    background-color:#e2e8f0;
     cursor:pointer
 }
 
 .pageLink:hover{
-    color:slateblue;
+    color:rgba(80, 65, 188, 1);
     background-color: white;
+}
+
+svg:hover{
+    fill: red;
 }

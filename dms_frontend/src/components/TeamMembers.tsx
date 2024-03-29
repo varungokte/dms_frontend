@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog"
+import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 
 
 
@@ -36,7 +36,7 @@ function TeamMembers() {
 				<div className="">
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
 					<Dialog >
-						<DialogTrigger className="m-5 p-3 bg-violet-800 text-white rounded-xl"><span className="text-xl">+</span> Add Member</DialogTrigger>
+						<DialogTrigger className="m-5 p-3 bg-custom-1 text-white rounded-xl"><span className="text-xl">+</span> Add Member</DialogTrigger>
 						<DialogContent className="bg-white">
 							<DialogHeader>
 								<DialogTitle className="text-xl">Add Team Member</DialogTitle>
@@ -58,7 +58,7 @@ function TeamMembers() {
 
 									<div className="flex">
 										<div className="flex-auto"></div>
-										<button className="bg-violet-800 text-white rounded-xl p-3 w-28">Add</button>
+										<button className="bg-custom-1 text-white rounded-xl p-3 w-28">Add</button>
 									</div>
 									
 								</DialogDescription>
@@ -77,8 +77,8 @@ function TeamMembers() {
 								{//@ts-ignore
 								members[category].map((member)=>{
 									return (
-										<div className="m-5 rounded-xl bg-white w-72">
-											<Card>
+										<div >
+											<Card className="m-5 rounded-2xl bg-white w-72">
 												<CardHeader>
 													<CardTitle className="m-auto">
 														<div style={{height:"100px", width:"100px", lineHeight:"100px", borderRadius:"50%", textAlign:"center", fontSize:"30px", backgroundColor: "goldenrod", color:"white"}}>{member.split(" ").map((name:String)=>{return name[0]})}</div>

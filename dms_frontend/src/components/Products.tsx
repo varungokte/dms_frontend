@@ -34,7 +34,7 @@ function Products(){
 						{Object.keys(products).map((product, index)=>{
 							return (
 								<TableRow className="border-none">
-									<TableCell className="text-lg	tableCell" onClick={()=>{setSelected(index)}}>{product}</TableCell>
+									<TableCell className={`text-lg	tableCell ${selected===index?"text-blue-600 bg-slate-200":""}`} onClick={()=>{setSelected(index)}}>{product}</TableCell>
 								</TableRow>
 						)})}
 					</TableBody>

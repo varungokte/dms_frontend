@@ -1,5 +1,9 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import { Ellipsis } from "lucide-react";
 
 
 function CriticalCases() {
@@ -9,14 +13,20 @@ function CriticalCases() {
     ["Lender's Agent Agreeement", "PDF", "01/01/01"],
     ["Lender's Agent Agreeement", "PNG", "02/02/02"],
     ["Power Purchase Agreement", "PDF", "03/03/03"]
-  ])
+  ]);
+
+  const [searchString, setSearchString] = useState("");
   return(
     <div>
 			<p className="text-3xl font-bold m-7">Critical Cases</p>
 
       <div className='flex flex-row relative'>
         <div className=''>
-          <input type="text" className="border-2 mx-10 my-2 p-4 rounded-xl" placeholder="Search"/>
+          <input type="text" className="border-2 mx-10 my-2 p-4 rounded-xl" placeholder="Search" 
+            onChange={(e)=>{
+              const val = e.target.value+"";
+              setSearchString(val.replace("\\", "/\\/"))
+            }} />
         </div>
 
         <div>
@@ -37,6 +47,8 @@ function CriticalCases() {
         </TableHeader>
         <TableBody>
           {defaultData.map((val,ind)=>{
+            const regEx = new RegExp(searchString, "i");
+            if (searchString=="" || (val[0]+"").search(regEx)!==-1)
             return(
               <TableRow>
                 <TableCell className="font-medium">{ind+1}</TableCell>
@@ -44,13 +56,12 @@ function CriticalCases() {
                 <TableCell>{val[1]}</TableCell>
                 <TableCell>{val[2]}</TableCell>
                 <TableCell><div className="text-red-600 bg-red-100 rounded-lg text-center">High</div></TableCell>
-                <TableCell>Action</TableCell>
+                <TableCell><Ellipsis/></TableCell>
               </TableRow>
             )
           })}
         </TableBody>
       </Table>
-
       </div>
     </div>
   )

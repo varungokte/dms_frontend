@@ -84,7 +84,7 @@ function Zones() {
 								
 							</CardContent>
 							<CardFooter>	
-								<button className="text-violet-800 m-auto" onClick={()=>{setCurrentZone(index); /* setZoneDetails(Fetch Zone Details) */}}>View All {`->`}</button>	
+								<button className="text-custom-1 m-auto" onClick={()=>{setCurrentZone(index); /* setZoneDetails(Fetch Zone Details) */}}>View All {`->`}</button>	
 							</CardFooter>
 						</Card>
 					)
