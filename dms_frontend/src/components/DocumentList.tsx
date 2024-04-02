@@ -88,9 +88,8 @@ function DocumentList(props:any) {
                             setPriority(arr);
                           }}>
                             {Object.keys(PriorityValues).filter(v=>!isNaN(Number(v))).map(val=>{
-                              console.log(Object.keys(PriorityValues).filter(v=>!isNaN(Number(v))))
                               if (Number(val)===priority[ind])
-                              {console.log("IT IS EQUAL", val)
+                              {
                                 return <option value={val} selected>{PriorityValues[Number(val)]}</option>
                               }else
                               return <option value={val}>{PriorityValues[Number(val)]}</option>

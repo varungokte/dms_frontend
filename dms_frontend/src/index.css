@@ -17,6 +17,6 @@ body{
     background-color: white;
 }
 
-svg:hover{
-    fill: red;
+.icon:hover{
+    color: yellow;
 }

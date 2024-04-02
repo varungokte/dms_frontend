@@ -32,10 +32,33 @@ export const LoginComponent = () => {
     }
 
 		const data = {
-			email: email,
-			password: password
+			E: email,
+			P: password
 		}
-		LoginUser(data)
+    fetch("http://192.168.1.2:3000/api/v1/allAPI/loginAdmin",{
+			method: "POST",
+			headers: {
+				"Content-type": "application/json"
+			},
+			body: JSON.stringify(data)
+		})
+		.then((res:any)=>{
+      console.log(res)
+			if (res.status == 409)
+      setErrorMessage(<p>Conflict Error</p>);
+			else if (res.status == 200)
+      setErrorMessage(<p>Successfully created</p>);
+
+      res.json().then((obj:object)=>{
+        console.log (obj)
+      })
+		})
+		.catch((err:any)=>{
+      console.log(err)
+			if (err.status == 409)
+      setErrorMessage(<p>Conflict Error</p>)
+		})
+		/* LoginUser(data)
 			.then((res) => {
 				console.log(res)
 				if (res.data.user) {
@@ -58,7 +81,7 @@ export const LoginComponent = () => {
 						title: "Error",
 						description: err.message
 					})
-				})
+				}) */
 	}
 
 	return (
@@ -99,7 +122,6 @@ export const LoginComponent = () => {
           <br/>
           <button type="submit" style={{backgroundColor:"slateblue", color:"white", borderRadius:"12px",width:"100%", height:"50px"}}  className="self-center">Sign In</button>
         </form>
-				<p className="mx-auto">Don't have an account? <Link to="/register" style={{color:"slateblue"}}>Create one.</Link></p>
       </div>
     </div>
 	)

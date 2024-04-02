@@ -3,22 +3,33 @@ import { useState } from 'react';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
-import TeamMembers from './components/TeamMembers';
 import Dashboard from './components/Dashboard';
+import CreateLoanAccount from './components/CreateLoanAccount';
 import Products from './components/Products';
+import TeamMembers from './components/TeamMembers';
 import Zones from './components/Zones';
 import TeamTasks from './components/TeamTasks';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
 import Default from './components/Default';
-import CreateLoanAccount from './components/CreateLoanAccount';
 import CriticalCases from './components/CriticalCases';
 import Reports from './components/Reports';
 import Reminders from './components/Reminders';
 
-import beacon_logo from "./components/static/beacon_logo.png";
-import cla_icon from "./components/static/cla_icon.svg";
-import DashboardIcon from './components/static/DashboardIcon';
+import beacon_logo from "./components/static/beacon_logo.png"
+import DashboardIcon from './components/static/PanelIcons/DashboardIcon';
+import LoanIcon from './components/static/PanelIcons/LoanIcon';
+import ProductIcon from './components/static/PanelIcons/ProductIcon';
+import TransIcon from './components/static/PanelIcons/TransIcon';
+import CompIcon from './components/static/PanelIcons/CompIcon';
+import CovenantIcon from './components/static/PanelIcons/CovenantIcon';
+import ConditionsIcon from './components/static/PanelIcons/ConditionsIcon';
+import ZoneIcon from './components/static/PanelIcons/ZoneIcon';
+import MembersIcon from './components/static/PanelIcons/MembersIcon';
+import ManagementIcon from './components/static/PanelIcons/ManagementIcon';
+import TaskIcon from './components/static/PanelIcons/TaskIcon';
+import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
+import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -41,147 +52,294 @@ export const MenuRouter = () => {
         ["Subordination Agreement", "PDF", 0, "03/03/02", 1, 1, ["subord.pdf"]],
       ]
     ]
-  ])
+  ]);
+	
+	const [componentList, setComponentList] = useState(Array(16).fill(true))
 
-	console.log(currLink)
+	const [hover,setHover] = useState(Array(componentList.length).fill(false));
+
+	//console.log("THE FACTUAL DOCUMENTS ", hover)
 
 	return (
 		<div className='relative'>
 			<div style={{ width: "17%", float: "left", height: "100vh", position: "fixed", overflowY:"scroll"}} className='bg-custom-1' >
 				<div className=''>
 					<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
-					<div className='m-8' >
-						<NavLink to="/" className={({ isActive, }) => {
+					<div className='mx-8 my-5' >
+						<NavLink to=""
+							onMouseEnter={()=>{
+								const arr = [...hover];
+								arr[0] = true;
+								setHover(arr);
+							}} 
+							onMouseLeave={()=>{
+								const arr = [...hover];
+								arr[0] = false;
+								setHover(arr);
+							}} 
+							 className={({ isActive, }) => {
 							if (isActive)
-								setCurrLink("dash");
+								setCurrLink("");
 							return "";
-						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${(currLink==="dash")?"bg-white text-custom-1":"text-white"}`}>
+							}}>
+							<div 
+							className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${(currLink==="")?"bg-white text-custom-1":"text-white"}`}>
 								<div className='flex flex-row'>
-									<DashboardIcon />
+									<DashboardIcon fill={(currLink==="" || hover[0])?"rgba(80, 65, 188, 1)":"white"}/>
 									<div className="mx-5">Dashboard</div>
 								</div>
 							</div>
 						</NavLink>
-
-						<NavLink to="/loan" className={({ isActive, }) => {
+						<NavLink to="loan" 
+							onMouseEnter={()=>{
+								const arr = [...hover];
+								arr[1] = true;
+								setHover(arr);
+							}} 
+							onMouseLeave={()=>{
+								const arr = [...hover];
+								arr[1] = false;
+								setHover(arr);
+							}}
+							 className={({ isActive, }) => {
 								if (isActive)
 								setCurrLink("loan");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="loan"?"bg-white text-custom-1":"text-white"}`}><div className='flex flex-row'><img src={cla_icon} className='mr-3'/><div>Create Loan Account</div></div></div>
+							<div 
+							className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="loan"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<LoanIcon fill={(currLink==="loan" || hover[1])?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Create Loan Account</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/products" className={({ isActive, }) => {
+						<NavLink to="products" 
+						onMouseEnter={()=>{
+							const arr = [...hover];
+							arr[2] = true;
+							setHover(arr);
+						}} 
+						onMouseLeave={()=>{
+							const arr = [...hover];
+							arr[2] = false;
+							setHover(arr);
+						}}
+						className={({ isActive, }) => {
 							if (isActive)
-								setCurrLink("prod");
+								setCurrLink("products");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="prod"?"bg-white text-custom-1":"text-white"}`}>Products</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="products"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<ProductIcon fill={currLink==="products" || hover[2]?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Products</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/transaction" className={({ isActive, }) => {
+						<NavLink to="transaction" 
+							onMouseEnter={()=>{
+								const arr = [...hover];
+								arr[3] = true;
+								setHover(arr);
+							}} 
+							onMouseLeave={()=>{
+								const arr = [...hover];
+								arr[3] = false;
+								setHover(arr);
+							}}
+							className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("transaction");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="transaction"?"bg-white text-custom-1":"text-white"}`}>Transaction Documents</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="transaction"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<TransIcon fill={currLink==="transaction"||hover[3]?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Transaction Documents</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/compliance" className={({ isActive, }) => {
+						<NavLink to="compliance" 
+							onMouseEnter={()=>{
+								const arr = [...hover];
+								arr[4] = true;
+								setHover(arr);
+							}} 
+							onMouseLeave={()=>{
+								const arr = [...hover];
+								arr[4] = false;
+								setHover(arr);
+							}} 
+							className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("compliance");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="compliance"?"bg-white text-custom-1":"text-white"}`}>Compliance Documents</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="compliance"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<CompIcon fill={currLink==="compliance" || hover[4]?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Compliance Documents</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/covenants" className={({ isActive, }) => {
+						<NavLink to="covenants" 
+							onMouseEnter={()=>{
+								const arr = [...hover];
+								arr[5] = true;
+								setHover(arr);
+							}} 
+							onMouseLeave={()=>{
+								const arr = [...hover];
+								arr[5] = false;
+								setHover(arr);
+							}}
+							className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("covenants");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="covenants"?"bg-white text-custom-1":"text-white"}`}>Covenants</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="covenants"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<CovenantIcon fill={currLink==="covenants" || hover[5]?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Covenants</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/precedent" className={({ isActive, }) => {
+						<NavLink to="precedent" 
+							onMouseEnter={()=>{
+								const arr = [...hover];
+								arr[6] = true;
+								setHover(arr);
+							}} 
+							onMouseLeave={()=>{
+								const arr = [...hover];
+								arr[6] = false;
+								setHover(arr);
+							}}
+							className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("precedent");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="precedent"?"bg-white text-custom-1":"text-white"}`}>Conditions Precedent</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="precedent"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<ConditionsIcon fill={currLink==="precedent" || hover[6]?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Condtions Precedent</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/subsequent" className={({ isActive, }) => {
+						<NavLink to="subsequent" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("subsequent");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="subsequent"?"bg-white text-custom-1":"text-white"}`}>Conditions Subsequent</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="subsequent"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<ConditionsIcon fill={currLink==="subsequent"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Condtions Subsequent</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/zones" className={({ isActive, }) => {
+						<NavLink to="zones" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("zone");
 							return ""; 
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="zone"?"bg-white text-custom-1":"text-white"}`}>Zone/City</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="zone"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<ZoneIcon fill={currLink==="zone"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Zone/City</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/team" className={({ isActive, }) => {
+						<NavLink to="team" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("team");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="team"?"bg-white text-custom-1":"text-white"}`}>Team Members</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="team"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<MembersIcon fill={currLink==="team"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Team Members</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/users" className={({ isActive, }) => {
+						<NavLink to="users" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("users");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="users"?"bg-white text-custom-1":"text-white"}`}>User Management</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="users"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<ManagementIcon fill={currLink==="users"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>User Management</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/tasks" className={({ isActive, }) => {
+						<NavLink to="tasks" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("tasks");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="tasks"?"bg-white text-custom-1":"text-white"}`}>Team Tasks</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="tasks"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<TaskIcon fill={currLink==="tasks"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Team Tasks</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/reminders" className={({ isActive, }) => {
+						<NavLink to="reminders" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("reminders");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="reminders"?"bg-white text-custom-1":"text-white"}`}>Reminders</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="reminders"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<ReminderIcon fill={currLink==="reminders"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Reminders</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/default" className={({ isActive, }) => {
+						<NavLink to="default" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("default");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="default"?"bg-white text-custom-1":"text-white"}`}>Default</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="default"?"bg-white text-custom-1":"text-white"}`}>
+								<div className='flex flex-row'>
+									<DefaultIcon fill={currLink==="default"?"rgba(80, 65, 188, 1)":"white"}/>
+									<div className='mx-3'>Default Cases</div>
+								</div>
+							</div>
 						</NavLink>
 
-						<NavLink to="/critical" className={({ isActive, }) => {
+						<NavLink to="critical" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("critical");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="critical"?"bg-white text-custom-1":"text-white"}`}>Critical Cases</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="critical"?"bg-white text-custom-1":"text-white"}`}>Critical Cases</div>
 						</NavLink>
 
-						<NavLink to="/reports" className={({ isActive, }) => {
+						<NavLink to="reports" className={({ isActive, }) => {
 							if (isActive)
 								setCurrLink("reports");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink pr-10 py-3 rounded-xl ${currLink==="reports"?"bg-white text-custom-1":"text-white"}`}>Reports</div>
+							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="reports"?"bg-white text-custom-1":"text-white"}`}>Reports</div>
 						</NavLink>
 					</div>
 				</div>
@@ -203,22 +361,22 @@ export const MenuRouter = () => {
 				</div>
 				<hr />
 				<Routes>
-					<Route path="/" element={<Dashboard/>} />
-					<Route path="/loan/*" element={<CreateLoanAccount/>} />
-					<Route path="/products" element={<Products/>} />
-					<Route path='/transaction' element={<DocumentList label={"Transaction Documents"} docData={txnTestData} />}/>
-					<Route path='/compliance' element={<DocumentList label={"Compliance Documents"} docData={txnTestData} />}/>
-					<Route path='/covenants' element={<DocumentList label={"Covenants"} docData={txnTestData} />}/>
-					<Route path='/precedent' element={<DocumentList label={"Conditions Precedent"} docData={txnTestData} />}/>
-					<Route path='/subsequent' element={<DocumentList label={"Conditions Subsequent"} docData={txnTestData} />}/>
-					<Route path='/zones' element={<Zones/>} />					
-					<Route path="/team" element={<TeamMembers/>} />
-					<Route path="/users" element={<UserManagement/>} />
-					<Route path="/tasks" element={<TeamTasks/>} />
-					<Route path='/reminders' element={<Reminders/>} />
-					<Route path='/default' element={<Default/>} />
-					<Route path='/critical' element={<CriticalCases/>} />
-					<Route path='/reports' element={<Reports/>} />
+					<Route path="" element={<Dashboard/>} />
+					<Route path="loan/*" element={<CreateLoanAccount/>} />
+					<Route path="products" element={<Products/>} />
+					<Route path='transaction' element={<DocumentList label={"Transaction Documents"} docData={txnTestData} />}/>
+					<Route path='compliance' element={<DocumentList label={"Compliance Documents"} docData={txnTestData} />}/>
+					<Route path='covenants' element={<DocumentList label={"Covenants"} docData={txnTestData} />}/>
+					<Route path='precedent' element={<DocumentList label={"Conditions Precedent"} docData={txnTestData} />}/>
+					<Route path='subsequent' element={<DocumentList label={"Conditions Subsequent"} docData={txnTestData} />}/>
+					<Route path='zones' element={<Zones/>} />					
+					<Route path="team" element={<TeamMembers/>} />
+					<Route path="users" element={<UserManagement/>} />
+					<Route path="tasks" element={<TeamTasks/>} />
+					<Route path='reminders' element={<Reminders/>} />
+					<Route path='default' element={<Default/>} />
+					<Route path='critical' element={<CriticalCases/>} />
+					<Route path='reports' element={<Reports/>} />
 					<Route path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

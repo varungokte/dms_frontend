@@ -1,9 +1,8 @@
 import { useState } from "react";
 
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
-
-
+import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
+import DialogForm from "./BasicComponents/DialogForm";
 
 function TeamMembers() {
 
@@ -12,7 +11,14 @@ function TeamMembers() {
 		"Chief Executive Officers":["Jean-Luc Picard", "William Riker"],
 		"Relationship Managers": ["Deanna Troi", "Beverly Crusher", "Worf"],
 		"My Team Members": ["?"]
-	})
+	});
+
+	const [newName, setNewName] = useState("");
+	const [newRole, setNewRole] = useState(-1);
+
+	const addMember = () =>{
+
+	}
 	
 	return(
 		<div>
@@ -37,33 +43,26 @@ function TeamMembers() {
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
 					<Dialog >
 						<DialogTrigger className="m-5 p-3 bg-custom-1 text-white rounded-xl"><span className="text-xl">+</span> Add Member</DialogTrigger>
-						<DialogContent className="bg-white">
-							<DialogHeader>
-								<DialogTitle className="text-xl">Add Team Member</DialogTitle>
-								<DialogDescription>
-									<div>
-										<label htmlFor="name">Name</label>
-										<br/>
-										<input id="name" className="border-2 rounded-xl mb-5 p-3 w-full"/>
-									</div>
-									
-									<div>
-										<label htmlFor="role">Role</label>
-										<br/>
-										<select id="role" className="bg-white border-2 rounded-xl mb-5 p-3 w-full" >
-											<option value="maker">Maker</option>
-											<option value="checker">Checker</option>
-										</select>
-									</div>
-
-									<div className="flex">
-										<div className="flex-auto"></div>
-										<button className="bg-custom-1 text-white rounded-xl p-3 w-28">Add</button>
-									</div>
-									
-								</DialogDescription>
-							</DialogHeader>
-						</DialogContent>
+						<DialogForm
+							title="Add Team Member"
+							formSubmit= {addMember}
+							submitButton= "Create User"
+							form= {[
+								{
+									category: "single",
+									label: "Name",
+									type: "text",
+									setter: setNewName
+								},
+								{
+									category: "single",
+									label: "Role",
+									type: "select",
+									setter: setNewRole,
+									options: ["Maker", "Checker"]
+								}
+							]}
+						/>
 					</Dialog>
 				</div>
 			</div>
@@ -89,14 +88,12 @@ function TeamMembers() {
 													<p className="text-center font-light">{category}</p>
 												</CardContent>
 											</Card>
-									</div>
+										</div>
 									)})}
-								</div>
-								
+							</div>
 						</div>
 					)
 				})}
-
 			</div>
 		</div>
 	)

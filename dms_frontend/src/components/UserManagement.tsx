@@ -1,10 +1,10 @@
 import { useState } from "react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
-
 import { Ellipsis } from "lucide-react";
+import DialogForm from "./BasicComponents/DialogForm";
 
 function UserManagement(){
   //userData is an array of users
@@ -92,69 +92,65 @@ function UserManagement(){
 
         <div className="">
           <Dialog>
-            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-custom-1">+ Add User</DialogTrigger>
-            <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">Add User</DialogTitle>
-                <hr/>
-                <DialogDescription>
-                  <form onSubmit={createUser}>
-                    <label htmlFor="name" className="text-lg">Name</label>
-                    <br/>
-                    <input id="name" onChange={(e)=>setNewName(e.target.value)} className="border-2 rounded-xl w-full h-10 p-3"/>
-                    <br/>
-                    <br/>
-                    <div className="grid grid-rows-2 grid-flow-col w-full">
-                      <div>
-                        <label htmlFor="email" className="text-lg">Email Address</label>
-                      </div>
-
-                      <div>
-                        <input type="email" onChange={e=>setNewEmail(e.target.value)} className="border-2 rounded-xl w-4/5 p-3"/>  
-                      </div>
-
-                      <div>
-                        <label htmlFor="role" className="text-lg">User Role</label>
-                      </div>                      
-
-                      <div>
-                        <select id="role" onChange={(e:any)=>setNewRole(e.target.value)} className="bg-white border-2 rounded-xl w-4/5 p-3">
-                          <option value={2}>Admin</option>
-                          <option value={0}>Maker</option>
-                          <option value={1}>Checker</option>
-                        </select>
-                      </div>
-                    </div>
-                    <br/>
-                    <br/>
-
-                    <div className="grid grid-rows-2 grid-flow-col w-full">
-                      <div>
-                        <label htmlFor="password" className="text-lg">Password</label>
-                      </div>
-
-                      <div>
-                        <input type="password" onChange={e=>setNewPassword(e.target.value)} className="border-2 rounded-xl w-4/5 p-3"/>
-                      </div>
-
-                      <div className="ml-9">
-                        <label htmlFor="permission" className="text-lg">Permissions</label>
-                      </div>                      
-
-                      <div className="flex m-auto">
-                        <div className="mx-5">
-                          <input type="checkbox" id="verify" className="mr-1"/><label htmlFor="verify">Verify</label>
-                        </div>
-                        <div className="mx-5">
-                          <input type="checkbox" id="read" className="mr-1"/><label htmlFor="read">Read</label>
-                        </div>
-                        </div>
-                    </div>
-                    <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add User</button>
-                  </form>
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
+          <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-custom-1">Add a User</DialogTrigger>
+          <DialogForm 
+            trigger="+ Add User" 
+            title="Add User" 
+            formSubmit={createUser} 
+            submitButton="Add User"
+            //category can be: single (entire line is one input field) or grid
+            //if grid, it will fields, whose value is an array of object; each object is a field
+            form={
+              [
+                {
+                  category: "single",
+                  label: "Name",
+                  type: "text",
+                  setter: setNewName
+                },
+                
+                {
+                  category: "grid",
+                  number: 2,
+                  fields:
+                  [
+                    {
+                      label: "Email",
+                      type: "email",
+                      setter: setNewEmail
+                    },
+                    {
+                      label: "Password",
+                      type: "password",
+                      setter: setNewPassword
+                    },
+                    {
+                      label: "Role",
+                      type: "select",
+                      setter: setNewRole,
+                      options: ["Admin", "Maker", "Checker"]
+                    },
+                    {
+                      label: "Permissions",
+                      type:"subgrid",
+                      fields: [
+                        {
+                          label: "Verify",
+                          type: "checkbox",
+                          setter: setNewPermission,
+                        },
+                        {
+                          label: "Read",
+                          type: "checkbox",
+                          setter: setNewPermission
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            />
             </Dialog>
         </div>
       </div>
@@ -184,70 +180,67 @@ function UserManagement(){
                     <TableCell>
                       <Dialog>
                         <DropdownMenu>
-                          <DropdownMenuTrigger><Ellipsis className="ml-5"/></DropdownMenuTrigger>
+                          <DropdownMenuTrigger>{<Ellipsis className="ml-5"/>}</DropdownMenuTrigger>
                           <DropdownMenuContent className="bg-white">
                             <DropdownMenuItem>
                               <DialogTrigger>Edit User</DialogTrigger>
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
-                        <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
-                          <DialogHeader>
-                            <DialogTitle className="text-2xl">Edit User</DialogTitle>
-                            <hr/>
-                            <DialogDescription>
-                              <form onSubmit={createUser}>
-                                <label htmlFor="name" className="text-lg">Name</label>
-                                <br/>
-                                <input id="name" onChange={(e)=>setNewName(e.target.value)} className="border-2 rounded-xl w-full h-10 p-3"/>
-                                <br/>
-                                <br/>
-                                <div className="grid grid-rows-2 grid-flow-col w-full">
-                                  <div>
-                                    <label htmlFor="email" className="text-lg">Email Address</label>
-                                  </div>
-
-                                  <div>
-                                    <input type="email" onChange={e=>setNewEmail(e.target.value)} className="border-2 rounded-xl w-4/5 p-3"/>  
-                                  </div>
-
-                                  <div>
-                                    <label htmlFor="role" className="text-lg">User Role</label>
-                                  </div>                      
-
-                                  <div>
-                                    <select id="role" onChange={(e:any)=>setNewRole(e.target.value)} className="bg-white border-2 rounded-xl w-4/5 p-3">
-                                      <option value={2}>Admin</option>
-                                      <option value={0}>Maker</option>
-                                      <option value={1}>Checker</option>
-                                    </select>
-                                  </div>
-                                </div>
-                                <br/>
-                                <br/>
-
-                                <div className="grid grid-rows-2 grid-flow-col w-full">
-                                  <div className="ml-9">
-                                    <label htmlFor="permission" className="text-lg">Permissions</label>
-                                  </div>                      
-
-                                  <div className="flex">
-                                    <div className="mx-5">
-                                      <input type="checkbox" id="verify" className="mr-1"/><label htmlFor="verify">Verify</label>
-                                    </div>
-                                    <div className="mx-5">
-                                      <input type="checkbox" id="read" className="mr-1"/><label htmlFor="read">Read</label>
-                                    </div>
-                                    </div>
-                                </div>
-                                <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add User</button>
-                              </form>
-                            </DialogDescription>
-                          </DialogHeader>
-                        </DialogContent>
-                      </Dialog>
-
-                    </TableCell>
+                        <DialogForm 
+                          title="Edit User" 
+                          formSubmit={createUser} 
+                          submitButton="Edit User"
+                          //category can be: single (entire line is one input field) or grid
+                          //if grid, it will fields, whose value is an array of object; each object is a field
+                          form={
+                            [
+                              {
+                                category: "single",
+                                label: "Name",
+                                type: "text",
+                                setter: setNewName
+                              },
+                              
+                              {
+                                category: "grid",
+                                number: 2,
+                                fields:
+                                [
+                                  {
+                                    label: "Email",
+                                    type: "email",
+                                    setter: setNewEmail
+                                  },
+                                  {
+                                    label: "Role",
+                                    type: "select",
+                                    setter: setNewRole,
+                                    options: ["Admin", "Maker", "Checker"]
+                                  },
+                                  {
+                                    label: "Permissions",
+                                    type:"subgrid",
+                                    fields: [
+                                      {
+                                        label: "Verify",
+                                        type: "checkbox",
+                                        setter: setNewPermission,
+                                      },
+                                      {
+                                        label: "Read",
+                                        type: "checkbox",
+                                        setter: setNewPermission
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        />
+                    </Dialog>
+                  </TableCell>
                 </TableRow>
                 )
               })}
