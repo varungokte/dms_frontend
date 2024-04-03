@@ -1,4 +1,5 @@
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import PurpleButtonStyling from "./PurpleButtonStyling";
 
 function DialogForm(props:any){
   //to handle inputs of type text, password and email
@@ -6,7 +7,7 @@ function DialogForm(props:any){
     return(
     <div className="mb-5">
       <label htmlFor={label} className="text-lg">{label}</label>
-      <input id={label} type={type} onChange={(e)=>setter(e.target.value)} className="border-2 rounded-xl w-full h-10 p-3"/>
+      <input id={label} type={type} onChange={(e)=>setter(e.target.value)} className="border-2 rounded-xl w-full h-full p-3"/>
     </div>
     )
   };
@@ -36,16 +37,16 @@ function DialogForm(props:any){
           <form onSubmit={props.createUser}>
             {props.form.map((field:any)=>{
               if (field["category"]=="single"){
-                if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password")
+                if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password" || field["type"]=="date")
                   return handleText(field["label"], field["setter"], field["type"])
                 else if (field["type"]=="select")
                   return handleSelect(field["label"], field["setter"], field["options"])
               }
               else if (field["category"]=="grid"){
                 return(
-                  <div className={`grid grid-cols-${field["number"]}`}>
+                  <div className={`grid grid-cols-2`}>
                     {field.fields.map((item:any)=>{
-                      if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password")
+                      if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date")
                         return <span className="mr-3">{handleText(item["label"], item["setter"], item["type"])}</span>
 
                       else if (item["type"]=="select")
@@ -76,7 +77,7 @@ function DialogForm(props:any){
                 )
               }
               })}
-            <button type="submit" className="float-right h-12 p-4 rounded-xl mt-9 bg-custom-1 text-white">{props.submitButton}</button>
+            <button type="submit" className={`float-right w-28 ${PurpleButtonStyling}`}>{props.submitButton}</button>
           </form>
         </DialogDescription>
       </DialogHeader>
@@ -86,16 +87,23 @@ function DialogForm(props:any){
 
 export default DialogForm;
 
+/* 
+  <Dialog>
+    <DialoggTrigger>Click Here </DialogTrigger>
+    <DialogForm props />
+  </Dialog>
+ */
+
 /* props:
-      title: Enter a user name
-      formSubmit: createUser
-      submitButton: Create User
+      title: "Enter a user name"
+      formSubmit: {createUser}
+      submitButton: "Create User"
       form: 
       [
         { 
-          category: single, 
-          label: Name, 
-          type: text,
+          category: "single", 
+          label: "Name", 
+          type: "text",
           setter: setNewName
         }, 
         {
@@ -104,20 +112,20 @@ export default DialogForm;
           fields:
           [
             {
-              type: email
-              label: Email,
+              type: "email"
+              label: "Email",
               setter: setNewEmail
             }, 
             {
-              type: password,
-              label: Password,
+              type: "password",
+              label: "Password",
               setter: setNewPassword
             }, 
             {
-              type: select,
-              label: Role,
+              type: "select",
+              label: "Role",
               setter: setNewRole
-              options: [Admin, Maker, Checker]
+              options: ["Admin", "Maker", "Checker"]
             }
           ]
         }

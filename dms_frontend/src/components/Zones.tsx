@@ -4,6 +4,7 @@ import { CircularProgressbar } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import Search from "./BasicComponents/Search";
 
 
 function Zones() {
@@ -27,7 +28,9 @@ function Zones() {
 		const [zoneDetails, setZoneDetails] = useState([
 			[1,"Loan Company", "Loan Person", "01/01/01"],
 			[2,"Construction Company", "Construction Person", "02/02/02"]
-		])
+		]);
+
+		const [searchString, setSearchString] = useState("");
 
 		const [currentZone, setCurrentZone] = useState(-1);
     return (
@@ -35,7 +38,7 @@ function Zones() {
 				<p className="text-3xl font-bold m-7">{currentZone==-1?"Zones":currentZone}</p>
 				<div className="flex flex-row">
 					<div className=''>
-						<input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search"/>
+          <Search setter={setSearchString} label="Search"/>
 					</div>
 					
 					<div>

@@ -2,6 +2,11 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 
+import { PriorityValues, PriorityStyling, PriorityIterate } from "./BasicComponents/Priority";
+import { StatusValues, StatusStyling } from "./BasicComponents/Status";
+import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import Search from "./BasicComponents/Search";
+import DialogForm from "./BasicComponents/DialogForm";
 
 function TeamTasks() {
   //An array which contains many tasks; each task is an array
@@ -17,30 +22,6 @@ function TeamTasks() {
     ["Substitution Agreement", "Diana Prince", "05/05/06", 0,1],
     ["Pledge Agreement", "Barry Allen", "06/06/07", 2, 0],
   ]);
-
-  enum PriorityValues {
-    "Low",
-    "Medium",
-    "High"
-  };
-
-  enum PriorityStyling {
-    "text-green-600 bg-green-100",
-    "text-yellow-600 bg-yellow-50",
-    "text-red-600 bg-red-100",
-  };
-
-  enum StatusValues {
-    "Complete",
-    "In Progress",
-    "Overdue"
-  };
-
-  enum StatusStyling {
-    "text-green-600",
-    "text-yellow-600",
-    "text-red-600",
-  };
 
   const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(-1);
@@ -59,119 +40,99 @@ function TeamTasks() {
 			<p className="text-3xl font-bold m-7">Team Tasks</p>
 			<div className="flex flex-row">
         <div className=''>
-          <input type="text" className="border-2 mx-10 p-5 rounded-xl my-2" 
-            onChange={(e)=>{
-              const val = e.target.value+"";
-              setSearchString(val.replace("\\", "/\\/"))
-            }} 
-            placeholder="Search"/>
+          <Search setter={setSearchString} label="Search"/>
         </div>
         
         <div className="flex-auto"> 
           <select className="bg-white p-6 m-2 rounded-xl" onChange={(e:any)=>setPriority(e.target.value)}>
             <option value={-1}>All Priorities</option>
-            <option value={2}>High</option>
-            <option value={1}>Medium</option>
-            <option value={0}>Low</option>
+            {PriorityIterate().map((num:any)=>{
+              return <option value={num}>{PriorityValues[Number(num)]}</option>
+            })}
           </select>
         </div>
 
         <div>
           <Dialog>
-            <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-custom-1">Add Task</DialogTrigger>
-            <DialogContent className="bg-white min-w-[600px] min-h-[400px]">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">Add Team Task</DialogTitle>
-                <hr/>
-                <DialogDescription>
-                  <form onSubmit={createTask}>
-                    <label htmlFor="task" className="text-lg">Task</label>
-                    <br/>
-                    <input id="task" onChange={(e)=>setNewTask(e.target.value)} className="border w-5/6 h-10 rounded-lg p-3"/>
-                    <br/>
-                    <br/>
-
-                    <label htmlFor="assignto" className="text-lg">Assigned To</label>
-                    <br/>
-                    <select id="assignto" required className="border-2 w-5/6 h-10 bg-white" onChange={(e)=>{setNewAssignee(e.target.value)}}>
-                      <option value={""}>Select a team member</option>
-                    {taskList.map((task,index)=>{
-                      return(
-                        <option value={index}>{task[1]}</option>
-                      )
-                    })}
-                    </select>
-                    <br/>
-                    <br/>
-
-                    <div className="grid grid-rows-2 grid-flow-col">
-                      <div>
-                        <label htmlFor="priority" className="text-lg">Priority</label>
-                      </div>
-
-                      <div>
-                        <select id="priority" required className="border-2 w-4/5 h-10 bg-white" onChange={(e:any)=>{setNewPriority(e.target.value)}}>
-                          <option value={""}>Select a priority</option>
-                          <option value={0}>Low</option>
-                          <option value={1}>Medium</option>
-                          <option value={2}>High</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label htmlFor="date" className="text-lg">Due Date</label>
-                      </div>                      
-
-                      <div>
-                        <input type="date" className="w-4/5 h-10 bg-white border p-3" onChange={(e:any)=>{setNewAssignee(e.target.value+"")}}/>
-                      </div>
-                    </div>
-                    <button type="submit" className="float-right mr-16 h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add Task</button>
-                  </form>
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
+            <DialogTrigger className={PurpleButtonStyling}>Add Task</DialogTrigger>
+            <DialogForm
+              title="Add Team Task"
+              formSubmit={createTask}
+              submitButton="Add Task"
+              form={[
+                {
+                  category: "single",
+                  type: "text",
+                  label: "Task",
+                  setter: setNewTask
+                },
+                {
+                  category: "single",
+                  type: "select",
+                  label: "Assigned To",
+                  setter: setNewAssignee,
+                  //@ts-ignore
+                  options: ["Select a Team Member"].concat( taskList.map(task=>task[1]))
+                },
+                {
+                  category: "grid", 
+                  number:2, 
+                  fields:[
+                    {
+                      type: "select",
+                      label: "Priority",
+                      setter: setNewPriority,
+                      options: ["Select a Priority"].concat(PriorityIterate().map(val=>PriorityValues[Number(val)]))
+                    },
+                    {
+                      type: "date",
+                      label: "Due Date",
+                      setter: setNewDate
+                    }
+                  ]
+                }
+              ]}
+            />
           </Dialog>
         </div>  
       </div>
 
     <div className="m-7">
-    <Table className="rounded-3xl bg-white">
-      <TableHeader>
-        <TableRow>
-          <TableHead>Task</TableHead>
-          <TableHead>Assign To</TableHead>
-          <TableHead>Due Date</TableHead>
-          <TableHead>Priority</TableHead>
-          <TableHead>Status</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
+      <Table className="rounded-3xl bg-white">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Task</TableHead>
+            <TableHead>Assign To</TableHead>
+            <TableHead>Due Date</TableHead>
+            <TableHead>Priority</TableHead>
+            <TableHead>Status</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
 
-        {taskList.map((task)=>{
-          const regEx = new RegExp(searchString, "i");
-          if ((priority==-1 || task[3]==priority) && (searchString=="" || (task[0]+"").search(regEx)!==-1 || (task[1]+"").search(regEx)!==-1))
-            return (
-            <TableRow>
-              <TableCell>{task[0]}</TableCell>
-              <TableCell>{task[1]}</TableCell>
-              <TableCell>{task[2]}</TableCell>
-              <TableCell>
-                <div className={`${PriorityStyling[Number(task[3])]} rounded-lg text-center`}>
-                  {PriorityValues[Number(task[3])]}
-                </div>
-              </TableCell>
-              <TableCell className={`${StatusStyling[Number(task[4])]}`}>{StatusValues[Number(task[4])]}</TableCell>
-            </TableRow>)
-          else  
+          {taskList.map((task)=>{
+            const regEx = new RegExp(searchString, "i");
+            if ((priority==-1 || task[3]==priority) && (searchString=="" || (task[0]+"").search(regEx)!==-1 || (task[1]+"").search(regEx)!==-1))
+              return (
+              <TableRow>
+                <TableCell>{task[0]}</TableCell>
+                <TableCell>{task[1]}</TableCell>
+                <TableCell>{task[2]}</TableCell>
+                <TableCell>
+                  <div className={`${PriorityStyling[Number(task[3])]} rounded-lg text-center`}>
+                    {PriorityValues[Number(task[3])]}
+                  </div>
+                </TableCell>
+                <TableCell className={`${StatusStyling[Number(task[4])]}`}>{StatusValues[Number(task[4])]}</TableCell>
+              </TableRow>)
+            else  
               return(<></>)
-        })}
-        
-      </TableBody>
-    </Table>
-
+          })}
+          
+        </TableBody>
+      </Table>
     </div>
-    </div>
+  </div>
   )
 }
 

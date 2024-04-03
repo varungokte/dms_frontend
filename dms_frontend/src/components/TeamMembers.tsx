@@ -3,6 +3,8 @@ import { useState } from "react";
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
 import DialogForm from "./BasicComponents/DialogForm";
+import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import Search from "./BasicComponents/Search";
 
 function TeamMembers() {
 
@@ -15,9 +17,9 @@ function TeamMembers() {
 
 	const [newName, setNewName] = useState("");
 	const [newRole, setNewRole] = useState(-1);
+	const [searchString, setSearchString] = useState("");
 
 	const addMember = () =>{
-
 	}
 	
 	return(
@@ -26,7 +28,7 @@ function TeamMembers() {
 
 			<div className='flex flex-row relative'>
 				<div className=''>
-					<input type="text" className="border-2 mx-10 my-2 p-3 w-72 rounded-xl" placeholder="Search"/>
+          <Search setter={setSearchString} label="Search"/>
 				</div>
 				
 				<div className='flex-auto'>
@@ -42,7 +44,7 @@ function TeamMembers() {
 				<div className="">
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
 					<Dialog >
-						<DialogTrigger className="m-5 p-3 bg-custom-1 text-white rounded-xl"><span className="text-xl">+</span> Add Member</DialogTrigger>
+						<DialogTrigger className={PurpleButtonStyling	}><span className="text-xl">+</span> Add Member</DialogTrigger>
 						<DialogForm
 							title="Add Team Member"
 							formSubmit= {addMember}

@@ -5,6 +5,8 @@ import 'react-date-range/dist/theme/default.css';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Ellipsis } from "lucide-react";
 
+import Search from "./BasicComponents/Search";
+
 
 function CriticalCases() {
   //An array of critical cases
@@ -22,11 +24,7 @@ function CriticalCases() {
 
       <div className='flex flex-row relative'>
         <div className=''>
-          <input type="text" className="border-2 mx-10 my-2 p-4 rounded-xl" placeholder="Search" 
-            onChange={(e)=>{
-              const val = e.target.value+"";
-              setSearchString(val.replace("\\", "/\\/"))
-            }} />
+          <Search setter={setSearchString} label="Search"/>
         </div>
 
         <div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Search from "./BasicComponents/Search";
 
 function Reminders() {
 
@@ -17,12 +18,7 @@ function Reminders() {
       <p className="text-3xl font-bold m-7">Reminders</p>
       <div className="flex flex-row m-3">
         <div className=''>
-          <input type="text" className="border-2 mx-10 p-5 rounded-xl" 
-            onChange={(e)=>{
-              const val = e.target.value+"";
-              setSearchString(val.replace("\\", "/\\/"))
-            }} 
-            placeholder="Search"/>
+          <Search setter={setSearchString} label="Search"/>
         </div>
         
         <div className="flex-auto"> 

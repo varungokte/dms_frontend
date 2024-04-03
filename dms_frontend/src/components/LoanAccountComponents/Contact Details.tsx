@@ -3,6 +3,8 @@ import { EllipsisVertical } from "lucide-react";
 
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
+import DialogForm from "../BasicComponents/DialogForm";
 
 function ContactDetails() {
   //contacts is an object where the keys are the categories (like borrower, lender, promoter) and values are arrays of people
@@ -61,82 +63,79 @@ function ContactDetails() {
       
         <div className="mr-3">
           <Dialog>
-            <DialogTrigger className="p-3 w-36 bg-custom-1 text-white mt-2 rounded-xl">+ Add Contact</DialogTrigger>
-            <DialogContent className="bg-white min-w-[600px] min-h-[400px] rounded-xl border-none">
-              <DialogHeader>
-                <DialogTitle className="text-2xl">Add New Contact</DialogTitle>
-                <hr/>
-                <DialogDescription>
-                  <form onSubmit={createContact}>
-                    <div className="container m-auto grid grid-cols-2">
-                      <div className="my-5">
-                        <label htmlFor="type" className="text-lg">Choose</label>
-                        <br/>
-                        <input type="text" id="type" onChange={e=>setPersonType(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-        
-                      <div className="my-5">
-                        <label htmlFor="cname" className="text-lg">Company Name</label>
-                        <br/>
-                        <input type="text" id="cname" onChange={e=>setCompany(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="person" className="text-lg">Contact Person Name</label>
-                        <br/>
-                        <input type="text" id="person" onChange={e=>setName(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="designation" className="text-lg">Designation</label>
-                        <br/>
-                        <input type="text" id="designation" onChange={e=>setDesignation(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="email" className="text-lg">Email Address</label>
-                        <br/>
-                        <input type="email" id="email" onChange={e=>setEmail(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="mention" className="text-lg">Mention</label>
-                        <br/>
-                        <select id="mention" onChange={(e:any)=>setMention(e.target.value)} className="bg-white border-2 rounded-xl py-3">
-                          <option value={0}>To</option>
-                          <option value={1}>Cc</option>
-                        </select>
-                      </div>                      
-
-                      <div className="my-5">
-                        <label htmlFor="landline" className="text-lg">Landline Number</label>
-                        <br/>
-                        <input type="text" id="landline" onChange={e=>setLandline(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="mobile" className="text-lg">Mobile Number</label>
-                        <br/>
-                        <input type="text" id="mobile" onChange={e=>setMobile(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="reg" className="text-lg">Registered Address</label>
-                        <br/>
-                        <input type="text" id="reg" onChange={e=>setRegAddress(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                      <div className="my-5">
-                        <label htmlFor="bill" className="text-lg">Billing Address</label>
-                        <input type="text" id="bill" onChange={e=>setBillAddress(e.target.value)} className="border-2 rounded-xl py-3"/>  
-                      </div>
-
-                    </div>
-                    <button type="submit" className="float-right h-12 p-4 rounded-lg mt-9 bg-custom-1 text-white">Add User</button>
-                  </form>
-                </DialogDescription>
-              </DialogHeader>
-            </DialogContent>
+            <DialogTrigger className={PurpleButtonStyling}>+ Add Contact</DialogTrigger>
+            <DialogForm
+              title="Add New Contact"
+              formSubmit={createContact}
+              submitButton="Add User"
+              form = {
+                [
+                  {
+                    category: "grid",
+                    number: 0,
+                    fields:
+                    [
+                      {
+                        type: "text",
+                        label: "Choose",
+                        setter: setPersonType
+                      },
+                      {
+                        type:"text",
+                        label: "Company Name",
+                        setter: setCompany
+                      },
+                      {
+                        type:"text",
+                        label: "Contact Person Name",
+                        setter: setName
+                      },
+                      {
+                        type:"text",
+                        label: "Designation",
+                        setter: setDesignation
+                      },
+                      {
+                        type:"email",
+                        label: "Email Address",
+                        setter: setEmail
+                      },
+                      {
+                        type:"select",
+                        label: "Mention",
+                        setter: setMention,
+                        options: ["To", "CC"]
+                      },
+                      {
+                        type:"text",
+                        label: "Landline Number",
+                        setter: setLandline
+                      },
+                      {
+                        type:"text",
+                        label: "Mobile Number",
+                        setter: setMobile
+                      },
+                      {
+                        type:"text",
+                        label: "Registered Address",
+                        setter: setRegAddress
+                      },
+                      {
+                        type:"text",
+                        label: "Company Name",
+                        setter: setCompany
+                      },
+                      {
+                        type:"text",
+                        label: "Billing Address",
+                        setter: setBillAddress
+                      }
+                    ]
+                  }
+                ]
+              } 
+              />
             </Dialog>
         </div>
       </div>

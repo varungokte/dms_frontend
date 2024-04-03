@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import Search from "./BasicComponents/Search";
 
 function Products(){
 
@@ -14,12 +15,13 @@ function Products(){
 	});
 
 	const [selected, setSelected] = useState(0);
+	const [searchString, setSearchString] = useState("");
 	
 	return(
 		<div>
 			<p className="text-3xl font-bold m-7">Products</p>
 			<div className=''>
-				<input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search Product"/>
+				<Search setter={setSearchString} label="Search"/>
 			</div>
 
 			<div className="flex flex-row relative m-10">

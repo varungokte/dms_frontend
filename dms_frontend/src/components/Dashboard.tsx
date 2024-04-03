@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import useGlobalContext from "../../GlobalContext";
+import { PriorityIterate } from "./BasicComponents/Priority";
 
 function Dashboard() {
 
@@ -15,6 +16,7 @@ function Dashboard() {
     },[])
      */
 
+    console.log(PriorityIterate())
     return (
         <div>This is the Dashboard {isLoggedIn() ? <>Logged In</> : <>Logged Out</>}</div>
     )

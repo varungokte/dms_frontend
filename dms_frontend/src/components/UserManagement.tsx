@@ -4,7 +4,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 import { Ellipsis } from "lucide-react";
+
+import { StatusValues, StatusStyling } from "./BasicComponents/Status";
+import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import DialogForm from "./BasicComponents/DialogForm";
+import Search from "./BasicComponents/Search";
+import Roles from "./BasicComponents/Roles";
 
 function UserManagement(){
   //userData is an array of users
@@ -37,19 +42,6 @@ function UserManagement(){
     if (!companyList.includes(userData[i][2]))
       companyList.push(userData[i][2]);
   
-  enum Roles {
-    "Maker", "Checker", "Admin", "Superadmin"
-  };
-
-  enum Status {
-    "Inactive","Active"
-  };
-
-  enum StatusStyling {
-    "text-red-600 bg-red-100",
-    "text-green-600 bg-green-100",
-  };
-
   const createUser = () => {
 
   }
@@ -59,11 +51,7 @@ function UserManagement(){
 			<p className="text-3xl font-bold m-7">User Management</p>
       <div className="flex flex-row">
         <div className=''>
-          <input type="text" className="border-2 mx-10 my-2 rounded-xl p-5" placeholder="Search" 
-            onChange={e=>{
-              const val = e.target.value+"";
-              setSearchString(val.replace("\\", "/\\/"))
-            }}/>  
+          <Search setter={setSearchString} label="Search Users"/>
         </div>
         
         <div className="mr-7">
@@ -81,27 +69,23 @@ function UserManagement(){
         <div className="flex-auto">
           <select className="bg-white border-2 p-6 mt-1 rounded-xl" onChange={(e:any)=>{setRoleFilter(e.target.value)}}>
             <option value="-1">Role</option>
-            {
-            [0,1,2,3].map((num,ind)=>{
-              return(
-                <option value={ind}>{Roles[num]}</option>
-              )
+            {Object.keys(Roles).filter(v=>!isNaN(Number(v))).map((num:any)=>{
+              return <option value={num}>{Roles[num]}</option>
             })}
           </select>
         </div>
 
         <div className="">
           <Dialog>
-          <DialogTrigger className="mx-10 my-3 text-white p-3 rounded-xl bg-custom-1">Add a User</DialogTrigger>
-          <DialogForm 
-            trigger="+ Add User" 
-            title="Add User" 
-            formSubmit={createUser} 
-            submitButton="Add User"
-            //category can be: single (entire line is one input field) or grid
-            //if grid, it will fields, whose value is an array of object; each object is a field
-            form={
-              [
+            <DialogTrigger className={PurpleButtonStyling}>Add a User</DialogTrigger>
+            <DialogForm 
+              trigger="+ Add User" 
+              title="Add User" 
+              formSubmit={createUser} 
+              submitButton="Add User"
+              //category can be: single (entire line is one input field) or grid
+              //if grid, it will fields, whose value is an array of object; each object is a field
+              form={[
                 {
                   category: "single",
                   label: "Name",
@@ -148,9 +132,8 @@ function UserManagement(){
                     }
                   ]
                 }
-              ]
-            }
-            />
+              ]}
+              />
             </Dialog>
         </div>
       </div>
@@ -167,83 +150,80 @@ function UserManagement(){
             </TableRow>
           </TableHeader>
           <TableBody>
-              {userData.map(user=>{
-                const regEx = new RegExp(searchString, "i");
-                if ((companyFilter=="-1" || companyFilter==user[2]) && (roleFilter==-1 || roleFilter==user[3]) && (searchString=="" || (user[0]+"").search(regEx)!==-1))
-                return (
-                  <TableRow>
-                    <TableCell>{user[0]}</TableCell>
-                    <TableCell>{user[1]}</TableCell>
-                    <TableCell>{user[2]}</TableCell>
-                    <TableCell>{Roles[Number(user[3])]}</TableCell>
-                    <TableCell><div className={`${StatusStyling[Number(user[4])]} text-center rounded-lg`}>{Status[Number(user[4])]}</div></TableCell>
-                    <TableCell>
-                      <Dialog>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger>{<Ellipsis className="ml-5"/>}</DropdownMenuTrigger>
-                          <DropdownMenuContent className="bg-white">
-                            <DropdownMenuItem>
-                              <DialogTrigger>Edit User</DialogTrigger>
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                        <DialogForm 
-                          title="Edit User" 
-                          formSubmit={createUser} 
-                          submitButton="Edit User"
-                          //category can be: single (entire line is one input field) or grid
-                          //if grid, it will fields, whose value is an array of object; each object is a field
-                          form={
+            {userData.map(user=>{
+              const regEx = new RegExp(searchString, "i");
+              if ((companyFilter=="-1" || companyFilter==user[2]) && (roleFilter==-1 || roleFilter==user[3]) && (searchString=="" || (user[0]+"").search(regEx)!==-1))
+              return (
+                <TableRow>
+                  <TableCell>{user[0]}</TableCell>
+                  <TableCell>{user[1]}</TableCell>
+                  <TableCell>{user[2]}</TableCell>
+                  <TableCell>{Roles[Number(user[3])]}</TableCell>
+                  <TableCell><div className={`${StatusStyling[Number(user[4])]} text-center rounded-lg`}>{StatusValues[Number(user[4])]}</div></TableCell>
+                  <TableCell>
+                    <Dialog>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger>{<Ellipsis className="ml-5"/>}</DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-white">
+                          <DropdownMenuItem>
+                            <DialogTrigger>Edit User</DialogTrigger>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                      <DialogForm 
+                        title="Edit User" 
+                        formSubmit={createUser} 
+                        submitButton="Edit User"
+                        //category can be: single (entire line is one input field) or grid
+                        //if grid, it will fields, whose value is an array of object; each object is a field
+                        form={[
+                          {
+                            category: "single",
+                            label: "Name",
+                            type: "text",
+                            setter: setNewName
+                          },
+                          
+                          {
+                            category: "grid",
+                            number: 2,
+                            fields:
                             [
                               {
-                                category: "single",
-                                label: "Name",
-                                type: "text",
-                                setter: setNewName
+                                label: "Email",
+                                type: "email",
+                                setter: setNewEmail
                               },
-                              
                               {
-                                category: "grid",
-                                number: 2,
-                                fields:
-                                [
+                                label: "Role",
+                                type: "select",
+                                setter: setNewRole,
+                                options: ["Admin", "Maker", "Checker"]
+                              },
+                              {
+                                label: "Permissions",
+                                type:"subgrid",
+                                fields: [
                                   {
-                                    label: "Email",
-                                    type: "email",
-                                    setter: setNewEmail
+                                    label: "Verify",
+                                    type: "checkbox",
+                                    setter: setNewPermission,
                                   },
                                   {
-                                    label: "Role",
-                                    type: "select",
-                                    setter: setNewRole,
-                                    options: ["Admin", "Maker", "Checker"]
-                                  },
-                                  {
-                                    label: "Permissions",
-                                    type:"subgrid",
-                                    fields: [
-                                      {
-                                        label: "Verify",
-                                        type: "checkbox",
-                                        setter: setNewPermission,
-                                      },
-                                      {
-                                        label: "Read",
-                                        type: "checkbox",
-                                        setter: setNewPermission
-                                      }
-                                    ]
+                                    label: "Read",
+                                    type: "checkbox",
+                                    setter: setNewPermission
                                   }
                                 ]
                               }
                             ]
                           }
-                        />
+                        ]}/>
                     </Dialog>
                   </TableCell>
                 </TableRow>
-                )
-              })}
+              )
+            })}
           </TableBody>
         </Table>
       </div>

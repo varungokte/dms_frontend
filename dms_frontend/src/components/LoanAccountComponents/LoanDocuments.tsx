@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 
+import { PriorityValues, PriorityStyling } from "../BasicComponents/Priority";
+import { StatusValues, StatusStyling } from "../BasicComponents/Status";
+
 
 function LoanDocuments(props: any) {
   //SHOULD GET DOCDATA FROM props.docData
@@ -17,27 +20,6 @@ function LoanDocuments(props: any) {
   ]);
   const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(-1);
-
-  enum Priority {
-    "Low", "Medium", "High"
-  };
-
-  enum PriorityStyling {
-    "text-green-600 bg-green-100",
-    "text-yellow-600 bg-yellow-50",
-    "text-red-600 bg-red-100",
-  };
-
-  enum Status {
-    "Verify", "Pending", "Overdue"
-  };
-
-  enum StatusStyling {
-    "text-green-600",
-    "text-yellow-600",
-    "text-red-600",
-  };
-
 
   return (
     <div className="bg-white rounded-xl">
@@ -58,7 +40,7 @@ function LoanDocuments(props: any) {
         <div className="flex-auto">
           <select className="bg-white border-2 p-3 rounded-xl mt-2 w-60" onChange={(e:any)=>setPriority(e.target.value)}>
             <option value={-1}>Priority</option>
-            {Object.keys(Priority).filter(v=>isNaN(Number(v))).map((val,ind)=>{
+            {Object.keys(PriorityValues).filter(v=>isNaN(Number(v))).map((val,ind)=>{
               return(
                 <option value={ind}>{val}</option>
               )
@@ -90,12 +72,12 @@ function LoanDocuments(props: any) {
               return (
                 <TableRow className="text-center">
                   <TableCell>{document[0]}</TableCell>
-                  <TableCell ><div className={`${PriorityStyling[Number(document[1])]} rounded-lg text-center`}>{Priority[Number(document[1])]}</div></TableCell>
+                  <TableCell ><div className={`${PriorityStyling[Number(document[1])]} rounded-lg text-center`}>{PriorityValues[Number(document[1])]}</div></TableCell>
                   <TableCell className="text-center">{document[2]}</TableCell>
                   <TableCell>{document[3]}</TableCell>
                   <TableCell>{document[4]}</TableCell>
                   <TableCell>{document[5]}</TableCell>
-                  <TableCell className={`${StatusStyling[Number(document[6])]}`}>{Status[Number(document[6])]}</TableCell>
+                  <TableCell className={`${StatusStyling[Number(document[6])]}`}>{StatusValues[Number(document[6])]}</TableCell>
                 </TableRow>
               )
             })}
