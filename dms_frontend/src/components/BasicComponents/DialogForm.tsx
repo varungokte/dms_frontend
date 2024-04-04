@@ -44,7 +44,7 @@ function DialogForm(props:any){
               }
               else if (field["category"]=="grid"){
                 return(
-                  <div className={`grid grid-cols-2`}>
+                  <div className={`grid grid-cols-${field["row"]}`}>
                     {field.fields.map((item:any)=>{
                       if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date")
                         return <span className="mr-3">{handleText(item["label"], item["setter"], item["type"])}</span>

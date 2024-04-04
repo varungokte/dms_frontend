@@ -2,9 +2,12 @@ import { useState } from "react";
 
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
+
 import DialogForm from "./BasicComponents/DialogForm";
 import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import Search from "./BasicComponents/Search";
+import ProfileIcon from "./BasicComponents/ProfileIcon";
+import Filter from "./BasicComponents/Filter";
 
 function TeamMembers() {
 
@@ -32,13 +35,7 @@ function TeamMembers() {
 				</div>
 				
 				<div className='flex-auto'>
-					<select className="mt-2 p-4 bg-white border-2 w-72 rounded-xl">
-					{Object.keys(members).map((designation)=>{
-						return (
-							<option value={designation}>{designation}</option>
-							)
-					})}
-					</select>	
+					<Filter setter={setSearchString} listsAreSame={true} labelList={Object.keys(members)} setPlaceholder={false} />
 				</div>
 
 				<div className="">
@@ -82,7 +79,7 @@ function TeamMembers() {
 											<Card className="m-5 rounded-2xl bg-white w-72">
 												<CardHeader>
 													<CardTitle className="m-auto">
-														<div style={{height:"100px", width:"100px", lineHeight:"100px", borderRadius:"50%", textAlign:"center", fontSize:"30px", backgroundColor: "goldenrod", color:"white"}}>{member.split(" ").map((name:String)=>{return name[0]})}</div>
+														<ProfileIcon name={member}/>
 													</CardTitle>
 												</CardHeader>
 												<CardContent>

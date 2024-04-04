@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/compone
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
 import DialogForm from "../BasicComponents/DialogForm";
+import ProfileIcon from "../BasicComponents/ProfileIcon";
 
 function ContactDetails() {
   //contacts is an object where the keys are the categories (like borrower, lender, promoter) and values are arrays of people
@@ -152,7 +153,7 @@ function ContactDetails() {
                   <CardTitle>	
                     <div className="flex flex-row">
                       <div className="flex-auto">
-                        <div style={{height:"100px", width:"100px", lineHeight:"100px", borderRadius:"50%", textAlign:"center", fontSize:"30px", backgroundColor: "goldenrod", color:"white"}}>{person[0].split(" ").map((name:String)=>{return name[0]})}</div>
+                        <ProfileIcon name={person[0]}/>
                       </div>
                       <div className=""><EllipsisVertical/></div>
                     </div>
@@ -169,7 +170,7 @@ function ContactDetails() {
               <DialogHeader>
                 <DialogTitle>
                   <div className="flex flex-row">
-                    <div style={{height:"70px", width:"70px", lineHeight:"70px", borderRadius:"50%", textAlign:"center", fontSize:"21px", backgroundColor: "goldenrod", color:"white"}}>{person[0].split(" ").map((name:String)=>{return name[0]})}</div>
+                      <ProfileIcon name={person[0]}/>
                     <div className="p-3">
                       <p className="my-1 font-normal text-custom-1">{person[0]}</p>
                       <p className="font-light text-base">{person[1]}</p>

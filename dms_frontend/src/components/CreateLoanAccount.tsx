@@ -5,7 +5,7 @@ import ContactDetails from "./LoanAccountComponents/Contact Details";
 import Ratings from "./LoanAccountComponents/Ratings";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 import Covenants from "./LoanAccountComponents/Covenants";
-import LoanAccount from "./LoanAccountComponents/LoanAccount";
+import LoanAccount from "./LoanAccount";
 import RelationshipMapping from "./LoanAccountComponents/RelationshipMapping";
 
 function CreateLoanAccount() {

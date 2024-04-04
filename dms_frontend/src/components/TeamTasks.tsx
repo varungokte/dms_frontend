@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 
-import { PriorityValues, PriorityStyling, PriorityIterate } from "./BasicComponents/Priority";
-import { StatusValues, StatusStyling } from "./BasicComponents/Status";
+import { PriorityValues, PriorityStyling, DocumentStatusValues, DocumentStatusStyling, EnumIteratorKeys, EnumIteratorValues } from "./BasicComponents/Constants";
 import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import Search from "./BasicComponents/Search";
 import DialogForm from "./BasicComponents/DialogForm";
+import Filter from "./BasicComponents/Filter";
 
 function TeamTasks() {
   //An array which contains many tasks; each task is an array
@@ -44,21 +44,17 @@ function TeamTasks() {
         </div>
         
         <div className="flex-auto"> 
-          <select className="bg-white p-6 m-2 rounded-xl" onChange={(e:any)=>setPriority(e.target.value)}>
-            <option value={-1}>All Priorities</option>
-            {PriorityIterate().map((num:any)=>{
-              return <option value={num}>{PriorityValues[Number(num)]}</option>
-            })}
-          </select>
+          <Filter setter={setPriority} listsAreSame={false} 
+            valueList={EnumIteratorKeys(PriorityValues)} labelList={EnumIteratorValues(PriorityValues)}
+            setPlaceholder={true} placeholderValue={[-1, "All Priorities"]} 
+          />
         </div>
 
         <div>
           <Dialog>
             <DialogTrigger className={PurpleButtonStyling}>Add Task</DialogTrigger>
             <DialogForm
-              title="Add Team Task"
-              formSubmit={createTask}
-              submitButton="Add Task"
+              title="Add Team Task" formSubmit={createTask} submitButton="Add Task"
               form={[
                 {
                   category: "single",
@@ -76,13 +72,13 @@ function TeamTasks() {
                 },
                 {
                   category: "grid", 
-                  number:2, 
+                  row:2, 
                   fields:[
                     {
                       type: "select",
                       label: "Priority",
                       setter: setNewPriority,
-                      options: ["Select a Priority"].concat(PriorityIterate().map(val=>PriorityValues[Number(val)]))
+                      options: ["Select a Priority"].concat(EnumIteratorKeys(PriorityValues).map(val=>PriorityValues[Number(val)]))
                     },
                     {
                       type: "date",
@@ -98,7 +94,7 @@ function TeamTasks() {
       </div>
 
     <div className="m-7">
-      <Table className="rounded-3xl bg-white">
+      <Table className="rounded-2xl bg-white">
         <TableHeader>
           <TableRow>
             <TableHead>Task</TableHead>
@@ -123,17 +119,20 @@ function TeamTasks() {
                     {PriorityValues[Number(task[3])]}
                   </div>
                 </TableCell>
-                <TableCell className={`${StatusStyling[Number(task[4])]}`}>{StatusValues[Number(task[4])]}</TableCell>
+                <TableCell className={`${DocumentStatusStyling[Number(task[4])]}`}>{DocumentStatusValues[Number(task[4])]}</TableCell>
               </TableRow>)
             else  
               return(<></>)
-          })}
-          
+          })}          
         </TableBody>
       </Table>
     </div>
   </div>
   )
+}
+
+function DocumentsIconArray(props:any){
+
 }
 
 export default TeamTasks;

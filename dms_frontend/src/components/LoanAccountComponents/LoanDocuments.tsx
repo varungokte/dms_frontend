@@ -3,7 +3,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 
 import { PriorityValues, PriorityStyling } from "../BasicComponents/Priority";
-import { StatusValues, StatusStyling } from "../BasicComponents/Status";
+import { StatusValues, StatusStyling } from "../BasicComponents/DocumentStatus";
 
 
 function LoanDocuments(props: any) {

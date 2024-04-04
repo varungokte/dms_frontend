@@ -21,10 +21,8 @@ export const RegistrationComponent = () => {
 		e.preventDefault();
 		const data = {
 			E: email,
-			CN: companyName,
+			N: companyName,
 			P: password,
-			TU: totalUsers,
-			MU: maximumUsers
 		}
 
 		console.log(JSON.stringify(data))

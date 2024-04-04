@@ -30,6 +30,8 @@ import ManagementIcon from './components/static/PanelIcons/ManagementIcon';
 import TaskIcon from './components/static/PanelIcons/TaskIcon';
 import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
 import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
+import LoanAccount from './components/LoanAccount';
+import ContactDetails from './components/LoanAccountComponents/Contact Details';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -39,9 +41,9 @@ export const MenuRouter = () => {
     ["ABC123", "Mortgage", "01/01/01", 
       [
         ["Lender's Agent Agreement", "PDF", 2, "02/02/02", 1, 12, ["lenderagreement.pdf" /* Will get the actual file(s) */]],
-        ["Escrow Agent Agreement", "XLSX", 1, "03/03/02", 1, 1, ["escrow.pdf"]],
+        ["Escrow Agent Agreement", "XLSX", 1, "03/03/02", 0, 0, []],
         ["Subordination Agreement", "PDF", 0, "03/03/02", 1, 1, ["subord.pdf"]],
-        ["Agreement 1", "PDF", 2, "11/11/11", 1,3,["sponer.pdf"]],
+        ["Agreement 1", "PDF", 2, "11/11/11", 1,3,[]],
         ["Agreement 2", "PDF", 1, "11/11/11", 2,3,["lender.pdf"]]
       ]
     ],
@@ -56,7 +58,7 @@ export const MenuRouter = () => {
   ]);
 	
 
-	console.log("THE FACTUAL DOCUMENTS ", hover)
+	//console.log("THE FACTUAL DOCUMENTS ", hover)
 
 	return (
 		<div className='relative'>
@@ -92,7 +94,7 @@ export const MenuRouter = () => {
 							className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="loan"?"bg-white text-custom-1":"text-white"}`}>
 								<div className='flex flex-row'>
 									<LoanIcon fill={(currLink==="loan" || hover===1)?"rgba(80, 65, 188, 1)":"white"}/>
-									<div className='mx-3'>Create Loan Account</div>
+									<div className='mx-3'>Loan Account</div>
 								</div>
 							</div>
 						</NavLink>
@@ -331,7 +333,7 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					<Route path="" element={<Dashboard/>} />
-					<Route path="loan/*" element={<CreateLoanAccount/>} />
+					<Route path="loan/*" element={<LoanAccount/>} />
 					<Route path="products" element={<Products/>} />
 					<Route path='transaction' element={<DocumentList label={"Transaction Documents"} docData={txnTestData} />}/>
 					<Route path='compliance' element={<DocumentList label={"Compliance Documents"} docData={txnTestData} />}/>
@@ -346,6 +348,7 @@ export const MenuRouter = () => {
 					<Route path='default' element={<Default/>} />
 					<Route path='critical' element={<CriticalCases/>} />
 					<Route path='reports' element={<Reports/>} />
+					<Route path="con" element={<ContactDetails/>}/>
 					<Route path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>
