@@ -1,15 +1,16 @@
 import { useState } from "react";
+import { Table, } from "@/components/ui/table";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
-import { Ellipsis } from "lucide-react";
-
-import { UserStatusValues, UserStatusStyling, UserRoles, EnumIteratorValues, EnumIteratorKeys } from "./BasicComponents/Constants";
-import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
-import DialogForm from "./BasicComponents/DialogForm";
+import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import { UserRoles, EnumIteratorValues, EnumIteratorKeys } from "./BasicComponents/Constants";
+import FormDialog from "./BasicComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 import Filter from "./BasicComponents/Filter";
+import ActionDialog from "./BasicComponents/ActionDialog";
+
+import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import edit_icon from "./static/edit_icon.svg";
+import delete_icon from "./static/delete_icon.svg";
 
 function UserManagement(){
   //userData is an array of users
@@ -38,6 +39,10 @@ function UserManagement(){
 
   }
 
+  const deleteUser = () =>{
+
+  }
+
   return(
     <div>
 			<p className="text-3xl font-bold m-7">User Management</p>
@@ -47,67 +52,60 @@ function UserManagement(){
         </div>
 
         <div className="flex-auto">
-          <Filter setter={setRoleFilter} listsAreSame={false} 
-            valueList={EnumIteratorKeys(UserRoles)} labelList={EnumIteratorValues(UserRoles)} 
+          <Filter setter={setRoleFilter} listsAreSame={false} valueList={EnumIteratorKeys(UserRoles)} labelList={EnumIteratorValues(UserRoles)} 
             setPlaceholder={true} placeholderValue={[-1,"Role"]}
           />
         </div>
 
         <div className="">
-          <Dialog>
-            <DialogTrigger className={PurpleButtonStyling}>Add a User</DialogTrigger>
-            <DialogForm 
-              trigger="+ Add User" 
-              title="Add User" 
-              formSubmit={createUser} 
-              submitButton="Add User"
-              //category can be: single (entire line is one input field) or grid
-              //if grid, it will fields, whose value is an array of object; each object is a field
-              form={[
-                {
-                  category: "grid",
-                  row: 2,
-                  fields:
-                  [
-                    {
-                      label: "Name",
-                      type: "text",
-                      setter: setNewName
-                    },
-                    {
-                      label: "Email",
-                      type: "email",
-                      setter: setNewEmail
-                    },
-                    {
-                      label: "Password",
-                      type: "password",
-                      setter: setNewPassword
-                    },
-                    {
-                      label: "Role",
-                      type: "select",
-                      setter: setNewRole,
-                      options: ["Admin", "Maker", "Checker"]
-                    },
-                  ]
-                }
-              ]}
-              />
-            </Dialog>
+          <FormDialog
+            triggerClassName={PurpleButtonStyling} 
+            triggerText="+ Add User" 
+            formTitle="Add User" 
+            formSubmit={createUser} 
+            submitButton="Add User"
+            //category can be: single (entire line is one input field) or grid
+            //if grid, it will fields, whose value is an array of object; each object is a field
+            form={[
+            { category: "grid", row: 2, fields: [
+              { label: "Name", type: "text", setter: setNewName },
+              { label: "Email", type: "email", setter: setNewEmail },
+              { label: "Password", type: "password", setter: setNewPassword },
+              { label: "Role", type: "select", setter: setNewRole, options: ["Admin", "Maker", "Checker"] },
+            ]}]}
+          />
         </div>
       </div>
       <div className="m-7">
         <Table className="bg-white border-2 rounded-xl">
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Email Address</TableHead>
-              <TableHead>Role</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Action</TableHead>
-            </TableRow>
-          </TableHeader>
+          <HeaderRows headingRows={[["Name"], ["Email Address"], ["Role"], ["Status"], ["Action"]]} />
+          <BodyRowsMapping
+            list={userData} dataType={["text", "text", "role", "userStatus", "action"]}
+            searchRows={searchString==""?[]:[searchString,0]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
+            action = {
+              <div className="flex flex-row">
+                <FormDialog 
+                  triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                  formTitle="Edit User" formSubmit={createUser} submitButton="Edit User"
+                  form={[
+                    { category: "single", label: "Name", type: "text", setter: setNewName },
+                    { category: "grid", number: 2, fields: [
+                      { label: "Email", type: "email", setter: setNewEmail },
+                      { label: "Role", type: "select", setter: setNewRole, options: ["Admin", "Maker", "Checker"] },
+                      { label: "Permissions", type:"subgrid", fields: [
+                        { label: "Verify", type: "checkbox", setter: setNewPermission, },
+                        { label: "Read", type: "checkbox", setter: setNewPermission }
+                      ]}]
+                    }
+                  ]}
+                />
+                <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
+                  actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser} 
+                />
+              </div>
+            }
+          />
+          {/* 
           <TableBody>
             {userData.map(user=>{
               const regEx = new RegExp(searchString, "i");
@@ -118,71 +116,13 @@ function UserManagement(){
                   <TableCell>{user[1]}</TableCell>
                   <TableCell>{UserRoles[Number(user[2])]}</TableCell>
                   <TableCell>
-                    <select className={`${UserStatusStyling[Number(user[3])]} text-center rounded-lg`}>
-                      <option className="bg-white">{UserStatusValues[Number(user[3])]}</option>
-                      {Number(user[3])===1?
-                        <option className="bg-white text-red-600">{UserStatusValues[0]}</option>
-                      :<option className="bg-white text-green-600">{UserStatusValues[1]}</option>
-                    }
-                    </select>
                   </TableCell>
                   <TableCell>
-                    <Dialog>
-                      <DialogTrigger>Edit User</DialogTrigger>
-                        <DialogForm 
-                          title="Edit User" formSubmit={createUser} submitButton="Edit User"
-                          //category can be: single (entire line is one input field) or grid
-                          //if grid, it will fields, whose value is an array of object; each object is a field
-                          form={[
-                            {
-                              category: "single",
-                              label: "Name",
-                              type: "text",
-                              setter: setNewName
-                            },
-                            
-                            {
-                              category: "grid",
-                              number: 2,
-                              fields:
-                              [
-                                {
-                                  label: "Email",
-                                  type: "email",
-                                  setter: setNewEmail
-                                },
-                                {
-                                  label: "Role",
-                                  type: "select",
-                                  setter: setNewRole,
-                                  options: ["Admin", "Maker", "Checker"]
-                                },
-                                {
-                                  label: "Permissions",
-                                  type:"subgrid",
-                                  fields: [
-                                    {
-                                      label: "Verify",
-                                      type: "checkbox",
-                                      setter: setNewPermission,
-                                    },
-                                    {
-                                      label: "Read",
-                                      type: "checkbox",
-                                      setter: setNewPermission
-                                    }
-                                  ]
-                                }
-                              ]
-                            }
-                          ]}
-                        />
-                    </Dialog>
                   </TableCell>
                 </TableRow>
               )
             })}
-          </TableBody>
+          </TableBody> */}
         </Table>
       </div>
     </div>

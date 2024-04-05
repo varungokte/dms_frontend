@@ -1,9 +1,8 @@
 import { useState } from "react";
 
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Dialog, DialogTrigger, } from "@/components/ui/dialog";
+import FormDialog from "./BasicComponents/FormDialog";
 
-import DialogForm from "./BasicComponents/DialogForm";
 import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import Search from "./BasicComponents/Search";
 import ProfileIcon from "./BasicComponents/ProfileIcon";
@@ -40,29 +39,17 @@ function TeamMembers() {
 
 				<div className="">
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
-					<Dialog >
-						<DialogTrigger className={PurpleButtonStyling	}><span className="text-xl">+</span> Add Member</DialogTrigger>
-						<DialogForm
-							title="Add Team Member"
-							formSubmit= {addMember}
-							submitButton= "Create User"
-							form= {[
-								{
-									category: "single",
-									label: "Name",
-									type: "text",
-									setter: setNewName
-								},
-								{
-									category: "single",
-									label: "Role",
-									type: "select",
-									setter: setNewRole,
-									options: ["Maker", "Checker"]
-								}
-							]}
-						/>
-					</Dialog>
+					<FormDialog
+						triggerClassName={PurpleButtonStyling}
+						triggerText={<><span className="text-xl">+ </span><span>Add Member</span></>}
+						formTitle="Add Team Member"
+						formSubmit= {addMember}
+						submitButton= "Create User"
+						form= {[
+							{ category: "single", label: "Name", type: "text", setter: setNewName },
+							{ category: "single", label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker"] }
+						]}
+					/>
 				</div>
 			</div>
 

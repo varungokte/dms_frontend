@@ -4,7 +4,7 @@ import { EllipsisVertical } from "lucide-react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
-import DialogForm from "../BasicComponents/DialogForm";
+import DialogForm from "../BasicComponents/FormDialog";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 
 function ContactDetails() {

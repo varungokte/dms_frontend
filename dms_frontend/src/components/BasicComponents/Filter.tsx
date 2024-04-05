@@ -5,9 +5,9 @@ function Filter(props:any){
       
       {props.labelList.map((item:any,index:number)=>{
         if (props.listsAreSame)
-          return <option value={item}>{item}</option>
+          return <option value={item} selected={props.currentValue==item?true:false}>{item}</option>
         else
-          return <option value={props.valueList[index]}>{item}</option>
+          return <option value={props.valueList[index]} selected={props.currentValue==item?true:false}>{item}</option>
       })}
       </select>
   )

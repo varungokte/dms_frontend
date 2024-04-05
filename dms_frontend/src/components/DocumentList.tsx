@@ -9,6 +9,7 @@ import Search from "./BasicComponents/Search";
 
 import chevron_right from "./static/chevron-right.svg";
 import chevron_down from "./static/chevron-down.svg";
+import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 
 function DocumentList(props:any) {
   //This can be for Transaction Documents, Compliance Documents, Covenants, and others
@@ -51,9 +52,7 @@ function DealDetails(props:any) {
       <Collapsible>
         <div className="bg-zinc-100 m-3 rounded-2xl">
           <CollapsibleTrigger className="w-full" 
-            onClick={()=>{
-              setChevronToggle((curr)=>{return !curr});
-            }}>
+            onClick={()=>setChevronToggle((curr)=>{return !curr})}>
             <TableRow className="border-none">
               <TableCell className="w-[20%] font-medium text-base">{props.deal[0]}</TableCell>
               <TableCell className="w-[20%] font-medium text-base">{props.deal[1]}</TableCell>
@@ -92,11 +91,8 @@ function SingleDealDocuments(props:any){
       <div className="float-right">
         <div className="text-base">
           Priority:{`  `}             
-          <select className="p-3 rounded-xl" 
-            onChange={(e:any)=>setPriority(e.target.value)}
-          >
+          <select className="p-3 rounded-xl" onChange={(e:any)=>setPriority(e.target.value)}>
             {EnumIteratorKeys(PriorityValues).map(val=>{
-              console.log(priority)
               if (Number(val)==priority)
                 return <option value={val} selected>{PriorityValues[Number(val)]}</option>
               else
@@ -109,19 +105,13 @@ function SingleDealDocuments(props:any){
       <br/> 
       <br/>
       <Table className="bg-gray-100 rounded-xl">
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[20%]">Document Name</TableHead>
-            <TableHead className="w-[10%]">Document Type</TableHead>
-            <TableHead className="w-[15%] text-center">Priority</TableHead>
-            <TableHead className="w-[20%]">Deal Date</TableHead>
-            <TableHead className="w-[20%]">Status</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {//@ts-ignore
-          props.documents.map(doc => {
+        <HeaderRows headingRows={[["Document Name", "w-[20%]"], ["Document Type", "w-[10%]"],["Priority","w-[15%] text-center"],["Deal Date", "w-[20%]"],["Status","w-[20%]"], ["Action"]]} />
+        <BodyRowsMapping 
+          list={props.douments} dataType={["text","text","text","priority","text","text","action"]}
+          searchRows={[]} filterRows={[priority,2]} 
+        />
+        <TableBody >
+          {props.documents.map((doc:any) => {
             if (doc[2]==priority)
             return(
               <TableRow>

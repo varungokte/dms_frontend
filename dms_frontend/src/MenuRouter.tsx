@@ -32,6 +32,8 @@ import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
 import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
 import LoanAccount from './components/LoanAccount';
 import ContactDetails from './components/LoanAccountComponents/Contact Details';
+import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
+import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -299,7 +301,12 @@ export const MenuRouter = () => {
 								setCurrLink("critical");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="critical" || hover===14?"bg-white text-custom-1":"text-white"}`}>Critical Cases</div>
+						<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="critical"?"bg-white text-custom-1":"text-white"}`}>
+							<div className='flex flex-row'>
+								<CriticalIcon fill={currLink==="critical"|| hover===14?"rgba(80, 65, 188, 1)":"white"}/>
+								<div className='mx-3'>Critical Cases</div>
+							</div>
+						</div>
 						</NavLink>
 
 						<NavLink to="reports" 
@@ -310,7 +317,12 @@ export const MenuRouter = () => {
 								setCurrLink("reports");
 							return "";
 						}}>
-							<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="reports" || hover===15?"bg-white text-custom-1":"text-white"}`}>Reports</div>
+						<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="reports"?"bg-white text-custom-1":"text-white"}`}>
+							<div className='flex flex-row'>
+								<ReportsIcon fill={currLink==="reports"|| hover===15?"rgba(80, 65, 188, 1)":"white"}/>
+								<div className='mx-3'>Reports</div>
+							</div>
+						</div>
 						</NavLink>
 					</div>
 				</div>
