@@ -107,26 +107,14 @@ function SingleDealDocuments(props:any){
       <Table className="bg-gray-100 rounded-xl">
         <HeaderRows headingRows={[["Document Name", "w-[20%]"], ["Document Type", "w-[10%]"],["Priority","w-[15%] text-center"],["Deal Date", "w-[20%]"],["Status","w-[20%]"], ["Action"]]} />
         <BodyRowsMapping 
-          list={props.douments} dataType={["text","text","text","priority","text","text","action"]}
-          searchRows={[]} filterRows={[priority,2]} 
+          list={props.documents} dataType={["text","text","priority","text","text","action"]}
+          searchRows={[]} filterRows={[priority,2]}
+          action={
+            props.documents.map((doc: any)=>{
+              return doc[6].length===0?<UploadButton fileType={doc[1]+""}/>:<></>
+            })
+          }
         />
-        <TableBody >
-          {props.documents.map((doc:any) => {
-            if (doc[2]==priority)
-            return(
-              <TableRow>
-                <TableCell>{doc[0]}</TableCell>
-                <TableCell>{doc[1]}</TableCell>
-                <TableCell >
-                  <div className={`${PriorityStyling[Number(doc[2])]} rounded-lg text-center`}>{PriorityValues[Number(doc[2])]}</div>
-                </TableCell>
-                <TableCell>{doc[3]}</TableCell>
-                <TableCell>{doc[4]}/{doc[5]}</TableCell>
-                <TableCell>{doc[6].length===0?<UploadButton fileType={doc[1]+""}/>:""}</TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
       </Table>
     </div>
   )

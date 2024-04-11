@@ -19,7 +19,7 @@ function HeaderRows(props:any){
 function BodyRowsMapping(props:any){
   return(
     <TableBody>
-      {props.list.map((singleRow:any)=>{
+      {props.list.map((singleRow:any, index:number)=>{
         let searchValid = true;
         if (props.searchRows.length>0){
           searchValid = false;
@@ -39,7 +39,7 @@ function BodyRowsMapping(props:any){
         }
 
         if (searchValid && filterValid)
-          return <SingleRow singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action}/>
+          return <SingleRow singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} rowIndex={index}/>
         else
           return <></>
       })}
@@ -51,11 +51,12 @@ function SingleRow(props:any){
   return(
     <TableRow>
       {props.dataType.map((dataType:any, index:number)=>{
-        let cellClassName=""
+        let cellClassName="";
         if (props.cellClassName)
           cellClassName = props.cellClassName[index]
+        
         if (dataType=="action")
-          return handleAction(props.action, cellClassName)
+          return handleAction(props.action[props.rowIndex], cellClassName)
 
         const item = props.singleRow[index];
         if (dataType=="text")
@@ -138,13 +139,15 @@ export { HeaderRows, BodyRowsMapping }
     ]
 
   props to BodyRowsMapping:
-    list = [
+    list = {[
       [singleRow1],
       [singleRow2]
-    ],
-    dataType =  ["text", "priority"]  cloumn data type
-    searchRows = empty if searchString is "", else [searchString, 0,1] do regExp search in columns 0 and 1
-    filerRows = [[priority, 2], [companyName, 1]]
+    ]}  REQ
+    dataType =  ["text", "priority"]  cloumn data type  REQ
+    searchRows = [] if searchString is "", else [searchString, 0,1] do regExp search in columns 0 and 1  REQ
+    filterRows = [[priority, 2], [companyName, 1]]  REQ
+    action ={<>Component to be rendered</>}
+    cellClassName={["Styling for Col1", "Styling for Col2"]}
  */
 
 

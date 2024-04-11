@@ -1,5 +1,6 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
@@ -38,6 +39,12 @@ import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
 	const [hover,setHover] = useState(-1);
+	const navigate = useNavigate();
+
+	const logoutUser = () => {
+		localStorage.removeItem("Beacon-DMS-token");
+		navigate("/login");
+	}
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 
@@ -59,9 +66,6 @@ export const MenuRouter = () => {
     ]
   ]);
 	
-
-	//console.log("THE FACTUAL DOCUMENTS ", hover)
-
 	return (
 		<div className='relative'>
 			<div style={{ width: "17%", float: "left", height: "100vh", position: "fixed", overflowY:"scroll"}} className='bg-custom-1' >
@@ -320,8 +324,8 @@ export const MenuRouter = () => {
 						<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${currLink==="reports"?"bg-white text-custom-1":"text-white"}`}>
 							<div className='flex flex-row'>
 								<ReportsIcon fill={currLink==="reports"|| hover===15?"rgba(80, 65, 188, 1)":"white"}/>
-								<div className='mx-3'>Reports</div>
 							</div>
+								<div className='mx-3'>Reports</div>
 						</div>
 						</NavLink>
 					</div>
@@ -334,10 +338,10 @@ export const MenuRouter = () => {
 							<DropdownMenuTrigger className='mb-3 pt-3'>
 								<span>You're logged in as: <span className='mt-2 text-blue-600'>Admin Person</span></span>
 							</DropdownMenuTrigger>
-							<DropdownMenuContent>
+							<DropdownMenuContent className='bg-white'>
 								<DropdownMenuItem>Profile</DropdownMenuItem>
 								<DropdownMenuSeparator />
-								<DropdownMenuItem><b>Logout</b></DropdownMenuItem>
+								<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 					</div>
@@ -346,6 +350,7 @@ export const MenuRouter = () => {
 				<Routes>
 					<Route path="" element={<Dashboard/>} />
 					<Route path="loan/*" element={<LoanAccount/>} />
+					<Route path="loan/create/*" element={<CreateLoanAccount/>} />
 					<Route path="products" element={<Products/>} />
 					<Route path='transaction' element={<DocumentList label={"Transaction Documents"} docData={txnTestData} />}/>
 					<Route path='compliance' element={<DocumentList label={"Compliance Documents"} docData={txnTestData} />}/>
@@ -360,7 +365,6 @@ export const MenuRouter = () => {
 					<Route path='default' element={<Default/>} />
 					<Route path='critical' element={<CriticalCases/>} />
 					<Route path='reports' element={<Reports/>} />
-					<Route path="con" element={<ContactDetails/>}/>
 					<Route path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

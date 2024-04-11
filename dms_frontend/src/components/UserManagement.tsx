@@ -12,6 +12,7 @@ import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import edit_icon from "./static/edit_icon.svg";
 import delete_icon from "./static/delete_icon.svg";
 
+//Routes: addUser,editUser, getUser
 function UserManagement(){
   //userData is an array of users
   //Each user is an array with: [Name, Email, Company Name, Role, Status]
@@ -39,7 +40,9 @@ function UserManagement(){
 
   }
 
-  const deleteUser = () =>{
+  const editUser = (index:number) => {}
+
+  const deleteUser = (index:number) =>{
 
   }
 
@@ -82,28 +85,31 @@ function UserManagement(){
           <BodyRowsMapping
             list={userData} dataType={["text", "text", "role", "userStatus", "action"]}
             searchRows={searchString==""?[]:[searchString,0]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
-            action = {
-              <div className="flex flex-row">
-                <FormDialog 
-                  triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                  formTitle="Edit User" formSubmit={createUser} submitButton="Edit User"
-                  form={[
-                    { category: "single", label: "Name", type: "text", setter: setNewName },
-                    { category: "grid", number: 2, fields: [
-                      { label: "Email", type: "email", setter: setNewEmail },
-                      { label: "Role", type: "select", setter: setNewRole, options: ["Admin", "Maker", "Checker"] },
-                      { label: "Permissions", type:"subgrid", fields: [
-                        { label: "Verify", type: "checkbox", setter: setNewPermission, },
-                        { label: "Read", type: "checkbox", setter: setNewPermission }
-                      ]}]
-                    }
-                  ]}
-                />
-                <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
-                  actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser} 
-                />
-              </div>
-            }
+            action = {userData.map((item:any, index:number)=>{
+              return(
+                <div className="flex flex-row">
+                  <FormDialog 
+                    triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                    formTitle="Edit User" formSubmit={editUser(index)} submitButton="Edit User"
+                    form={[
+                      { category: "single", label: "Name", type: "text", setter: setNewName },
+                      { category: "grid", number: 2, fields: [
+                        { label: "Email", type: "email", setter: setNewEmail },
+                        { label: "Role", type: "select", setter: setNewRole, options: ["Admin", "Maker", "Checker"] },
+                        { label: "Permissions", type:"subgrid", fields: [
+                          { label: "Verify", type: "checkbox", setter: setNewPermission, },
+                          { label: "Read", type: "checkbox", setter: setNewPermission }
+                        ]}]
+                      }
+                    ]}
+                  />
+                    <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
+                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
+                    />
+                    
+                </div>
+              )
+            })}
           />
           {/* 
           <TableBody>

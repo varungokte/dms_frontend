@@ -69,73 +69,21 @@ function ContactDetails() {
               title="Add New Contact"
               formSubmit={createContact}
               submitButton="Add User"
-              form = {
-                [
-                  {
-                    category: "grid",
-                    number: 0,
-                    fields:
-                    [
-                      {
-                        type: "text",
-                        label: "Choose",
-                        setter: setPersonType
-                      },
-                      {
-                        type:"text",
-                        label: "Company Name",
-                        setter: setCompany
-                      },
-                      {
-                        type:"text",
-                        label: "Contact Person Name",
-                        setter: setName
-                      },
-                      {
-                        type:"text",
-                        label: "Designation",
-                        setter: setDesignation
-                      },
-                      {
-                        type:"email",
-                        label: "Email Address",
-                        setter: setEmail
-                      },
-                      {
-                        type:"select",
-                        label: "Mention",
-                        setter: setMention,
-                        options: ["To", "CC"]
-                      },
-                      {
-                        type:"text",
-                        label: "Landline Number",
-                        setter: setLandline
-                      },
-                      {
-                        type:"text",
-                        label: "Mobile Number",
-                        setter: setMobile
-                      },
-                      {
-                        type:"text",
-                        label: "Registered Address",
-                        setter: setRegAddress
-                      },
-                      {
-                        type:"text",
-                        label: "Company Name",
-                        setter: setCompany
-                      },
-                      {
-                        type:"text",
-                        label: "Billing Address",
-                        setter: setBillAddress
-                      }
-                    ]
-                  }
-                ]
-              } 
+              form = {[
+                { category: "grid", number: 0, fields: [
+                  { type: "text", label: "Choose", setter: setPersonType },
+                  { type:"text", label: "Company Name", setter: setCompany },
+                  { type:"text", label: "Contact Person Name", setter: setName },
+                  { type:"text", label: "Designation", setter: setDesignation },
+                  { type:"email", label: "Email Address", setter: setEmail },
+                  { type:"select", label: "Mention", setter: setMention, options: ["To", "CC"] },
+                  { type:"text", label: "Landline Number", setter: setLandline },
+                  { type:"text", label: "Mobile Number", setter: setMobile },
+                  { type:"text", label: "Registered Address", setter: setRegAddress },
+                  { type:"text", label: "Company Name", setter: setCompany },
+                  { type:"text", label: "Billing Address",setter: setBillAddress }
+                ]}
+              ]} 
               />
             </Dialog>
         </div>

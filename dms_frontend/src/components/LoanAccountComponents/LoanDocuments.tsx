@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table";
 
-import { PriorityValues, PriorityStyling } from "../BasicComponents/Priority";
-import { StatusValues, StatusStyling } from "../BasicComponents/DocumentStatus";
-
+import { PriorityValues, PriorityStyling, DocumentStatusValues, DocumentStatusStyling, EnumIteratorValues, EnumIteratorKeys } from "../BasicComponents/Constants";
+import Search from "../BasicComponents/Search";
+import Filter from "../BasicComponents/Filter";
+import { HeaderRows } from "../BasicComponents/Table";
 
 function LoanDocuments(props: any) {
   //SHOULD GET DOCDATA FROM props.docData
@@ -26,26 +26,16 @@ function LoanDocuments(props: any) {
       <br/>
 			<p className="text-2xl font-bold m-7 mt-5">{props.label}</p>
 
-
       <div className="flex flex-row">
         <div className=''>
-          <input type="text" className="border-2 mx-10 p-3 rounded-xl my-2 w-72" 
-          onChange={(e)=>{
-            const val = e.target.value+"";
-            setSearchString(val.replace("\\", "/\\/"))
-          }} 
-          placeholder="Search"/>
+          <Search setter={setSearchString} label="Search" />
         </div>
 
         <div className="flex-auto">
-          <select className="bg-white border-2 p-3 rounded-xl mt-2 w-60" onChange={(e:any)=>setPriority(e.target.value)}>
-            <option value={-1}>Priority</option>
-            {Object.keys(PriorityValues).filter(v=>isNaN(Number(v))).map((val,ind)=>{
-              return(
-                <option value={ind}>{val}</option>
-              )
-            })}
-          </select>
+          <Filter setter={setPriority} listsAreSame={false} 
+            labelList={EnumIteratorValues(PriorityValues)} valueList={EnumIteratorKeys(PriorityValues)}
+            setPlaceholder={true} placeholderValue={[-1,"Priority"]} 
+          />
         </div>
       
         <div className="mr-3">
@@ -54,17 +44,8 @@ function LoanDocuments(props: any) {
       </div>
       <div className="m-5">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-center">Document Name</TableHead>
-              <TableHead className="text-center">Priority</TableHead>
-              <TableHead className="text-center">Physical Location</TableHead>
-              <TableHead className="text-center">Execution Location</TableHead>
-              <TableHead className="text-center">Start Date</TableHead>
-              <TableHead className="text-center">End Date</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-            </TableRow>
-          </TableHeader>
+          <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Status"]]} />
+
           <TableBody>
             {docData.map(document => {
               const regEx = new RegExp(searchString, "i");
@@ -77,7 +58,7 @@ function LoanDocuments(props: any) {
                   <TableCell>{document[3]}</TableCell>
                   <TableCell>{document[4]}</TableCell>
                   <TableCell>{document[5]}</TableCell>
-                  <TableCell className={`${StatusStyling[Number(document[6])]}`}>{StatusValues[Number(document[6])]}</TableCell>
+                  <TableCell className={`${DocumentStatusStyling[Number(document[6])]}`}>{DocumentStatusValues[Number(document[6])]}</TableCell>
                 </TableRow>
               )
             })}

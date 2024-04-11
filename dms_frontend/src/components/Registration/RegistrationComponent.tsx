@@ -1,21 +1,14 @@
-import { FormEvent, useState } from "react"
-import { useNavigate } from "react-router-dom";
-import useGlobalContext from "../../../GlobalContext";
-import { useToast } from "../ui/use-toast";
-
+import { FormEvent, useState } from "react";
+import useGlobalContext from "./../../../GlobalContext";
 
 export const RegistrationComponent = () => {
 	const [companyName, setCompanyName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [totalUsers, setTotalUsers] = useState(0);
 	const [maximumUsers, setMaximumUsers] = useState(0);
 	const [message, setMessage] = useState("");
 
-	const navigate = useNavigate()
-	const { RegisterUser } = useGlobalContext();
-	const { toast } = useToast()
-
+	const {RegisterAdmin} = useGlobalContext()
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
@@ -23,18 +16,10 @@ export const RegistrationComponent = () => {
 			E: email,
 			N: companyName,
 			P: password,
+			MU: maximumUsers
 		}
 
-		console.log(JSON.stringify(data))
-
-		fetch("http://192.168.1.2:3000/api/v1/allAPI/addAdmin",{
-			method: "POST",
-			headers: {
-				"Content-type": "application/json"
-			},
-			body: JSON.stringify(data)
-		})
-		.then((res:any)=>{
+		RegisterAdmin(data).then((res:any)=>{
 			if (res.status == 409)
 				setMessage("Conflict Error");
 			else if (res.status == 200)
@@ -44,23 +29,6 @@ export const RegistrationComponent = () => {
 			if (err.status == 409)
 				setMessage("Conflict Error")
 		})
-
-		/* RegisterUser(data)
-			.then(() => toast({
-				variant: "default",
-				title: "Registration Successfull",
-				description: "now you can login"
-			}))
-			.then(() => {
-				navigate('/login');
-			})
-			.catch((err) => {
-				toast({
-					variant: "default",
-					title: "Error",
-					description: err.message
-				})
-			}) */
 	}
 
 	return (
@@ -102,16 +70,6 @@ export const RegistrationComponent = () => {
 					onChange={(e) => setPassword(e.target.value)}
 				/>
 
-				<br/>
-				<br/>
-				<label htmlFor="role">Total Users</label>
-				<br/>
-				<input
-					type="number"
-					id="total"
-					value={totalUsers}
-					onChange={(e:any) => setTotalUsers(e.target.value)}
-				/>
 				<br/>
 				<br/>
 				<label htmlFor="cname">Maximum Users</label>

@@ -30,7 +30,7 @@ function Ratings() {
   return(
     <div className="bg-white rounded-xl">
       <br/>
-			<p className="text-2xl font-bold mx-7 mb-5">Contact Details</p>
+			<p className="text-2xl font-bold mx-7 mb-5">Ratings</p>
 
       <div className="flex flex-row">
         <div className=''>

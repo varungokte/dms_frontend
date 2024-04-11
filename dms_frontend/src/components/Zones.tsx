@@ -3,7 +3,7 @@ import { useState } from "react";
 import { CircularProgressbar } from "react-circular-progressbar";
 import 'react-circular-progressbar/dist/styles.css';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table"
+import { Table } from "@/components/ui/table"
 import Search from "./BasicComponents/Search";
 import Filter from "./BasicComponents/Filter";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";

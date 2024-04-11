@@ -1,9 +1,6 @@
 import { FormEvent, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import useGlobalContext from "../../../GlobalContext";
-import { useToast } from "../ui/use-toast";
-import { Link } from "react-router-dom";
-
 
 import login_img from "./../static/login_img.png";
 import eye from "./../static/eye.svg";
@@ -16,76 +13,35 @@ export const LoginComponent = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState(<></>);
 
-	const navigate = useNavigate()
+	const navigate = useNavigate();
 	const { LoginUser } = useGlobalContext();
-	const { toast } = useToast()
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
+    console.log()
 		if (email===""){
       setErrorMessage(<p className="text-red-600">Email is required</p>)
       return;
     }
     if (password===""){
       setErrorMessage(<p className="text-red-600">Password is required</p>);
-      return
+      return;
     }
 
 		const data = {
 			E: email,
 			P: password
 		}
-    fetch("http://192.168.1.2:3000/api/v1/allAPI/loginAdmin",{
-			method: "POST",
-			headers: {
-				"Content-type": "application/json"
-			},
-			body: JSON.stringify(data)
-		})
-		.then((res:any)=>{
-      console.log(res)
-			if (res.status == 409)
-      setErrorMessage(<p>Conflict Error</p>);
-			else if (res.status == 200)
-      setErrorMessage(<p>Successfully created</p>);
-
-      res.json().then((obj:object)=>{
-        console.log (obj)
-      })
-		})
-		.catch((err:any)=>{
-      console.log(err)
-			if (err.status == 409)
-      setErrorMessage(<p>Conflict Error</p>)
-		})
-		/* LoginUser(data)
+		LoginUser(data)
 			.then((res) => {
-				console.log(res)
-				if (res.data.user) {
-					toast({
-						variant: "default",
-						title: "Login Successful",
-						})
-				} else {
-						toast({
-							variant: "destructive",
-							title: "Something went wrong",
-						})
-				}
-			}
-			).then(() => {
-				navigate('/')
-				}).catch((err) => {
-					toast({
-						variant: "default",
-						title: "Error",
-						description: err.message
-					})
-				}) */
+        if (res==="verify_email")
+          navigate("/verify")
+        else
+          navigate('/')
+			})
 	}
 
-	return (
-		
+	return (		
     <div className="flex flex-row">
       <div style={{marginTop:"3%",}}>
         <img src={login_img} width={"80%"} style={{float:"right", paddingRight:"5%"}}/>

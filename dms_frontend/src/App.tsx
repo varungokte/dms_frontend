@@ -1,35 +1,19 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
 import { RegistrationPage } from './components/Registration/RegistrationPage';
-import { MenuRouter } from './MenuRouter';
 import { LoginPage } from './components/Login/LoginPage';
-import { useEffect, useState } from 'react';
-import useGlobalContext from "../GlobalContext";
+import PrivateRoutes from './PrivateRoutes';
+import VerificationComponent from './components/VerificationComponent';
 
 
 function App() {
-  const { isLoggedIn } = useGlobalContext();
-
-  useEffect(() => {
-    isLoggedIn();
-  }, [])
-
-  /* if (!isLoggedIn())
-    return (
-      <BrowserRouter>
-        <Routes>
-          <Route path="/register" element={<RegistrationPage />} />
-          <Route path='/login' element={<LoginPage />} />
-        </Routes>
-      </BrowserRouter>
-  ); */
-
   return (
     <BrowserRouter>
       <Routes>
-          <Route path="/register" element={<RegistrationPage />} />
-          <Route path='/login' element={<LoginPage />} />
-        <Route path='/*' element={<MenuRouter />} />
+        <Route path="/register" element={<RegistrationPage />} />
+        <Route path='/login' element={<LoginPage />} />
+        <Route path="/verify" element={<VerificationComponent/>} />
+        <Route path='/*' element={<PrivateRoutes />} />
       </Routes>
     </BrowserRouter>
   )
