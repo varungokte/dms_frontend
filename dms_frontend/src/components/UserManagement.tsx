@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Table, } from "@/components/ui/table";
+import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { UserRoles, EnumIteratorValues, EnumIteratorKeys } from "./BasicComponents/Constants";
@@ -14,6 +15,7 @@ import delete_icon from "./static/delete_icon.svg";
 
 //Routes: addUser,editUser, getUser
 function UserManagement(){
+  const newUser = useGlobalContext().createUser;
   //userData is an array of users
   //Each user is an array with: [Name, Email, Company Name, Role, Status]
   //Role can be maker(0), checker(1), admin (2), superadmin (3)
@@ -21,7 +23,7 @@ function UserManagement(){
   const [userData]= useState([  
     ["Bruce Wayne", "bw@email.com", 2,1],
     ["Mark Scout", "email@email.com", 1,1],
-    ["Nix Card", "email123@email,com", 2, 0 ],
+    ["Nix Card", "email123@email.com", 2, 0 ],
     ["Wile E. Cayote", "example@email.com", 1, 0],
     ["Lucius Fox", "email@email.com", 2, 1],
     ["Oliver Queen", "oq@email.com", 2, 1],
@@ -29,18 +31,48 @@ function UserManagement(){
   ]);
   const [roleFilter, setRoleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
+  const [selectedUser, setSelectedUser] = useState(-1);
+  const [message, setMessage] = useState(<></>);
 
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
-  const [newRole, setNewRole] = useState(-1);
+  const [newRole, setNewRole] = useState(0);
   const [newPassword, setNewPassword] = useState("");
-  const [newPermission, setNewPermission] = useState(-1);
 
-  const createUser = () => {
+  const createUser = (e:any) => {
+    e.preventDefault();
+    const data = {
+      N: newName,
+      E: newEmail,
+      P: newPassword,
+      R: newRole,
+    }
 
+    newUser(data).then(res=>{
+      console.log(res);
+    }).catch((err)=>{
+      if (err=="dupliate_user"){
+        setMessage(<p>Duplicate User</p>)
+      }
+    })
   }
 
-  const editUser = (index:number) => {}
+  const editUser = () => {
+    if (selectedUser==-1) 
+      return;
+    
+    const arr = userData[selectedUser];
+    const data = {} as any;
+
+    if (newName!=arr[0])
+      data["N"] = newName
+    if (newEmail!=arr[1])
+      data["E"] = newEmail
+    if (newPassword!=arr[2])
+      data["P"] = newPassword
+    if (newRole!=arr[3])
+      data["R"] = newRole
+  }
 
   const deleteUser = (index:number) =>{
 
@@ -65,7 +97,7 @@ function UserManagement(){
             triggerClassName={PurpleButtonStyling} 
             triggerText="+ Add User" 
             formTitle="Add User" 
-            formSubmit={createUser} 
+            formSubmit={createUser}
             submitButton="Add User"
             //category can be: single (entire line is one input field) or grid
             //if grid, it will fields, whose value is an array of object; each object is a field
@@ -74,12 +106,13 @@ function UserManagement(){
               { label: "Name", type: "text", setter: setNewName },
               { label: "Email", type: "email", setter: setNewEmail },
               { label: "Password", type: "password", setter: setNewPassword },
-              { label: "Role", type: "select", setter: setNewRole, options: ["Admin", "Maker", "Checker"] },
+              { label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker", "Admin"] },
             ]}]}
           />
         </div>
       </div>
       <div className="m-7">
+      {message}
         <Table className="bg-white border-2 rounded-xl">
           <HeaderRows headingRows={[["Name"], ["Email Address"], ["Role"], ["Status"], ["Action"]]} />
           <BodyRowsMapping
@@ -90,45 +123,28 @@ function UserManagement(){
                 <div className="flex flex-row">
                   <FormDialog 
                     triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                    formTitle="Edit User" formSubmit={editUser(index)} submitButton="Edit User"
+                    formTitle="Edit User" formSubmit={editUser}  submitButton="Edit User"
                     form={[
-                      { category: "single", label: "Name", type: "text", setter: setNewName },
-                      { category: "grid", number: 2, fields: [
+                      { category: "grid", row: 2, fields: [
+                        { label: "Name", type: "text", setter: setNewName },
                         { label: "Email", type: "email", setter: setNewEmail },
-                        { label: "Role", type: "select", setter: setNewRole, options: ["Admin", "Maker", "Checker"] },
-                        { label: "Permissions", type:"subgrid", fields: [
-                          { label: "Verify", type: "checkbox", setter: setNewPermission, },
-                          { label: "Read", type: "checkbox", setter: setNewPermission }
-                        ]}]
-                      }
-                    ]}
+                        { label: "Password", type: "password", setter: setNewPassword },
+                        { label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker", "Admin"] },
+                      ]}]}
+                    prefill={true}
+                    prefillValues={[item[0],item[1],"",item[2]]}
+                    prefillVariables={[newName,newEmail,newPassword,newRole]}
+                    currentIndex={index}
+                    currentSetter={setSelectedUser}
                   />
                     <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
-                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
+                      actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
                     />
                     
                 </div>
               )
             })}
           />
-          {/* 
-          <TableBody>
-            {userData.map(user=>{
-              const regEx = new RegExp(searchString, "i");
-              if ((roleFilter==-1 || roleFilter==user[3]) && (searchString=="" || (user[0]+"").search(regEx)!==-1))
-              return (
-                <TableRow>
-                  <TableCell>{user[0]}</TableCell>
-                  <TableCell>{user[1]}</TableCell>
-                  <TableCell>{UserRoles[Number(user[2])]}</TableCell>
-                  <TableCell>
-                  </TableCell>
-                  <TableCell>
-                  </TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody> */}
         </Table>
       </div>
     </div>

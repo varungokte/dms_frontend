@@ -3,7 +3,6 @@ import { useState } from "react";
 import ContactDetails from "./LoanAccountComponents/Contact Details";
 import Ratings from "./LoanAccountComponents/Ratings";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
-import Covenants from "./LoanAccountComponents/Covenants";
 import RelationshipMapping from "./LoanAccountComponents/RelationshipMapping";
 import BasicDetails from "./LoanAccountComponents/BasicDetails";
 

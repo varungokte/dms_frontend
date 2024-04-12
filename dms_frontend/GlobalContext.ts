@@ -1,11 +1,11 @@
 import axios from 'axios'
 import { decodeToken } from "react-jwt";
 
-const Base_Url = "http://192.168.1.2:3000/api/v1/allAPI/";
+const Base_Url = "http://192.168.1.4:3000/api/v1/allAPI";
 
 const RegisterAdmin = async (data:object) => {
 	try {
-		const response = await axios.post(`${Base_Url}addAdmin`, data);
+		const response = await axios.post(`${Base_Url}/addAdmin`, data);
 		return response;
 	} 
 	catch (error) {
@@ -15,16 +15,17 @@ const RegisterAdmin = async (data:object) => {
 
 const RegisterUser = async (data: object) => {
 	try {
-		const response = await axios.post(`${Base_Url}register`, data);
+		const response = await axios.post(`${Base_Url}/register`, data);
 		return response;
 	} 
 	catch (error) {
 		throw error;
 	}
 }
+//Conflict Error 409 -> User inactive; contact admin
 const LoginUser = async (data: object) => {
 	try {
-		const response = await axios.post(`${Base_Url}login`, data, {
+		const response = await axios.post(`${Base_Url}/login`, data, {
 			headers:{
 				"Content-type": "application/json"
 			}
@@ -56,7 +57,7 @@ const isLoggedIn = () => {
 
 const sendOTP = async (token: any) => {
 	try {
-		const response = await axios.get(`${Base_Url}sendOTP`,{
+		const response = await axios.get(`${Base_Url}/sendOTP`,{
 			headers:{
 			"Authorization": `Bearer ${token}`
 		}
@@ -70,10 +71,10 @@ const sendOTP = async (token: any) => {
 
 const verifyOTP = async (token: any, otp:any) => {
 	try {
-		const response = await axios.post(`${Base_Url}verifyOTP`,{otp:otp},{
+		const response = await axios.post(`${Base_Url}/verifyOTP`,{otp:otp},{
 			headers:{
-			"Authorization": `Bearer ${token}`
-		}
+				"Authorization": `Bearer ${token}`
+			}
 		});
 		return response;
 	}
@@ -82,6 +83,25 @@ const verifyOTP = async (token: any, otp:any) => {
 	}
 }
 
+//Conflict Error -> Duplicate User
+const createUser = async (data:object) => {
+	try {
+		const response = await axios.post(`${Base_Url}/addUser`,data, {
+			headers:{
+				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
+			}
+		});
+		return response;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		if (error.response.status===409)
+			return "duplicate_user"
+	}
+}
+
+
 const useGlobalContext = () => {
 	return {
 		RegisterAdmin,
@@ -89,7 +109,8 @@ const useGlobalContext = () => {
 		LoginUser,
 		isLoggedIn,
 		sendOTP,
-		verifyOTP
+		verifyOTP,
+		createUser,
 	}
 }
 

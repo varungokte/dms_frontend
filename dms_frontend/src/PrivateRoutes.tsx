@@ -10,9 +10,15 @@ function PrivateRoutes(){
 }
 
 function EmailVerification(props:any){
-  return (props.token["EV"]===1)?<MenuRouter />:<Navigate to="/verify"/>
+  return (props.token["S"]===2)?<MenuRouter />:<Navigate to="/verify"/>
 }
 
 
 
 export default PrivateRoutes;
+
+
+//User Status
+//1 - Unverified
+//2 - Active
+//3 - Inactive

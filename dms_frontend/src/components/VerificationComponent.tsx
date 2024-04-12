@@ -39,7 +39,7 @@ function VerificationComponent(props:any){
         setMessage(<p>Try Again</p>)
       else {
         //@ts-ignore
-        if (decoded["EV"]==0)
+        if (decoded["S"]==2)
           setMessage(<p>Try Again</p>)
         else{
           setMessage(<p>Success</p>)
