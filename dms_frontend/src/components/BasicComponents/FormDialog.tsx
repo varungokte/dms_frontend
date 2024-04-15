@@ -5,14 +5,11 @@ function FormDialog(props:any){
 
   //to handle inputs of type text, password and email
 
-  /* const getPrefilledValues = () => {
-    props.setter
-  } */
   const handleText = (label:string, setter: Function, type: string, prefillValue:string) => {
     return(
     <div className="mb-5">
-      <label htmlFor={label} className="text-lg">{label}</label>
-      <input name="otp" autoComplete="garbage" id={label} type={type} onChange={(e)=>setter(e.target.value)} placeholder={prefillValue} className="border-2 rounded-xl w-full h-full p-3"/>
+      <label htmlFor={label} className="font-light text-lg">{label}</label>
+      <input name="otp" autoComplete="garbage" id={label} type={type} onChange={(e)=>setter(e.target.value)} placeholder={prefillValue} className="border rounded-xl w-full h-full p-4"/>
     </div>
     )
   };
@@ -20,9 +17,9 @@ function FormDialog(props:any){
   const handleSelect = (label:string, setter: Function, options: [string], prefillValue:number) => {
     return(
       <div className="mb-5">
-        <label htmlFor={label} className="text-lg">{label}</label>
+        <label htmlFor={label} className="font-light text-lg">{label}</label>
         <br/>
-        <select id={label} onChange={(e:any)=>setter(e.target.value)} className="bg-white border-2 rounded-xl w-full h-12 p-3">
+        <select id={label} onChange={(e:any)=>setter(e.target.value)} className="bg-white border rounded-xl w-full h-10/12 p-4">
           {options.map((option:any,index:any)=>{
             return <option value={index} selected={props.prefill&&prefillValue==index}>{option}</option>
           })}
@@ -36,7 +33,7 @@ function FormDialog(props:any){
       <DialogTrigger className={props.triggerClassName}>{props.triggerText}</DialogTrigger>
       <DialogContent className="bg-white min-w-[800px] min-h-[500px]">
         <DialogHeader>
-          <DialogTitle className="text-2xl">{props.formTitle}</DialogTitle>
+          <DialogTitle className="text-2xl font-normal">{props.formTitle}</DialogTitle>
           <hr/>
         </DialogHeader>
         <div>
@@ -85,41 +82,41 @@ export default FormDialog;
  */
 
 /* props:
-      triggerClassName: {PurpleButtonStyling}
-      triggerText: "Add User"
-      formTitle: "Enter a user name"
-      formSubmit: {createUser}
-      submitButton: "Create User"
-      form: 
-      [
-        { 
-          category: "single", 
-          label: "Name", 
-          type: "text",
-          setter: setNewName
-        }, 
-        {
-          category: grid, 
-          number:4, 
-          fields:
-          [
-            {
-              type: "email"
-              label: "Email",
-              setter: setNewEmail
-            }, 
-            {
-              type: "password",
-              label: "Password",
-              setter: setNewPassword
-            }, 
-            {
-              type: "select",
-              label: "Role",
-              setter: setNewRole
-              options: ["Admin", "Maker", "Checker"]
-            }
-          ]
-        }
-      ]    
+    triggerClassName: {PurpleButtonStyling}
+    triggerText: "Add User"
+    formTitle: "Enter a user name"
+    formSubmit: {createUser}
+    submitButton: "Create User"
+    form: 
+    [
+      { 
+        category: "single", 
+        label: "Name", 
+        type: "text",
+        setter: setNewName
+      }, 
+      {
+        category: grid, 
+        row:4, //Number of rows
+        fields:
+        [
+          {
+            type: "email"
+            label: "Email",
+            setter: setNewEmail
+          }, 
+          {
+            type: "password",
+            label: "Password",
+            setter: setNewPassword
+          }, 
+          {
+            type: "select",
+            label: "Role",
+            setter: setNewRole
+            options: ["Admin", "Maker", "Checker"]
+          }
+        ]
+      }
+    ]    
   */

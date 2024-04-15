@@ -1,5 +1,5 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles } from "./Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook } from "./Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
@@ -68,7 +68,11 @@ function SingleRow(props:any){
         if (dataType=="userStatus")
           return handleUserStatus(Number(item), cellClassName);
         if (dataType=="role")
-          return handleRole(Number(item), cellClassName);    
+          return handleRole(Number(item), cellClassName);
+        if (dataType=="ratingType")
+          return handleRatingType(Number(item), cellClassName);
+        if (dataType=="ratingOutlook")
+          return handleRatingOutlook(Number(item), cellClassName);    
       })}
     </TableRow>
   )
@@ -123,6 +127,14 @@ const handleAction = (action:any, cellClassName:string) => {
   return <TableCell className={cellClassName}>{action}</TableCell>
 }
 
+const handleRatingType = (index:any, cellClassName:string) => {
+  return <TableCell className={cellClassName}>{RatingTypes[index]}</TableCell>
+}
+
+const handleRatingOutlook = (index:any, cellClassName:string) => {
+  return <TableCell className={cellClassName}>{RatingOutlook[index]}</TableCell>
+}
+
 export { HeaderRows, BodyRowsMapping }
 
 /* 
@@ -148,15 +160,4 @@ export { HeaderRows, BodyRowsMapping }
     filterRows = [[priority, 2], [companyName, 1]]  REQ
     action ={<>Component to be rendered</>}
     cellClassName={["Styling for Col1", "Styling for Col2"]}
- */
-
-
-
-/* 
-Data Types:
-  text
-  Priority Label
-  Document Status
-  User Status
-  Action (Custom)
  */

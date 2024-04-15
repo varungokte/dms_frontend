@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
-
+import { Table } from "@/components/ui/table"
+import Search from "../BasicComponents/Search";
+import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 
 function Ratings() {
   //Ratingslist is an array of different ratings
@@ -13,19 +14,6 @@ function Ratings() {
     ["ICRA", 0, "12/06/20", 0, "LINK3", "Gold Level"]
   ])
   const [searchString, setSearchString] = useState("");
-  
-  enum RatingTypes {
-    "Provisional",
-    "Final"
-  };
-
-  enum RatingOutlook {
-    "Negative",
-    "Stable",
-    "Positive"
-  };
-
-  
 
   return(
     <div className="bg-white rounded-xl">
@@ -34,42 +22,17 @@ function Ratings() {
 
       <div className="flex flex-row">
         <div className=''>
-          <input type="text" className="border-2 mx-10 p-3 rounded-xl my-2 w-72" 
-          onChange={(e)=>{
-            const val = e.target.value+"";
-            setSearchString(val.replace("\\", "/\\/"))
-          }} 
-          placeholder="Search"/>
+          <Search setter={setSearchString} label="Search" />
         </div>
       </div>
 
       <div className="m-5">
       <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>Rating Agency</TableHead>
-            <TableHead>Rating Type</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Outlook</TableHead>
-            <TableHead>Link</TableHead>
-            <TableHead>Rating</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {ratingsList.map(rating =>{
-            return(
-              <TableRow>
-                <TableCell>{rating[0]}</TableCell>
-                <TableCell>{RatingTypes[Number(rating[1])]}</TableCell>
-                <TableCell>{rating[2]}</TableCell>
-                <TableCell>{RatingOutlook[Number(rating[3])]}</TableCell>
-                <TableCell className="text-blue-500">{rating[4]}</TableCell>
-                <TableCell>{rating[5]}</TableCell>
-              </TableRow>
-            )
-          })}
-          
-        </TableBody>
+        <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
+
+        <BodyRowsMapping list={ratingsList} dataType={["text", "ratingType", "text", "ratingOutlook", "text", "text"]}
+          searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
+        />
       </Table>
 
       </div>

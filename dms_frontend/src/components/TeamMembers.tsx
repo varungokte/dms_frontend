@@ -62,19 +62,17 @@ function TeamMembers() {
 								{//@ts-ignore
 								members[category].map((member)=>{
 									return (
-										<div >
-											<Card className="m-5 rounded-2xl bg-white w-72">
-												<CardHeader>
-													<CardTitle className="m-auto">
-														<ProfileIcon name={member}/>
-													</CardTitle>
-												</CardHeader>
-												<CardContent>
-													<p className="text-center font-medium">{member}</p>
-													<p className="text-center font-light">{category}</p>
-												</CardContent>
-											</Card>
-										</div>
+										<Card className="m-5 rounded-2xl bg-white w-72">
+											<CardHeader>
+												<CardTitle className="m-auto">
+													<ProfileIcon name={member} size="large" />
+												</CardTitle>
+											</CardHeader>
+											<CardContent>
+												<p className="text-center font-medium">{member}</p>
+												<p className="text-center font-light">{category}</p>
+											</CardContent>
+										</Card>
 									)})}
 							</div>
 						</div>

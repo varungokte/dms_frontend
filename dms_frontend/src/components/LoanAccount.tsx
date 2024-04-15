@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
+import { Table } from "@/components/ui/table";
 import Search from "./BasicComponents/Search";
 import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";

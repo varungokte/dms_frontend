@@ -32,7 +32,6 @@ import TaskIcon from './components/static/PanelIcons/TaskIcon';
 import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
 import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
 import LoanAccount from './components/LoanAccount';
-import ContactDetails from './components/LoanAccountComponents/Contact Details';
 import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
 import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 

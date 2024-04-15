@@ -1,9 +1,9 @@
 import { useState } from "react";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible";
 
-import { PriorityValues, PriorityStyling, EnumIteratorKeys } from "./BasicComponents/Constants";
+import { PriorityValues, EnumIteratorKeys } from "./BasicComponents/Constants";
 import UploadButton from "./BasicComponents/UploadButton";
 import Search from "./BasicComponents/Search";
 

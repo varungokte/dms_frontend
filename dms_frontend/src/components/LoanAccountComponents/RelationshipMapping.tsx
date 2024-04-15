@@ -1,30 +1,51 @@
 import { useState } from "react";
+import Filter from "../BasicComponents/Filter";
+import { EnumIteratorKeys, EnumIteratorValues, UserRoles } from "../BasicComponents/Constants";
+import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
+import FormDialog from "../BasicComponents/FormDialog";
 
 function RelationshipMapping(){
   const [role, setRole] = useState("");
+
+  const [newName, setNewName] = useState("");
+  const [newRole, setNewRole] = useState(-1);
+  const [newOperation, setNewOperation] = useState("");
+
+  const addUser = (e:any) =>{
+    e.preventDefault();
+  }
+
   return (
     <div className="bg-white rounded-xl">
       <br/>
-			<p className="text-2xl font-bold mx-7 mb-5">Relationship Mapping</p>
+      <p className="text-2xl font-bold mx-7 mb-2">Relationship Mapping</p>
       <hr/>
-      <div className="flex flex-row">
+      <div className="flex flex-row m-7">
         <div className='flex-auto'>
-          <select className="border-2 bg-white mx-5 p-3 rounded-xl my-2 w-72" 
-            onChange={(e)=>{
-            const val = e.target.value+"";
-            setRole(val.replace("\\", "/\\/"))
-          }}>
-            <option value={-1}>All Roles</option>
-            <option value={0}>Maker</option>
-            <option value={1}>Checker</option>
-            <option value={2}>Admin</option>
-          </select>
+          <Filter setter={setRole} listsAreSame={false} labelList={EnumIteratorValues(UserRoles)} valueList={EnumIteratorKeys(UserRoles)}
+            setPlaceholder={true} placeholderValue={[-1, "All Roles"]}
+          />
         </div>
         
         <div>
-          <button>a</button>
+          <FormDialog 
+            triggerText="+ Add"
+            triggerClassName={PurpleButtonStyling}
+            formTitle="Relationship Mapping"
+            formSubmit={addUser}
+            submitButton="Save"
+            form = {[
+              {category:"single", label:"Name", type:"text", setter:setNewName },
+              {category:"grid", row: 2, fields:[
+                {label:"Role", type:"select", setter:setNewRole, options:EnumIteratorValues(UserRoles) },
+                {label: "Operation", type:"text", setter:setNewOperation }
+              ]}
+            ]}
+          />  
         </div>
       </div>
+
+      <div className=""></div>
     </div>
   )
 }

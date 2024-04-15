@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table";
+import { Table } from "@/components/ui/table";
 
-import { PriorityValues, PriorityStyling, DocumentStatusValues, DocumentStatusStyling, EnumIteratorValues, EnumIteratorKeys } from "../BasicComponents/Constants";
+import { PriorityValues, EnumIteratorValues, EnumIteratorKeys } from "../BasicComponents/Constants";
 import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
-import { HeaderRows } from "../BasicComponents/Table";
+import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 
 function LoanDocuments(props: any) {
   //SHOULD GET DOCDATA FROM props.docData
@@ -12,11 +12,11 @@ function LoanDocuments(props: any) {
   //docData is an array of documents
   //Each document is a array: [Document Name, Priority, Physical Location, Execution Location, Start Date, End Date, Status]
   const [docData] = useState([
-    ["Common Loan Agreement", 2, "Jaipur", "Jaipur", "15/08/17", "15/08/17", 0],
-    ["Lender Agent Agreement", 2, "Pune", "Pune",  "15/08/17", "15/08/17", 2],
-    ["Power Purchase Agreement", 0, "Surat", "Surat", "15/08/17", "15/08/17", 1],
-    ["Lender Agent Agreement", 1, "Surat", "Surat",  "15/08/17", "15/08/17", 2],
-    ["Escrow Agreement", 1, "Pune", "Pune",  "15/08/17", "15/08/17", 2],
+    ["Common Loan Agreement", 2, "Jaipur", "Jaipur", "15/08/17", "15/08/17"],
+    ["Lender Agent Agreement", 2, "Pune", "Pune",  "15/08/17", "15/08/17"],
+    ["Power Purchase Agreement", 0, "Surat", "Surat", "15/08/17", "15/08/17"],
+    ["Lender Agent Agreement", 1, "Surat", "Surat",  "15/08/17", "15/08/17"],
+    ["Escrow Agreement", 1, "Pune", "Pune",  "15/08/17", "15/08/17"],
   ]);
   const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(-1);
@@ -44,25 +44,11 @@ function LoanDocuments(props: any) {
       </div>
       <div className="m-5">
         <Table>
-          <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Status"]]} />
+          <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],]} />
 
-          <TableBody>
-            {docData.map(document => {
-              const regEx = new RegExp(searchString, "i");
-              if ((priority==-1 || priority==document[1]) && (searchString=="" || (document[0]+"").search(regEx)!==-1))
-              return (
-                <TableRow className="text-center">
-                  <TableCell>{document[0]}</TableCell>
-                  <TableCell ><div className={`${PriorityStyling[Number(document[1])]} rounded-lg text-center`}>{PriorityValues[Number(document[1])]}</div></TableCell>
-                  <TableCell className="text-center">{document[2]}</TableCell>
-                  <TableCell>{document[3]}</TableCell>
-                  <TableCell>{document[4]}</TableCell>
-                  <TableCell>{document[5]}</TableCell>
-                  <TableCell className={`${DocumentStatusStyling[Number(document[6])]}`}>{DocumentStatusValues[Number(document[6])]}</TableCell>
-                </TableRow>
-              )
-            })}
-          </TableBody>
+          <BodyRowsMapping list={docData} dataType={["text","priority","text","text","text","text"]}
+            searchRows={searchString==""?[]:[searchString,0]} filterRows={priority==-1?[]:[priority,1]}
+          />
         </Table>
       </div>
       <br/>

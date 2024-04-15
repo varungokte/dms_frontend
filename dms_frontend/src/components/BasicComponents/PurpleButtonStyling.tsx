@@ -1,3 +1,3 @@
-const PurpleButtonStyling = "mx-10 my-3 text-white p-3 rounded-xl bg-custom-1";
+const PurpleButtonStyling = "mx-10 h-16 rounded-xl text-white w-48 bg-custom-1";
 
 export default PurpleButtonStyling;

@@ -2,7 +2,7 @@ function Search(props:any){
   return(
     <input 
       type="text" 
-      className="border-2 mx-10 my-2 p-4 rounded-xl" 
+      className="border-2 mx-10 h-full p-5 rounded-xl" 
       placeholder={props.label} 
       onChange={
         (e)=>{

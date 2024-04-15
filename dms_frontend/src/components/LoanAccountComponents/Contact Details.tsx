@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
 import DialogForm from "../BasicComponents/FormDialog";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
+import Filter from "../BasicComponents/Filter";
+import Search from "../BasicComponents/Search";
 
 function ContactDetails() {
   //contacts is an object where the keys are the categories (like borrower, lender, promoter) and values are arrays of people
@@ -42,50 +44,37 @@ function ContactDetails() {
 			<p className="text-2xl font-bold mx-7 mb-2">Contact Details</p>
       <hr/>
 
-      <div className="flex flex-row">
+      <div className="flex flex-row mt-5">
         <div className=''>
-          <input type="text" className="border-2 mx-10 p-3 rounded-xl my-2 w-72" 
-          onChange={(e)=>{
-            const val = e.target.value+"";
-            setSearchString(val.replace("\\", "/\\/"))
-          }} 
-          placeholder="Search"/>
+          <Search setter={setSearchString} label="Search" />
         </div>
 
         <div className="flex-auto">
-          <select className="bg-white border-2 p-3 rounded-xl mt-2 w-60" onChange={(e:any)=>setRole(e.target.value)}>
-            {Object.keys(contacts).sort().map(category=>{
-              return(
-                <option value={category}>{category}</option>
-              )
-            })}
-          </select>
+          <Filter setter={setRole} listsAreSame={true} labelList={Object.keys(contacts).sort()} />
         </div>
       
         <div className="mr-3">
-          <Dialog>
-            <DialogTrigger className={PurpleButtonStyling}>+ Add Contact</DialogTrigger>
-            <DialogForm
-              title="Add New Contact"
-              formSubmit={createContact}
-              submitButton="Add User"
-              form = {[
-                { category: "grid", number: 0, fields: [
-                  { type: "text", label: "Choose", setter: setPersonType },
-                  { type:"text", label: "Company Name", setter: setCompany },
-                  { type:"text", label: "Contact Person Name", setter: setName },
-                  { type:"text", label: "Designation", setter: setDesignation },
-                  { type:"email", label: "Email Address", setter: setEmail },
-                  { type:"select", label: "Mention", setter: setMention, options: ["To", "CC"] },
-                  { type:"text", label: "Landline Number", setter: setLandline },
-                  { type:"text", label: "Mobile Number", setter: setMobile },
-                  { type:"text", label: "Registered Address", setter: setRegAddress },
-                  { type:"text", label: "Company Name", setter: setCompany },
-                  { type:"text", label: "Billing Address",setter: setBillAddress }
-                ]}
-              ]} 
-              />
-            </Dialog>
+          <DialogForm
+            triggerText="+ Add Contact"
+            triggerClassName={PurpleButtonStyling}
+            formTitle="Add New Contact"
+            formSubmit={createContact}
+            submitButton="Add User"
+            form = {[
+              { category: "grid", row:2, fields: [
+                { type: "text", label: "Choose", setter: setPersonType },
+                { type:"select", label: "Mention", setter: setMention, options: ["To", "CC"] },
+                { type:"text", label: "Company Name", setter: setCompany },
+                { type:"text", label: "Landline Number", setter: setLandline },
+                { type:"text", label: "Contact Person Name", setter: setName },
+                { type:"text", label: "Mobile Number", setter: setMobile },
+                { type:"text", label: "Designation", setter: setDesignation },
+                { type:"text", label: "Registered Address", setter: setRegAddress },
+                { type:"email", label: "Email Address", setter: setEmail }, 
+                { type:"text", label: "Billing Address",setter: setBillAddress }
+              ]}
+            ]} 
+          />
         </div>
       </div>
       <div className="flex flex-row flex-wrap m-7">
@@ -101,7 +90,7 @@ function ContactDetails() {
                   <CardTitle>	
                     <div className="flex flex-row">
                       <div className="flex-auto">
-                        <ProfileIcon name={person[0]}/>
+                        <ProfileIcon name={person[0]} size="small" />
                       </div>
                       <div className=""><EllipsisVertical/></div>
                     </div>
@@ -118,54 +107,52 @@ function ContactDetails() {
               <DialogHeader>
                 <DialogTitle>
                   <div className="flex flex-row">
-                      <ProfileIcon name={person[0]}/>
-                    <div className="p-3">
+                      <ProfileIcon name={person[0]} size="small" />
+                    <div className="px-3">
                       <p className="my-1 font-normal text-custom-1">{person[0]}</p>
                       <p className="font-light text-base">{person[1]}</p>
                     </div>
                   </div>
                 </DialogTitle>
-                <DialogDescription className="">
-                    <div className="grid grid-rows-5 grid-flow-col w-full">
-                      <div className="m-5">
-                        <p className="font-medium">{person[0]}</p>
-                        <p className="font-light">Contact Person Name</p>
-                      </div>
-
-                      <div className="m-5">
-                        <p className="font-medium">{person[1]}</p>
-                        <p className="font-light">Designation</p>
-                      </div>
-                      
-                      <div className="m-5">
-                        <p className="font-medium">{person[4]}</p>
-                        <p className="font-light">Email</p>
-                      </div>
-
-                      <div className="m-5">
-                        <p className="font-medium">{person[3]}</p>
-                        <p className="font-light">Mobile Number</p>
-                      </div>
-
-                      <div className="m-5">
-                        <p className="font-medium">{person[2]}</p>
-                        <p className="font-light">Landline Number</p>
-                      </div>
-
-                      <div className="m-5">
-                        <p className="font-medium">{person[5]}</p>
-                        <p className="font-light">Registered Address</p>
-                      </div>
-
-                      <div></div>
-
-                      <div className="m-5">
-                        <p className="font-medium">{person[6]}</p>
-                        <p className="font-light">Billing Address</p>
-                      </div>
-                    </div>
-                </DialogDescription>
               </DialogHeader>
+              <div className="grid grid-rows-5 grid-flow-col w-full">
+                <div className="m-5">
+                  <p className="font-medium">{person[0]}</p>
+                  <p className="font-light">Contact Person Name</p>
+                </div>
+
+                <div className="m-5">
+                  <p className="font-medium">{person[1]}</p>
+                  <p className="font-light">Designation</p>
+                </div>
+                
+                <div className="m-5">
+                  <p className="font-medium">{person[4]}</p>
+                  <p className="font-light">Email</p>
+                </div>
+
+                <div className="m-5">
+                  <p className="font-medium">{person[3]}</p>
+                  <p className="font-light">Mobile Number</p>
+                </div>
+
+                <div className="m-5">
+                  <p className="font-medium">{person[2]}</p>
+                  <p className="font-light">Landline Number</p>
+                </div>
+
+                <div className="m-5">
+                  <p className="font-medium">{person[5]}</p>
+                  <p className="font-light">Registered Address</p>
+                </div>
+
+                <div></div>
+
+                <div className="m-5">
+                  <p className="font-medium">{person[6]}</p>
+                  <p className="font-light">Billing Address</p>
+                </div>
+              </div>
             </DialogContent>
           </Dialog>
           )
