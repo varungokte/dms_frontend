@@ -1,10 +1,29 @@
 import { useState } from "react";
-import Filter from "../BasicComponents/Filter";
-import { EnumIteratorKeys, EnumIteratorValues, UserRoles } from "../BasicComponents/Constants";
-import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
+
+import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem,DropdownMenuLabel,DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+
+
 import FormDialog from "../BasicComponents/FormDialog";
+import Search from "../BasicComponents/Search";
+import Filter from "../BasicComponents/Filter";
+
+import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
+import ProfileIcon from "../BasicComponents/ProfileIcon";
+import { EnumIteratorKeys, EnumIteratorValues, UserRoles } from "../BasicComponents/Constants";
+import { EllipsisVertical } from "lucide-react";
 
 function RelationshipMapping(){
+  const [userInfo, setUserInfo] = useState([
+    ["Kal-El", "Maker"],
+    ["Salvor Hardin", "Checker"],
+    ["Lucy McLean","Checker"],
+    ["Cassian Andor","Checker"],
+    ["Peter Parker","Maker"],
+    ["Benjamin Sisko","Checker"],
+  ])
+
   const [role, setRole] = useState("");
 
   const [newName, setNewName] = useState("");
@@ -15,12 +34,14 @@ function RelationshipMapping(){
     e.preventDefault();
   }
 
+  const editUser = (e:any) => {
+    e.preventDefault();
+    
+  }
+
   return (
-    <div className="bg-white rounded-xl">
-      <br/>
-      <p className="text-2xl font-bold mx-7 mb-2">Relationship Mapping</p>
-      <hr/>
-      <div className="flex flex-row m-7">
+    <div className="mt-8">
+      <div className="flex flex-row">
         <div className='flex-auto'>
           <Filter setter={setRole} listsAreSame={false} labelList={EnumIteratorValues(UserRoles)} valueList={EnumIteratorKeys(UserRoles)}
             setPlaceholder={true} placeholderValue={[-1, "All Roles"]}
@@ -30,22 +51,46 @@ function RelationshipMapping(){
         <div>
           <FormDialog 
             triggerText="+ Add"
-            triggerClassName={PurpleButtonStyling}
+            triggerClassName={`${PurpleButtonStyling} w-10`}
             formTitle="Relationship Mapping"
             formSubmit={addUser}
             submitButton="Save"
             form = {[
               {category:"single", label:"Name", type:"text", setter:setNewName },
               {category:"grid", row: 2, fields:[
-                {label:"Role", type:"select", setter:setNewRole, options:EnumIteratorValues(UserRoles) },
-                {label: "Operation", type:"text", setter:setNewOperation }
+                {label: "Role", type: "select", setter: setNewRole, options: EnumIteratorValues(UserRoles) },
+                {label: "Operation", type: "text", setter: setNewOperation }
               ]}
             ]}
           />  
         </div>
       </div>
 
-      <div className=""></div>
+      <div className="flex flex-row flex-wrap">
+        {userInfo.map(user=>{
+          return (
+            <Card className="mr-5 my-5 w-72 rounded-xl">
+              <CardHeader>
+                <CardTitle>	
+                  <div className="flex flex-row">
+                    <div className="flex-auto">
+                      <ProfileIcon name={user[0]} size="small" />
+                    </div>
+                    
+                    <div className="">
+                    </div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-left">
+                <p className="font-medium">{user[0]}</p>
+                <p className="font-light">{user[1]}</p>
+                <p className="font-light">{role}</p>
+              </CardContent>
+            </Card>
+          )
+        })}
+      </div>
     </div>
   )
 }

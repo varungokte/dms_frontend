@@ -1,6 +1,7 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
+import { decodeToken } from 'react-jwt';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
@@ -18,6 +19,7 @@ import Reports from './components/Reports';
 import Reminders from './components/Reminders';
 
 import beacon_logo from "./components/static/beacon_logo.png"
+import ProfileIcon from './components/BasicComponents/ProfileIcon';
 import DashboardIcon from './components/static/PanelIcons/DashboardIcon';
 import LoanIcon from './components/static/PanelIcons/LoanIcon';
 import ProductIcon from './components/static/PanelIcons/ProductIcon';
@@ -39,11 +41,45 @@ export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
 	const [hover,setHover] = useState(-1);
 	const navigate = useNavigate();
+	const [userInfo, setUserInfo] = useState(<div>Loading</div>)
 
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
 		navigate("/login");
 	}
+	
+	const getUserInfo = () => {
+		const token = localStorage.getItem("Beacon-DMS-token");
+		if (token){
+			const decoded = decodeToken(token);
+			return decoded;
+		}
+		else
+			return("NO TOKEN");
+	}
+
+	useEffect(()=>{
+		const res = getUserInfo();
+		if (res!="NO TOKEN")
+			setUserInfo(
+			<DropdownMenu>
+				<DropdownMenuTrigger className='mb-3 mx-6'>
+					<div className="flex flex-row">
+						{/* @ts-ignore */}
+						<div><ProfileIcon name={res["N"]} size="small"/></div>
+						<div className="text-left mx-3"> {/* @ts-ignore */}
+							<p>{res["N"]}</p>
+							<p className="font-light">No Role</p>
+						</div>
+					</div>
+					</DropdownMenuTrigger>
+				<DropdownMenuContent className='bg-white'>
+					<DropdownMenuItem>Profile</DropdownMenuItem>
+					<DropdownMenuSeparator />
+					<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>);
+	},[])
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 
@@ -333,16 +369,7 @@ export const MenuRouter = () => {
 			<div style={{ width: "83%", float: "right" }}>
 				<div className='relative h-20 w-100 bg-white'>
 					<div className=' absolute inset-y-5 right-0 w-50'>
-						<DropdownMenu>
-							<DropdownMenuTrigger className='mb-3 pt-3'>
-								<span>You're logged in as: <span className='mt-2 text-blue-600'>Admin Person</span></span>
-							</DropdownMenuTrigger>
-							<DropdownMenuContent className='bg-white'>
-								<DropdownMenuItem>Profile</DropdownMenuItem>
-								<DropdownMenuSeparator />
-								<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
-							</DropdownMenuContent>
-						</DropdownMenu>
+						{userInfo}
 					</div>
 				</div>
 				<hr />

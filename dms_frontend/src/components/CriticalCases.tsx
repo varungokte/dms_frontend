@@ -48,7 +48,7 @@ function CriticalCases() {
             const regEx = new RegExp(searchString, "i");
             if (searchString=="" || (val[0]+"").search(regEx)!==-1)
             return(
-              <TableRow>
+              <TableRow key={ind}>
                 <TableCell className="font-medium">{ind+1}</TableCell>
                 <TableCell>{val[0]}</TableCell>
                 <TableCell>{val[1]}</TableCell>

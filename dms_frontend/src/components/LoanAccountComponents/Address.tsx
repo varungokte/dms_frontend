@@ -13,24 +13,22 @@ function Address(props:any) {
   ])
   const [secondRow, setSecondRow] = useState([
     ["state", "State", "text", setState],
-    ["pincode", "Pincode", setPincode],
-    ["country", "Country", setCountry],
+    ["pincode", "Pincode", "number", setPincode],
+    ["country", "Country", "text", setCountry],
   ])
 
   return (
-    <div className="bg-white rounded-xl">
+    <div className="">
       <br/>
-      <p className="text-2xl font-bold mx-7 mb-2">{props.label} Address</p>
-      <hr/>
       <form >
-        <div className="grid grid-cols-2 px-7 py-5">
+        <div className="grid grid-cols-2 py-5">
           {firstRow.map(field=>{
-            return <FormTextField id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
+            return <FormTextField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
           })}
         </div>
-        <div className="grid grid-cols-3 px-7">
+        <div className="grid grid-cols-3 py-5">
           {secondRow.map(field =>{
-            return <FormTextField id={field[0]} label={field[1]} setter={field[3]} fieldType={field[2]} />
+            return <FormTextField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} fieldType={field[2]} />
           })}
         </div>
       </form>

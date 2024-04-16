@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 import { Ellipsis } from "lucide-react";
 import Search from "./BasicComponents/Search";
+import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 
 
 function Default() {
@@ -30,30 +31,11 @@ function Default() {
       </div>
       <div className="m-7">
       <Table className="rounded-xl bg-white">
-        <TableHeader className="">
-          <TableRow>
-            <TableHead className="w-[100px]">Sr. No.</TableHead>
-            <TableHead>Deal</TableHead>
-            <TableHead>Default Type</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Action</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {defaultData.map((val,ind)=>{
-            const regEx = new RegExp(searchString, "i");
-            if (searchString=="" || (val[0]+"").search(regEx)!==-1)
-            return(
-              <TableRow>
-                <TableCell className="font-medium">{ind+1}</TableCell>
-                <TableCell>{val[0]}</TableCell>
-                <TableCell>{val[1]}</TableCell>
-                <TableCell>{val[2]}</TableCell>
-                <TableCell><Ellipsis/></TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
+        <HeaderRows headingRows={[["Sr. No.","w-[100px]"],["Deal"],["Default Type"],["Date"],["Action"]]} />
+        <BodyRowsMapping list={defaultData} dataType={["index","text","text","text","action"]}
+          searchRows={searchString==""?[]:[searchString,0]} filterRows={[]} 
+          action={<Ellipsis/>} cellClassName={["font-medium","","","",""]}
+        />
       </Table>
 
       </div>

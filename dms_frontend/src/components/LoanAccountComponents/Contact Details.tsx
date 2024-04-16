@@ -2,12 +2,12 @@ import { useState } from "react";
 import { EllipsisVertical } from "lucide-react";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
-import DialogForm from "../BasicComponents/FormDialog";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import Filter from "../BasicComponents/Filter";
 import Search from "../BasicComponents/Search";
+import FormDialog from "../BasicComponents/FormDialog";
 
 function ContactDetails() {
   //contacts is an object where the keys are the categories (like borrower, lender, promoter) and values are arrays of people
@@ -39,12 +39,8 @@ function ContactDetails() {
   }
 
   return(
-    <div className="bg-white rounded-xl">
-      <br/>
-			<p className="text-2xl font-bold mx-7 mb-2">Contact Details</p>
-      <hr/>
-
-      <div className="flex flex-row mt-5">
+    <div className="mt-8">
+      <div className="flex flex-row">
         <div className=''>
           <Search setter={setSearchString} label="Search" />
         </div>
@@ -54,7 +50,7 @@ function ContactDetails() {
         </div>
       
         <div className="mr-3">
-          <DialogForm
+          <FormDialog
             triggerText="+ Add Contact"
             triggerClassName={PurpleButtonStyling}
             formTitle="Add New Contact"
@@ -77,7 +73,7 @@ function ContactDetails() {
           />
         </div>
       </div>
-      <div className="flex flex-row flex-wrap m-7">
+      <div className="  ">
       {//@ts-ignore
         contacts[role].map((person,index)=>{
           const regEx = new RegExp(searchString, "i");

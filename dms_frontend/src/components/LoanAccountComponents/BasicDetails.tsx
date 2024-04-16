@@ -58,16 +58,14 @@ function BasicDetails() {
   }
   
   return(
-    <div className="bg-white rounded-xl">
+    <div className="">
       <br/>
-			<p className="text-2xl font-bold mx-7 mb-2">Basic Details</p>
-      <hr/>
-      <form className="grid grid-cols-4 p-7" onSubmit={submitForm}>
+      <form className="grid grid-cols-4" onSubmit={submitForm}>
         {fieldList.map(field=>{
           if (field[2]=="select")
-            return <FormSelectField id={field[0]} label={field[1]} setter={field[3]} optionsList={field[4]} />
+            return <FormSelectField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} optionsList={field[4]} />
           else
-            return <FormTextField id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
+            return <FormTextField key={field[0]}  id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
         })}
       </form>
     </div>
@@ -90,7 +88,7 @@ function FormSelectField(props:any) {
       <br/>
       <select className="border-2 bg-white w-4/5 p-4 rounded-xl" id={props.id}>
         {props.optionsList.map((option:any, index:number)=>{
-          return <option value={index}>{option}</option>
+          return <option key={index} value={index}>{option}</option>
         })}
       </select>
     </div>

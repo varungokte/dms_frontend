@@ -4,7 +4,6 @@ import { MenuRouter } from "./MenuRouter";
 
 function PrivateRoutes(){
   const token = useGlobalContext().isLoggedIn();
-  console.log("ARKHAM", token)
   const { isLoggedIn } = useGlobalContext();
   return isLoggedIn()? <EmailVerification token={token} />: <Navigate to="/login" />
 }

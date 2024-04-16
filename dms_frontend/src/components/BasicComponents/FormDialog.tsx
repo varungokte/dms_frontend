@@ -5,28 +5,46 @@ function FormDialog(props:any){
 
   //to handle inputs of type text, password and email
 
-  const handleText = (label:string, setter: Function, type: string, prefillValue:string) => {
+  const handleText = (index:number, label:string, setter: Function, type: string, prefillValue:string) => {
     return(
-    <div className="mb-5">
-      <label htmlFor={label} className="font-light text-lg">{label}</label>
-      <input name="otp" autoComplete="garbage" id={label} type={type} onChange={(e)=>setter(e.target.value)} placeholder={prefillValue} className="border rounded-xl w-full h-full p-4"/>
-    </div>
+      <div key={index+label+"t_0"} className="mb-5">
+        <label key={index+label+"t_1"} htmlFor={label} className="font-light text-lg">{label}</label>
+        <input key={index+label+"t_2"} name="otp" autoComplete="garbage" id={label} type={type} onChange={(e)=>setter(e.target.value)} placeholder={prefillValue} className="border rounded-xl w-full h-full p-4"/>
+      </div>
     )
   };
   
-  const handleSelect = (label:string, setter: Function, options: [string], prefillValue:number) => {
+  const handleSelect = (index:number, label:string, setter: Function, options: [string], prefillValue:number) => {
     return(
-      <div className="mb-5">
-        <label htmlFor={label} className="font-light text-lg">{label}</label>
+      <div key={index+label+"s_0"} className="mb-5">
+        <label key={index+label+"s_1"} htmlFor={label} className="font-light text-lg">{label}</label>
         <br/>
-        <select id={label} onChange={(e:any)=>setter(e.target.value)} className="bg-white border rounded-xl w-full h-10/12 p-4">
-          {options.map((option:any,index:any)=>{
-            return <option value={index} selected={props.prefill&&prefillValue==index}>{option}</option>
+        <select key={index+label+"s_2"} id={label} onChange={(e:any)=>setter(e.target.value)} className="bg-white border rounded-xl w-full h-10/12 p-4">
+          {options.map((option:any,optionIndex:any)=>{
+            return <option key={optionIndex} value={optionIndex} selected={props.prefill&&prefillValue==optionIndex}>{option}</option>
           })}
         </select>
       </div>
     )
   };
+  
+  const handleFile = (index:number, label:string, setter:Function, fileList:[File]) => {
+    return (
+      <div key={index+label+"f_0"} className="flex flex-row mb-5">
+        <div>
+          <label key={index+label+"f_1"} htmlFor={label} className="font-light text-lg">{label}</label>
+          <br/>
+          <input key={index+label+"f_2"} type="file" multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} className="bg-white border text-custom-1 rounded-xl w-full h-10/12 p-4" />
+        </div>
+        <div key={index+label+"f_3"}>
+        {fileList.map(doc=>{
+          return(
+            <div key={1}>{doc.name}</div>
+          )
+        })}</div>        
+      </div>
+    )
+  }
 
   return (
     <Dialog>
@@ -38,27 +56,30 @@ function FormDialog(props:any){
         </DialogHeader>
         <div>
           <form onSubmit={(e)=>{props.formSubmit(e)}}>
-           {props.form.map((field:any,index:number)=>{
+            {props.form.map((field:any,index:number)=>{
               if (field["category"]=="single"){
                 if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password" || field["type"]=="date")
-                  return handleText(field["label"], field["setter"], field["type"], props.prefill?props.prefillValues[index]:"")
+                  return handleText(index, field["label"], field["setter"], field["type"], props.prefill?props.prefillValues[index]:"")
                 else if (field["type"]=="select")
-                  return handleSelect(field["label"], field["setter"], field["options"], props.prefill?props.prefillValues[index]:-1)
+                  return handleSelect(index, field["label"], field["setter"], field["options"], props.prefill?props.prefillValues[index]:-1)
+                else if (field["type"]=="file")
+                  return handleFile(index, field["label"], field["setter"], field["fileList"]);
               }
               else if (field["category"]=="grid"){
                 return(
                   <div className={`grid grid-cols-${field["row"]}`}>
                     {field.fields.map((item:any, itemIndex:number)=>{
                       if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date")
-                        return <span className="mr-3">{handleText(item["label"], item["setter"], item["type"], props.prefill?props.prefillValues[itemIndex]:"")}</span>
-
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["label"], item["setter"], item["type"], props.prefill?props.prefillValues[itemIndex]:"")}</span>
                       else if (item["type"]=="select")
-                        return <span className="mr-3">{handleSelect(item["label"], item["setter"], item["options"], props.prefill?props.prefillValues[itemIndex]:-1)}</span>
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["label"], item["setter"], item["options"], props.prefill?props.prefillValues[itemIndex]:-1)}</span>
+                      else if (item["type"]=="file")
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["label"], item["setter"], field["fileList"])} </span>  
                     })}
                   </div>
                 )
               }
-              })}
+            })}
             <DialogFooter>
               <DialogClose>
                 <button type="submit" className={`float-right w-28 ${PurpleButtonStyling}`}>{props.submitButton}</button>

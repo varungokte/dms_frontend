@@ -16,10 +16,7 @@ function Ratings() {
   const [searchString, setSearchString] = useState("");
 
   return(
-    <div className="bg-white rounded-xl">
-      <br/>
-			<p className="text-2xl font-bold mx-7 mb-5">Ratings</p>
-
+    <div className="mt-8">
       <div className="flex flex-row">
         <div className=''>
           <Search setter={setSearchString} label="Search" />
@@ -27,14 +24,13 @@ function Ratings() {
       </div>
 
       <div className="m-5">
-      <Table>
-        <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
+        <Table className="border">
+          <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
 
-        <BodyRowsMapping list={ratingsList} dataType={["text", "ratingType", "text", "ratingOutlook", "text", "text"]}
-          searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
-        />
-      </Table>
-
+          <BodyRowsMapping list={ratingsList} dataType={["text", "ratingType", "text", "ratingOutlook", "text", "text"]}
+            searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
+          />
+        </Table>
       </div>
     </div>
   )

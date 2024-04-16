@@ -8,8 +8,8 @@ function HeaderRows(props:any){
   return(
     <TableHeader>
       <TableRow>
-      {props.headingRows.map((heading:any)=>{
-        return <TableHead className={heading.length>1?heading[1]:""}>{heading[0]}</TableHead>
+      {props.headingRows.map((heading:any,index:number)=>{
+        return <TableHead key={index} className={heading.length>1?heading[1]:""}>{heading[0]}</TableHead>
       })}
       </TableRow>
     </TableHeader>
@@ -39,7 +39,7 @@ function BodyRowsMapping(props:any){
         }
 
         if (searchValid && filterValid)
-          return <SingleRow singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} rowIndex={index}/>
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} />
         else
           return <></>
       })}
@@ -49,42 +49,50 @@ function BodyRowsMapping(props:any){
 
 function SingleRow(props:any){
   return(
-    <TableRow>
+    <TableRow key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
         let cellClassName="";
+        const uniqueIndex = props.rowIndex+"_"+index;
         if (props.cellClassName)
-          cellClassName = props.cellClassName[index]
-        
+          cellClassName = props.cellClassName[index];
+      
+        if (dataType=="index")
+          return handleIndex(props.rowIndex+1, cellClassName, uniqueIndex);
+      
         if (dataType=="action")
-          return handleAction(props.action[props.rowIndex], cellClassName)
+          return handleAction(props.action[props.rowIndex], cellClassName, uniqueIndex)
+    
+        const item = props.singleRow[props.dataType[0]=="index"?index-1:index];
 
-        const item = props.singleRow[index];
         if (dataType=="text")
-          return handleText(item, cellClassName);
+          return handleText(item, cellClassName, uniqueIndex);
         if (dataType=="priority")
-          return handlePriority(Number(item), cellClassName);
+          return handlePriority(Number(item), cellClassName, uniqueIndex);
         if (dataType=="docStatus")
-          return handleDocStatus(Number(item), cellClassName);
+          return handleDocStatus(Number(item), cellClassName, uniqueIndex);
         if (dataType=="userStatus")
-          return handleUserStatus(Number(item), cellClassName);
+          return handleUserStatus(Number(item), cellClassName, uniqueIndex);
         if (dataType=="role")
-          return handleRole(Number(item), cellClassName);
+          return handleRole(Number(item), cellClassName, uniqueIndex);
         if (dataType=="ratingType")
-          return handleRatingType(Number(item), cellClassName);
+          return handleRatingType(Number(item), cellClassName, uniqueIndex);
         if (dataType=="ratingOutlook")
-          return handleRatingOutlook(Number(item), cellClassName);    
+          return handleRatingOutlook(Number(item), cellClassName, uniqueIndex);    
       })}
     </TableRow>
   )
 }
 
-const handleText = (item:String, cellClassName:string) => {
-  return <TableCell className={cellClassName}>{item}</TableCell>
+const handleIndex = (index:number, cellClassName:string, uniqueIndex:string) =>{
+  return <TableCell key={uniqueIndex}  className={cellClassName}>{index}</TableCell>
+}
+const handleText = (item:String, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{item}</TableCell>
 }
 
-const handlePriority = (index:number, cellClassName:string) => {
+const handlePriority = (index:number, cellClassName:string, uniqueIndex:string) => {
   return(
-    <TableCell>
+    <TableCell key={uniqueIndex}>
       <div className={`${PriorityStyling[index]} rounded-lg text-center ${cellClassName}`}>
         {PriorityValues[index]}
       </div>
@@ -92,17 +100,17 @@ const handlePriority = (index:number, cellClassName:string) => {
   )
 }
 
-const handleDocStatus = (index:number, cellClassName:string) => {
+const handleDocStatus = (index:number, cellClassName:string, uniqueIndex:string) => {
   return(
-    <TableCell className={`${DocumentStatusStyling[index]} ${cellClassName}`}>
+    <TableCell key={uniqueIndex} className={`${DocumentStatusStyling[index]} ${cellClassName}`}>
       {DocumentStatusValues[index]}
     </TableCell>
   )
 }
 
-const handleUserStatus = (index:number, cellClassName:string) => {
+const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string) => {
   return (
-    <TableCell className={cellClassName}>
+    <TableCell key={uniqueIndex} className={cellClassName}>
       <DropdownMenu>
       <DropdownMenuTrigger className={`${UserStatusStyling[index]} w-28 h-10 text-center rounded-xl `}>
         <div className="flex flex-row w-full" >
@@ -119,20 +127,20 @@ const handleUserStatus = (index:number, cellClassName:string) => {
   )
 }
 
-const handleRole = (index:number, cellClassName:string) => {
-  return <TableCell className={cellClassName}>{UserRoles[index]}</TableCell>
+const handleRole = (index:number, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{UserRoles[index]}</TableCell>
 }
 
-const handleAction = (action:any, cellClassName:string) => {
-  return <TableCell className={cellClassName}>{action}</TableCell>
+const handleAction = (action:any, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{action}</TableCell>
 }
 
-const handleRatingType = (index:any, cellClassName:string) => {
-  return <TableCell className={cellClassName}>{RatingTypes[index]}</TableCell>
+const handleRatingType = (index:any, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{RatingTypes[index]}</TableCell>
 }
 
-const handleRatingOutlook = (index:any, cellClassName:string) => {
-  return <TableCell className={cellClassName}>{RatingOutlook[index]}</TableCell>
+const handleRatingOutlook = (index:any, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{RatingOutlook[index]}</TableCell>
 }
 
 export { HeaderRows, BodyRowsMapping }
