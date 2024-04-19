@@ -19,7 +19,7 @@ function VerificationComponent(props:any){
       <div className="text-center">Verify your email in order to access the rest of the site</div>
     </div>
   );
-
+    //Error 503 -> Maintainance Mode
   const clickVerify =() =>{
     sendOTP(token).then((res) =>{
       console.log(res)

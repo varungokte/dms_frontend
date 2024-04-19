@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { decodeToken } from "react-jwt";
 
-const Base_Url = "http://192.168.1.4:3000/api/v1/allAPI";
+const Base_Url = "http://192.168.1.9:3000/api/v1/allAPI";
 
 const RegisterAdmin = async (data:object) => {
 	try {
@@ -30,10 +30,12 @@ const LoginUser = async (data: object) => {
 				"Content-type": "application/json"
 			}
 		});
+		console.log(response)
 		if (response.status == 409)
 			return "verify_email";
 		else if (response.status == 200){
-			localStorage.setItem("Beacon-DMS-token",response.data.message);
+			localStorage.setItem("Beacon-DMS-token",response.data.message.token);
+			localStorage.setItem("Beacon-DMS-userid", response.data.message._userID);
 			return "logged_in";
 		}	
 		else
@@ -101,6 +103,20 @@ const createUser = async (data:object) => {
 	}
 }
 
+const createLoan = async (data:object) => {
+	try {
+		const response = await axios.post(`${Base_Url}/createLoan`,data, {
+			headers:{
+				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
+			}
+		});
+		return response;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+	}
+}
 
 const useGlobalContext = () => {
 	return {
@@ -111,6 +127,7 @@ const useGlobalContext = () => {
 		sendOTP,
 		verifyOTP,
 		createUser,
+		createLoan
 	}
 }
 

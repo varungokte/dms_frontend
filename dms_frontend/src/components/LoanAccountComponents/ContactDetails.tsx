@@ -58,8 +58,8 @@ function ContactDetails() {
             submitButton="Add User"
             form = {[
               { category: "grid", row:2, fields: [
-                { type: "text", label: "Choose", setter: setPersonType },
-                { type:"select", label: "Mention", setter: setMention, options: ["To", "CC"] },
+                { type: "select", label: "Contact Type", setter: setPersonType, options: ["Borrower", "Lender"] },
+                { type:"select", label: "Email Recipient Type", setter: setMention, options: ["To", "Cc","Bcc"] },
                 { type:"text", label: "Company Name", setter: setCompany },
                 { type:"text", label: "Landline Number", setter: setLandline },
                 { type:"text", label: "Contact Person Name", setter: setName },

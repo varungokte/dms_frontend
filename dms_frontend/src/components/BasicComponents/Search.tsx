@@ -2,13 +2,10 @@ function Search(props:any){
   return(
     <input 
       type="text" 
-      className="border-2 mr-10 h-full p-5 rounded-xl" 
+      className="border-2 mx-10 h-full p-5 rounded-xl" 
       placeholder={props.label} 
       onChange={
-        (e)=>{
-          const val = e.target.value+"";
-          props.setter(val.replace("\\", "/\\/"))
-        }
+        (e)=>{ props.setter((e.target.value+"").replace("\\", "/\\/")) }
       } 
     />
   )

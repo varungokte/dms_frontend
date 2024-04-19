@@ -1,6 +1,5 @@
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PurpleButtonStyling from "./PurpleButtonStyling";
-
 function FormDialog(props:any){
 
   //to handle inputs of type text, password and email
@@ -31,13 +30,15 @@ function FormDialog(props:any){
   const handleFile = (index:number, label:string, setter:Function, fileList:[File]) => {
     return (
       <div key={index+label+"f_0"} className="flex flex-row mb-5">
+        <div className="font-light text-lg">{label}:</div>
         <div>
-          <label key={index+label+"f_1"} htmlFor={label} className="font-light text-lg">{label}</label>
+          <label key={index+label+"f_1"} htmlFor={label} className="bg-custom-1 text-white mx-3 my-5 border rounded-xl p-3">Choose File(s)</label>
           <br/>
-          <input key={index+label+"f_2"} type="file" multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} className="bg-white border text-custom-1 rounded-xl w-full h-10/12 p-4" />
+          <input key={index+label+"f_2"} id={label} type="file" style={{width:"0.1px", opacity:"0"}} multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} /* className="bg-white border text-custom-1 rounded-xl w-full h-10/12 p-4" */ />
         </div>
         <div key={index+label+"f_3"}>
         {fileList.map(doc=>{
+          console.log("CONAN",fileList)
           return(
             <div key={1}>{doc.name}</div>
           )
@@ -46,6 +47,8 @@ function FormDialog(props:any){
     )
   }
 
+  /* const handleTextClick = (index: number, label: string, setter:Function, )
+ */
   return (
     <Dialog>
       <DialogTrigger className={props.triggerClassName}>{props.triggerText}</DialogTrigger>
@@ -81,8 +84,8 @@ function FormDialog(props:any){
               }
             })}
             <DialogFooter>
-              <DialogClose>
-                <button type="submit" className={`float-right w-28 ${PurpleButtonStyling}`}>{props.submitButton}</button>
+              <DialogClose type="submit" className={`float-right w-28 ${PurpleButtonStyling}`}>
+                {props.submitButton}
               </DialogClose>
             </DialogFooter>
           </form>
@@ -94,13 +97,6 @@ function FormDialog(props:any){
 }
 
 export default FormDialog;
-
-/* 
-  <Dialog>
-    <DialoggTrigger>Click Here </DialogTrigger>
-    <DialogForm props />
-  </Dialog>
- */
 
 /* props:
     triggerClassName: {PurpleButtonStyling}

@@ -5,6 +5,7 @@ import { Table } from "@/components/ui/table";
 import Search from "./BasicComponents/Search";
 import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import { DealDisplayDialog } from "./BasicComponents/DisplayDialog";
 
 function LoanAccount() {
   const [accountList, setAccountList] = useState([
@@ -12,6 +13,10 @@ function LoanAccount() {
     ["AGMT2023002", "Company2", "Group2", "East","80000", "80000"],
     ["AGMT2023003", "Company3", "Group3", "South","30000", "30000"], 
   ]);
+
+  const [singleDealDetails, setSingleDealDetails] = useState([
+    {}
+  ])
 
   const [searchString, setSearchString] = useState("");
 
@@ -28,14 +33,25 @@ function LoanAccount() {
         <Table className="">
           <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Client Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["O/S Amount"]]} />
           <BodyRowsMapping 
-            list={accountList.map((acc:any,ind)=>{return[ind+1].concat(acc)})} 
-            dataType={["text","text","text","text","text","text","text"]} 
+            list={accountList} 
+            dataType={["index","textClick","text","text","text","text","text"]} 
             cellClassName={["font-medium", "text-custom-1","","","","",""]} 
             searchRows={[]} filterRows={[]}
+            onClickForm={
+              <></>
+            }
           />
         </Table>
         <br/>
       </div>
+
+      <DealDisplayDialog
+        triggerText={accountList[0][0]}
+        triggerClassName="text-custom-1"
+        data={
+          ["Basic Details", ]
+        }
+       />
     </div>
   )
 }
