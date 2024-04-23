@@ -1,86 +1,85 @@
+import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { useState } from "react";
+import useGlobalContext from "./../../../GlobalContext";
+import { FormSectionNavigation, goToNextSection } from "../BasicComponents/FormSectionNavigation";
 
-function BankDetails() {
-  const [accountName, setAccountName] = useState("");
-  const [accountNumber, setAccountNumber] = useState("");
-  const [accountType, setAccountType] = useState(-1);
-  const [ifsc, setIfsc] = useState("");
-  const [bankName, setBankName] = useState("");
-  const [branchName, setBranchName] = useState("");
-  const [branchAddress, setBranchAddress] = useState("");
+function BankDetails(props:any) {
+  const {createLoan} = useGlobalContext();
 
   const [firstRow, setFirstRow] = useState([
-    ["accountName", "Account Name", "text", setAccountName],
-    ["accountNumber", "Account Number", "text", setAccountNumber],
+    { id:"AN", name:"Account Name", type:"text" },
+    { id:"BAN", name:"Account Number", type:"text" },
   ]);
   
   const [secondRow, setSecondRow] = useState([
-    ["accountType", "Account Type", "select", setAccountType, ["op1","op2"]],
-    ["ifsc", "IFSC", "text", setIfsc],
-    ["bankName", "Bank Name", "text", setBankName],
+    { id:"AT", name:"Account Type", type:"select", options:["op1","op2"] },
+    { id:"IFSC", name:"IFSC", type:"text" },
+    { id:"BN", name:"Bank Name", type:"text"},
   ]);
   const [thirdRow, setThirdRow] = useState([
-    ["branchName", "Branch Name", "text", setBranchName],
-    ["branchAddress", "Branch Address", "text", setBranchAddress],
-  ])
+    { id:"LB", name:"Branch Name", type:"text" },
+    { id:"BA", name:"Branch Address", type:"text" },
+  ]);
+
+  const [fieldValues, setFieldValues] = useState({
+    "AN": null, "BAN": null, 
+    "AT": null, "IFSC": null, "BN": null,
+    "LB": null, "BA": null
+  })
+
+  const submitForm = (e:any) =>{
+    e.preventDefault();
+
+    let data:any={};
+
+    Object.keys(fieldValues).map(field=>{
+      //@ts-ignore
+      if (fieldValues[field]==null || fieldValues[field]==-1)
+        return;
+      //@ts-ignore
+      data[field] = fieldValues[field];
+    });
+
+    if (Object.keys(data).length!=0){
+      console.log("SUBMITTED NOW",data);
+      /* createLoan(data).then(res=> {
+        console.log("RES", res);
+        goToNextSection(props.setCurrentSection, props.sectionCount);
+      }
+      ).catch(err=> console.log(err)) */
+    }
+    else
+      goToNextSection(props.setCurrentSection, props.sectionCount);
+  }
 
   return (
     <div className="">
       <br/>
-      <form>
-        <div className="grid grid-cols-2 py-5">
+      <form onSubmit={submitForm}>
+        <div className="grid grid-cols-2">
           {firstRow.map(field=>{
-            if (field[2]=="select")
-              return <FormSelectField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} optionsList={field[4]} />
-            else
-              return <FormTextField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
+            return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} />
           })}
         </div>
 
-        <div className="grid grid-cols-3 py-5">
+        <div className="grid grid-cols-3">
           {secondRow.map(field=>{
-            if (field[2]=="select")
-              return <FormSelectField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} optionsList={field[4]} />
+            if (field.type=="select")
+              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} optionsList={field.options} />
             else
-              return <FormTextField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
+              return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} />
           })}
         </div>
 
-        <div className="grid grid-cols-2 py-5">
+        <div className="grid grid-cols-2">
           {thirdRow.map(field=>{
-            if (field[2]=="select")
-              return <FormSelectField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} optionsList={field[4]} />
-            else
-              return <FormTextField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
+            return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} />
           })}
         </div>
+        <br/>
+        <FormSectionNavigation setCurrentSection={props.setCurrentSection} />
       </form>
     </div>
   )
 }
-
-function FormTextField(props:any) {
-  return (
-    <div className="">
-      <label htmlFor={props.id}>{props.label}</label>
-      <br/>
-      <input className="border-2 p-4 w-11/12 rounded-xl" id={props.id} type={props.type} onChange={(e)=>{props.setter(e.target.value)}}/>
-    </div>
-  )
-}
-
-function FormSelectField(props:any) {
-  return (
-    <div className="">
-      <label htmlFor={props.id}>{props.label}</label>
-      <br/>
-      <select className="border-2 bg-white w-11/12 p-4 rounded-xl" id={props.id}>
-        {props.optionsList.map((option:any, index:number)=>{
-          return <option key={index} value={index}>{option}</option>
-        })}
-      </select>
-    </div>
-  )
-}
-
 export default BankDetails;

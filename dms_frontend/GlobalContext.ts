@@ -34,8 +34,9 @@ const LoginUser = async (data: object) => {
 		if (response.status == 409)
 			return "verify_email";
 		else if (response.status == 200){
+			console.log("THIS IS USER ID",response.data.message._userId)
 			localStorage.setItem("Beacon-DMS-token",response.data.message.token);
-			localStorage.setItem("Beacon-DMS-userid", response.data.message._userID);
+			localStorage.setItem("Beacon-DMS-userid", response.data.message._userId);
 			return "logged_in";
 		}	
 		else
@@ -84,11 +85,45 @@ const verifyOTP = async (token: any, otp:any) => {
 		throw error;
 	}
 }
-
+//editUser getUser
 //Conflict Error -> Duplicate User
 const createUser = async (data:object) => {
 	try {
 		const response = await axios.post(`${Base_Url}/addUser`,data, {
+			headers:{
+				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
+			}
+		});
+		return response;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		if (error.response.status===409)
+			return "duplicate_user"
+	}
+}
+
+const editUser = async (data:object) => {
+	try {
+		const response = await axios.post(`${Base_Url}/editUser`,data, {
+			headers:{
+				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
+			}
+		});
+		return response;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		if (error.response.status===409)
+			return "duplicate_user"
+	}
+}
+
+const getAllUsers = async () => {
+	try {
+		const response = await axios.get(`${Base_Url}/getAllUsers`, {
 			headers:{
 				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
 			}
@@ -127,7 +162,9 @@ const useGlobalContext = () => {
 		sendOTP,
 		verifyOTP,
 		createUser,
-		createLoan
+		editUser,
+		getAllUsers,
+		createLoan,
 	}
 }
 

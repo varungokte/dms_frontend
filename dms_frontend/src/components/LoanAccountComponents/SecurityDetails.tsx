@@ -1,58 +1,73 @@
-import { useState } from "react"
 
-function SecurityDetails(){
-  const [securitiesList, setSecurities] = useState([])
+import { useEffect, useState } from "react";
+import useGlobalContext from "../../../GlobalContext";
+import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
+import { FormSectionNavigation, goToNextSection } from "../BasicComponents/FormSectionNavigation";
+import { useNavigate } from "react-router-dom";
 
-  const [sharePercentage, setSharePercentage] = useState(-1);
-  const [valuationDate, setValuationDate] = useState(new Date());
-  const [securityType, setSecurityType] = useState(-1);
-  const [securityValue, setSecurityValue] = useState(-1);
+function SecurityDetails(props:any){
+  const [fieldValues, setFieldValues] = useState({
+    "S": null, "DV": null, "T": null, "V": null
+  });
+
+  const [disableFields, setDisableFields] = useState(false);
+
+  useEffect(()=>{
+    if (!props.showSecurityDetails)
+      setDisableFields(true)
+  },[])
 
   const [fieldList, setFieldList] = useState([
-    ["sharePercentage", "Share Percentage(%)", "number", setSharePercentage],
-    ["valuationDate", "Date of Valuation", "date", setValuationDate],
-    ["securityType", "Security Type", "select", setSecurityType, ["op1","op2"]],
-    ["securityValue", "Security Value", "text", setSecurityValue]
+    { id:"S", name:"Share Percentage(%)", type:"number" },
+    { id:"DV", name:"Date of Valuation", type:"date" },
+    { unnecessaryComplication: true, id:"T", name:"Security Type", type:"select", options:["op1","op2"] },
+    { unnecessaryComplication: true, id:"V", name:"Security Value", type:"text" }
   ])
+
+  const {createLoan} = useGlobalContext();
+  const navigate = useNavigate();
+
+  const submitForm = (e:any) => {
+    e.preventDefault();
+    let data:any={};
+
+    Object.keys(fieldValues).map(field=>{
+      //@ts-ignore
+      if (fieldValues[field]==null || fieldValues[field]==-1)
+        return;
+      //@ts-ignore
+      data[field] = fieldValues[field];
+    })
+
+    if (Object.keys(data).length!=0){
+      console.log("SUBMITTED NOW",data);
+      /* createLoan(data).then(res=> {
+        console.log("RES", res);
+        goToNextSection(props.setCurrentSection, props.sectionCount);
+      }
+      ).catch(err=> console.log(err)) */
+    }
+    else
+      goToNextSection(props.setCurrentSection, props.sectionCount); 
+  }
+
   return(
     <div className="">
       <br/>
-      <form className="grid grid-cols-2">
-        {fieldList.map(field=>{
-          if (field[2]=="select")
-            return <FormSelectField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} optionsList={field[4]} />
-          else 
-            return <FormTextField key={field[0]} id={field[0]} label={field[1]} setter={field[3]} type={field[2]} />
-        })}
+      {disableFields?<p className="text-red-600">These fields are not applicable because the security type was marked unsecured in the previous section.<br/>Please move on to the next section</p>:""}
+      <form onSubmit={submitForm}>
+        <div className="grid grid-cols-2">
+          {fieldList.map(field=>{
+            if (field.type=="select")
+              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} optionsList={field.options} disabled={disableFields} />
+            else 
+              return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} disabled={disableFields}  />
+          })}
+        </div>
+        <FormSectionNavigation setCurrentSection={props.setCurrentSection} />
       </form>
     </div>
   )
 }
 
-function FormTextField(props:any) {
-  return (
-    <div className="my-6">
-      <label htmlFor={props.id}>{props.label}</label>
-      <br/>
-      <input className="border-2 p-4 w-4/5 rounded-xl" id={props.id} type={props.type} onChange={(e)=>{props.setter(e.target.value)}}/>
-    </div>
-  )
-}
-
-
-function FormSelectField(props:any) {
-  return (
-    <div className="my-6">
-      <label htmlFor={props.id}>{props.label}</label>
-      <br/>
-      <select className="border-2 bg-white w-4/5 p-4 rounded-xl" id={props.id}>
-        {props.optionsList.map((option:any, index:number)=>{
-          return <option key={index} value={index}>{option}</option>
-        })}
-      </select>
-    </div>
-  )
-}
-
-
-export default SecurityDetails
+export default SecurityDetails;

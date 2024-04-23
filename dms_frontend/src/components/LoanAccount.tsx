@@ -34,7 +34,7 @@ function LoanAccount() {
           <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Client Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["O/S Amount"]]} />
           <BodyRowsMapping 
             list={accountList} 
-            dataType={["index","textClick","text","text","text","text","text"]} 
+            dataType={["index","text","text","text","text","text","text"]} 
             cellClassName={["font-medium", "text-custom-1","","","","",""]} 
             searchRows={[]} filterRows={[]}
             onClickForm={
@@ -45,13 +45,13 @@ function LoanAccount() {
         <br/>
       </div>
 
-      <DealDisplayDialog
+      {/* <DealDisplayDialog
         triggerText={accountList[0][0]}
         triggerClassName="text-custom-1"
         data={
           ["Basic Details", ]
         }
-       />
+       /> */}
     </div>
   )
 }

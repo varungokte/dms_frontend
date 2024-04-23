@@ -119,8 +119,9 @@ const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem className="bg-white text-red-600">{UserStatusValues[0]}</DropdownMenuItem>
-        <DropdownMenuItem className="bg-white text-green-600">{UserStatusValues[1]}</DropdownMenuItem>
+        <DropdownMenuItem className="bg-white text-yellow-600">{UserStatusValues[1]}</DropdownMenuItem>
+        <DropdownMenuItem className="bg-white text-green-600">{UserStatusValues[2]}</DropdownMenuItem>
+        <DropdownMenuItem className="bg-white text-red-600">{UserStatusValues[3]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>

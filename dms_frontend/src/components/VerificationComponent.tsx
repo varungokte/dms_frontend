@@ -36,13 +36,13 @@ function VerificationComponent(props:any){
       const decoded = decodeToken(token);
       setNewToken(token);
       if (!decoded)
-        setMessage(<p>Try Again</p>)
+        setMessage(<p className="text-red-600">Try Again</p>)
       else {
         //@ts-ignore
         if (decoded["S"]==2)
-          setMessage(<p>Try Again</p>)
+          setMessage(<p className="text-red-600">Try Again</p>)
         else{
-          setMessage(<p>Success</p>)
+          setMessage(<p className="text-green-600">Success</p>)
           setInputField(2)
         }
       }
@@ -65,13 +65,14 @@ function VerificationComponent(props:any){
       <button onClick={()=>clickVerify()} className="text-white bg-green-500 h-12 w-56 font-medium text-xl rounded-xl text-center">Verify</button>
     </div>,
     <form onSubmit={(e)=>clickSubmit(e)}>
-      <label htmlFor="otp" className="start-0">OTP</label>
+      <label htmlFor="otp" className="start-0 text-lg font-medium  ml-5">Enter OTP Below</label>
       <br/>
-      <input id="otp" className="border rounded xl ml-2" onChange={(e:any)=>setOtp(e.target.value)} type="text" />
+      <input id="otp" className="border rounded-xl h-10 w-11/12  ml-5" onChange={(e:any)=>setOtp(e.target.value)} type="text" />
       <br/>
-      <button type="submit">Submit</button>
+      <br/>
+      <button type="submit" className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Submit</button>
     </form>,
-      <button onClick={clickContinue}>Continue</button>
+    <button onClick={clickContinue} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
     ]
 
   return (
@@ -81,17 +82,6 @@ function VerificationComponent(props:any){
       {stages[inputField]}
       <br/>
       {message}
-      {/* <div className="my-28">TEST HERE
-      <div>
-        <form onSubmit={()=>clickSubmit()}>
-          <label htmlFor="otp" className="start-0">OTP</label>
-          <br/>
-          <input id="otp" onChange={(e:any)=>setOtp(e.target.value)} type="text" />
-          <br/>
-          <button type="submit">Submit</button>
-        </form>
-      </div>
-      </div> */}
     </div>
   )
 }

@@ -45,29 +45,26 @@ export const MenuRouter = () => {
 	const [userInfo, setUserInfo] = useState(<div>Loading</div>);
 	const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
 	
+	const onConnect = () => {
+		setSocketIsConnected(()=>{const a = true; return a});
+		socket.emit("sendMessage", {message:"Connection established"})
+		console.log("CONNECTED")
+		socket.emit("subscribe", "BusinessChannel")
+	}
 
-
-	/* useEffect(()=>{
-		const onConnect = () => {
-			setSocketIsConnected(true);
-			socket.emit("sendMessage", {message:"Connection established"})
-
-			socket.emit("subscribe", "BusinessChannel")
-		}
-
-		const onDisconnect = () => {
-			setSocketIsConnected(false);
-		}
-
+	const onDisconnect = () => {
+		setSocketIsConnected(false);
+	}
+	useEffect(()=>{
 		socket.on("connect", onConnect);
 		socket.on("connect_error",(error)=>{	
 			console.log(error)
 		})
 		socket.on("disconnect", onDisconnect);
 		socket.on("messageReceived", (data:any)=>{
-			console.log("RECIEBDE",data)
+			console.log("RECIEVE",data)
 		})
-	},[]) */
+	},[])
 
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
@@ -91,10 +88,11 @@ export const MenuRouter = () => {
 			<DropdownMenu>
 				<DropdownMenuTrigger className='mb-3 mx-6'>
 					<div className="flex flex-row">
+						{/* {socketIsConnected?"CONNECTED":"NOT CONNECTED"} */}
 						{/* @ts-ignore */}
-						<div><ProfileIcon name={res["N"]} size="small"/></div>
+						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small"/></div>
 						<div className="text-left mx-3"> {/* @ts-ignore */}
-							<p>{res["N"]}</p>
+							<p>{/* {res["N"]} */}Test User</p>
 							<p className="font-light">No Role</p>
 						</div>
 					</div>
@@ -162,7 +160,7 @@ export const MenuRouter = () => {
 										return "";
 									}}
 								>
-									<div className={`p-3 text-md pageLink py-3 my-3 rounded-xl ${(currLink===item.path)?"bg-white text-custom-1":"text-white"}`}>
+									<div className={`p-3 text-sm pageLink py-3 my-3 rounded-xl ${(currLink===item.path)?"bg-white text-custom-1":"text-white"}`}>
 										<div className='flex flex-row'>
 											{createElement(item.icon, {fill: (currLink===item.path || hover===index)?"rgba(80, 65, 188, 1)":"white"})}
 											<div className="mx-5">{item.name}</div>

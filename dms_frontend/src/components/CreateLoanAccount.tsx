@@ -11,9 +11,13 @@ import BankDetails from "./LoanAccountComponents/BankDetails";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function CreateLoanAccount() {
+  const [currentSection, setCurrentSection] = useState(0);
+
+  const [showSecurityDetails, setShowSecurityDetails] = useState(true);
+
   const [formSections, setFormSections] = useState([
     { name: "Basic Details", component: BasicDetails },
-    { name: "Security Details", component: SecurityDetails},
+    { name: "Security Details", component: SecurityDetails, show: showSecurityDetails},
     { name: "Bank Details", component: BankDetails},
     { name: "Contact Details", component: ContactDetails},
     { name: "Relationship Mapping", component: RelationshipMapping},
@@ -22,9 +26,6 @@ function CreateLoanAccount() {
     { name: "Ratings", component: Ratings }
   ])
 	
-  const [currentSection, setCurrentSection] = useState(0);
-  const [okToChange, setOkToChange] = useState(false);
-  const [submit, setSubmit] = useState(false);
 
   return(
     <div style={{width:"relative"}}>
@@ -50,11 +51,17 @@ function CreateLoanAccount() {
         </div>
 
         <div className="mx-10">
-          {React.createElement (formSections[currentSection].component, {label: (formSections[currentSection].label?formSections[currentSection].label:"")})} 
+          {
+            React.createElement (formSections[currentSection].component, 
+            {
+              setCurrentSection:setCurrentSection, 
+              sectionCount: formSections.length-1, 
+              label: (formSections[currentSection].label?formSections[currentSection].label:""),
+              setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:"",
+              showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:"",
+            }
+          )} 
         </div>
-
-        <br/>
-
       </div> 
     </div>
   )

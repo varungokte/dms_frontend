@@ -53,7 +53,7 @@ export default App;
         8:Hospitality Manufacturing 
         9:Renewable Energy 
         10:Roads 
-       11:Commercial Space 
+        11:Commercial Space 
         12:Others
    
    SA-Sanctioned Amount
@@ -118,3 +118,10 @@ export default App;
    BA-Branch Address
    IFSC-Indian Financial System Code
  */  
+
+/* 
+User Status
+1 - Unverified
+2 - Active
+3 - Inactive
+*/

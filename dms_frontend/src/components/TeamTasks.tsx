@@ -53,7 +53,7 @@ function TeamTasks() {
 
         <div>
           <FormDialog
-            triggerClassName={PurpleButtonStyling} triggerText="Add Task"
+            triggerClassName={PurpleButtonStyling} triggerText="Add Task" formSize="medium"
             formTitle="Add Team Task" formSubmit={createTask} submitButton="Add Task"
             form={[
               { category: "single", type: "text", label: "Task", setter: setNewTask },

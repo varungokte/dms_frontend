@@ -40,11 +40,8 @@ function TeamMembers() {
 				<div className="">
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
 					<FormDialog
-						triggerClassName={PurpleButtonStyling}
-						triggerText={<><span className="text-xl">+ </span><span>Add Member</span></>}
-						formTitle="Add Team Member"
-						formSubmit= {addMember}
-						submitButton= "Create User"
+						triggerText={<><span className="text-xl">+ </span><span>Add Member</span></>} triggerClassName={PurpleButtonStyling}
+						formTitle="Add Team Member" formSubmit= {addMember} submitButton= "Create User"  formSize="small"
 						form= {[
 							{ category: "single", label: "Name", type: "text", setter: setNewName },
 							{ category: "single", label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker"] }

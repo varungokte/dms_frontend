@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
@@ -16,19 +16,28 @@ import delete_icon from "./static/delete_icon.svg";
 //Routes: addUser,editUser, getUser
 function UserManagement(){
   const newUser = useGlobalContext().createUser;
+  const changeUserInfo = useGlobalContext().editUser;
+  const getUsers = useGlobalContext().getAllUsers;
   //userData is an array of users
   //Each user is an array with: [Name, Email, Company Name, Role, Status]
   //Role can be maker(0), checker(1), admin (2), superadmin (3)
   //Status can be inactive(0) or active(1)
-  const [userData]= useState([  
-    ["Bruce Wayne", "bw@email.com", 2,1],
-    ["Mark Scout", "email@email.com", 1,1],
-    ["Nix Card", "email123@email.com", 2, 0 ],
-    ["Wile E. Cayote", "example@email.com", 1, 0],
-    ["Lucius Fox", "email@email.com", 2, 1],
-    ["Oliver Queen", "oq@email.com", 2, 1],
-    ["Helena Eagan", "he@email.com", 2, 0]
-  ]);
+
+  useEffect(()=>{
+    getUsers().then((res)=>{
+      const arr:any =[];
+      //@ts-ignore
+      res.data.message.map(user=>{
+        arr.push([user.N, user.E, user.S])
+      });
+      console.log("ARR",arr)
+      setUserData(arr);
+    }).catch(err=>{
+      console.log(err)
+    })
+  },[])
+  
+  const [userData, setUserData]= useState([]);
   const [roleFilter, setRoleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [selectedUser, setSelectedUser] = useState(-1);
@@ -72,7 +81,17 @@ function UserManagement(){
       data["P"] = newPassword
     if (newRole!=arr[3])
       data["R"] = newRole
+
+    changeUserInfo(data).then(res=>{
+      console.log(res);
+    }).catch((err)=>{
+      if (err=="dupliate_user"){
+        setMessage(<p>Duplicate User</p>)
+      }
+    })
   }
+
+
 
   const deleteUser = (index:number) =>{
 
@@ -87,20 +106,15 @@ function UserManagement(){
         </div>
 
         <div className="flex-auto">
-          <Filter setter={setRoleFilter} listsAreSame={false} valueList={EnumIteratorKeys(UserRoles)} labelList={EnumIteratorValues(UserRoles)} 
+          {/* <Filter setter={setRoleFilter} listsAreSame={false} valueList={EnumIteratorKeys(UserRoles)} labelList={EnumIteratorValues(UserRoles)} 
             setPlaceholder={true} placeholderValue={[-1,"Role"]}
-          />
+          /> */}
         </div>
 
         <div className="">
           <FormDialog
-            triggerClassName={PurpleButtonStyling} 
-            triggerText="+ Add User" 
-            formTitle="Add User" 
-            formSubmit={createUser}
-            submitButton="Add User"
-            //category can be: single (entire line is one input field) or grid
-            //if grid, it will fields, whose value is an array of object; each object is a field
+            triggerText="+ Add User" triggerClassName={PurpleButtonStyling}  formSize="medium"
+            formTitle="Add User" formSubmit={createUser} submitButton="Add User"
             form={[
             { category: "grid", row: 2, fields: [
               { label: "Name", type: "text", setter: setNewName },
@@ -114,10 +128,10 @@ function UserManagement(){
       <div className="m-7">
       {message}
         <Table className="bg-white border-2 rounded-xl">
-          <HeaderRows headingRows={[["Name"], ["Email Address"], ["Role"], ["Status"], ["Action"]]} />
+          <HeaderRows headingRows={[["Name"], ["Email Address"]/* , ["Role"] */, ["Status"], ["Action"]]} />
           <BodyRowsMapping
-            list={userData} dataType={["text", "text", "role", "userStatus", "action"]}
-            searchRows={searchString==""?[]:[searchString,0]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
+            list={userData} dataType={["text", "text"/* , "role" */, "userStatus", "action"]}
+            searchRows={searchString==""?[]:[searchString,0,1]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
             action = {userData.map((item:any, index:number)=>{
               return(
                 <div className="flex flex-row">
