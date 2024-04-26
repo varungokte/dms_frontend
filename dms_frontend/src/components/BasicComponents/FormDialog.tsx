@@ -1,4 +1,4 @@
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PurpleButtonStyling from "./PurpleButtonStyling";
 
 function FormDialog(props:any){
@@ -8,22 +8,24 @@ function FormDialog(props:any){
     large="min-w-[1000px] min-h-[300px]"
   }
 
+  //EDIT USER IN USER MANAGEMENT
+
   //to handle inputs of type text, password and email
-  const handleText = (index:number, label:string, setter: Function, type: string, prefillValue:string) => {
+  const handleText = (index:number, id:string, name: string, type: string, prefillValue:string) => {
     return(
-      <div key={index+label+"t_0"} className="mb-5">
-        <label key={index+label+"t_1"} htmlFor={label} className="font-light text-lg">{label}</label>
-        <input key={index+label+"t_2"} name="otp" autoComplete="garbage" id={label} type={type} onChange={(e)=>setter(e.target.value)} placeholder={prefillValue} className=" border rounded-xl w-full h-full p-4"/>
+      <div key={index+id+"t_0"} className="mb-5">
+        <label key={index+id+"t_1"} htmlFor={id} className="font-light text-lg">{name}</label>
+        <input key={index+id+"t_2"} name="otp" autoComplete="garbage" id={id} type={type} onChange={(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; console.log(curr); return curr})} placeholder={prefillValue} className={` border rounded-if w-full h-full p-4 ${props.large?"bg-red-600":""}`}/>
       </div>
     )
   };
   
-  const handleSelect = (index:number, label:string, setter: Function, options: [string], prefillValue:number) => {
+  const handleSelect = (index:number, id:string, name: string, options: [string], prefillValue:number) => {
     return(
-      <div key={index+label+"s_0"} className="mb-5">
-        <label key={index+label+"s_1"} htmlFor={label} className="font-light text-lg">{label}</label>
+      <div key={index+id+"s_0"} className="mb-5">
+        <label key={index+id+"s_1"} htmlFor={id} className="font-light text-lg">{name}</label>
         <br/>
-        <select key={index+label+"s_2"} id={label} onChange={(e:any)=>setter(e.target.value)} className="bg-white border rounded-xl w-full h-10/12 p-4">
+        <select key={index+id+"s_2"} id={id} onChange={(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; return curr})} className="bg-white border rounded-if w-full h-10/12 p-4">
           {options.map((option:any,optionIndex:any)=>{
             return <option key={optionIndex} value={optionIndex} selected={props.prefill&&prefillValue==optionIndex}>{option}</option>
           })}
@@ -37,9 +39,9 @@ function FormDialog(props:any){
       <div key={index+label+"f_0"} className="flex flex-row mb-5">
         <div className="font-light text-lg">{label}:</div>
         <div>
-          <label key={index+label+"f_1"} htmlFor={label} className="bg-custom-1 text-white mx-3 my-5 border rounded-xl p-3">Choose File(s)</label>
+          <label key={index+label+"f_1"} htmlFor={label} className="bg-custom-1 text-white mx-3 my-5 border rounded-if p-3">Choose File(s)</label>
           <br/>
-          <input key={index+label+"f_2"} id={label} type="file" style={{width:"0.1px", opacity:"0"}} multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} /* className="bg-white border text-custom-1 rounded-xl w-full h-10/12 p-4" */ />
+          <input key={index+label+"f_2"} id={label} type="file" style={{width:"0.1px", opacity:"0"}} multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} /* className="bg-white border text-custom-1 rounded-if w-full h-10/12 p-4" */ />
         </div>
         <div key={index+label+"f_3"}>
         {fileList.map(doc=>{
@@ -64,46 +66,44 @@ function FormDialog(props:any){
           <hr/>
         </DialogHeader>
         
-        <DialogDescription>
         <form onSubmit={(e)=>{props.formSubmit(e)}}>
           {props.form.map((field:any,index:number)=>{
-            //@ts-ignore
             if (field["category"]=="single"){
               if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password" || field["type"]=="date" || field["type"]=="number")
-                return handleText(index, field["label"], field["setter"], field["type"], props.prefill?props.prefillValues[index]:"")
+                return handleText(index, field["id"], field["name"], field["type"], props.prefill?props.prefillValues[index]:"")
               else if (field["type"]=="select")
-                return handleSelect(index, field["label"], field["setter"], field["options"], props.prefill?props.prefillValues[index]:-1)
+                return handleSelect(index, field["id"], field["name"], field["options"], props.prefill?props.prefillValues[index]:-1)
               else if (field["type"]=="file")
-                return handleFile(index, field["label"], field["setter"], field["fileList"]);
+                return handleFile(index, field["id"], field["name"], field["fileList"]);
             }
-            else if (field["category"]=="grid")
+            else if (field["category"]=="grid"){
+              let gridStyle = ""; 
+              if (field["customWidth"])
+                gridStyle = field["customWidth"]
+              else
+                gridStyle = field["row"];
               return(
                 <div>
                   <div className="text-2xl font-medium my-2">{field["sectionName"]}</div>
-                  <div className={`grid grid-cols-${field["row"]}`}>
+                  <div className={`grid grid-cols-${gridStyle}`}>
                     {field.fields.map((item:any, itemIndex:number)=>{
-                      if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number"){
-                        if (item["large"])
-                          return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["label"], item["setter"], item["type"], props.prefill?props.prefillValues[itemIndex]:"")}<div></div></span>
-                          return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["label"], item["setter"], item["type"], props.prefill?props.prefillValues[itemIndex]:"")}</span>
-                        
-                      }
+                      if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number")
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], props.edit?props.usersList[props.currentUser]:"")}</span>
                       else if (item["type"]=="select")
-                        return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["label"], item["setter"], item["options"], props.prefill?props.prefillValues[itemIndex]:-1)}</span>
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], props.edit?props.usersList[props.currentUser]:-1)}</span>
                       else if (item["type"]=="file")
-                        return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["label"], item["setter"], field["fileList"])} </span>  
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["id"], item["name"], field["fileList"])} </span>  
                     })}
                   </div>
                 </div> 
-              )
+              )}
             })}
             <DialogFooter>
-              <DialogClose type="submit" className={`float-right w-28 ${PurpleButtonStyling}`}>
-                {props.submitButton}
+              <DialogClose  className={`float-right w-28 ${PurpleButtonStyling}`}>
+                <button type="submit">{props.submitButton}</button>
               </DialogClose>
             </DialogFooter>
           </form>
-        </DialogDescription>
       </DialogContent>
     </Dialog>
     

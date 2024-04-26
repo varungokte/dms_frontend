@@ -33,11 +33,18 @@ export const LoginComponent = () => {
 			P: password
 		}
 		LoginUser(data)
-			.then((res) => {
-        if (res==="verify_email")
-          navigate("/verify")
-        else
-          navigate('/')
+			.then((res:any) => {
+        console.log("RES",res)
+        if (res==401 || res==412){
+          setErrorMessage(<p className="text-red-600">Incorrect Username or Password</p>)
+          return;
+        }
+        if (res==409){
+          console.log("REDIRECTING TO VERIFY")
+          navigate("/verify")}
+        else{
+          console.log("NAVIGAING TO DASHOARD")
+          navigate('/')}
 			})
 	}
 
@@ -68,9 +75,6 @@ export const LoginComponent = () => {
             <div style={{marginRight:"55%"}}>
               <input type="checkbox" id="remember"/>
               <label htmlFor="remember">Remember me</label>
-            </div>
-            <div style={{float: "right"}}>
-              <button>Forgot Password</button>
             </div>
           </div>
           <br/>

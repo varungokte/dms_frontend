@@ -116,7 +116,43 @@ export default App;
    LB-Location of Branch 
    BN-Bank Name
    BA-Branch Address
-   IFSC-Indian Financial System Code
+   IFSC-Indian Financial System Code    
+ 
+ |4|**Contact Details**||
+  BID-Business ID
+  AID-Agreement Id
+  CT-Contact Type
+  RT-Recipient Type
+      1-to
+      2-cc
+      3-bcc
+  CE-Contant Email
+  CN-Company Name
+  PN-Person Name
+  D-Designation
+  LN-Landline Number 
+  MN-Mobile Number
+  
+  
+  -+-Billing Details-+-
+  
+  BA-Borrow Address 
+  BC-Borrow City 
+  BS-Borrow State 
+  BCC-Borrow Country Code
+  BP-Borrow Pincode
+  
+  -+-Registered Address-+-
+  
+  RA-Register Address 
+  RC-Register City 
+  RS-Register State 
+  RCC-Register Country Code 
+  RP-Register Pincode
+ 
+
+
+
  */  
 
 /* 

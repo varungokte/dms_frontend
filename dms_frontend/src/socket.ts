@@ -1,12 +1,11 @@
 import {io} from "socket.io-client";
+import useGlobalContext from "./../GlobalContext";
 
-const token =  localStorage.getItem("Beacon-DMS-token");
-const _userId = localStorage.getItem("Beacon-DMS-userid")
+const {getEncryptedToken} = useGlobalContext();
+const token =  getEncryptedToken();
 
-export const socket = io("http://192.168.1.9:3000", {
-  //@ts-ignore
-  query:{
-    token: token,
-    _userId: _userId
-  }
-});
+const socket = io("http://192.168.1.9:3000", {
+  query:{ data: token }
+})
+
+export {socket} ;

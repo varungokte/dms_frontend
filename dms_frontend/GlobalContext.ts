@@ -1,99 +1,133 @@
 import axios from 'axios'
-import { decodeToken } from "react-jwt";
-
+import { decodeToken, isExpired } from "react-jwt";
+import CryptoJS from "crypto-js";
 const Base_Url = "http://192.168.1.9:3000/api/v1/allAPI";
+const encryption_key = "JAIBAJRANGBALI";
+
+const handleEncryption = async (data:object) => {
+	try{
+		const encryptedText = await CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
+		return encryptedText;
+	}
+	catch(err){
+		console.log(err);
+	}
+}
+
+const handleDecryption = async (text:string) => {
+	try{
+		const decryptedString = await CryptoJS.AES.decrypt(text, encryption_key).toString(CryptoJS.enc.Utf8);
+		const obj = await JSON.parse(decryptedString);
+		return await obj;
+	}
+	catch (err){
+		console.log(err);
+	}
+}
 
 const RegisterAdmin = async (data:object) => {
 	try {
-		const response = await axios.post(`${Base_Url}/addAdmin`, data);
+		const req_body = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
 		return response;
 	} 
 	catch (error) {
 		throw error;
 	}
-}
+}	
 
-const RegisterUser = async (data: object) => {
-	try {
-		const response = await axios.post(`${Base_Url}/register`, data);
-		return response;
-	} 
-	catch (error) {
-		throw error;
-	}
-}
 //Conflict Error 409 -> User inactive; contact admin
+//Precondition Failed 412 -> Incorrect Password
+//Unauthorized 401 -> Incorrect Username
 const LoginUser = async (data: object) => {
 	try {
-		const response = await axios.post(`${Base_Url}/login`, data, {
-			headers:{
-				"Content-type": "application/json"
-			}
+		const req_body = await handleEncryption(data);
+		console.log("req_body", req_body);
+		const response = await axios.post(`${Base_Url}/login`, {data:req_body}, {
+			headers:{ "Content-type": "application/json" }
 		});
-		console.log(response)
-		if (response.status == 409)
-			return "verify_email";
-		else if (response.status == 200){
-			console.log("THIS IS USER ID",response.data.message._userId)
-			localStorage.setItem("Beacon-DMS-token",response.data.message.token);
-			localStorage.setItem("Beacon-DMS-userid", response.data.message._userId);
-			return "logged_in";
+		console.log("response", response)
+		console.log(response.status)
+		if (response.status == 200){
+			localStorage.setItem("Beacon-DMS-token",response["data"]);
+			return 200;
 		}	
 		else
-			return "failure";
+			return response.status;
 	} 
 	catch (error) {
-		throw error;
+		console.log(error);
+		//@ts-ignore
+		return  error.response.status
 	}
 }
 
-const isLoggedIn = () => {
-	const token = localStorage.getItem('Beacon-DMS-token')
-	if (token) {	
-		const decodedToken = decodeToken(token);
-		if (decodedToken)
-			return decodedToken;
-	}
-	else
-		return false;
+const getEncryptedToken = () => {
+	const token = localStorage.getItem('Beacon-DMS-token');
+	return token;
 }
 
-const sendOTP = async (token: any) => {
+const getDecryptedToken = async () => {
+	const token = getEncryptedToken();
+	if (token==null)
+		return null;
+	const decryptedToken = await handleDecryption(token);
+	const decodedToken = await decodeToken(decryptedToken["TKN"]);
+	const valid = isExpired(decryptedToken["TKN"]);
+	if (!valid)
+		return null;
+	return await decodedToken;
+}
+
+//Error 503 -> Maintainance Mode
+const sendOTP = async () => {
 	try {
-		const response = await axios.get(`${Base_Url}/sendOTP`,{
-			headers:{
-			"Authorization": `Bearer ${token}`
-		}
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/sendOTP`, {
+			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		return response;
+		if (response.status==200)
+			return 200;
+		if (response.status==503)
+			return 503;
+		return response.status;
 	}
 	catch(error){
 		throw error;
 	}
 }
 
-const verifyOTP = async (token: any, otp:any) => {
+//Error 412 -> User already verified
+const verifyOTP = async (otp:any) => {
 	try {
-		const response = await axios.post(`${Base_Url}/verifyOTP`,{otp:otp},{
-			headers:{
-				"Authorization": `Bearer ${token}`
-			}
+		const token = await getEncryptedToken();
+		const enc_otp = await handleEncryption({otp});
+		const response = await axios.post(`${Base_Url}/verifyOTP`,{data: enc_otp},{
+			headers:{	"Authorization": `Bearer ${token}` }
 		});
-		return response;
+		console.log(response)
+
+		console.log(response["data"])
+		return response["data"];
 	}
 	catch(error){
 		throw error;
 	}
 }
-//editUser getUser
-//Conflict Error -> Duplicate User
+
+//Conflict Error 409 -> Duplicate User
+//Forbidden 403 -> User is not admin
 const createUser = async (data:object) => {
 	try {
-		const response = await axios.post(`${Base_Url}/addUser`,data, {
-			headers:{
-				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
-			}
+		console.log(data)
+		const req_body = await handleEncryption(data);
+		console.log("REQ_BODY", req_body)
+		//@ts-ignore
+		const token = getEncryptedToken();
+		const response = await axios.post(`${Base_Url}/addUser`,{data:req_body}, {
+			headers:{ "Authorization": `Bearer ${token}` }
 		});
+		console.log(response)
 		return response;
 	}
 	catch(error:any) {
@@ -106,9 +140,10 @@ const createUser = async (data:object) => {
 
 const editUser = async (data:object) => {
 	try {
+		const token = await getEncryptedToken();
 		const response = await axios.post(`${Base_Url}/editUser`,data, {
 			headers:{
-				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
+				"Authorization": `Bearer ${token}`
 			}
 		});
 		return response;
@@ -123,12 +158,15 @@ const editUser = async (data:object) => {
 
 const getAllUsers = async () => {
 	try {
-		const response = await axios.get(`${Base_Url}/getAllUsers`, {
-			headers:{
-				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
-			}
+		const token = await getEncryptedToken();
+		console.log("ENCRYPTED", token);
+		const response = await axios.get(`${Base_Url}/listUser`, {
+			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		return response;
+		console.log("Response: ",response);
+		const decryptedObject = handleDecryption(response["data"]);
+		console.log("DECRYPTED VALUE BACK FROM FUNCTION", decryptedObject);
+		return decryptedObject;
 	}
 	catch(error:any) {
 		if (!error.response)
@@ -140,9 +178,10 @@ const getAllUsers = async () => {
 
 const createLoan = async (data:object) => {
 	try {
+		const token = await getEncryptedToken();
 		const response = await axios.post(`${Base_Url}/createLoan`,data, {
 			headers:{
-				"Authorization": `Bearer ${localStorage.getItem("Beacon-DMS-token")}`
+				"Authorization": `Bearer ${token}`
 			}
 		});
 		return response;
@@ -153,18 +192,91 @@ const createLoan = async (data:object) => {
 	}
 }
 
+const createAID = async (data:object) =>{
+	try {
+		const token = await getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/createAID`,{data:enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` }
+		});
+		return response;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response
+	}
+}
+
+//createContact  listContact
+
+const addContact = async (data:object) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/createContact`,{data:enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` }
+		});
+		return response;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response
+	}
+}
+
+const getContacts = async (loanId:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listContact`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: {
+				"_loanId": loanId
+			}
+		});
+		console.log(response.data);
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response
+	}
+}
+
+/* const decrypt = async (data:object) => {
+	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
+	console.log("ENCRYPTED TEXTZ", encryptedText);
+	const reqBody = {"data":encryptedText};
+
+	const obj = await handleDecryption("U2FsdGVkX18wPWv+D83d+QrLDMwoTIwTa3u74O3wG87AtCcHErX7iuHS6Ns48w3i");
+	console.log("RESULT", reqBody);
+	const response = await axios.post(`${Base_Url}/decrypt`,reqBody);
+	return obj;
+}
+ */
 const useGlobalContext = () => {
 	return {
+		getEncryptedToken,
+		getDecryptedToken,
+		handleDecryption,
 		RegisterAdmin,
-		RegisterUser,
 		LoginUser,
-		isLoggedIn,
 		sendOTP,
 		verifyOTP,
 		createUser,
 		editUser,
 		getAllUsers,
 		createLoan,
+		createAID,
+		addContact,
+		getContacts,
+		//decrypt
 	}
 }
 

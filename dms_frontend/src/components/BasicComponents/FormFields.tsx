@@ -3,7 +3,7 @@ function FormTextField(props:any) {
     <div className="my-3">
       <label htmlFor={props.id}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
       <br/>
-      <input className="border-2 p-4 w-4/5 rounded-xl" min={props.type=="number"?"1":""} /* required={props.required} */ disabled={props.disabled} id={props.id} type={props.type} 
+      <input className="border-2 p-4 w-4/5 rounded-xl" min={props.type=="number"?0:""} /* required={props.required} */ disabled={props.disabled} id={props.id} type={props.type} 
       onChange={(e)=>{
         props.setter((curr:any)=>{
           const obj = {...curr};
@@ -15,7 +15,6 @@ function FormTextField(props:any) {
     </div>
   )
 }
-
 
 function FormSelectField(props:any) {
   return (

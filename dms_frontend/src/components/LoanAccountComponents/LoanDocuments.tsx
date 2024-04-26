@@ -68,11 +68,8 @@ function LoanDocuments(props: any) {
       
         <div className="mr-3">
           <FormDialog
-            triggerText="Add"
-            triggerClassName={PurpleButtonStyling}
-            formTitle={props.label}
-            formSubmit={addDocument}
-            submitButton="Save"
+            triggerText="Add" triggerClassName={PurpleButtonStyling} formSize="medium"
+            formTitle={props.label} formSubmit={addDocument} submitButton="Save"
             form={[
               {category:"grid", row:2, fields:[
                 {label:"Document Name", type:"text", setter:setNewDocName},

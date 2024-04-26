@@ -1,8 +1,8 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
-import { decodeToken } from 'react-jwt';
-import {socket} from "./socket"
+//import {socket} from "./socket";
+import useGlobalContext from './../GlobalContext';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
@@ -42,10 +42,12 @@ export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
 	const [hover,setHover] = useState(-1);
 	const navigate = useNavigate();
+	const {getDecryptedToken} = useGlobalContext();
 	const [userInfo, setUserInfo] = useState(<div>Loading</div>);
-	const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
-	
-	const onConnect = () => {
+	//const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
+
+
+	/* const onConnect = () => {
 		setSocketIsConnected(()=>{const a = true; return a});
 		socket.emit("sendMessage", {message:"Connection established"})
 		console.log("CONNECTED")
@@ -54,43 +56,38 @@ export const MenuRouter = () => {
 
 	const onDisconnect = () => {
 		setSocketIsConnected(false);
-	}
-	useEffect(()=>{
+	} */
+/* 	useEffect(()=>{
 		socket.on("connect", onConnect);
-		socket.on("connect_error",(error)=>{	
-			console.log(error)
+		socket.on("connect_error",(error:any)=>{	
+			//console.log(error)
 		})
 		socket.on("disconnect", onDisconnect);
 		socket.on("messageReceived", (data:any)=>{
 			console.log("RECIEVE",data)
 		})
-	},[])
+	},[]) */
 
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
 		navigate("/login");
 	}
 	
-	const getUserInfo = () => {
-		const token = localStorage.getItem("Beacon-DMS-token");
-		if (token){
-			const decoded = decodeToken(token);
-			return decoded;
-		}
-		else
-			return("NO TOKEN");
+	const getUserInfo = async() => {
+		const decodedToken = await getDecryptedToken();
+		if (decodedToken)
+			return decodedToken;
 	}
 
 	useEffect(()=>{
-		const res = getUserInfo();
-		if (res!="NO TOKEN")
+		getUserInfo().then(res=>{
+			if (res)
 			setUserInfo(
 			<DropdownMenu>
 				<DropdownMenuTrigger className='mb-3 mx-6'>
 					<div className="flex flex-row">
-						{/* {socketIsConnected?"CONNECTED":"NOT CONNECTED"} */}
 						{/* @ts-ignore */}
-						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small"/></div>
+						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={socketIsConnected}/></div>
 						<div className="text-left mx-3"> {/* @ts-ignore */}
 							<p>{/* {res["N"]} */}Test User</p>
 							<p className="font-light">No Role</p>
@@ -103,7 +100,8 @@ export const MenuRouter = () => {
 					<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
 				</DropdownMenuContent>
 			</DropdownMenu>);
-	},[])
+		})
+	},[/* socketIsConnected */])
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 
@@ -150,7 +148,7 @@ export const MenuRouter = () => {
 					<div className='mx-8 my-5'>
 						{componentList.map((item:any,index:number)=>{
 							return (
-								<NavLink to={item.path}
+								<NavLink to={item.path} key={index}
 									onClick={()=>setCurrLink(item.path)}
 									onMouseEnter={()=>setHover(index)} 
 									onMouseLeave={()=>setHover(-1)} 
@@ -181,17 +179,17 @@ export const MenuRouter = () => {
 				</div>
 				<hr />
 				<Routes>
-					{componentList.map(item=>{
+					{componentList.map((item,index)=>{
 						if (item.path=="loan")
 							return(
 							<>
-								<Route path="loan/*" element={<LoanAccount/>} />
-								<Route path="loan/create/*" element={<CreateLoanAccount/>} />
+								<Route key={index+"_11"} path="loan/*" element={<LoanAccount/>} />
+								<Route key={index+"_12"} path="loan/create/*" element={<CreateLoanAccount/>} />
 							</>
 						)
 						if (item.component==DocumentList)
-							return <Route path={item.path} element={createElement(item.component, { label: item.name, docData: txnTestData })}  />
-						return <Route path={item.path} element={createElement(item.component)} />
+							return <Route key={index+"_21"} path={item.path} element={createElement(item.component, { label: item.name, docData: txnTestData })}  />
+						return <Route key={index+"_22"} path={item.path} element={createElement(item.component)} />
 					})}
 					<Route path="/*" element={<>Not Found</>} />
 				</Routes>

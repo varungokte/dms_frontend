@@ -3,7 +3,7 @@ import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { UserRoles, EnumIteratorValues, EnumIteratorKeys } from "./BasicComponents/Constants";
+import { UserRoles, EnumIteratorValues } from "./BasicComponents/Constants";
 import FormDialog from "./BasicComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 import Filter from "./BasicComponents/Filter";
@@ -15,55 +15,79 @@ import delete_icon from "./static/delete_icon.svg";
 
 //Routes: addUser,editUser, getUser
 function UserManagement(){
-  const newUser = useGlobalContext().createUser;
-  const changeUserInfo = useGlobalContext().editUser;
-  const getUsers = useGlobalContext().getAllUsers;
-  //userData is an array of users
-  //Each user is an array with: [Name, Email, Company Name, Role, Status]
-  //Role can be maker(0), checker(1), admin (2), superadmin (3)
-  //Status can be inactive(0) or active(1)
-
-  useEffect(()=>{
-    getUsers().then((res)=>{
-      const arr:any =[];
-      //@ts-ignore
-      res.data.message.map(user=>{
-        arr.push([user.N, user.E, user.S])
-      });
-      console.log("ARR",arr)
-      setUserData(arr);
-    }).catch(err=>{
-      console.log(err)
-    })
-  },[])
-  
-  const [userData, setUserData]= useState([]);
+  const [userData, setUserData]= useState<any>([["Person 1", "Email1", 0]]);
   const [roleFilter, setRoleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [selectedUser, setSelectedUser] = useState(-1);
   const [message, setMessage] = useState(<></>);
 
+  const [fieldValues, setFieldValues] = useState({
+    "N": "Conan O'Brien", "E": "email",
+    "P": "123", "R": "1",
+  })
+
+  const [fieldList, setFieldList] = useState([
+    { category: "grid", row: 2, fields: [
+      { id: "N", name: "Name", type: "text", editable: true },
+      { id: "E", name: "Email", type: "email", editable: false },
+      { id: "R", name: "Password", type: "password", editable: true },
+      { id: "P", name: "Role", type: "select", options: EnumIteratorValues(UserRoles), editable: true },
+    ]}
+  ]);
+
   const [newName, setNewName] = useState("");
   const [newEmail, setNewEmail] = useState("");
   const [newRole, setNewRole] = useState(0);
   const [newPassword, setNewPassword] = useState("");
+  
+  const [userAdded, setUserAdded] = useState(false);
+
+  const newUser = useGlobalContext().createUser;
+  const changeUserInfo = useGlobalContext().editUser;
+  const getUsers = useGlobalContext().getAllUsers;
+
+  useEffect(()=>{
+    getUsers().then((res)=>{
+      const arr:any =[];
+      if (res.length==0)
+        setUserData(["Person 1", "Email1", 0]);
+      else{
+        res.map((user:any)=>{ 
+          arr.push([user.N, user.E, user.S])
+        });
+        setUserData(arr);
+      }
+    }).catch(err=> console.log(err))
+  },[userAdded])
 
   const createUser = (e:any) => {
     e.preventDefault();
-    const data = {
-      N: newName,
-      E: newEmail,
-      P: newPassword,
-      R: newRole,
+    let data:any={};
+    for (let i=0; i<fieldList.length; i++){
+      const field = fieldList[i];
+      if (field.category=="single"){
+        //@ts-ignore
+        data[field.id] = fieldValues[field.id];
+      }
+      else if (field.category=="grid"){
+        for (let j=0; j<field.fields.length; j++){
+          const gridField = field.fields[j];
+          //@ts-ignore
+          data[gridField.id] = fieldValues[gridField.id]
+        }
+      }
     }
+    
+    console.log("TEST ZE DATA", data);
 
-    newUser(data).then(res=>{
+    /* newUser(data).then(res=>{
       console.log(res);
+      setUserAdded(true);
     }).catch((err)=>{
       if (err=="dupliate_user"){
         setMessage(<p>Duplicate User</p>)
       }
-    })
+    }) */
   }
 
   const editUser = () => {
@@ -71,6 +95,7 @@ function UserManagement(){
       return;
     
     const arr = userData[selectedUser];
+    console.log("THE SELECTED USER", selectedUser)
     const data = {} as any;
 
     if (newName!=arr[0])
@@ -90,8 +115,6 @@ function UserManagement(){
       }
     })
   }
-
-
 
   const deleteUser = (index:number) =>{
 
@@ -113,15 +136,9 @@ function UserManagement(){
 
         <div className="">
           <FormDialog
-            triggerText="+ Add User" triggerClassName={PurpleButtonStyling}  formSize="medium"
+            triggerText="+ Add User" triggerClassName={PurpleButtonStyling} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
-            form={[
-            { category: "grid", row: 2, fields: [
-              { label: "Name", type: "text", setter: setNewName },
-              { label: "Email", type: "email", setter: setNewEmail },
-              { label: "Password", type: "password", setter: setNewPassword },
-              { label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker", "Admin"] },
-            ]}]}
+            form={fieldList} setter={setFieldValues}
           />
         </div>
       </div>
@@ -129,7 +146,7 @@ function UserManagement(){
       {message}
         <Table className="bg-white border-2 rounded-xl">
           <HeaderRows headingRows={[["Name"], ["Email Address"]/* , ["Role"] */, ["Status"], ["Action"]]} />
-          <BodyRowsMapping
+          {userData.length==-1?<p className="text-center">No users available</p>:<BodyRowsMapping
             list={userData} dataType={["text", "text"/* , "role" */, "userStatus", "action"]}
             searchRows={searchString==""?[]:[searchString,0,1]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
             action = {userData.map((item:any, index:number)=>{
@@ -137,19 +154,8 @@ function UserManagement(){
                 <div className="flex flex-row">
                   <FormDialog 
                     triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                    formTitle="Edit User" formSubmit={editUser}  submitButton="Edit User"
-                    form={[
-                      { category: "grid", row: 2, fields: [
-                        { label: "Name", type: "text", setter: setNewName },
-                        { label: "Email", type: "email", setter: setNewEmail },
-                        { label: "Password", type: "password", setter: setNewPassword },
-                        { label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker", "Admin"] },
-                      ]}]}
-                    prefill={true}
-                    prefillValues={[item[0],item[1],"",item[2]]}
-                    prefillVariables={[newName,newEmail,newPassword,newRole]}
-                    currentIndex={index}
-                    currentSetter={setSelectedUser}
+                    formTitle="Edit User" formSubmit={editUser}  submitButton="Edit User" formSize="medium"
+                    form={fieldList} setter={setFieldValues} usersList={userData} currentUser={index} edit={true}
                   />
                     <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
                       actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
@@ -158,7 +164,8 @@ function UserManagement(){
                 </div>
               )
             })}
-          />
+          />}
+          
         </Table>
       </div>
     </div>

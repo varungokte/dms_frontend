@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import useGlobalContext from "./../../../GlobalContext";
+
 import { EllipsisVertical } from "lucide-react";
+import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
+import ProfileIcon from "../BasicComponents/ProfileIcon";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
-
-
-import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
-import ProfileIcon from "../BasicComponents/ProfileIcon";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu"
+import FormDialog from "../BasicComponents/FormDialog";
 import Filter from "../BasicComponents/Filter";
 import Search from "../BasicComponents/Search";
-import FormDialog from "../BasicComponents/FormDialog";
+
 
 function ContactDetails() {
   //contacts is an object where the keys are the categories (like borrower, lender, promoter) and values are arrays of people
@@ -27,8 +28,8 @@ function ContactDetails() {
   const [role, setRole] = useState("Borrower");
 
   const [name, setName] = useState("");
-  const [personType, setPersonType] = useState("");
-  const [mention, setMention] = useState("");
+  const [contactType, setContactType] = useState("");
+  const [recipient, setRecipient] = useState("");
   const [designation, setDesignation] = useState("");
   const [company, setCompany] = useState("");
   const [mobile, setMobile] = useState("");
@@ -49,9 +50,45 @@ function ContactDetails() {
   const [regState, setRegState] = useState("");
   const [regCountry, setRegCountry] = useState("");
   
+  const {addContact, getContacts} = useGlobalContext();
+
+  useEffect(()=>{
+    getContacts("662b7070bbe57c45023ce5fa").then(res=>{
+      console.log(res)
+    })
+  },[])
 
   const createContact = (e:any) => {
     e.preventDefault();
+    console.log("SUBMITTING DATA")
+    const data = {
+      "AID": "ACAERucpd",
+      "_loanId": "662b7070bbe57c45023ce5fa",
+      "CT": contactType,
+      "CE": email,
+      "RT": recipient,
+      "CN": company,
+      "D": designation,
+      "PN": name,
+      "MN": mobile,
+      "LN": landline,
+
+      "BA": billBuilding,
+      "BP": billPincode,
+      "BC": billCity,
+      "BS": billState,
+      "BCC": billCountry,
+
+      "RA": regBulding,
+      "RP": regPincode,
+      "RC": regCity,
+      "RS": regState,
+      "RCC": regCountry
+    }
+
+    addContact(data).then(res=>{
+      console.log("ZZZZZZZZZZZZZZZZZZZZZZZZ",res)
+    })
   }
 
   return(
@@ -71,25 +108,29 @@ function ContactDetails() {
             formTitle="Add New Contact"  formSubmit={createContact} submitButton="Add User"
             form = {[
               { category: "grid", row:3, sectionName:"", fields: [
-                { type: "select", label: "Contact Type", setter: setPersonType, options: ["Borrower", "Lender"] },
+                { type: "select", label: "Contact Type", setter: setContactType, options: ["Borrower", "Lender"] },
                 { type:"email", label: "Email Address", setter: setEmail }, 
-                { type:"select", label: "Email Recipient Type", setter: setMention, options: ["To", "Cc","Bcc"] },
+                { type:"select", label: "Email Recipient Type", setter: setRecipient, options: ["To", "Cc","Bcc"] },
                 { type:"text", label: "Company Name", setter: setCompany },
                 { type:"text", label: "Designation", setter: setDesignation },
                 { type:"text", label: "Contact Person Name", setter: setName },
                 { type:"text", label: "Mobile Number", setter: setMobile },
                 { type:"text", label: "Landline Number", setter: setLandline },
               ]},
-              { category: "grid", row: 3, sectionName:"Billing Address", fields:[
-                { type:"text", label: "Bulding/Street/Locality Name", setter: setBillBuilding, large: true },
+              { category: "grid", row: 2, sectionName:"Billing Address", customWidth:'[70%_auto]', fields:[
+                { type:"text", label: "Bulding/Street/Locality Name", setter: setBillBuilding },
                 { type:"number", label: "Pincode",setter: setBillPincode },
+              ]},
+              { category:"grid", row: 3, fields:[
                 { type:"text", label: "Country",setter: setBillCountry },
                 { type:"text", label: "State",setter: setBillState },
                 { type:"text", label: "City",setter: setBillCity },
               ]}, 
-              { category: "grid", row: 3, sectionName:"Registered Address", fields:[
-                { type:"text", label: "Bulding/Street/Locality Name", setter: setRegBuilding, large: true },
+              { category: "grid", row: 2, sectionName:"Registered Address", customWidth:'[70%_auto]', fields:[
+                { type:"text", label: "Bulding/Street/Locality Name", setter: setRegBuilding },
                 { type:"number", label: "Pincode",setter: setRegPincode },
+              ]},
+              { category: "grid", row: 3, fields:[
                 { type:"text", label: "Country",setter: setRegCountry },
                 { type:"text", label: "State",setter: setRegState },
                 { type:"text", label: "City",setter: setRegCity },
@@ -104,54 +145,20 @@ function ContactDetails() {
           const regEx = new RegExp(searchString, "i");
           if (searchString=="" || (person[0]+"").search(regEx)!==-1)
           return(
-            <div className="">
-              <Card className="m-5 w-72 rounded-xl">
-                <CardHeader>
-                  <CardTitle>	
-                    <div className="flex flex-row">
-                      <div className="flex-auto">
-                        <ProfileIcon name={person[0]} size="small" />
-                      </div>
-                      <div className="">
-                        <Dialog>
-                         <DropdownMenu>
-                            <DropdownMenuTrigger><EllipsisVertical/></DropdownMenuTrigger>
-                            <DropdownMenuContent className="bg-white">
-                              <DropdownMenuItem>
-                                <DialogTrigger>View Profile</DialogTrigger>
-                              </DropdownMenuItem>
-                              <FormDialog
-                                triggerText={<DropdownMenuItem>Edit</DropdownMenuItem>}  formSize="large"
-                                formTitle="Add New Contact"  formSubmit={createContact} submitButton="Add User"
-                                form = {[
-                                  { category: "grid", row:3, sectionName:"", fields: [
-                                    { type: "select", label: "Contact Type", setter: setPersonType, options: ["Borrower", "Lender"] },
-                                    { type:"email", label: "Email Address", setter: setEmail }, 
-                                    { type:"select", label: "Email Recipient Type", setter: setMention, options: ["To", "Cc","Bcc"] },
-                                    { type:"text", label: "Company Name", setter: setCompany },
-                                    { type:"text", label: "Designation", setter: setDesignation },
-                                    { type:"text", label: "Contact Person Name", setter: setName },
-                                    { type:"text", label: "Mobile Number", setter: setMobile },
-                                    { type:"text", label: "Landline Number", setter: setLandline },
-                                  ]},
-                                  { category: "grid", row: 3, sectionName:"Billing Address", fields:[
-                                    { type:"text", label: "Bulding/Street/Locality Name", setter: setBillBuilding, large: true },
-                                    { type:"number", label: "Pincode",setter: setBillPincode },
-                                    { type:"text", label: "Country",setter: setBillCountry },
-                                    { type:"text", label: "State",setter: setBillState },
-                                    { type:"text", label: "City",setter: setBillCity },
-                                  ]},
-                                  { category: "grid", row: 3, sectionName:"Registered Address", fields:[
-                                    { type:"text", label: "Bulding/Street/Locality Name", setter: setRegBuilding, large: true },
-                                    { type:"number", label: "Pincode",setter: setRegPincode },
-                                    { type:"text", label: "Country",setter: setRegCountry },
-                                    { type:"text", label: "State",setter: setRegState },
-                                    { type:"text", label: "City",setter: setRegCity },
-                                  ]},
-                                ]} 
-                              />
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+            <Card key={index} className="m-5 w-72 rounded-xl">
+              <CardHeader>
+                <CardTitle>	
+                  <div className="flex flex-row">
+                    <div className="flex-auto">
+                      <ProfileIcon name={person[0]} size="small" />
+                    </div>
+                    <div className="">
+                        <DropdownMenu>
+                      <Dialog>
+                        <DropdownMenuTrigger><EllipsisVertical/></DropdownMenuTrigger>
+                        <DropdownMenuContent className="bg-white">
+                          <DropdownMenuItem>
+                          <DialogTrigger>View Profile</DialogTrigger>
                           <DialogContent className="bg-white">
                             <DialogHeader>
                               <DialogTitle>
@@ -203,18 +210,52 @@ function ContactDetails() {
                               </div>
                             </DialogDescription>
                           </DialogContent>
-                        </Dialog>
-                      </div>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem>
+                        <FormDialog
+                          triggerText={"Edit"}  formSize="large"
+                          formTitle="Add New Contact"  formSubmit={createContact} submitButton="Add User"
+                          form = {[
+                            { category: "grid", row:3, sectionName:"", fields: [
+                              { type: "select", label: "Contact Type", setter: setContactType, options: ["Borrower", "Lender"] },
+                              { type:"email", label: "Email Address", setter: setEmail }, 
+                              { type:"select", label: "Email Recipient Type", setter: setRecipient, options: ["To", "Cc","Bcc"] },
+                              { type:"text", label: "Company Name", setter: setCompany },
+                              { type:"text", label: "Designation", setter: setDesignation },
+                              { type:"text", label: "Contact Person Name", setter: setName },
+                              { type:"text", label: "Mobile Number", setter: setMobile },
+                              { type:"text", label: "Landline Number", setter: setLandline },
+                            ]},
+                            { category: "grid", row: 3, sectionName:"Billing Address", fields:[
+                              { type:"text", label: "Bulding/Street/Locality Name", setter: setBillBuilding, large: true },
+                              { type:"number", label: "Pincode",setter: setBillPincode },
+                              { type:"text", label: "Country",setter: setBillCountry },
+                              { type:"text", label: "State",setter: setBillState },
+                              { type:"text", label: "City",setter: setBillCity },
+                            ]},
+                            { category: "grid", row: 3, sectionName:"Registered Address", fields:[
+                              { type:"text", label: "Bulding/Street/Locality Name", setter: setRegBuilding, large: true },
+                              { type:"number", label: "Pincode",setter: setRegPincode },
+                              { type:"text", label: "Country",setter: setRegCountry },
+                              { type:"text", label: "State",setter: setRegState },
+                              { type:"text", label: "City",setter: setRegCity },
+                            ]},
+                          ]} 
+                          />
+                        </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </Dialog>
+                      </DropdownMenu>
                     </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-left">
-                  <p className="font-medium">{person[0]}</p>
-                  <p className="font-light">{person[4]}</p>
-                  <p className="font-light">{role}</p>
-                </CardContent>
-              </Card>
-            </div>
+                  </div>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="text-left">
+                <p className="font-medium">{person[0]}</p>
+                <p className="font-light">{person[4]}</p>
+                <p className="font-light">{role}</p>
+              </CardContent>
+            </Card>
           )
         })}
       </div>

@@ -9,13 +9,17 @@ import SecurityDetails from "./LoanAccountComponents/SecurityDetails";
 import BankDetails from "./LoanAccountComponents/BankDetails";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
 
 function CreateLoanAccount() {
   const [currentSection, setCurrentSection] = useState(0);
 
+  const [okToFrolic, setOkToFrolic] = useState(false);
+
   const [showSecurityDetails, setShowSecurityDetails] = useState(true);
 
   const [formSections, setFormSections] = useState([
+    { name: "Create Agreement ID", component: GenerateLoanID },
     { name: "Basic Details", component: BasicDetails },
     { name: "Security Details", component: SecurityDetails, show: showSecurityDetails},
     { name: "Bank Details", component: BankDetails},
@@ -26,7 +30,6 @@ function CreateLoanAccount() {
     { name: "Ratings", component: Ratings }
   ])
 	
-
   return(
     <div style={{width:"relative"}}>
 			<p className="text-3xl font-bold mx-7 my-2">Create Loan Account</p>
@@ -37,9 +40,9 @@ function CreateLoanAccount() {
             <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap' }}>
               {formSections.map((section:any, index:number)=>{
                 return(
-                  <button key={index} className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":"white"}`} onClick={()=>setCurrentSection(index)}>
+                  <button key={index} /* disabled={!okToFrolic || index==0} */ className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} onClick={()=>setCurrentSection(index)}>
                     <div className="flex flex-row">
-                      <div className={`border rounded-full  ${currentSection===index?"border-white":"border-black"}`} 
+                      <div className={`border rounded-full ${index===0?(currentSection===index?"border-white":"border-slate-300"):currentSection===index?"border-white":"border-black"}`} 
                         style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}</div>
                       <div className="m-auto">{section.name}</div>
                     </div>
@@ -54,11 +57,13 @@ function CreateLoanAccount() {
           {
             React.createElement (formSections[currentSection].component, 
             {
+              currentSection: currentSection,
               setCurrentSection:setCurrentSection, 
               sectionCount: formSections.length-1, 
               label: (formSections[currentSection].label?formSections[currentSection].label:""),
               setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:"",
               showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:"",
+              setOkToFrolic: currentSection==0?setOkToFrolic:"",
             }
           )} 
         </div>

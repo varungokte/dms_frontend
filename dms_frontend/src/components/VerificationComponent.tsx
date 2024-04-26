@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 function VerificationComponent(props:any){
   const {sendOTP, verifyOTP,} = useGlobalContext();
-  const token = localStorage.getItem("Beacon-DMS-token");
 	const navigate = useNavigate();
 
   const [message, setMessage] = useState(<></>)
@@ -19,10 +18,11 @@ function VerificationComponent(props:any){
       <div className="text-center">Verify your email in order to access the rest of the site</div>
     </div>
   );
-    //Error 503 -> Maintainance Mode
+  
   const clickVerify =() =>{
-    sendOTP(token).then((res) =>{
-      console.log(res)
+    sendOTP().then((res) => {
+      if (res===503)
+        setMessage(<p className="text-yellow-600">Server Maintainance. Try Again</p>);
       setHeading(<div className="text-custom-1 font-bold text-3xl text-center">Enter OTP</div>);
       setInputField(1)
     }).catch(err=>{
@@ -31,20 +31,15 @@ function VerificationComponent(props:any){
   };
   const clickSubmit = (e:any) => {
     e.preventDefault();
-    verifyOTP(token, otp).then(res => {
-      const token = res.data.message;
-      const decoded = decodeToken(token);
-      setNewToken(token);
-      if (!decoded)
+    verifyOTP(otp).then(res => {
+      const decoded = decodeToken(res);
+      console.log(decoded);
+      if (!res || !decoded)
         setMessage(<p className="text-red-600">Try Again</p>)
       else {
         //@ts-ignore
-        if (decoded["S"]==2)
-          setMessage(<p className="text-red-600">Try Again</p>)
-        else{
-          setMessage(<p className="text-green-600">Success</p>)
-          setInputField(2)
-        }
+        setNewToken(res);
+        setInputField(2)
       }
     })
   };

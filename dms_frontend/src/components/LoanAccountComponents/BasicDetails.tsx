@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
-import {FormSectionNavigation, goToNextSection} from "../BasicComponents/FormSectionNavigation";
+import {FormSectionNavigation, goToNextSection} from "./../BasicComponents/FormSectionNavigation";
 
 function BasicDetails(props:any) {
   const [fieldValues, setFieldValues] = useState({ 
@@ -41,8 +41,6 @@ function BasicDetails(props:any) {
   ]);
 
   const {createLoan} = useGlobalContext();
-
-  const [disableField, setDisableField] = useState(false);
 
   const submitForm = (e:any) => {
     e.preventDefault();
@@ -95,7 +93,7 @@ function BasicDetails(props:any) {
         <div className="grid grid-cols-4">
         {fieldList.map(field=>{
           let disabled = false;
-          if (fieldValues["A"]==2 && (field.id=="F" || field.id=="S" || field.id=="V"))
+          if ((fieldValues["A"]==-1 || fieldValues["A"]==2 || fieldValues["A"]==null) && (field.id=="F" || field.id=="S" || field.id=="V"))
             disabled=true
           if (field.type=="select")
             return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} optionsList={field.options} required={field.required} disabled={disabled} />
@@ -104,7 +102,7 @@ function BasicDetails(props:any) {
         })}
         </div>
         <br/>
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} />
       </form>
       <br/>
     </div>
