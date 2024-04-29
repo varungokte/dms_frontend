@@ -15,7 +15,7 @@ import delete_icon from "./static/delete_icon.svg";
 
 //Routes: addUser,editUser, getUser
 function UserManagement(){
-  const [userData, setUserData]= useState<any>([["Person 1", "Email1", 0]]);
+  const [userData, setUserData]= useState<any>([]);
   const [roleFilter, setRoleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [selectedUser, setSelectedUser] = useState(-1);
@@ -52,7 +52,7 @@ function UserManagement(){
       if (res.length==0)
         setUserData(["Person 1", "Email1", 0]);
       else{
-        res.map((user:any)=>{ 
+        res.map((user:any)=>{
           arr.push([user.N, user.E, user.S])
         });
         setUserData(arr);
@@ -62,7 +62,7 @@ function UserManagement(){
 
   const createUser = (e:any) => {
     e.preventDefault();
-    let data:any={};
+    const data:any={};
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
       if (field.category=="single"){
@@ -124,7 +124,7 @@ function UserManagement(){
     <div>
 			<p className="text-3xl font-bold m-7">User Management</p>
       <div className="flex flex-row">
-        <div className=''>
+        <div className='m-auto flex-auto'>
           <Search setter={setSearchString} label="Search Users"/>
         </div>
 
@@ -155,12 +155,12 @@ function UserManagement(){
                   <FormDialog 
                     triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                     formTitle="Edit User" formSubmit={editUser}  submitButton="Edit User" formSize="medium"
-                    form={fieldList} setter={setFieldValues} usersList={userData} currentUser={index} edit={true}
+                    form={fieldList} setter={setFieldValues} 
+                    edit={true} userValues={{"N": userData[index][0], "E": userData[index][1], "S": userData[index][2]}}
                   />
-                    <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
-                      actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
-                    />
-                    
+                  <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
+                    actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
+                  />
                 </div>
               )
             })}

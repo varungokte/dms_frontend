@@ -1,9 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 
-import { RegistrationPage } from './components/Registration/RegistrationPage';
-import { LoginPage } from './components/Login/LoginPage';
+import { RegistrationPage } from './components/AuthPages/RegistrationPage';
+import { LoginPage } from './components/AuthPages/LoginPage';
 import PrivateRoutes from './PrivateRoutes';
-import VerificationComponent from './components/VerificationComponent';
+import VerificationPage from './components/AuthPages/VerificationPage';
 
 
 function App() {
@@ -12,7 +12,7 @@ function App() {
       <Routes>
         <Route path="/register" element={<RegistrationPage />} />
         <Route path='/login' element={<LoginPage />} />
-        <Route path="/verify" element={<VerificationComponent/>} />
+        <Route path="/verify" element={<VerificationPage/>} />
         <Route path='/*' element={<PrivateRoutes />} />
       </Routes>
     </BrowserRouter>
@@ -20,15 +20,6 @@ function App() {
 }
 
 export default App;
-
-
-//can the same person be a maker in a certain transation and checker in another 
-
-// enter the name of zone 
-
-// enter the name of product 
-
-// is a transaction assigned to a person or a document 
 
 
 /*   Loan_Basic
@@ -161,3 +152,14 @@ User Status
 2 - Active
 3 - Inactive
 */
+
+/*  CT-Contact Type
+	1 Borrower
+	2 Promotor 
+	3 Lender 
+	4 Lender Agent 
+	5 Legal Council (LLC) 
+	6 Banks Legal Team (vetting) 
+	7 Lender Insurance Agent (LIA) 
+	8 Lenders Independent Engineer (LIE)
+ */

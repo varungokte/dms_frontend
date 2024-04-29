@@ -1,9 +1,9 @@
 import { useState } from "react";
-import useGlobalContext from "./../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 import { decodeToken } from "react-jwt";
 import { useNavigate } from "react-router-dom";
 
-function VerificationComponent(props:any){
+function VerificationComponent(){
   const {sendOTP, verifyOTP,} = useGlobalContext();
 	const navigate = useNavigate();
 

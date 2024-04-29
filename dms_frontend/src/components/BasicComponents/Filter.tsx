@@ -1,6 +1,6 @@
 function Filter(props:any){
   return(
-    <select className="bg-white border-2 p-5 h-full rounded-xl" onChange={(e:any)=>{props.setter(e.target.value)}}>
+    <select className="bg-white border-2 p-3 rounded-xl" onChange={(e:any)=>{props.setter(e.target.value)}}>
       {props.setPlaceholder?<option value={props.placeholderValue[0]}>{props.placeholderValue[1]}</option>:""}
       
       {props.labelList.map((item:any,index:number)=>{

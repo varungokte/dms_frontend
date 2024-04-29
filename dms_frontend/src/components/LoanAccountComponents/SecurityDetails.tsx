@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { FormSectionNavigation, goToNextSection } from "../BasicComponents/FormSectionNavigation";
-import { useNavigate } from "react-router-dom";
 
 function SecurityDetails(props:any){
   const [fieldValues, setFieldValues] = useState({
@@ -25,7 +24,6 @@ function SecurityDetails(props:any){
   ])
 
   const {createLoan} = useGlobalContext();
-  const navigate = useNavigate();
 
   const submitForm = (e:any) => {
     e.preventDefault();
@@ -64,7 +62,7 @@ function SecurityDetails(props:any){
               return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} disabled={disableFields}  />
           })}
         </div>
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} />
+        <FormSectionNavigation setCurrentSection={props.setCurrentSection} isForm={true} />
       </form>
     </div>
   )

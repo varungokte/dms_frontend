@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
-//import {socket} from "./socket";
+import {socket} from "./socket";
 import useGlobalContext from './../GlobalContext';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
@@ -44,10 +44,10 @@ export const MenuRouter = () => {
 	const navigate = useNavigate();
 	const {getDecryptedToken} = useGlobalContext();
 	const [userInfo, setUserInfo] = useState(<div>Loading</div>);
-	//const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
+	const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
 
 
-	/* const onConnect = () => {
+	const onConnect = () => {
 		setSocketIsConnected(()=>{const a = true; return a});
 		socket.emit("sendMessage", {message:"Connection established"})
 		console.log("CONNECTED")
@@ -56,8 +56,8 @@ export const MenuRouter = () => {
 
 	const onDisconnect = () => {
 		setSocketIsConnected(false);
-	} */
-/* 	useEffect(()=>{
+	}
+	useEffect(()=>{
 		socket.on("connect", onConnect);
 		socket.on("connect_error",(error:any)=>{	
 			//console.log(error)
@@ -66,7 +66,7 @@ export const MenuRouter = () => {
 		socket.on("messageReceived", (data:any)=>{
 			console.log("RECIEVE",data)
 		})
-	},[]) */
+	},[])
 
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");

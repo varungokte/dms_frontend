@@ -4,9 +4,9 @@ import useGlobalContext from "../../../GlobalContext";
 
 import login_img from "./../static/login_img.png";
 import eye from "./../static/eye.svg";
-import eye_slash from "./../static/eye-slash.svg"
+import eye_slash from "./../static/eye-slash.svg";
 
-export const LoginComponent = () => {
+export const LoginPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 

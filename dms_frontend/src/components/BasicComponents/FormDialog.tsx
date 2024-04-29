@@ -1,7 +1,9 @@
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import PurpleButtonStyling from "./PurpleButtonStyling";
+import { useState } from "react";
 
 function FormDialog(props:any){
+  const [open, setOpen] = useState(false);
   enum FormSizes {
     small= "min-w-[600px] min-h-[300px]",
     medium="min-w-[800px] min-h-[300px]",
@@ -15,7 +17,7 @@ function FormDialog(props:any){
     return(
       <div key={index+id+"t_0"} className="mb-5">
         <label key={index+id+"t_1"} htmlFor={id} className="font-light text-lg">{name}</label>
-        <input key={index+id+"t_2"} name="otp" autoComplete="garbage" id={id} type={type} onChange={(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; console.log(curr); return curr})} placeholder={prefillValue} className={` border rounded-if w-full h-full p-4 ${props.large?"bg-red-600":""}`}/>
+        <input key={index+id+"t_2"} name="otp" autoComplete="garbage" id={id} type={type} onChange={(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; return curr})} placeholder={prefillValue} className={` border rounded-if w-full h-full p-4 ${props.large?"bg-red-600":""}`}/>
       </div>
     )
   };
@@ -57,7 +59,7 @@ function FormDialog(props:any){
   /* const handleTextClick = (index: number, label: string, setter:Function, )
  */
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger className={props.triggerClassName}>{props.triggerText}</DialogTrigger>
       {/* @ts-ignore */}
       <DialogContent className={`bg-white overflow-y-scroll max-h-screen ${FormSizes[props.formSize]} `}>
@@ -66,13 +68,13 @@ function FormDialog(props:any){
           <hr/>
         </DialogHeader>
         
-        <form onSubmit={(e)=>{props.formSubmit(e)}}>
+        <form onSubmit={(e)=>{props.formSubmit(e); setOpen(false)}}>
           {props.form.map((field:any,index:number)=>{
             if (field["category"]=="single"){
               if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password" || field["type"]=="date" || field["type"]=="number")
-                return handleText(index, field["id"], field["name"], field["type"], props.prefill?props.prefillValues[index]:"")
+                return handleText(index, field["id"], field["name"], field["type"], props.edit?props.userList[index][props.labelList.indexOf(field["id"])]:"")
               else if (field["type"]=="select")
-                return handleSelect(index, field["id"], field["name"], field["options"], props.prefill?props.prefillValues[index]:-1)
+                return handleSelect(index, field["id"], field["name"], field["options"], props.edit?props.userList[index][props.labelList.indexOf(field["id"])]:"")
               else if (field["type"]=="file")
                 return handleFile(index, field["id"], field["name"], field["fileList"]);
             }
@@ -87,10 +89,11 @@ function FormDialog(props:any){
                   <div className="text-2xl font-medium my-2">{field["sectionName"]}</div>
                   <div className={`grid grid-cols-${gridStyle}`}>
                     {field.fields.map((item:any, itemIndex:number)=>{
-                      if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number")
-                        return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], props.edit?props.usersList[props.currentUser]:"")}</span>
+                      if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number"){
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], props.edit?props.userValues[item["id"]]:"")}</span>
+                      }
                       else if (item["type"]=="select")
-                        return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], props.edit?props.usersList[props.currentUser]:-1)}</span>
+                        return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], props.edit?props.userValues[item["id"]]:"")}</span>
                       else if (item["type"]=="file")
                         return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["id"], item["name"], field["fileList"])} </span>  
                     })}
@@ -98,12 +101,9 @@ function FormDialog(props:any){
                 </div> 
               )}
             })}
-            <DialogFooter>
-              <DialogClose  className={`float-right w-28 ${PurpleButtonStyling}`}>
-                <button type="submit">{props.submitButton}</button>
-              </DialogClose>
-            </DialogFooter>
-          </form>
+              <button className={`float-right w-28 ${PurpleButtonStyling}`} type="submit" >
+                {props.submitButton}</button>
+              </form>
       </DialogContent>
     </Dialog>
     

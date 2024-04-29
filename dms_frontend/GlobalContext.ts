@@ -178,17 +178,20 @@ const getAllUsers = async () => {
 
 const createLoan = async (data:object) => {
 	try {
-		const token = await getEncryptedToken();
-		const response = await axios.post(`${Base_Url}/createLoan`,data, {
-			headers:{
-				"Authorization": `Bearer ${token}`
-			}
+		const token = getEncryptedToken();
+		console.log("REG Data",data)
+		const enc_data = await handleEncryption(data);
+		console.log("ECN Data",enc_data)
+		const response = await axios.post(`${Base_Url}/createLoan`,{data:enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		return response;
+		return response.status;
 	}
 	catch(error:any) {
 		if (!error.response)
 			return;
+		else
+			return error.response.status
 	}
 }
 
@@ -199,7 +202,8 @@ const createAID = async (data:object) =>{
 		const response = await axios.post(`${Base_Url}/createAID`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		return response;
+		const decryptedObject = await handleDecryption(response.data);
+		return decryptedObject;
 	}
 	catch(error:any) {
 		if (!error.response)
@@ -209,16 +213,18 @@ const createAID = async (data:object) =>{
 	}
 }
 
-//createContact  listContact
-
-const addContact = async (data:object) => {
+const addContact = async (data:object, actionType:string) => {
 	try {
 		const token = getEncryptedToken();
+		console.log(data)
 		const enc_data = await handleEncryption(data);
+		console.log("ACTION", actionType);
 		const response = await axios.post(`${Base_Url}/createContact`,{data:enc_data}, {
-			headers:{ "Authorization": `Bearer ${token}` }
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { "type": actionType },
 		});
-		return response;
+		if (response.status==200)
+			return response;
 	}
 	catch(error:any) {
 		if (!error.response)
@@ -233,11 +239,8 @@ const getContacts = async (loanId:string) => {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/listContact`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: {
-				"_loanId": loanId
-			}
+			params: { "_loanId": loanId },
 		});
-		console.log(response.data);
 		const decryptedObject = handleDecryption(response.data);
 		return decryptedObject;
 	}
@@ -246,6 +249,41 @@ const getContacts = async (loanId:string) => {
 			return;
 		else
 			return error.response
+	}
+};
+
+const getLoanList = async () => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listLoan`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
+
+const getLoanFields = async (loanId:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/getLoan`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { "_loanId": loanId },
+		});
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
 	}
 }
 
@@ -276,6 +314,8 @@ const useGlobalContext = () => {
 		createAID,
 		addContact,
 		getContacts,
+		getLoanList,
+		getLoanFields,
 		//decrypt
 	}
 }

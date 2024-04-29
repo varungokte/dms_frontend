@@ -1,7 +1,7 @@
 import { FormEvent, useState } from "react";
-import useGlobalContext from "./../../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 
-export const RegistrationComponent = () => {
+export const RegistrationPage = () => {
 	const [companyName, setCompanyName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");

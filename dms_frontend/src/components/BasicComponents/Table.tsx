@@ -1,5 +1,5 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook } from "./Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, RatingValues } from "./Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
@@ -73,11 +73,15 @@ function SingleRow(props:any){
         if (dataType=="userStatus")
           return handleUserStatus(Number(item), cellClassName, uniqueIndex);
         if (dataType=="role")
-          return handleRole(Number(item), cellClassName, uniqueIndex);
+        return handleRole(Number(item), cellClassName, uniqueIndex);
+        if (dataType=="ratingAgency")
+          return handleRatingAgency(Number(item)-1, cellClassName, uniqueIndex);
         if (dataType=="ratingType")
-          return handleRatingType(Number(item), cellClassName, uniqueIndex);
+          return handleRatingType(Number(item)-1, cellClassName, uniqueIndex);
         if (dataType=="ratingOutlook")
-          return handleRatingOutlook(Number(item), cellClassName, uniqueIndex);    
+          return handleRatingOutlook(Number(item)-1, cellClassName, uniqueIndex);
+        if (dataType=="ratingValue")
+          return handleRatingValue(Number(item)-1, cellClassName, uniqueIndex);  
       })}
     </TableRow>
   )
@@ -136,12 +140,20 @@ const handleAction = (action:any, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{action}</TableCell>
 }
 
+const handleRatingAgency = (index:any, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{RatingAgencies[index]}</TableCell>
+}
+
 const handleRatingType = (index:any, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{RatingTypes[index]}</TableCell>
 }
 
 const handleRatingOutlook = (index:any, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{RatingOutlook[index]}</TableCell>
+}
+
+const handleRatingValue = (index:any, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{RatingValues[index]}</TableCell>
 }
 
 export { HeaderRows, BodyRowsMapping }

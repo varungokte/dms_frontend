@@ -17,10 +17,13 @@ function FormSectionNavigation(props:any) {
         <button className="text-red-600 border border-red-600 rounded-xl h-12 w-36 mx-3" onClick={()=>navigate("/loan")}>Cancel</button>
       </div>
       <div>
-        {props.currentSection?<></>:<button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mt-5 m-3" onClick={previousSection}><div className="flex flex-row place-content-center"><ChevronLeft/><div>Previous</div></div></button>
+        {props.currentSection?<></>:<button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mt-5 m-3" onClick={previousSection}><div className="flex flex-row place-content-center"><ChevronLeft/><div>Previous</div></div></button>}
+        
+        {props.isForm
+          ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36 my-1" type="submit"><div className="flex flex-row place-content-center"><ChevronRight/><div>Next</div></div></button>
+          :<button className="text-white bg-custom-1 rounded-xl h-12 w-36 my-1" onClick={()=>goToNextSection(props.setCurrentSection,props.sectionCount)}><div className="flex flex-row place-content-center"><ChevronRight/><div>Next</div></div></button>
         }
-        <button className="text-white bg-custom-1 rounded-xl h-12 w-36 my-1" type="submit"><div className="flex flex-row place-content-center"><ChevronRight/><div>Next</div></div></button>
-      </div>
+        </div>
   </div>
   )
 }

@@ -77,7 +77,7 @@ function BankDetails(props:any) {
           })}
         </div>
         <br/>
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} />
+        <FormSectionNavigation setCurrentSection={props.setCurrentSection} isForm={true} />
       </form>
     </div>
   )

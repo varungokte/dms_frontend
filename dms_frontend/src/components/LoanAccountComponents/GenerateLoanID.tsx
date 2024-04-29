@@ -12,7 +12,7 @@ function GenerateLoanID(props:any){
   const userSubmittedId = (e:any) => {
     e.preventDefault();
     console.log("USER GENERATED ID", agreementId);
-    createAID({"AID":agreementId}).then(res=>{
+    /* createAID({"AID":agreementId}).then(res=>{
       console.log("REPOSNE", res);
       if (res?.status==200){
         props.setOkToFrolic(true);
@@ -22,14 +22,18 @@ function GenerateLoanID(props:any){
         setErrorMessage(<p className="text-red-600">Try Again</p>)
     }).catch(err=>{
       console.log(err)
-    })
+    }) */
+    props.setOkToFrolic(true);
+    props.setCurrentSection(1);
   };
 
   const systemGeneratedId = () => {
     createAID({}).then(res=>{
       console.log("RESPONSE", res)
       console.log("SYSTEM GENERATED ID");
-      if (res?.status==200){
+      if (res){
+        props.setAID(res.AID);
+        props.setLoanId(res._loanId)
         props.setOkToFrolic(true);
         props.setCurrentSection(1);
       }
