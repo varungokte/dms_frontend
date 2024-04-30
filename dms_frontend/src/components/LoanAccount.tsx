@@ -38,12 +38,10 @@ function LoanAccount() {
 			<p className="text-3xl font-bold mx-5 mb-5">Loan Account</p>
       <hr/>
       <br/>
-      <hr/>
       <div className="flex flex-row">
         <div className="m-auto flex-auto"> <Search label="Search by Agreement ID" setter={setSearchString}/></div>
         <div className="m-auto"><Link className={PurpleButtonStyling} to="create" state={{linkSource: "CREATE"}} >Add a Loan Account</Link></div>
       </div>
-    <hr/>
       <div className="m-5 border rounded-xl">
         <Table className="">
           <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Company Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["Status"], ["Action"]]} />

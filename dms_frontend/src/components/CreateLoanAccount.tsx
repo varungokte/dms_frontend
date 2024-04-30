@@ -43,6 +43,14 @@ function CreateLoanAccount() {
     }
   },[]);
 
+  const goToNextSection = () => {
+    const sectionCount = formSections.length-1;
+    setCurrentSection((curr:any)=>{
+      if (curr===sectionCount) return sectionCount 
+      else return curr+1
+    });
+  };
+
   const [formSections] = useState([
     { name: "Create Agreement ID", component: GenerateLoanID },
     { name: "Basic Details", component: BasicDetails },
@@ -89,8 +97,8 @@ function CreateLoanAccount() {
               AID: AID,
               setAID: setAID,
               currentSection: currentSection,
-              setCurrentSection:setCurrentSection, 
-              sectionCount: formSections.length-1, 
+              setCurrentSection: setCurrentSection,
+              goToNextSection: goToNextSection,
               label: (formSections[currentSection].label?formSections[currentSection].label:""),
               setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:"",
               showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:"",

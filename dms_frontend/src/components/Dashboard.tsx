@@ -1,10 +1,13 @@
-import { useEffect } from "react";
-import useGlobalContext from "./../../GlobalContext";
+import PermissionSetter from "./BasicComponents/PermissionSetter";
 
 function Dashboard() {
-	const encryption_key = "JAIBAJRANGBALI";
 	return (
-		<div className="text-center my-4 font-bold text-5xl text-custom-1">DASHBOARD</div>
+		<div>
+			<div className="text-center my-4 font-bold text-5xl text-custom-1">DASHBOARD</div>
+			<PermissionSetter/>
+			
+		</div>
+		
 	)
 }
 

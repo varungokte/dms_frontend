@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
-import {FormSectionNavigation, goToNextSection} from "./../BasicComponents/FormSectionNavigation";
+import {FormSectionNavigation} from "./../BasicComponents/FormSectionNavigation";
+import moment from "moment";
 
 function BasicDetails(props:any) {
 
@@ -10,7 +11,10 @@ function BasicDetails(props:any) {
     if (props.actionType=="EDIT" && props.preexistingValues){
       const obj:any ={};
       Object.keys(props.preexistingValues).map(value=>{
-        obj[value]= props.preexistingValues[value];
+        if (value=="SD" || value=="DD" || value=="CD" || value=="RED")
+          obj[value] = moment(props.preexistingValues["SD"]).format("DD/MM/YYYY");
+        else
+          obj[value]= props.preexistingValues[value];
       });
 
       setFieldValues(curr=>{
@@ -40,6 +44,7 @@ function BasicDetails(props:any) {
     { id:"PN", name:"PAN Number", type:"text", required: true },
     { id:"GST", name:"GST Number", type:"text", required: false },
     { id:"CIN", name:"CIN Number", type:"text", required: false },
+    { id:"break" },
     { id:"SD", name:"Sanction Date", type:"date", required: true },
     { id:"DD", name:"Downsell Date", type:"date", required: false },
     { id:"CD", name:"Loan Closure Date", type:"date", required: true },
@@ -62,9 +67,6 @@ function BasicDetails(props:any) {
     const data:any={};
     const dsra:any={};
 
-    data["AID"]= props.AID;
-    data["_loanId"]= props.loanId;
-
     Object.keys(fieldValues).map(field=>{
       if (field=="A" && fieldValues[field]==2)
         dsra[field] = fieldValues[field]
@@ -84,12 +86,16 @@ function BasicDetails(props:any) {
 
     if (Object.keys(data).length!=0){
       console.log("SUBMITTED NOW",data);
+
+      data["AID"]= props.AID;
+      data["_loanId"]= props.loanId;
+
       if (fieldValues["ST"]==2)
         props.setShowSecurityDetails(false);
 
       createLoan(data).then(res=> {
         if (res==200)
-          goToNextSection(props.setCurrentSection, props.sectionCount);
+          props.goToNextSection();
       }   
       ).catch(err=> console.log(err))
     }
@@ -97,7 +103,7 @@ function BasicDetails(props:any) {
 
       if (fieldValues["ST"]==2)
       props.setShowSecurityDetails(false);
-      goToNextSection(props.setCurrentSection, props.sectionCount);}
+      props.goToNextSection();}
   }
 
   return(
@@ -107,8 +113,10 @@ function BasicDetails(props:any) {
       <br/>
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-4">
-        {fieldList.map(field=>{
+        {fieldList.map((field,index)=>{
           let disabled = false;
+          if (field.id=="break")
+            return<div key={index}></div>
           if ((fieldValues["A"]==-1 || fieldValues["A"]==2 || fieldValues["A"]==null) && (field.id=="F" || field.id=="S" || field.id=="V"))
             disabled=true
           if (field.type=="select")
@@ -120,7 +128,7 @@ function BasicDetails(props:any) {
         })}
         </div>
         <br/>
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
       <br/>
     </div>

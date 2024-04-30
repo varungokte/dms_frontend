@@ -24,7 +24,7 @@ function GenerateLoanID(props:any){
       console.log(err)
     }) */
     props.setOkToFrolic(true);
-    props.setCurrentSection(1);
+    props.goToNextSection();
   };
 
   const systemGeneratedId = () => {
@@ -35,7 +35,7 @@ function GenerateLoanID(props:any){
         props.setAID(res.AID);
         props.setLoanId(res._loanId)
         props.setOkToFrolic(true);
-        props.setCurrentSection(1);
+        props.goToNextSection();
       }
       else
         setErrorMessage(<p className="text-red-600">Try Again</p>)

@@ -84,10 +84,7 @@ function ContactDetails(props:any) {
   const createContact = (e:any) => {
     e.preventDefault();
     console.log("SUBMITTING DATA");
-    const data:any = {
-      "AID": props.AID,
-      "_loanId": loanId,
-    };
+    const data:any = {};
     console.log("AID LAON", data)
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
@@ -109,19 +106,20 @@ function ContactDetails(props:any) {
         }
       }
     }
-    console.log("FINAL", data);
-    addContact(data, "").then(res=>{
-      console.log("ZZZZZZZZZZZZZZZZZZZZZZZZ",res)
-    })
+    if (Object.keys(data).length!=0){
+      console.log("SUBMITTED NOW",data);
+      data["AID"]=AID;
+      data["_loanId"]= loanId;
+
+      addContact(data, "").then(res=>{
+        console.log("ZZZZZZZZZZZZZZZZZZZZZZZZ",res)
+      })
+    }    
   }
 
   const editContact = (e:any) =>{
     e.preventDefault();
-    const data:any = {
-      "AID": AID,
-      "_loanId": loanId,
-      "_contactId": "662f6e086c52bf3e4ec40368",
-    };
+    const data:any = {};
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
       if (field.category=="single"){
@@ -142,12 +140,18 @@ function ContactDetails(props:any) {
         }
       }
     }
+    
+    if (Object.keys(data).length!=0){
+      console.log("data", data);
 
-    console.log("data", data)
+      data["AID"]=AID;
+      data["_loanId"]=loanId;
+      data["_contactId"]="662f6e086c52bf3e4ec40368";
 
-    addContact(data,"EDIT").then(res=>{
-      console.log("EDITED", res)
-    })
+      addContact(data,"EDIT").then(res=>{
+        console.log("EDITED", res)
+      })
+    }
   }
 
   return(
@@ -268,7 +272,7 @@ function ContactDetails(props:any) {
           })}
         </div>
       <br/>
-      <FormSectionNavigation setCurrentSection={props.setCurrentSection} isForm={false} sectionCount={props.sectionCount} />
+      <FormSectionNavigation isForm={false} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

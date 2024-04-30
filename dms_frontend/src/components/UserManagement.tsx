@@ -138,7 +138,7 @@ function UserManagement(){
           <FormDialog
             triggerText="+ Add User" triggerClassName={PurpleButtonStyling} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
-            form={fieldList} setter={setFieldValues}
+            form={fieldList} setter={setFieldValues} permissionSetter={true}
           />
         </div>
       </div>
@@ -146,7 +146,9 @@ function UserManagement(){
       {message}
         <Table className="bg-white border-2 rounded-xl">
           <HeaderRows headingRows={[["Name"], ["Email Address"]/* , ["Role"] */, ["Status"], ["Action"]]} />
-          {userData.length==-1?<p className="text-center">No users available</p>:<BodyRowsMapping
+          {userData.length==-1
+          ?<p className="text-center">No users available</p>
+          :<BodyRowsMapping
             list={userData} dataType={["text", "text"/* , "role" */, "userStatus", "action"]}
             searchRows={searchString==""?[]:[searchString,0,1]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
             action = {userData.map((item:any, index:number)=>{

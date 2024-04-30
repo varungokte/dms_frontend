@@ -287,6 +287,78 @@ const getLoanFields = async (loanId:string) => {
 	}
 }
 
+const addRating = async (data:object) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addRating`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+const getRatingsList = async (loanId:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listRating`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { "_loanId": loanId },
+		});
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject; 
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+const addRole = async (data:object) => {
+	try {
+		const token = getEncryptedToken();
+		console.log(data)
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addRole`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+const getRolesList = async () => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listRole`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject; 
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+
+
 /* const decrypt = async (data:object) => {
 	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
 	console.log("ENCRYPTED TEXTZ", encryptedText);
@@ -316,7 +388,10 @@ const useGlobalContext = () => {
 		getContacts,
 		getLoanList,
 		getLoanFields,
-		//decrypt
+		addRating,
+		getRatingsList,
+		addRole,
+		getRolesList,
 	}
 }
 

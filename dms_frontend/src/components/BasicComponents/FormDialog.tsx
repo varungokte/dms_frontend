@@ -29,7 +29,7 @@ function FormDialog(props:any){
         <br/>
         <select key={index+id+"s_2"} id={id} onChange={(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; return curr})} className="bg-white border rounded-if w-full h-10/12 p-4">
           {options.map((option:any,optionIndex:any)=>{
-            return <option key={optionIndex} value={optionIndex} selected={props.prefill&&prefillValue==optionIndex}>{option}</option>
+            return <option key={index+"_"+optionIndex} value={optionIndex} selected={props.prefill&&prefillValue==optionIndex}>{option}</option>
           })}
         </select>
       </div>
@@ -39,22 +39,23 @@ function FormDialog(props:any){
   const handleFile = (index:number, label:string, setter:Function, fileList:[File]) => {
     return (
       <div key={index+label+"f_0"} className="flex flex-row mb-5">
-        <div className="font-light text-lg">{label}:</div>
-        <div>
-          <label key={index+label+"f_1"} htmlFor={label} className="bg-custom-1 text-white mx-3 my-5 border rounded-if p-3">Choose File(s)</label>
-          <br/>
-          <input key={index+label+"f_2"} id={label} type="file" style={{width:"0.1px", opacity:"0"}} multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} /* className="bg-white border text-custom-1 rounded-if w-full h-10/12 p-4" */ />
-        </div>
+        <div key={index+label+"f_-1"} className="font-light text-lg">{label}:</div>
+        <label key={index+label+"f_1"} htmlFor={label} className="bg-custom-1 text-white mx-3 my-5 border rounded-if p-3">Choose File(s)</label>
+        <br/>
+        <input key={index+label+"f_2"} id={label} type="file" style={{width:"0.1px", opacity:"0"}} multiple onChange={(e:any)=>setter((curr:any)=>{curr.push(e.target.files); return curr;})} /* className="bg-white border text-custom-1 rounded-if w-full h-10/12 p-4" */ />
         <div key={index+label+"f_3"}>
-        {fileList.map(doc=>{
-          console.log("CONAN",fileList)
-          return(
-            <div key={1}>{doc.name}</div>
-          )
-        })}</div>        
+          {fileList.map(doc=>{
+            console.log("CONAN",fileList)
+            return(
+              <div key={1}>{doc.name}</div>
+            )
+          })}
+        </div>        
       </div>
     )
   }
+
+  const handlePermissions = (index:number)=> {}
 
   /* const handleTextClick = (index: number, label: string, setter:Function, )
  */
@@ -85,9 +86,9 @@ function FormDialog(props:any){
               else
                 gridStyle = field["row"];
               return(
-                <div>
-                  <div className="text-2xl font-medium my-2">{field["sectionName"]}</div>
-                  <div className={`grid grid-cols-${gridStyle}`}>
+                <div key={index+"grid"}>
+                  <div key={index+"grid name"} className="text-2xl font-medium my-2">{field["sectionName"]}</div>
+                  <div key={index+"gridz"} className={`grid grid-cols-${gridStyle}`}>
                     {field.fields.map((item:any, itemIndex:number)=>{
                       if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number"){
                         return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], props.edit?props.userValues[item["id"]]:"")}</span>

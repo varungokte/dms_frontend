@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
-import { FormSectionNavigation, goToNextSection } from "../BasicComponents/FormSectionNavigation";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
 function SecurityDetails(props:any){
   const [fieldValues, setFieldValues] = useState({
@@ -38,6 +38,8 @@ function SecurityDetails(props:any){
     })
 
     if (Object.keys(data).length!=0){
+      data["AID"]= props.AID;
+      data["_loanId"]= props.loanId;
       console.log("SUBMITTED NOW",data);
       /* createLoan(data).then(res=> {
         console.log("RES", res);
@@ -46,7 +48,7 @@ function SecurityDetails(props:any){
       ).catch(err=> console.log(err)) */
     }
     else
-      goToNextSection(props.setCurrentSection, props.sectionCount); 
+      props.goToNextSection(props.setCurrentSection, props.sectionCount); 
   }
 
   return(
@@ -62,7 +64,7 @@ function SecurityDetails(props:any){
               return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} disabled={disableFields}  />
           })}
         </div>
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} isForm={true} />
+        <FormSectionNavigation setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
     </div>
   )

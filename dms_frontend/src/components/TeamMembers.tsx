@@ -51,23 +51,23 @@ function TeamMembers() {
 			</div>
 
 			<div className="mx-10 mt-5">
-				{Object.keys(members).map((category: string)=>{
+				{Object.keys(members).map((category: string, index)=>{
 					return(
-						<div>
-							<p className="text-lg font-semibold">{category}</p>
-							<div className="flex flex-row">
+						<div key={index+category}>
+							<p key={index+category+"category"} className="text-lg font-semibold">{category}</p>
+							<div key={index+category+"a"} className="flex flex-row">
 								{//@ts-ignore
-								members[category].map((member)=>{
+								members[category].map((member,index)=>{
 									return (
-										<Card className="m-5 rounded-2xl bg-white w-72">
-											<CardHeader>
-												<CardTitle className="m-auto">
-													<ProfileIcon name={member} size="large" />
+										<Card key={index} className="m-5 rounded-2xl bg-white w-72">
+											<CardHeader key={index+"head"}>
+												<CardTitle key={index+"title"} className="m-auto">
+													<ProfileIcon key={index+"icon"} name={member} size="large" />
 												</CardTitle>
 											</CardHeader>
-											<CardContent>
-												<p className="text-center font-medium">{member}</p>
-												<p className="text-center font-light">{category}</p>
+											<CardContent key={index+"content"}>
+												<p key={index+"name"} className="text-center font-medium">{member}</p>
+												<p key={index+"role"} className="text-center font-light">{category}</p>
 											</CardContent>
 										</Card>
 									)})}

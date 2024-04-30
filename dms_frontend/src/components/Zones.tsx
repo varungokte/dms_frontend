@@ -60,24 +60,24 @@ function AllZones(props:any){
 	const [currency] = useState(props.currency)
 	
 	return(
-		Object.keys(zones).map((zone)=>{
+		Object.keys(zones).map((zone, index)=>{
 			const regEx = new RegExp(props.searchString, "i")
 			if (zone.search(regEx)!==-1)
 				return(
-					<Card style={{width:"48vh", marginRight:"5%", marginBottom:"3%", borderRadius:"20px", backgroundColor:"white"}}>
-						<CardHeader>
-							<CardTitle></CardTitle>
+					<Card key={index+"c"} style={{width:"48vh", marginRight:"5%", marginBottom:"3%", borderRadius:"20px", backgroundColor:"white"}}>
+						<CardHeader key={index+"h"}>
+							<CardTitle key={index+"t"}></CardTitle>
 						</CardHeader>
-						<CardContent>
-							<div className="flex flex-row ">
-								<div style={{width:150, height:150}}>
+						<CardContent key={index+"c"}>
+							<div key={index+"cdiv"} className="flex flex-row ">
+								<div key={index+"pie"} style={{width:150, height:150}}>
 									<CircularProgressbar value={/* @ts-ignore */ zones[zone][0]} text={zones[zone][0]}/>
 								</div>
-								<div className="mx-5">
-									<p className="text-xl">{zone}</p>
+								<div className="mx-5" key={index+"i"}>
+									<p className="text-xl" key={index+"n"}>{zone}</p>
 									<br/>
-									<p className="font-bold text-lg">{/* @ts-ignore */ `${currency[0]} ${zones[zone][1]} ${currency[1]}`}</p>
-									<p className="text-lg">{/* @ts-ignore */`Total Facilities: ${zones[zone][2]}`}</p>
+									<p className="font-bold text-lg" key={index+"v"}>{/* @ts-ignore */ `${currency[0]} ${zones[zone][1]} ${currency[1]}`}</p>
+									<p className="text-lg" key={index+"f"}>{/* @ts-ignore */`Total Facilities: ${zones[zone][2]}`}</p>
 								</div>
 							</div>
 						</CardContent>

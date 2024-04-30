@@ -1,7 +1,7 @@
 import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FormSectionNavigation, goToNextSection } from "../BasicComponents/FormSectionNavigation";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
 function BankDetails(props:any) {
   const {createLoan} = useGlobalContext();
@@ -41,6 +41,9 @@ function BankDetails(props:any) {
     });
 
     if (Object.keys(data).length!=0){
+      data["AID"]= props.AID;
+      data["_loanId"]= props.loanId;
+
       console.log("SUBMITTED NOW",data);
       /* createLoan(data).then(res=> {
         console.log("RES", res);
@@ -49,7 +52,7 @@ function BankDetails(props:any) {
       ).catch(err=> console.log(err)) */
     }
     else
-      goToNextSection(props.setCurrentSection, props.sectionCount);
+      props.goToNextSection(props.setCurrentSection, props.sectionCount);
   }
 
   return (
@@ -77,7 +80,7 @@ function BankDetails(props:any) {
           })}
         </div>
         <br/>
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} isForm={true} />
+        <FormSectionNavigation setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
     </div>
   )

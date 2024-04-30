@@ -18,6 +18,7 @@ import Default from './components/Default';
 import CriticalCases from './components/CriticalCases';
 import Reports from './components/Reports';
 import Reminders from './components/Reminders';
+import RoleManagement from './components/RoleManagement';
 
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
@@ -48,10 +49,15 @@ export const MenuRouter = () => {
 
 
 	const onConnect = () => {
-		setSocketIsConnected(()=>{const a = true; return a});
-		socket.emit("sendMessage", {message:"Connection established"})
-		console.log("CONNECTED")
-		socket.emit("subscribe", "BusinessChannel")
+		try{
+			setSocketIsConnected(()=>{const a = true; return a});
+			socket.emit("sendMessage", {message:"Connection established"})
+			console.log("CONNECTED")
+			socket.emit("subscribe", "BusinessChannel");
+		}
+		catch(err){
+
+		}
 	}
 
 	const onDisconnect = () => {
@@ -60,8 +66,11 @@ export const MenuRouter = () => {
 	useEffect(()=>{
 		socket.on("connect", onConnect);
 		socket.on("connect_error",(error:any)=>{	
-			//console.log(error)
-		})
+			console.log("socketerror")
+		});
+		socket.on("connect_failed", ()=>{
+			console.log("socketfailed")
+		} )
 		socket.on("disconnect", onDisconnect);
 		socket.on("messageReceived", (data:any)=>{
 			console.log("RECIEVE",data)
@@ -101,7 +110,7 @@ export const MenuRouter = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>);
 		})
-	},[/* socketIsConnected */])
+	},[socketIsConnected])
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 
@@ -132,7 +141,8 @@ export const MenuRouter = () => {
 		{ name: "Conditions Precedent", path:"precedent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Conditions Subsequent", path:"subsequent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Zones", path:"zones", component: Zones, icon: ZoneIcon },
-		{ name: "Team Members", path:"team", component: TeamMembers, icon: MembersIcon },
+		{ name: "Role Management", path:"roles", component: RoleManagement },
+		{ name: "Team Management", path:"team", component: TeamMembers, icon: MembersIcon },
 		{ name: "User Management", path:"users", component: UserManagement, icon: ManagementIcon },
 		{ name: "Team Tasks", path:"tasks", component: TeamTasks, icon: TaskIcon },
 		{ name: "Reminders", path:"reminders", component: Reminders, icon: ReminderIcon },
@@ -151,16 +161,16 @@ export const MenuRouter = () => {
 								<NavLink to={item.path} key={index}
 									onClick={()=>setCurrLink(item.path)}
 									onMouseEnter={()=>setHover(index)} 
-									onMouseLeave={()=>setHover(-1)} 
-										className={({ isActive, }) => {
+									onMouseLeave={()=>setHover(-1)}
+									className={({ isActive, }) => {
 										if (isActive)
 											setCurrLink(item.path);
-										return "";
+										return "bg-red-800";
 									}}
 								>
 									<div className={`p-3 text-sm pageLink py-3 my-3 rounded-xl ${(currLink===item.path)?"bg-white text-custom-1":"text-white"}`}>
 										<div className='flex flex-row'>
-											{createElement(item.icon, {fill: (currLink===item.path || hover===index)?"rgba(80, 65, 188, 1)":"white"})}
+											{item.icon?createElement(item.icon, {fill: (currLink===item.path || hover===index)?"rgba(80, 65, 188, 1)":"white"}):""}
 											<div className="mx-5">{item.name}</div>
 										</div>
 									</div>
@@ -180,18 +190,13 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					{componentList.map((item,index)=>{
-						if (item.path=="loan")
-							return(
-							<>
-								<Route key={index+"_11"} path="loan/*" element={<LoanAccount/>} />
-								<Route key={index+"_12"} path="loan/create/*" element={<CreateLoanAccount/>} />
-							</>
-						)
 						if (item.component==DocumentList)
-							return <Route key={index+"_21"} path={item.path} element={createElement(item.component, { label: item.name, docData: txnTestData })}  />
-						return <Route key={index+"_22"} path={item.path} element={createElement(item.component)} />
+							return <Route key={index} path={item.path} element={createElement(item.component, { label: item.name, docData: txnTestData })}  />
+						else
+							return <Route key={index} path={item.path} element={createElement(item.component)} />
 					})}
-					<Route path="/*" element={<>Not Found</>} />
+					<Route key={"LOANCREATE"} path="loan/create/*" element={<CreateLoanAccount/>} />
+					<Route key={"NOTFOUND"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>
 		</div>
