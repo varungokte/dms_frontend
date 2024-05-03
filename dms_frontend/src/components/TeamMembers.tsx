@@ -3,12 +3,16 @@ import { useState } from "react";
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import FormDialog from "./BasicComponents/FormDialog";
 
-import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import Search from "./BasicComponents/Search";
 import ProfileIcon from "./BasicComponents/ProfileIcon";
 import Filter from "./BasicComponents/Filter";
+import { useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft } from "lucide-react";
 
 function TeamMembers() {
+	const {id} =  useParams();
+	const navigate = useNavigate();
 
 	//An object where each key is the category of people, and the value is an array of the people in that category
 	const [members, setMembers] = useState({
@@ -26,7 +30,7 @@ function TeamMembers() {
 	
 	return(
 		<div>
-			<p className="text-3xl font-bold m-7">Team Members</p>
+			<p className="text-3xl font-bold m-7"><button onClick={()=>navigate("/teams")}><ChevronLeft className="mt-1"/></button>  Team Members</p>
 
 			<div className='flex flex-row relative'>
 				<div className=''>
@@ -40,7 +44,7 @@ function TeamMembers() {
 				<div className="">
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
 					<FormDialog
-						triggerText={<><span className="text-xl">+ </span><span>Add Member</span></>} triggerClassName={PurpleButtonStyling}
+						triggerText={<><span className="text-xl">+ </span><span>Add Member</span></>} triggerClassName={CreateButtonStyling}
 						formTitle="Add Team Member" formSubmit= {addMember} submitButton= "Create User"  formSize="small"
 						form= {[
 							{ category: "single", label: "Name", type: "text", setter: setNewName },

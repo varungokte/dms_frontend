@@ -5,6 +5,8 @@ import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../BasicComponents/Constants";
 import FormDialog from "../BasicComponents/FormDialog";
 import useGlobalContext from "./../../../GlobalContext";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
 function Ratings(props:any) {
   //Ratingslist is an array of different ratings
@@ -89,7 +91,7 @@ function Ratings(props:any) {
         </div>
         <div>
           <FormDialog 
-            triggerText="+ Add Rating" triggerClassName={"mx-10 p-5 rounded-xl h-full text-white text-lg bg-custom-1"} formSize="medium"
+            triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
             form = {fieldList} setter={setFieldValues}
           />
@@ -105,6 +107,7 @@ function Ratings(props:any) {
           />
         </Table>
       </div>
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 };

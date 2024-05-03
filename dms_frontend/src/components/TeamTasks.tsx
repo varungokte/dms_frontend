@@ -6,7 +6,7 @@ import FormDialog from "./BasicComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 import Filter from "./BasicComponents/Filter";
 
-import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { PriorityValues, EnumIteratorKeys, EnumIteratorValues } from "./BasicComponents/Constants";
 
 function TeamTasks() {
@@ -53,7 +53,7 @@ function TeamTasks() {
 
         <div>
           <FormDialog
-            triggerClassName={PurpleButtonStyling} triggerText="Add Task" formSize="medium"
+            triggerClassName={CreateButtonStyling} triggerText="Add Task" formSize="medium"
             formTitle="Add Team Task" formSubmit={createTask} submitButton="Add Task"
             form={[
               { category: "single", type: "text", label: "Task", setter: setNewTask },

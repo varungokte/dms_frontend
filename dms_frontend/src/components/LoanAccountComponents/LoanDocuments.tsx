@@ -6,10 +6,11 @@ import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import FormDialog from "../BasicComponents/FormDialog";
-import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
 import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
 function LoanDocuments(props: any) {
   //SHOULD GET DOCDATA FROM props.docData
@@ -68,7 +69,7 @@ function LoanDocuments(props: any) {
       
         <div className="mr-3">
           <FormDialog
-            triggerText="Add" triggerClassName={PurpleButtonStyling} formSize="medium"
+            triggerText="Add" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle={props.label} formSubmit={addDocument} submitButton="Save"
             form={[
               {category:"grid", row:2, fields:[
@@ -125,6 +126,7 @@ function LoanDocuments(props: any) {
         </Table>
       </div>
       <br/>
+      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

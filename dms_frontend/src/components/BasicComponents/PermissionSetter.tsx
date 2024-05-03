@@ -1,20 +1,23 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
 
 function PermissionSetter(props:any){
-  const [permissionTypes] = useState (["access", "view", "delete",])
+  const [permissionTypes] = useState (["access", "view", "delete",]);
 
   const [permissionList, setPermissionList] = useState({
-    "Loan Account": ["access", "edit"],
-    "Product": ["view", "access"],
-    "Transaction Documents": ["access", "edit"],
-    "Compliance Documents": ["delete", "access"],
-    "Covenants": [ "edit"],
+    "Loan Account": [],
+    "Product": [],
+    "Transaction Documents": [],
+    "Compliance Documents": [],
+    "Covenants": [],
   });
 
+  useEffect(()=>{
+    if (!props.newRole)
+      setPermissionList(props.singleRole);
+  },[])
 
-  console.log(permissionList)
 
   const togglePermission = (permissions: string[], action: string, value:boolean, section: string) => {
     if (value)
@@ -22,19 +25,23 @@ function PermissionSetter(props:any){
     
     else
      permissions = permissions.filter(name=> name!==action);
-     
-    setPermissionList(curr=>{
-      console.log("NEW PERMISSIONS", permissions);
-      //@ts-ignore
-      curr[section] = [...permissions];
-      console.log("OBJ",curr)
-      return curr;
-    })
+    
+    if (props.setter)
+      props.setter((curr:any)=>{
+        //@ts-ignore
+        curr[section] = [...permissions];
+        return curr;
+      })
+    else
+      setPermissionList(curr=>{
+        //@ts-ignore
+        curr[section] = [...permissions];
+        return curr;
+      })
   }
   
   return (
     <div className="mx-1">
-      <p className="mx-1 text-2xl">Permissions</p>
       <Table className="rounded-xl bg-white">
         <TableHeader>
           <TableRow>
@@ -57,10 +64,10 @@ function PermissionSetter(props:any){
                       <input 
                         type="checkbox" 
                         //@ts-ignore
-                        checked={permissionList[section].includes(action)?true:false} 
+                        defaultChecked={permissionList[section].includes(action)}
+                        //@ts-ignore
+                        value={permissionList[section].includes(action)?true:false} 
                         onChange={(e)=>{
-                          //@ts-ignore
-                          console.log(index,action, permissionList[section].includes(action))
                           //@ts-ignore
                           togglePermission(permissionList[section],action,e.target.checked,section);
                         }}

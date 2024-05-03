@@ -38,6 +38,7 @@ import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
 import LoanAccount from './components/LoanAccount';
 import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
 import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
+import TeamManagement from './components/TeamManagement';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -142,7 +143,7 @@ export const MenuRouter = () => {
 		{ name: "Conditions Subsequent", path:"subsequent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Zones", path:"zones", component: Zones, icon: ZoneIcon },
 		{ name: "Role Management", path:"roles", component: RoleManagement },
-		{ name: "Team Management", path:"team", component: TeamMembers, icon: MembersIcon },
+		{ name: "Team Management", path:"teams", component: TeamManagement, icon: MembersIcon },
 		{ name: "User Management", path:"users", component: UserManagement, icon: ManagementIcon },
 		{ name: "Team Tasks", path:"tasks", component: TeamTasks, icon: TaskIcon },
 		{ name: "Reminders", path:"reminders", component: Reminders, icon: ReminderIcon },
@@ -195,8 +196,9 @@ export const MenuRouter = () => {
 						else
 							return <Route key={index} path={item.path} element={createElement(item.component)} />
 					})}
-					<Route key={"LOANCREATE"} path="loan/create/*" element={<CreateLoanAccount/>} />
-					<Route key={"NOTFOUND"} path="/*" element={<>Not Found</>} />
+					<Route key={"C"} path="loan/create/*" element={<CreateLoanAccount/>} />
+					<Route key={"T"} path="teams/:id" element={<TeamMembers/>} />
+					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>
 		</div>

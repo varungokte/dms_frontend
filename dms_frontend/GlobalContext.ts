@@ -347,7 +347,10 @@ const getRolesList = async () => {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject; 
+		if (response.status==200)
+			return decryptedObject; 
+		else
+		return null;
 	}
 	catch(error:any) {
 		if (!error.response)
@@ -357,7 +360,72 @@ const getRolesList = async () => {
 	}
 }
 
+const getUserSuggestions = async () => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/suggestion`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: {type: "RM"}
+		});
+		const decryptedObject = handleDecryption(response.data);
+		console.log(decryptedObject)
+		if (response.status==200)
+			return decryptedObject; 
+		else
+			return null;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
 
+
+const getTeamList = async (loanId:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/getTeam`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: {_loanId: loanId}
+		});
+		const decryptedObject = handleDecryption(response.data);
+		console.log(response)
+		console.log(decryptedObject);
+		
+		if (response.status==200)
+			return decryptedObject; 
+		else
+			return null;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
+
+const addTeamMember = async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+		console.log(data)
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addMember`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+//addMember, getTeam
 
 /* const decrypt = async (data:object) => {
 	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
@@ -392,6 +460,9 @@ const useGlobalContext = () => {
 		getRatingsList,
 		addRole,
 		getRolesList,
+		getUserSuggestions,
+		getTeamList,
+		addTeamMember,
 	}
 }
 

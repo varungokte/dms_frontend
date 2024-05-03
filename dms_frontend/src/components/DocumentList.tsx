@@ -1,15 +1,13 @@
 import { useState } from "react";
 
-import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table"
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible";
-
+import { Table, TableBody } from "@/components/ui/table"
+import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { PriorityValues, EnumIteratorKeys } from "./BasicComponents/Constants";
+import TableCollapsible from "./BasicComponents/TableCollapsible";
+
 import UploadButton from "./BasicComponents/UploadButton";
 import Search from "./BasicComponents/Search";
-
-import chevron_right from "./static/chevron-right.svg";
-import chevron_down from "./static/chevron-down.svg";
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import ProgressBar from "./BasicComponents/ProgressBar";
 
 function DocumentList(props:any) {
   //This can be for Transaction Documents, Compliance Documents, Covenants, and others
@@ -48,38 +46,21 @@ function DealDetails(props:any) {
   const [chevronToggle, setChevronToggle] = useState(false);
 
   return(
-    <div>
-      <Collapsible>
-        <div className="bg-zinc-100 m-3 rounded-2xl">
-          <CollapsibleTrigger className="w-full" 
-            onClick={()=>setChevronToggle((curr)=>{return !curr})}>
-            <TableRow className="border-none">
-              <TableCell className="w-[20%] font-medium text-base">{props.deal[0]}</TableCell>
-              <TableCell className="w-[20%] font-medium text-base">{props.deal[1]}</TableCell>
-              <TableCell className="w-[30%] font-medium text-base">{props.deal[2]}</TableCell>
-              <TableCell className="w-[26.70%] font-medium text-base text-justify">Document Upload</TableCell>
-              <TableCell className="w-[10%]" rowSpan={2}><img src={chevronToggle?chevron_down:chevron_right} width={"20px"}/></TableCell>
-            </TableRow>
-
-            <TableRow className="border-none">
-              <TableCell className="font-light">Sanction No.</TableCell>
-              <TableCell className="font-light">Deal Name</TableCell>
-              <TableCell className="font-light">Date</TableCell>
-              <TableCell className="content-center">
-                <div className="w-full bg-gray-200 rounded-full h-2.5" style={{width: "70%"}}>
-                  <div className="bg-green-600 h-2.5 rounded-full" style={{width:"50%"}}></div>
-                  50%
-                </div>
-              </TableCell>
-            </TableRow>
-          </CollapsibleTrigger>
-        </div>
-          <CollapsibleContent>
-            <SingleDealDocuments documents={props.deal[3]}/>
-            <br/>
-          </CollapsibleContent>
-      </Collapsible>
-    </div>
+    <TableCollapsible
+      topRow={[
+        [props.deal[0], "[20%]", "font-medium text-base"], 
+        [props.deal[1], "[20%]", "font-medium text-base"],
+        [props.deal[2], "[30%]", "font-medium text-base"],
+        ["Document Upload", "[26.70%]", "font-medium text-base text-justify"],
+      ]}
+      bottomRow={[
+        ["Sanction No.", "font-light"], 
+        ["Deal Name", "font-light"],
+        ["Date", "font-light"],
+        [<ProgressBar value={50} />, "content-center"],
+      ]}
+      content={<SingleDealDocuments documents={props.deal[3]}/>}
+    />
   )  
 }
 

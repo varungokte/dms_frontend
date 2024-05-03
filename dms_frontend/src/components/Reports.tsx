@@ -1,5 +1,5 @@
 import { useState } from "react";
-import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import {CreateButtonStyling} from "./BasicComponents/PurpleButtonStyling";
 
 function Reports() {
   const [loanType, setLoanType] = useState("");
@@ -42,7 +42,7 @@ function Reports() {
             <div className="mt-8 flex flex-row">
               <div className="w-5/12"></div>
               <div>
-                <button className={PurpleButtonStyling}>Create Report</button>
+                <button className={CreateButtonStyling}>Create Report</button>
               </div>
             </div>
           </div>

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 
 import { EllipsisVertical } from "lucide-react";
-import PurpleButtonStyling from "../BasicComponents/PurpleButtonStyling";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
@@ -12,6 +11,7 @@ import FormDialog from "../BasicComponents/FormDialog";
 import Filter from "../BasicComponents/Filter";
 import Search from "../BasicComponents/Search";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 
 function ContactDetails(props:any) {
@@ -111,9 +111,9 @@ function ContactDetails(props:any) {
       data["AID"]=AID;
       data["_loanId"]= loanId;
 
-      addContact(data, "").then(res=>{
+      /* addContact(data, "").then(res=>{
         console.log("ZZZZZZZZZZZZZZZZZZZZZZZZ",res)
-      })
+      }) */
     }    
   }
 
@@ -167,7 +167,7 @@ function ContactDetails(props:any) {
       
         <div className="mr-3">
           <FormDialog
-            triggerText="+ Add Contact" triggerClassName={PurpleButtonStyling} formSize="large"
+            triggerText="+ Add Contact" triggerClassName={CreateButtonStyling} formSize="large"
             formTitle="Add New Contact"  formSubmit={createContact} submitButton="Add Contact"
             form = {fieldList} setter={setFieldValues}
           />
@@ -272,7 +272,7 @@ function ContactDetails(props:any) {
           })}
         </div>
       <br/>
-      <FormSectionNavigation isForm={false} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

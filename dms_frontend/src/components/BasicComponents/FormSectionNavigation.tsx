@@ -17,7 +17,7 @@ function FormSectionNavigation(props:any) {
         <button className="text-red-600 border border-red-600 rounded-xl h-12 w-36 mx-3" onClick={()=>navigate("/loan")}>Cancel</button>
       </div>
       <div>
-        {props.currentSection
+        {props.currentSection==1
           ?<></>
           :<button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle	" onClick={previousSection}><div className="flex flex-row place-content-center"><ChevronLeft/><div>Previous</div></div></button>
         }

@@ -3,13 +3,13 @@ import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { UserRoles, EnumIteratorValues } from "./BasicComponents/Constants";
+import { UserRoles, EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
 import FormDialog from "./BasicComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 import Filter from "./BasicComponents/Filter";
 import ActionDialog from "./BasicComponents/ActionDialog";
 
-import PurpleButtonStyling from "./BasicComponents/PurpleButtonStyling";
+import { CreateButtonStyling, SubmitButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import edit_icon from "./static/edit_icon.svg";
 import delete_icon from "./static/delete_icon.svg";
 
@@ -30,15 +30,12 @@ function UserManagement(){
     { category: "grid", row: 2, fields: [
       { id: "N", name: "Name", type: "text", editable: true },
       { id: "E", name: "Email", type: "email", editable: false },
-      { id: "R", name: "Password", type: "password", editable: true },
-      { id: "P", name: "Role", type: "select", options: EnumIteratorValues(UserRoles), editable: true },
+      { id: "P", name: "Password", type: "password", editable: true },
+      { id: "RM", name: "Reporting Manager", type:"text" },
+      { id: "R", name: "Role", type: "select", options: EnumIteratorValues(UserRoles), editable: true },
+      { id: "Z", name: "Zone", type: "select", options: EnumIteratorValues(ZoneList) }
     ]}
   ]);
-
-  const [newName, setNewName] = useState("");
-  const [newEmail, setNewEmail] = useState("");
-  const [newRole, setNewRole] = useState(0);
-  const [newPassword, setNewPassword] = useState("");
   
   const [userAdded, setUserAdded] = useState(false);
 
@@ -52,8 +49,9 @@ function UserManagement(){
       if (res.length==0)
         setUserData(["Person 1", "Email1", 0]);
       else{
+        console.log(res)
         res.map((user:any)=>{
-          arr.push([user.N, user.E, user.S])
+          arr.push([user.N, user.E, user.RM, user.Z, user.S])
         });
         setUserData(arr);
       }
@@ -80,14 +78,14 @@ function UserManagement(){
     
     console.log("TEST ZE DATA", data);
 
-    /* newUser(data).then(res=>{
+    newUser(data).then(res=>{
       console.log(res);
       setUserAdded(true);
     }).catch((err)=>{
       if (err=="dupliate_user"){
         setMessage(<p>Duplicate User</p>)
       }
-    }) */
+    })
   }
 
   const editUser = () => {
@@ -97,15 +95,6 @@ function UserManagement(){
     const arr = userData[selectedUser];
     console.log("THE SELECTED USER", selectedUser)
     const data = {} as any;
-
-    if (newName!=arr[0])
-      data["N"] = newName
-    if (newEmail!=arr[1])
-      data["E"] = newEmail
-    if (newPassword!=arr[2])
-      data["P"] = newPassword
-    if (newRole!=arr[3])
-      data["R"] = newRole
 
     changeUserInfo(data).then(res=>{
       console.log(res);
@@ -136,27 +125,27 @@ function UserManagement(){
 
         <div className="">
           <FormDialog
-            triggerText="+ Add User" triggerClassName={PurpleButtonStyling} formSize="medium"
+            triggerText="+ Add User" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
-            form={fieldList} setter={setFieldValues} permissionSetter={true}
+            form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
           />
         </div>
       </div>
       <div className="m-7">
       {message}
         <Table className="bg-white border-2 rounded-xl">
-          <HeaderRows headingRows={[["Name"], ["Email Address"]/* , ["Role"] */, ["Status"], ["Action"]]} />
+          <HeaderRows headingRows={[["Name"], ["Email Address"],["Reporting Manager"], ["Zone"], /* , ["Role"] */, ["Status"], ["Action"]]} />
           {userData.length==-1
           ?<p className="text-center">No users available</p>
           :<BodyRowsMapping
-            list={userData} dataType={["text", "text"/* , "role" */, "userStatus", "action"]}
+            list={userData} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
             searchRows={searchString==""?[]:[searchString,0,1]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
             action = {userData.map((item:any, index:number)=>{
               return(
                 <div className="flex flex-row">
                   <FormDialog 
                     triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                    formTitle="Edit User" formSubmit={editUser}  submitButton="Edit User" formSize="medium"
+                    formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
                     form={fieldList} setter={setFieldValues} 
                     edit={true} userValues={{"N": userData[index][0], "E": userData[index][1], "S": userData[index][2]}}
                   />
