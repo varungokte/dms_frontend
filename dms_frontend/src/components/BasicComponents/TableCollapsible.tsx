@@ -10,16 +10,16 @@ function TableCollapsible(props:any){
       <div className="bg-zinc-100 m-3 rounded-2xl">
         <CollapsibleTrigger className="w-full" 
           onClick={()=>setChevronToggle((curr:any)=>{return !curr})}>
-          <TableRow className="border-none">
+          <TableRow className="border-none w-full">
             {props.topRow.map((column:any)=>{
-              return <TableCell className={`w-${column[1]} ${column[2]}`}>{column[0]}</TableCell>
+              return <TableCell className={`${column[1]}`}>{column[0]}</TableCell>
             })}
             <TableCell className="w-[10%]" rowSpan={2}>{chevronToggle?<ChevronDown/>:<ChevronRight/>}</TableCell>
           </TableRow>
 
           <TableRow className="border-none">
             {props.bottomRow.map((column:any)=>{
-              return <TableCell className={column[1]}>{column[0]}</TableCell>
+              return <TableCell className={`${column[1]}`}>{column[0]}</TableCell>
             })}
           </TableRow>
         </CollapsibleTrigger>

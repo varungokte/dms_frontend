@@ -6,6 +6,8 @@ export const RegistrationPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [maximumUsers, setMaximumUsers] = useState(0);
+	const [zone, setZone] = useState(-1);
+	const [reportingManager,setReportingManager] = useState("ABC");
 	const [message, setMessage] = useState("");
 
 	const {RegisterAdmin} = useGlobalContext()
@@ -16,7 +18,9 @@ export const RegistrationPage = () => {
 			E: email,
 			N: companyName,
 			P: password,
-			MU: maximumUsers
+			MU: maximumUsers,
+			Z: zone,
+			RM: reportingManager
 		}
 
 		RegisterAdmin(data).then((res:any)=>{
@@ -79,6 +83,28 @@ export const RegistrationPage = () => {
 					id="max"
 					value={maximumUsers}
 					onChange={(e:any) => setMaximumUsers(e.target.value)}
+				/>
+				<br/>
+				<br/>
+				<label htmlFor="cname">Zone</label>
+				<br/>
+				<input
+					type="number"
+					id="z"
+					value={zone}
+					onChange={(e:any) => setZone(e.target.value)}
+				/>
+				<br/>
+				<br/>
+				<label htmlFor="cname">Reporting Manager</label>
+				<br/>
+				<input
+					type="text"
+					id="name"
+					name="name"
+					value={reportingManager}
+					placeholder="Reporting Manager"
+					onChange={(e) => setReportingManager(e.target.value)}
 				/>
 				<br/>
 				<br/>

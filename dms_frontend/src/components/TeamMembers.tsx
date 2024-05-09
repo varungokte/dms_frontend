@@ -10,9 +10,15 @@ import Filter from "./BasicComponents/Filter";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 
+import useGlobalContext from "./../../GlobalContext";
+
 function TeamMembers() {
 	const {id} =  useParams();
 	const navigate = useNavigate();
+
+	const {useTitle} = useGlobalContext();
+
+	useTitle(id || "Team Members")
 
 	//An object where each key is the category of people, and the value is an array of the people in that category
 	const [members, setMembers] = useState({

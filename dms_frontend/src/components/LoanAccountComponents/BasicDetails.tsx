@@ -18,11 +18,22 @@ function BasicDetails(props:any) {
       });
 
       setFieldValues(curr=>{
-        console.log ("NEW OBJECT", {...curr,...obj})
+        return {...curr, ...obj}
+      });
+      setOldFieldValues(curr=>{
         return {...curr, ...obj}
       })
     }
   },[])
+
+  const [oldFieldValues, setOldFieldValues] = useState({ 
+    "AID": null, "Z": null, "CN": null, "PN": null, 
+    "GN": null, "GST":null, "CIN": null, "I": null, 
+    "SA": null, "HA":null,"DA": null, "DD": null, 
+    "PS": null, "OA":null,"T": null, "P": null, 
+    "ST": null, "SD": null, "CD": null, "RED": null, 
+    "A": null, "F": null, "S": null, "V": null,
+  }) 
 
   const [fieldValues, setFieldValues] = useState({ 
     "AID": null, "Z": null, "CN": null, "PN": null, 
@@ -71,11 +82,11 @@ function BasicDetails(props:any) {
       if (field=="A" && fieldValues[field]==2)
         dsra[field] = fieldValues[field]
       else if (field=="A" || field=="F" || field=="S" || field=="V"){
-        if (fieldValues[field]!=null)
+        if (fieldValues[field]!=null && fieldValues[field]==oldFieldValues[field])
           dsra[field] = fieldValues[field];
       }
       //@ts-ignore
-      if (fieldValues[field]==null || fieldValues[field]==-1)
+      if (fieldValues[field]==null || fieldValues[field]==-1 || (props.actionType=="EDIT" && fieldValues[field]==oldFieldValues[field]))
         return;
       //@ts-ignore
       data[field] = fieldValues[field];
@@ -100,10 +111,10 @@ function BasicDetails(props:any) {
       ).catch(err=> console.log(err))
     }
     else{
-
       if (fieldValues["ST"]==2)
-      props.setShowSecurityDetails(false);
-      props.goToNextSection();}
+        props.setShowSecurityDetails(false);
+        props.goToNextSection();
+    }
   }
 
   return(

@@ -3,6 +3,8 @@ import { useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
 import Search from "./BasicComponents/Search";
 
+import useGlobalContext from "./../../GlobalContext";
+
 function Products(){
 
 	//An object where each key is the name of a product, and its corresponding value is an array of sub-products
@@ -16,6 +18,10 @@ function Products(){
 
 	const [selected, setSelected] = useState(0);
 	const [searchString, setSearchString] = useState("");
+
+	const {useTitle} = useGlobalContext();
+
+	useTitle("Products")
 	
 	return(
 		<div>

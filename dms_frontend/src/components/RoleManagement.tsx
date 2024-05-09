@@ -25,7 +25,11 @@ function RoleManagement(){
     }}
   ]);
 
-  const [newRole, setNewRole] = useState<any>({})
+  const [newRole, setNewRole] = useState<any>({});
+
+	const {useTitle} = useGlobalContext();
+
+	useTitle("Role Management");
 
  /*  useEffect(()=>{
     getRolesList().then(res=>{

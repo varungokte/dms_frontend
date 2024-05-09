@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table } from "@/components/ui/table";
+import useGlobalContext from "./../../../GlobalContext";
 
-import { PriorityValues, EnumIteratorValues, EnumIteratorKeys } from "../BasicComponents/Constants";
+import { PriorityValues, EnumIteratorValues, EnumIteratorKeys, TransactionDocumentTypes } from "../BasicComponents/Constants";
 import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
@@ -11,35 +12,49 @@ import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
 
 function LoanDocuments(props: any) {
-  //SHOULD GET DOCDATA FROM props.docData
 
   //docData is an array of documents
   //Each document is a array: [Document Name, Priority, Physical Location, Execution Location, Start Date, End Date, Status]
   const [docData] = useState([
-    ["Common Loan Agreement", 2, "Jaipur", "Jaipur", "15/08/17", "15/08/17"],
-    ["Lender Agent Agreement", 2, "Pune", "Pune",  "15/08/17", "15/08/17"],
-    ["Power Purchase Agreement", 0, "Surat", "Surat", "15/08/17", "15/08/17"],
-    ["Lender Agent Agreement", 1, "Surat", "Surat",  "15/08/17", "15/08/17"],
-    ["Escrow Agreement", 1, "Pune", "Pune",  "15/08/17", "15/08/17"],
+    { "N":"Common Loan Agreement", "T":"PDF", "P": 3, "PL":"Jaipur", "EL":"Jaipur", "SD":"15/08/17", "ED":"15/08/17" },
+    { "N":"Lender Agent Agreement", "T":"XLSX", "P":3, "PL":"Pune", "EL":"Pune", "SD":"15/08/17", "ED":"15/08/17" },
+    { "N":"Power Purchase Agreement", "T":"PDF", "P": 1, "PL":"Surat", "EL":"Surat", "SD":"15/08/17", "ED":"15/08/17 "},
+    { "N":"Lender Agent Agreement", "T":"XLSX", "P":2, "PL":"Surat", "EL":"Surat", "SD":"15/08/17", "ED":"15/08/17" },
+    { "N":"Escrow Agreement", "T":"PDF", "P":2, "PL":"Pune", "EL":"Pune", "SD":"15/08/17", "ED":"15/08/17" },
   ]);
   
   const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(-1);
-
-  
-  const [newDocName, setNewDocName] = useState("");
   const [newFiles, setNewFiles] = useState<any>([]);
-  const [newDocType, setNewDocType] = useState(-1)
-  const [newStartDate, setNewStartDate] = useState(new Date());
-  const [newEndDate, setNewEndDate] = useState(new Date());
-  const [newExeLoc, setNewExeLoc] = useState("");
-  const [newPhyLoc, setNewPhyLoc] = useState("");
-  const [newPriority, setNewPriority] = useState(-1);
-  
-  const addDocument = (e:any) =>{
-    e.preventDefault();
+
+  const [fieldValues, setFieldValues] = useState({
+    "N":"", "T":"",
+    "Docs":[], 
+    "SD":"", "ED":"",
+    "EL":"", "PL":""
+  });
+
+  const [fieldList, setFieldList] = useState([
+    {category:"grid", row:2, fields:[
+      { id: "N", name:"Document Name", type:"select", options:EnumIteratorValues(TransactionDocumentTypes), required:true },
+      { id: "T", name:"Document Type", type:"select", options:["PDF","XLSX"], required:true },
+    ]},
+    { category:"grid", row:2, fields:[
+      { id:"SD", name:"Start Date", type:"date", required:true },
+      { id:"ED", name:"End Date", type:"date", required:true },
+      { id:"EL", name:"Execution Location", type:"text" },
+      { id:"PL", name:"Physical Location", type:"text" },
+    ]},
+    { category:"single", id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
+    { category:"single", id: "Docs", name:"Upload Document", type:"file", fileList: newFiles },
+  ]);
+
+  const addDocument = () =>{
+    setTimeout(()=>{},9000)
+    console.log("FIELD VALUES", fieldValues);
   }
 
   const editDocument = (e:any) => {
@@ -68,57 +83,31 @@ function LoanDocuments(props: any) {
         </div>
       
         <div className="mr-3">
-          <FormDialog
-            triggerText="Add" triggerClassName={CreateButtonStyling} formSize="medium"
+          <FormDialogDocuments
+            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`}
             formTitle={props.label} formSubmit={addDocument} submitButton="Save"
-            form={[
-              {category:"grid", row:2, fields:[
-                {label:"Document Name", type:"text", setter:setNewDocName},
-                {label:"Document Type", type:"select", setter:setNewDocType, options:["PDF","XLSX"]},
-              ]},
-              {category:"single", label:"Upload Document", type:"file", setter:setNewFiles, fileList: newFiles},
-              {category:"grid", row:2, fields:[
-                {label:"Start Date", type:"date", setter:setNewStartDate},
-                {label:"End Date", type:"date", setter:setNewEndDate},
-                {label:"Execution Location", type:"text", setter:setNewExeLoc},
-                {label:"Physical Location", type:"text", setter:setNewPhyLoc},
-              ]},
-              {category:"single", label:"Priority", type:"select", setter:setNewPriority, options:EnumIteratorValues(PriorityValues)}
-            ]}
+            form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
           />
         </div>        
       </div>
       <div className="m-5">
-        <Table>
-          <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
+        <Table className="border rounded-3xl" style={{borderRadius:"md"}}>
+          <HeaderRows className="" headingRows={[["Document Name"],["File Type"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
 
-          <BodyRowsMapping list={docData} dataType={["text","priority","text","text","text","text","action"]}
-            searchRows={searchString==""?[]:[searchString,0]} filterRows={priority==-1?[]:[priority,1]}
+          <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["text","text","priority","text","text","text","text","action"]}
+            searchRows={searchString==""?[]:[searchString,"N"]} filterRows={priority==-1?[]:[priority,"P"]}
             action = {docData.map((item:any, index:number)=>{
               return(
                 <div className="flex flex-row">
                   <FormDialog 
-                    triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                    formTitle="Edit User" formSubmit={editDocument}  submitButton="Edit User"
-                    form={[
-                      {category:"grid", row:2, fields:[
-                        {label:"Document Name", type:"text", setter:setNewDocName},
-                        {label:"Document Type", type:"select", setter:setNewDocType, options:["PDF","XLSX"]},
-                      ]},
-                      {category:"single", label:"Upload Document", type:"file", setter:setNewFiles, fileList: newFiles},
-                      {category:"grid", row:2, fields:[
-                        {label:"Start Date", type:"date", setter:setNewStartDate},
-                        {label:"End Date", type:"date", setter:setNewEndDate},
-                        {label:"Execution Location", type:"text", setter:setNewExeLoc},
-                        {label:"Physical Location", type:"text", setter:setNewPhyLoc},
-                      ]},
-                      {category:"single", label:"Priority", type:"select", setter:setNewPriority, options:EnumIteratorValues(PriorityValues)}
-                    ]}
+                    triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>} formSize="medium"
+                    formTitle="Edit User" formSubmit={editDocument} submitButton="Edit User"
+                    form={fieldList} setter={setFieldValues}
+                    edit={true} fieldValues={fieldValues}  currentFields={docData[index]}
                   />
                     <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
                       actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteDocument} 
                     />
-                    
                 </div>
               )
             })}

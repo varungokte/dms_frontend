@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { Ellipsis } from "lucide-react";
 
 import Search from "./BasicComponents/Search";
-
+import useGlobalContext from "./../../GlobalContext";
 
 function CriticalCases() {
   //An array of critical cases
@@ -16,6 +16,10 @@ function CriticalCases() {
     ["Lender's Agent Agreeement", "PNG", "02/02/02"],
     ["Power Purchase Agreement", "PDF", "03/03/03"]
   ]);
+
+  const {useTitle} = useGlobalContext();
+
+  useTitle("Critical Cases")
 
   const [searchString, setSearchString] = useState("");
   return(

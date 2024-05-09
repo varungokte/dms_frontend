@@ -8,6 +8,7 @@ import Filter from "./BasicComponents/Filter";
 
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { PriorityValues, EnumIteratorKeys, EnumIteratorValues } from "./BasicComponents/Constants";
+import useGlobalContext from "./../../GlobalContext";
 
 function TeamTasks() {
   //An array which contains many tasks; each task is an array
@@ -34,7 +35,11 @@ function TeamTasks() {
   const [data, setData] = useState("DAT")
   const createTask = () => {
     setData("TASK"+" " +newTask+" " +newAssignee+" " +newPriority+" " +newDate)
-  }
+  };
+
+	const {useTitle} = useGlobalContext();
+
+	useTitle("Team Tasks");
 
   return (
     <div>

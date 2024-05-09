@@ -13,16 +13,19 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
 import { useLocation } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
+import LoanCovenants from "./LoanAccountComponents/LoanCovenants";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
-  
-  const {getLoanFields} = useGlobalContext();
+
+  const {getLoanFields, useTitle} = useGlobalContext();
+
+  useTitle(`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`)
 
   const [actionType] = useState(state.linkSource);
 
   const [loanId, setLoanId] = useState(state.linkSource=="CREATE"?"":state.loanId);
-  const [AID, setAID] = useState(state.AID);
+  const [AID, setAID] = useState(state.linkSource=="CREATE"?"":state.AID);
   const [preexisting, setPreexisting] = useState([]);
 
   const [currentSection, setCurrentSection] = useState(state.linkSource=="CREATE"?0:1);
@@ -60,6 +63,7 @@ function CreateLoanAccount() {
     { name: "Relationship Mapping", component: RelationshipMapping},
     { name: "Transaction Documents", component: LoanDocuments, label: "Transaction Documents"},
     { name: "Compliance Documents", component: LoanDocuments, label: "Compliance Documents"},
+    { name: "Covenants", component: LoanCovenants },
     { name: "Ratings", component: Ratings }
   ])
 	

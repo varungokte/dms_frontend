@@ -13,7 +13,6 @@ import { CreateButtonStyling, SubmitButtonStyling } from "./BasicComponents/Purp
 import edit_icon from "./static/edit_icon.svg";
 import delete_icon from "./static/delete_icon.svg";
 
-//Routes: addUser,editUser, getUser
 function UserManagement(){
   const [userData, setUserData]= useState<any>([]);
   const [roleFilter, setRoleFilter] = useState(-1);
@@ -31,10 +30,11 @@ function UserManagement(){
       { id: "N", name: "Name", type: "text", editable: true },
       { id: "E", name: "Email", type: "email", editable: false },
       { id: "P", name: "Password", type: "password", editable: true },
-      { id: "RM", name: "Reporting Manager", type:"text" },
+      { id: "Z", name: "Zone", type: "select", options: EnumIteratorValues(ZoneList) },
+      { id: "RM", name: "Reporting Manager", type:"combobox" },
       { id: "R", name: "Role", type: "select", options: EnumIteratorValues(UserRoles), editable: true },
-      { id: "Z", name: "Zone", type: "select", options: EnumIteratorValues(ZoneList) }
-    ]}
+    ]},
+    { category:"single", id: "P", name: "Permissions", type: "permissions" },
   ]);
   
   const [userAdded, setUserAdded] = useState(false);
@@ -43,17 +43,16 @@ function UserManagement(){
   const changeUserInfo = useGlobalContext().editUser;
   const getUsers = useGlobalContext().getAllUsers;
 
+  const {useTitle, getUserSuggestions} = useGlobalContext();
+
+  useTitle("User Management")
+
   useEffect(()=>{
     getUsers().then((res)=>{
-      const arr:any =[];
       if (res.length==0)
-        setUserData(["Person 1", "Email1", 0]);
+        setUserData([{}]);
       else{
-        console.log(res)
-        res.map((user:any)=>{
-          arr.push([user.N, user.E, user.RM, user.Z, user.S])
-        });
-        setUserData(arr);
+        setUserData(res);
       }
     }).catch(err=> console.log(err))
   },[userAdded])
@@ -68,7 +67,9 @@ function UserManagement(){
         data[field.id] = fieldValues[field.id];
       }
       else if (field.category=="grid"){
+        //@ts-ignore
         for (let j=0; j<field.fields.length; j++){
+          //@ts-ignore
           const gridField = field.fields[j];
           //@ts-ignore
           data[gridField.id] = fieldValues[gridField.id]
@@ -128,6 +129,7 @@ function UserManagement(){
             triggerText="+ Add User" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
             form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+            suggestions={true}  suggestionsFunction={getUserSuggestions}
           />
         </div>
       </div>
@@ -138,8 +140,8 @@ function UserManagement(){
           {userData.length==-1
           ?<p className="text-center">No users available</p>
           :<BodyRowsMapping
-            list={userData} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
-            searchRows={searchString==""?[]:[searchString,0,1]} filterRows={roleFilter==-1?[]:[roleFilter,2]}
+            list={userData} columns={["N","E", "RM", "Z", "S"]} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
+            searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
             action = {userData.map((item:any, index:number)=>{
               return(
                 <div className="flex flex-row">
@@ -147,7 +149,7 @@ function UserManagement(){
                     triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                     formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
                     form={fieldList} setter={setFieldValues} 
-                    edit={true} userValues={{"N": userData[index][0], "E": userData[index][1], "S": userData[index][2]}}
+                    edit={false} currentFields={userData[index]}
                   />
                   <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
                     actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 

@@ -15,7 +15,9 @@ function LoanAccount() {
 
   const [ids, setIds] = useState([]);
 
-  const {getLoanList} = useGlobalContext();
+  const {getLoanList, useTitle} = useGlobalContext();
+
+  useTitle("Loan Account");
   
   useEffect(()=>{
     getLoanList().then(res=>{
@@ -25,7 +27,7 @@ function LoanAccount() {
         arr.push([deal.AID, deal.CN, deal.GN, deal.Z, deal.SA,0]);
         idarr.push(deal._id);
       });
-      setAccountList(arr);
+      setAccountList(res);
       setIds(idarr);
     })
   },[])
@@ -46,14 +48,14 @@ function LoanAccount() {
         <Table className="">
           <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Company Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["Status"], ["Action"]]} />
           <BodyRowsMapping 
-            list={accountList} 
+            list={accountList} columns={["AID", "CN", "GN", "Z", "SA", "S"]}
             dataType={["index","text","text","text","text","text","text", "action"]} 
             cellClassName={["font-medium", "text-custom-1","","","","",""]} 
             searchRows={[]} filterRows={[]}
             action = {accountList.map((item:any, index:number)=>{
               return(
                 <div className="flex flex-row">
-                  <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item[0]}}><img src={edit_icon}/></Link>
+                  <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item.AID}}><img src={edit_icon}/></Link>
                   {/* <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
                     actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
                   /> */}

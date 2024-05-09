@@ -1,12 +1,12 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, RatingValues, ZoneList, EnumIteratorValues } from "./Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, RatingValues, ZoneList, EnumIteratorValues, FrequencyType } from "./Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
 
 function HeaderRows(props:any){
   return(
-    <TableHeader>
+    <TableHeader className={props.className}>
       <TableRow>
       {props.headingRows.map((heading:any,index:number)=>{
         return <TableHead key={index} className={heading.length>1?heading[1]:""}>{heading[0]}</TableHead>
@@ -33,13 +33,15 @@ function BodyRowsMapping(props:any){
         if (props.filterRows.length>0){
           filterValid = false;
           const filter = props.filterRows[0];
-          for (let i=1; i<props.filterRows.length; i++)
-            if ((singleRow[props.filterRows[i]]+"")==filter)
-            filterValid = true;
+          for (let i=1; i<props.filterRows.length; i++){
+            console.log("FILTER", singleRow[props.filterRows[i]], filter+1)
+            if ((singleRow[props.filterRows[i]])==Number(filter)+1){console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
+              filterValid = true;}
+          }
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} />
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} columns={props.columns} />
         else
           return <></>
       })}
@@ -59,29 +61,31 @@ function SingleRow(props:any){
         if (dataType=="index")
           return handleIndex(props.rowIndex+1, cellClassName, uniqueIndex);
       
-        if (dataType=="action")
+        else if (dataType=="action")
           return handleAction(props.action[props.rowIndex], cellClassName, uniqueIndex)
     
-        const item = props.singleRow[props.dataType[0]=="index"?index-1:index];
+        const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
 
         if (dataType=="text")
           return handleText(item, cellClassName, uniqueIndex);
-        if (dataType=="priority")
-          return handlePriority(Number(item), cellClassName, uniqueIndex);
-        if (dataType=="docStatus")
+        else if (dataType=="priority")
+          return handlePriority(Number(item)-1, cellClassName, uniqueIndex);
+        else if (dataType=="docStatus")
           return handleDocStatus(Number(item), cellClassName, uniqueIndex);
-        if (dataType=="userStatus")
+        else if (dataType=="userStatus")
           return handleUserStatus(Number(item), cellClassName, uniqueIndex);
-        if (dataType=="role")
+        else if (dataType=="role")
           return handleRole(Number(item), cellClassName, uniqueIndex);
-        if(dataType=="zone")
+        else if(dataType=="zone")
           return handleZone(Number(item), cellClassName, uniqueIndex);
-        if (dataType=="ratingAgency")
+        else if (dataType=="ratingAgency")
           return handleRatingAgency(Number(item)-1, cellClassName, uniqueIndex);
-        if (dataType=="ratingType")
+        else if (dataType=="ratingType")
           return handleRatingType(Number(item)-1, cellClassName, uniqueIndex);
-        if (dataType=="ratingOutlook")
+        else if (dataType=="ratingOutlook")
           return handleRatingOutlook(Number(item)-1, cellClassName, uniqueIndex);
+        else if (dataType=="frequency")
+          return handleFrequency(Number(item)-1, cellClassName, uniqueIndex)
       })}
     </TableRow>
   )
@@ -144,18 +148,21 @@ const handleAction = (action:any, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{action}</TableCell>
 }
 
-const handleRatingAgency = (index:any, cellClassName:string, uniqueIndex:string) => {
+const handleRatingAgency = (index:number, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{RatingAgencies[index]}</TableCell>
 }
 
-const handleRatingType = (index:any, cellClassName:string, uniqueIndex:string) => {
+const handleRatingType = (index:number, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{RatingTypes[index]}</TableCell>
 }
 
-const handleRatingOutlook = (index:any, cellClassName:string, uniqueIndex:string) => {
+const handleRatingOutlook = (index:number, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{RatingOutlook[index]}</TableCell>
 }
 
+const handleFrequency = (index:number, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{FrequencyType[index]}</TableCell>
+}
 
 export { HeaderRows, BodyRowsMapping }
 

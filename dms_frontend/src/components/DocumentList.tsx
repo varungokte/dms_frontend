@@ -1,4 +1,5 @@
 import { useState } from "react";
+import useGlobalContext from "./../../GlobalContext";
 
 import { Table, TableBody } from "@/components/ui/table"
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
@@ -17,6 +18,10 @@ function DocumentList(props:any) {
   //Each document details is an array: [Doc_Name, Doc_type, Priority, Deal_Date, Status, completed, total, [the actual document files]]
   const [docData] = useState(props.docData)
   const [searchString, setSearchString] = useState("");
+
+  const {useTitle} =useGlobalContext();
+
+  useTitle(props.label)
 
   return(
     <div>
@@ -43,15 +48,14 @@ function DocumentList(props:any) {
 }
 
 function DealDetails(props:any) {
-  const [chevronToggle, setChevronToggle] = useState(false);
 
   return(
     <TableCollapsible
       topRow={[
-        [props.deal[0], "[20%]", "font-medium text-base"], 
-        [props.deal[1], "[20%]", "font-medium text-base"],
-        [props.deal[2], "[30%]", "font-medium text-base"],
-        ["Document Upload", "[26.70%]", "font-medium text-base text-justify"],
+        [props.deal[1], "w-[20%] font-medium text-base"],
+        [props.deal[0], "w-[20%] font-medium text-base"], 
+        [props.deal[2], "w-[30%] font-medium text-base"],
+        ["Document Upload", "w-[26.70%] font-medium text-base text-justify"],
       ]}
       bottomRow={[
         ["Sanction No.", "font-light"], 

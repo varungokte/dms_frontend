@@ -12,66 +12,60 @@ import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation"
 import useGlobalContext from "./../../../GlobalContext";
 
 function RelationshipMapping(props:any){
-  const [userInfo, setUserInfo] = useState([
-    ["Kal-El", "Maker"],
-    ["Salvor Hardin", "Checker"],
-    ["Lucy McLean","Checker"],
-    ["Cassian Andor","Checker"],
-    ["Peter Parker","Maker"],
-    ["Benjamin Sisko","Checker"],
-  ]);
+  const [userInfo, setUserInfo] = useState([]);
   const [role, setRole] = useState("");
 
   const [fieldValues, setFieldValues] = useState([{}]);
 
-  const [userSuggestions, setUserSuggestions] = useState([]);
-
   const [fieldList, setFieldList] = useState([
     {category:"grid", row: 2, fields:[
-      {id:"N", name:"Name/Email", type:"text"},
-      {id:"E", name:"Email", type:"text"},
-      { id: "R", name: "Role", type: "select", options: EnumIteratorValues(UserRoles) },
-    ]}
+      {id:"C", name:"Name/Email", type:"combobox"},
+      { id: "R", name: "Role", type: "role" },
+    ]},
   ]);
 
   const { getUserSuggestions, getTeamList, addTeamMember } = useGlobalContext();
 
   useEffect(()=>{
     getTeamList(props.loanId).then(res=>{
-      console.log("GETTEAM",res);
-      if (res && res.length>0)
-        setUserInfo(res);
+      const arr:any = [];
+      if (res){
+        for (let i=0; i<res.M.length; i++)
+          arr.push([res.M[i].N, res.M[i].E, "NOROLE"])
+        
+        setUserInfo(arr);
+      }
     });
-
-    getUserSuggestions().then(res=>{
-      console.log("AUTONS", res)
-      if (res)
-        setUserSuggestions(res["U"]);
-    })
   },[]);
+
+  useEffect(()=>{
+    console.log("THE FIELD VALUES", fieldValues)
+  },[fieldValues])
 
   const addUser = (e:any) =>{
     e.preventDefault();
 
-    const arr=[];
+    const arr:any=[];
 
-    /* for (let i=0; i<fieldValues.length; i++){
+    for (let i=0; i<Object.keys(fieldValues).length; i++){
+      console.log(Object.keys(fieldValues)[0])
       //@ts-ignore
-      data.push({"N":fieldValues[i].N.N, "E": fieldValues[i].N.E, "R":(fieldValues[i].R)?Number(fieldValues[i].R):1})
-    } */
+      arr.push({"N":fieldValues[i]["0"].N, "E": fieldValues[i]["0"].E, "R":(fieldValues[i].R)?Number(fieldValues[i].R):1})
+    }
 
-    arr.push({"E": "varungokte.codium@gmail.com", "N": "Test Company"})
-
+    
     console.log("SENDING THE DATA",arr);
 
     const data={
       "M":arr,
       "_loanId": props.loanId
-    }
+    };
 
-    addTeamMember(data).then(res=>{
+    console.log("DATA", data)
+
+    /* addTeamMember(data).then(res=>{
       console.log(res)
-    })
+    }) */
 
   }
 
@@ -93,8 +87,8 @@ function RelationshipMapping(props:any){
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formSize="medium"
             formTitle="Relationship Mapping" formSubmit={addUser} submitButton="Save"
             form = {fieldList} setter={setFieldValues} fieldValues={fieldValues}
-            repeatFields={true} suggestions={userSuggestions}
-            //apiCallOnClick={true} apiFunction={getUserSuggestions}
+            repeatFields={true} 
+            suggestions={true} suggestionsFunction={getUserSuggestions}
           />  
         </div>
       </div>

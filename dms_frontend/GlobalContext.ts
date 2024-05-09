@@ -1,8 +1,15 @@
 import axios from 'axios'
 import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
+import { useEffect } from 'react';
 const Base_Url = "http://192.168.1.9:3000/api/v1/allAPI";
 const encryption_key = "JAIBAJRANGBALI";
+
+const useTitle = (title:string) => {
+	useEffect(()=>{
+		document.title=title+" | Beacon DMS"
+	},[title])
+}
 
 const handleEncryption = async (data:object) => {
 	try{
@@ -27,8 +34,10 @@ const handleDecryption = async (text:string) => {
 
 const RegisterAdmin = async (data:object) => {
 	try {
+		console.log(data);
 		const req_body = await handleEncryption(data);
 		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
+		console.log(response);
 		return response;
 	} 
 	catch (error) {
@@ -216,13 +225,14 @@ const createAID = async (data:object) =>{
 const addContact = async (data:object, actionType:string) => {
 	try {
 		const token = getEncryptedToken();
-		console.log(data)
+		console.log("OBJECT",data)
 		const enc_data = await handleEncryption(data);
 		console.log("ACTION", actionType);
 		const response = await axios.post(`${Base_Url}/createContact`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "type": actionType },
 		});
+		console.log("RESPONSE ",response)
 		if (response.status==200)
 			return response;
 	}
@@ -325,7 +335,6 @@ const getRatingsList = async (loanId:string) => {
 const addRole = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
-		console.log(data)
 		const enc_data = await handleEncryption(data);
 		const response = await axios.post(`${Base_Url}/addRole`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
@@ -365,10 +374,9 @@ const getUserSuggestions = async () => {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/suggestion`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: {type: "RM"}
+			params: {type: "UM"}
 		});
 		const decryptedObject = handleDecryption(response.data);
-		console.log(decryptedObject)
 		if (response.status==200)
 			return decryptedObject; 
 		else
@@ -391,8 +399,6 @@ const getTeamList = async (loanId:string) => {
 			params: {_loanId: loanId}
 		});
 		const decryptedObject = handleDecryption(response.data);
-		console.log(response)
-		console.log(decryptedObject);
 		
 		if (response.status==200)
 			return decryptedObject; 
@@ -410,13 +416,31 @@ const getTeamList = async (loanId:string) => {
 const addTeamMember = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
-		console.log(data)
 		const enc_data = await handleEncryption(data);
 		const response = await axios.post(`${Base_Url}/addMember`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
 	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+const testDocumentUpload = async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/testUpload`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		console.log(response);
+		return response.status;
+	}
+
 	catch(error:any) {
 		if (!error.response)
 			return;
@@ -440,6 +464,7 @@ const addTeamMember = async (data:any) => {
  */
 const useGlobalContext = () => {
 	return {
+		useTitle,
 		getEncryptedToken,
 		getDecryptedToken,
 		handleDecryption,
@@ -463,6 +488,7 @@ const useGlobalContext = () => {
 		getUserSuggestions,
 		getTeamList,
 		addTeamMember,
+		testDocumentUpload,
 	}
 }
 

@@ -1,6 +1,16 @@
+//FILTER SHOWS VALUE-1
+
+import { useEffect } from "react";
+
 function Filter(props:any){
+  useEffect(()=>{
+    console.log("PROPS ",props);
+    console.log("LABEL LIST ", props.labelList);
+    console.log("VALUE LIST ", props.valueList);
+  },[props]);
+  
   return(
-    <select className="bg-white border-2 p-3 rounded-xl" value={props.currentValue} onChange={(e:any)=>{props.setter(e.target.value)}}>
+    <select className="bg-white border-2 p-3 rounded-xl" onChange={(e:any)=>{console.log(e.target.value); props.setter(e.target.value)}}>
       {props.setPlaceholder?<option value={props.placeholderValue[0]}>{props.placeholderValue[1]}</option>:""}
       
       {props.labelList.map((item:any,index:number)=>{

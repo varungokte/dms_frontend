@@ -111,9 +111,9 @@ function ContactDetails(props:any) {
       data["AID"]=AID;
       data["_loanId"]= loanId;
 
-      /* addContact(data, "").then(res=>{
+      addContact(data, "").then(res=>{
         console.log("ZZZZZZZZZZZZZZZZZZZZZZZZ",res)
-      }) */
+      })
     }    
   }
 

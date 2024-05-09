@@ -48,7 +48,6 @@ export const MenuRouter = () => {
 	const [userInfo, setUserInfo] = useState(<div>Loading</div>);
 	const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
 
-
 	const onConnect = () => {
 		try{
 			setSocketIsConnected(()=>{const a = true; return a});
@@ -145,7 +144,7 @@ export const MenuRouter = () => {
 		{ name: "Role Management", path:"roles", component: RoleManagement },
 		{ name: "Team Management", path:"teams", component: TeamManagement, icon: MembersIcon },
 		{ name: "User Management", path:"users", component: UserManagement, icon: ManagementIcon },
-		{ name: "Team Tasks", path:"tasks", component: TeamTasks, icon: TaskIcon },
+		//{ name: "Team Tasks", path:"tasks", component: TeamTasks, icon: TaskIcon },
 		{ name: "Reminders", path:"reminders", component: Reminders, icon: ReminderIcon },
 		{ name: "Default Cases", path:"default", component: Default, icon: DefaultIcon },
 		{ name: "Critical Cases", path:"critical", component: CriticalCases, icon: CriticalIcon },

@@ -4,13 +4,19 @@ enum UserStatusValues { "Unverified"=1, "Active", "Inactive" };
 
 enum UserStatusStyling { "text-yellow-600 bg-yellow-100"=1, "text-green-600 bg-green-100", "text-red-600 bg-red-100" };
 
-enum DocumentStatusValues { "Complete", "In Progress", "Overdue", };
+enum DocumentStatusValues { "Pending", "In Progress", "Verified", "Overdue" };
 
 enum DocumentStatusStyling { "text-green-600", "text-yellow-600", "text-red-600", };
+
+enum TransactionDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
+
+enum FileStatusValue { "Pending", "In Progress", "Verified", "Overdue"};
 
 enum PriorityValues { "Low", "Medium", "High", };
 
 enum PriorityStyling { "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100", };
+
+enum CovenantType {"Periodic", "Event-Based"};
 
 enum RatingAgencies { "ICRA", "CRISIL"};
 
@@ -30,6 +36,8 @@ enum LoanType { "Long Term"=1, "Short Term" };
 
 enum LoanProduct { "Term Loan"=1,"Drop-line LOC","WCDL","Debentures" };
 
+enum FrequencyType {"Monthly", "Quarterly", "Half-Yearly", "Yearly"};
+
 const EnumIteratorKeys = (list: any) => {
   return Object.keys(list).filter(v=>!isNaN(Number(v)))
 };
@@ -41,9 +49,13 @@ const EnumIteratorValues = (list: any) => {
 export {
   UserRoles, UserStatusValues, UserStatusStyling, 
   DocumentStatusValues, DocumentStatusStyling, 
+  FileStatusValue,
   PriorityValues, PriorityStyling,
+  CovenantType,
   RatingTypes, RatingOutlook, RatingAgencies, RatingValues,
   ZoneList, IndustryList, LoanType, LoanProduct,
   EnumIteratorKeys, EnumIteratorValues,
-  ContactType
+  ContactType,
+  FrequencyType,
+  TransactionDocumentTypes,
 };

@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
-
 function PermissionSetter(props:any){
-  const [permissionTypes] = useState (["access", "view", "delete",]);
+  const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
   const [permissionList, setPermissionList] = useState({
     "Loan Account": [],
@@ -14,10 +13,14 @@ function PermissionSetter(props:any){
   });
 
   useEffect(()=>{
-    if (!props.newRole)
+    if (props.singleRole)
       setPermissionList(props.singleRole);
-  },[])
+    console.log("PROPS.singlerole",props.singleRole)
+  },[props.singleRole])
 
+  useEffect(()=>{
+    console.log("CURRENT PERMISSIONS LIST", permissionList)
+  },[permissionList])
 
   const togglePermission = (permissions: string[], action: string, value:boolean, section: string) => {
     if (value)
@@ -26,17 +29,24 @@ function PermissionSetter(props:any){
     else
      permissions = permissions.filter(name=> name!==action);
     
-    if (props.setter)
+    if (props.setter){
       props.setter((curr:any)=>{
         //@ts-ignore
         curr[section] = [...permissions];
-        return curr;
+        return {...curr};
       })
+      setPermissionList(curr=>{
+        //@ts-ignore
+        curr[section] = [...permissions];
+        console.log("NEW CURR",curr)
+        return {...curr};
+      })
+    }
     else
       setPermissionList(curr=>{
         //@ts-ignore
         curr[section] = [...permissions];
-        return curr;
+        return {...curr};
       })
   }
   
@@ -64,9 +74,9 @@ function PermissionSetter(props:any){
                       <input 
                         type="checkbox" 
                         //@ts-ignore
-                        defaultChecked={permissionList[section].includes(action)}
                         //@ts-ignore
-                        value={permissionList[section].includes(action)?true:false} 
+                        checked={permissionList[section].includes(action)}
+                        //@ts-ignore
                         onChange={(e)=>{
                           //@ts-ignore
                           togglePermission(permissionList[section],action,e.target.checked,section);

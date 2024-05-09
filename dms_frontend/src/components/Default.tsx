@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { Table } from "@/components/ui/table"
 import { Ellipsis } from "lucide-react";
 import Search from "./BasicComponents/Search";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import useGlobalContext from "./../../GlobalContext";
 
 
 function Default() {
@@ -15,6 +16,10 @@ function Default() {
   ]);
 
   const [searchString, setSearchString] = useState("");
+
+	const {useTitle} = useGlobalContext();
+
+	useTitle("Default Cases");
 
   return(
     <div>

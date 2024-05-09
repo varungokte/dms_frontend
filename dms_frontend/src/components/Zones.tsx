@@ -7,6 +7,7 @@ import { Table } from "@/components/ui/table"
 import Search from "./BasicComponents/Search";
 import Filter from "./BasicComponents/Filter";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import useGlobalContext from "./../../GlobalContext";
 
 function Zones() {
 	const [zones, setZones] = useState({
@@ -16,43 +17,47 @@ function Zones() {
 		"South East Zone": [100,0.0005,98],
 		"The Zone No One Talks About": [1,90,1]
 	});
+
+	const {useTitle} = useGlobalContext();
+
+	useTitle("Zones");
 	
 	const [currentZone, setCurrentZone] = useState("");
 
-    //An object where the 
-    //key: zone name
-    //value: array where [percent_complete, money(in crores of INR), total_number_of_facilities] NOTE all of these are of Number type
-  
-		//Currency array: [currency(INR,USD,etc.), amount(crore,billion,etc.)]
-		const [currency, setCurrency] = useState(["INR", "Cr."])
+	//An object where the 
+	//key: zone name
+	//value: array where [percent_complete, money(in crores of INR), total_number_of_facilities] NOTE all of these are of Number type
 
-		//An array of arrays for details of a specific zone: [deal_1, deal_2, deal_3] where each deal is an array 
-		//Single deal details: [deal_id, deal_name, monitoring_manager, start_date]
-		const [zoneDetails, setZoneDetails] = useState([
-			[1,"Loan Company", "Loan Person", "01/01/01"],
-			[2,"Construction Company", "Construction Person", "02/02/02"]
-		]);
+	//Currency array: [currency(INR,USD,etc.), amount(crore,billion,etc.)]
+	const [currency, setCurrency] = useState(["INR", "Cr."])
 
-		const [searchString, setSearchString] = useState("");
+	//An array of arrays for details of a specific zone: [deal_1, deal_2, deal_3] where each deal is an array 
+	//Single deal details: [deal_id, deal_name, monitoring_manager, start_date]
+	const [zoneDetails, setZoneDetails] = useState([
+		[1,"Loan Company", "Loan Person", "01/01/01"],
+		[2,"Construction Company", "Construction Person", "02/02/02"]
+	]);
 
-    return (
-			<div>
-				<p className="text-3xl font-bold m-7">{currentZone==""?"Zones":currentZone}</p>
-				<div className="flex flex-row">
-					<div className=''>
-          <Search setter={setSearchString} label="Search"/>
-					</div>
-					
-					<div>
-						<Filter currentValue={currentZone} setter={setCurrentZone} listsAreSame={true} labelList={Object.keys(zones)} setPlaceholder={true} placeholderValue={["", "All Zones"]} />
-					</div>
+	const [searchString, setSearchString] = useState("");
+
+	return (
+		<div>
+			<p className="text-3xl font-bold m-7">{currentZone==""?"Zones":currentZone}</p>
+			<div className="flex flex-row">
+				<div className=''>
+				<Search setter={setSearchString} label="Search"/>
 				</div>
-
-				<div className="flex flex-row flex-wrap mx-10">
-					{currentZone==""? <AllZones zones={zones} searchString={searchString} setter={setCurrentZone} currency={currency}/> : <SingleZone setter={setCurrentZone} zoneDetails={zoneDetails} />}
+				
+				<div>
+					<Filter currentValue={currentZone} setter={setCurrentZone} listsAreSame={true} labelList={Object.keys(zones)} setPlaceholder={true} placeholderValue={["", "All Zones"]} />
 				</div>
 			</div>
-    )
+
+			<div className="flex flex-row flex-wrap mx-10">
+				{currentZone==""? <AllZones zones={zones} searchString={searchString} setter={setCurrentZone} currency={currency}/> : <SingleZone setter={setCurrentZone} zoneDetails={zoneDetails} />}
+			</div>
+		</div>
+	)
 };
 
 function AllZones(props:any){

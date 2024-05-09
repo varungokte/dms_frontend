@@ -1,78 +1,105 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { Check, ChevronsUpDown } from "lucide-react"
+
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList, } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger, } from "@/components/ui/popover";
+
 /* 
 props:
-  optionsList= []
-  enteredTerm, setEnteredTerm
-  displayMultipleLines: true
-  displayFields: ["N","E"]
+  optionsList= [
+    { values: ["Person Name","email@email"], label: "Person Name<email@email>" },
+    { values: ["",""], label: "" },
+  ]
+  label=""
+  value=""
+  setValue()
+  type: "single" || "double"
 */
 
 function Combobox(props:any){
-	const [optionsList, setOptionsList] = useState(props.optionsList);
-	const [showSuggestions, setShowSuggestions] = useState(true);
-	const [currentSuggestion, setCurrentSuggestion] = useState(-1);
-	const [suggestions, setSuggestions] = useState<any>([]);
+  const [options] = useState(props.optionsList);
 
-  const [enteredTerm, setEnteredTerm] = useState("");
+  const [open, setOpen] = useState(false);
 
-	const suggest = (e:any)=>{
-    e.preventDefault();
-		setShowSuggestions(true);
-		const text = e.target.value;
-		const regEx = new RegExp(text, "i");
-		const results = [];
-		for (let i=0; i<optionsList.length; i++){
-			const str = optionsList[i];
-      let stringExists = false;
+	useEffect(()=>{
+		console.log("THIS IS VALUE ",props);
+	},[]);
 
-      if (!props.displayMultipleLines)
-        stringExists=!(str.search(regEx)==-1);
-      else {
-        for (let i=0; i<props.displayFields.length; i++)
-          stringExists = stringExists || !(str[props.displayFields[i]].search(regEx)==-1)
-      }
-
-      if (stringExists)
-        results.push(str);
-		}
-		setEnteredTerm(text);
-		setSuggestions(results);
-	};
+  console.log("SET NEW ")
 
   return (
-    <div className="">
-      <input className={props.className} onChange={suggest} value={enteredTerm} required style={{zIndex:"90"}} />
-        {enteredTerm.length>0 && showSuggestions
-          ?<div className="bg-white border-2 w-60" style={{position: "absolute", overflowY:"scroll", zIndex:"100"}}>
-            {suggestions.map((option:any,index:number)=>{
-            return (
-              <div key={index}
-                className={`border h-full ${currentSuggestion==index?"bg-gray-200":""}`} 
-                onClick={()=>{
-                  {props.displayMultipleLines?setEnteredTerm(option[props.displayFields[0]]):setEnteredTerm(option)}; 
-                  setShowSuggestions(false);
-                  props.setFinalResult(option);
-                }} 
-                onMouseEnter={()=>setCurrentSuggestion(index)}
-              >
-                {props.displayMultipleLines
-                  ?<div>
-                    { props.displayFields.map((field:any,fieldIndex:number)=>{return <div className={fieldIndex!=0?"font-light italic":""}>{option[field]}</div>})}
-                  </div>
-                 
-                  :<div>{option}</div>
-                }
-              </div>
-            )
-          })}
-          </div>
-          :""
-        }
-      <input type="" style={{width:"0px"}}/>
-    </div>
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button
+          role="combobox"
+          aria-expanded={open}
+          className=" border rounded-if w-full h-10/12 p-4 justify-between"
+        >
+          {props.type=="single"
+            ?(props.value
+              ? options.find((option:any) => option.value === props.value)?.label
+              : `Select ${props.label}`)
+            :(props.searchFields.map((field:any)=>{
+              (props.value
+                ? options.find((option:any) => option.values[field] === props.value)?.label
+                : `Select ${props.label}`)
+            }))
+          }
+          <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="bg-white w-[200px] p-0">
+        <Command>
+          <CommandInput placeholder={`Select ${props.label}`} />
+					<CommandList>
+						<CommandEmpty>No options found.</CommandEmpty>
+						<CommandGroup>
+              {props.type=="single"
+                ?options.map((option:any) => (
+                  <CommandItem
+                    key={option.value}
+                    value={option.value}
+                    onSelect={(currentValue) => {
+                      props.setValue(currentValue === props.value ? "" : currentValue)
+                      setOpen(false)
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        props.value === option.value ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.label}
+                  </CommandItem>
+                )):options.map((option:any) => (
+                  <CommandItem
+                    key={option.values.N}
+                    value={option.values}
+                    onSelect={(currentValues) => {
+                      props.setValue(currentValues.includes(props.value) ? "" : currentValues)
+                      setOpen(false)
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        options.values.includes(option.value) ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {option.label}
+                  </CommandItem>
+                ))
+              }
+							{}
+						</CommandGroup>
+					</CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   )
 }
-
-
 
 export default Combobox;

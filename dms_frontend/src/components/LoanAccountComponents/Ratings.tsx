@@ -45,7 +45,7 @@ function Ratings(props:any) {
         arr.push([rating.A, rating.T, rating.DT, rating.O, rating.L, rating.R]);
         console.log(arr)
       })
-      setRatingsList(arr);
+      setRatingsList(res);
     }).catch(err=>{
       console.log(err);
     })
@@ -102,7 +102,7 @@ function Ratings(props:any) {
         <Table className="border">
           <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
 
-          <BodyRowsMapping list={ratingsList} dataType={["ratingAgency", "ratingType", "text", "ratingOutlook", "text", "text"]}
+          <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "text", "ratingOutlook", "text", "text"]}
             searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
           />
         </Table>
