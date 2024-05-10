@@ -212,13 +212,13 @@ const createAID = async (data:object) =>{
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
 		const decryptedObject = await handleDecryption(response.data);
-		return decryptedObject;
+		return {status:response.status,obj:decryptedObject};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0, obj:{}};
 		else
-			return error.response
+			return {status:Number(error.response.status), obj:{}};
 	}
 }
 

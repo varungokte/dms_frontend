@@ -7,15 +7,15 @@ import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import FormDialog from "../BasicComponents/FormDialog";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
+
 import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
-import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
 
 function LoanDocuments(props: any) {
-
   //docData is an array of documents
   //Each document is a array: [Document Name, Priority, Physical Location, Execution Location, Start Date, End Date, Status]
   const [docData] = useState([
@@ -32,29 +32,37 @@ function LoanDocuments(props: any) {
 
   const [fieldValues, setFieldValues] = useState({
     "N":"", "T":"",
-    "Docs":[], 
     "SD":"", "ED":"",
-    "EL":"", "PL":""
+    "EL":"", "PL":"",
   });
+  
+  useEffect(()=>{
+    console.log("FLELIST",newFiles)
+  },[newFiles])
 
   const [fieldList, setFieldList] = useState([
     {category:"grid", row:2, fields:[
-      { id: "N", name:"Document Name", type:"select", options:EnumIteratorValues(TransactionDocumentTypes), required:true },
-      { id: "T", name:"Document Type", type:"select", options:["PDF","XLSX"], required:true },
+      { id: "N", name:"Document Name", type:"select", options:EnumIteratorValues(TransactionDocumentTypes), required:false },
+      { id: "T", name:"Document Type", type:"select", options:["PDF","XLSX"], required:false },
     ]},
     { category:"grid", row:2, fields:[
-      { id:"SD", name:"Start Date", type:"date", required:true },
-      { id:"ED", name:"End Date", type:"date", required:true },
+      { id:"SD", name:"Start Date", type:"date", required:false },
+      { id:"ED", name:"End Date", type:"date", required:false },
       { id:"EL", name:"Execution Location", type:"text" },
       { id:"PL", name:"Physical Location", type:"text" },
     ]},
     { category:"single", id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
-    { category:"single", id: "Docs", name:"Upload Document", type:"file", fileList: newFiles },
+    { category:"single", id: "Docs", name:"Document Upload", type:"file", fileList: newFiles },
   ]);
 
   const addDocument = () =>{
-    setTimeout(()=>{},9000)
     console.log("FIELD VALUES", fieldValues);
+    console.log("FILE VALUES", newFiles);
+  }
+
+  const uploadFile = async (file:File) => {
+    console.log("Received", file);
+    return 200;
   }
 
   const editDocument = (e:any) => {
@@ -86,7 +94,8 @@ function LoanDocuments(props: any) {
           <FormDialogDocuments
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`}
             formTitle={props.label} formSubmit={addDocument} submitButton="Save"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} 
+            fileList={newFiles} fileSetter={setNewFiles} uploadFile={uploadFile}
           />
         </div>        
       </div>

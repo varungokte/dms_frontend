@@ -14,29 +14,31 @@ function GenerateLoanID(props:any){
     console.log("USER GENERATED ID", agreementId);
     createAID({"AID":agreementId}).then(res=>{
       console.log("REPOSNE", res);
-      if (res?.status==200){
+      if (res.status==422)
+        setErrorMessage(<p className="text-red-600">This Agreement ID has been taken. Please enter another one.</p>)
+      else if (res.status!==200)
+        setErrorMessage(<p className="text-yellow-600">Please try again later.</p>)
+      else{
+        props.setAID(res.obj.AID);
+        props.setLoanId(res.obj._loanId)
         props.setOkToFrolic(true);
         props.setCurrentSection(1);
       }
-      else
-        setErrorMessage(<p className="text-red-600">Try Again</p>)
     }).catch(err=>{
       console.log(err)
-    })
+    });
   };
 
   const systemGeneratedId = () => {
     createAID({}).then(res=>{
-      console.log("RESPONSE", res)
-      console.log("SYSTEM GENERATED ID");
-      if (res){
-        props.setAID(res.AID);
-        props.setLoanId(res._loanId)
+      if (res.status!==200)
+        setErrorMessage(<p className="text-yellow-600">Please try again later.</p>)
+      else {
+        props.setAID(res.obj.AID);
+        props.setLoanId(res.obj._loanId)
         props.setOkToFrolic(true);
         props.goToNextSection();
       }
-      else
-        setErrorMessage(<p className="text-red-600">Try Again</p>)
     }).catch(err=>{
       console.log(err)
     })
@@ -60,7 +62,7 @@ function GenerateLoanID(props:any){
               <button className="text-white bg-custom-1 rounded-xl h-12 w-36 my-1" type="submit">Submit</button>
             </div>
           </div>
-        </form>
+          </form>
         
         <p className="text-center">OR</p>
         <hr className="w-7/12 m-auto" />
@@ -71,6 +73,8 @@ function GenerateLoanID(props:any){
         {errorMessage}
       </div>
       <br/>
+      <button onClick={()=>{props.setOkToFrolic(true);
+        props.setCurrentSection(1);}}>Skip</button>
     </div>
   )
 }

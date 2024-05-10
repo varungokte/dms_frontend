@@ -34,16 +34,15 @@ function BodyRowsMapping(props:any){
           filterValid = false;
           const filter = props.filterRows[0];
           for (let i=1; i<props.filterRows.length; i++){
-            console.log("FILTER", singleRow[props.filterRows[i]], filter+1)
-            if ((singleRow[props.filterRows[i]])==Number(filter)+1){console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAa")
-              filterValid = true;}
+            if ((singleRow[props.filterRows[i]])==Number(filter)+1)
+              filterValid = true;
           }
         }
 
         if (searchValid && filterValid)
           return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} columns={props.columns} />
         else
-          return <></>
+          return ""
       })}
     </TableBody>
   )

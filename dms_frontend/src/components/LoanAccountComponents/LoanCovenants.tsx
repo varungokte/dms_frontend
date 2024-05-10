@@ -14,23 +14,27 @@ import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
 function LoanCovenants(props:any){
   const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(1);
-
-  useEffect(()=>{
-    console.log("THE CURRENT PRIORIYTY", priority);
-  },[priority])
+  const [newFiles, setNewFiles] = useState<any>([])
 
   const [documentList, setDocumentList] = useState([
     { "T":1, "D": "An example of a periodic covenant", "F":2, "SD":"1/2/3", "ED":"2/2/3" },
     { "T":2, "D": "An example of an event-based covenant", "P":2 }
   ]);
 
-  const [fieldValues, setFieldValues] = useState({
-    "F":[], 
-  });
+  const [fieldValues, setFieldValues] = useState({});
+
+  useEffect(()=>{
+    console.log("TELEPATH", fieldValues);
+  },[fieldValues])
 
   const addCovenant = (e:any) => {
     e.preventDefault();
   };
+  
+  const uploadFile = async (file:File) => {
+    console.log("Received", file);
+    return 200;
+  }
 
   const editCovenant = (e:any) => {
     e.preventDefault();
@@ -42,18 +46,18 @@ function LoanCovenants(props:any){
   
   const [fieldList, setFieldList] = useState([
     {category:"grid", row:2, fields:[
-      { id: "T", name:"Document Type", type:"select", options:EnumIteratorValues(CovenantType) },
+      { id: "T", name:"Covenant Type", type:"select", options:EnumIteratorValues(CovenantType) },
       { id: "P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
     ]},
-    { category:"single", id: "U", name:"Upload Document", type:"file", },
     { category:"grid", row:2, fields:[
       { id:"EL", name:"Execution Location", type:"text" },
       { id:"PL", name:"Physical Location", type:"text" },
-      { id:"SD", name:"Start Date", type:"date" },
-      { id:"ED", name:"End Date", type:"date" },
-      { id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType) },
+      { id:"SD", name:"Start Date", type:"date", dependsOn:"T", dependsValue:1 },
+      { id:"ED", name:"End Date", type:"date", dependsOn:"T", dependsValue:1 },
+      { id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType), dependsOn:"T", dependsValue:1 },
     ]},
-    { category:"single", id:"D", name:"Description", type:"textarea" }
+    { category:"single", id:"D", name:"Description", type:"textarea" },
+    { category:"single", id: "U", name:"Upload Document", type:"file", },
   ]);
 
   return(
@@ -74,9 +78,10 @@ function LoanCovenants(props:any){
 
         <div className="mr-3">
           <FormDialogDocuments
-            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formSize="medium"
+            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`}
             formTitle="Covenants" formSubmit={addCovenant} submitButton="Save"
             form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+            fileList={newFiles} fileSetter={setNewFiles} uploadFile={uploadFile}
           />
         </div>
       </div>
