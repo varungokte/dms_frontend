@@ -29,6 +29,7 @@ function VerificationComponent(){
     console.log(err)
     })
   };
+  
   const clickSubmit = (e:any) => {
     e.preventDefault();
     verifyOTP(otp).then(res => {
@@ -44,12 +45,6 @@ function VerificationComponent(){
       }
     })
   };
-
-  /* useEffect(()=>{
-    //@ts-ignore
-    if (decodeToken(token)["EV"]==1)
-      navigate("/")
-  }) */
 
   const clickContinue = () =>{
     localStorage.setItem("Beacon-DMS-token", newToken);

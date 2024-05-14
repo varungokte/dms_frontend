@@ -4,7 +4,7 @@ import useGlobalContext from "./../GlobalContext";
 const {getEncryptedToken} = useGlobalContext();
 const token =  getEncryptedToken();
 
-const socket = io("https://dms-site.vercel.app", {
+const socket = io("https://dms-pbe2.onrender.com", {
   query:{ data: token }
 })
 

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { useEffect } from 'react';

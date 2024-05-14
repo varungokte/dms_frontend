@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
-//import {socket} from "./socket";
+import {socket} from "./socket";
 import useGlobalContext from './../GlobalContext';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
@@ -44,9 +44,9 @@ export const MenuRouter = () => {
 	const navigate = useNavigate();
 	const {getDecryptedToken} = useGlobalContext();
 
-	//const [socketIsConnected, setSocketIsConnected] = useState( socket.connected);
+	const [socketIsConnected, setSocketIsConnected] = useState( socket.connected);
 
-	/* const onConnect = () => {
+	const onConnect = () => {
 		try{
 			setSocketIsConnected(()=>{const a = true; return a});
 			socket.emit("sendMessage", {message:"Connection established"})
@@ -74,29 +74,14 @@ export const MenuRouter = () => {
 			console.log("RECIEVE",data)
 		})
 	},[])
- */
+
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
 		navigate("/login");
 	}
-	const [userInfo, setUserInfo] = useState(<DropdownMenu>
-		<DropdownMenuTrigger className='mb-3 mx-6'>
-			<div className="flex flex-row">
-				{/* @ts-ignore */}
-				<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={true /* socketIsConnected */}/></div>
-				<div className="text-left mx-3"> {/* @ts-ignore */}
-					<p>{/* {res["N"]} */}Test User</p>
-					<p className="font-light">No Role</p>
-				</div>
-			</div>
-			</DropdownMenuTrigger>
-		<DropdownMenuContent className='bg-white'>
-			<DropdownMenuItem>Profile</DropdownMenuItem>
-			<DropdownMenuSeparator />
-			<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
-		</DropdownMenuContent>
-	</DropdownMenu>
-	);
+	
+	const [userInfo, setUserInfo] = useState(<p>Loading</p>);
+	
 	const getUserInfo = async() => {
 		const decodedToken = await getDecryptedToken();
 		if (decodedToken)
@@ -110,7 +95,6 @@ export const MenuRouter = () => {
 			<DropdownMenu>
 				<DropdownMenuTrigger className='mb-3 mx-6'>
 					<div className="flex flex-row">
-						{/* @ts-ignore */}
 						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={socketIsConnected}/></div>
 						<div className="text-left mx-3"> {/* @ts-ignore */}
 							<p>{/* {res["N"]} */}Test User</p>
@@ -125,7 +109,7 @@ export const MenuRouter = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>);
 		})
-	},[/* socketIsConnected */])
+	},[socketIsConnected])
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 

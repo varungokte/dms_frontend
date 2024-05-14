@@ -18,7 +18,7 @@ export const LoginPage = () => {
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
-    console.log()
+
 		if (email===""){
       setErrorMessage(<p className="text-red-600">Email is required</p>)
       return;
@@ -32,6 +32,7 @@ export const LoginPage = () => {
 			E: email,
 			P: password
 		}
+
 		LoginUser(data)
 			.then((res:any) => {
         console.log("RES",res)
@@ -40,7 +41,7 @@ export const LoginPage = () => {
           return;
         }
         if (res==409){
-          setErrorMessage(<p className="text-red-600">Inactive User. Contact your admin</p>)
+          setErrorMessage(<p className="text-red-600">Inactive User. Contact your admin.</p>)
           /* console.log("REDIRECTING TO VERIFY")
           navigate("/verify") */
         }
