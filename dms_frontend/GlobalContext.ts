@@ -430,14 +430,40 @@ const addTeamMember = async (data:any) => {
 	}
 }
 
-const testDocumentUpload = async (data:any) => {
+const createDocument = async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+
+		console.log("theta",data);
+
+		for (const [key, value] of data.entries()) 
+			console.log(`${key}: ${value}, ${typeof value}`);
+
+		const response = await axios.post(`${Base_Url}/uploadTest`, data, {
+			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
+		});
+
+		console.log("Server response, ",response);
+		return response.status;
+	}
+
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+const deleteDocument = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/testUpload`, {data: enc_data}, {
+		const response = await axios.post(`${Base_Url}/uploadTest`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
-		console.log(response);
+
+		console.log("Server response, ",response);
 		return response.status;
 	}
 
@@ -461,12 +487,14 @@ const testDocumentUpload = async (data:any) => {
 	const response = await axios.post(`${Base_Url}/decrypt`,reqBody);
 	return obj;
 }
- */
+*/
+
 const useGlobalContext = () => {
 	return {
 		useTitle,
 		getEncryptedToken,
 		getDecryptedToken,
+		handleEncryption,
 		handleDecryption,
 		RegisterAdmin,
 		LoginUser,
@@ -488,7 +516,8 @@ const useGlobalContext = () => {
 		getUserSuggestions,
 		getTeamList,
 		addTeamMember,
-		testDocumentUpload,
+		createDocument,
+		deleteDocument,
 	}
 }
 

@@ -14,13 +14,9 @@ function FormDialog(props:any){
     large= "min-w-[1000px] min-h-[300px]"
   }
   
-  const [userNames, setUserNames] = useState([]);
+  const [userNames] = useState([]);
 
   const [repeatForm, setRepeatForm] = useState([<RenderForm {...props} key={"f0"} formIndex={currentForm} userNames={userNames}/>]);
-
-  const doSomeValidation = () => {
-    
-  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -70,9 +66,8 @@ function RenderForm (props:any){
   const [currentPermission, setCurrentPermission] = useState(0);
   const [prefillValues, setPrefillValues] = useState<any>({});
 
-
   useEffect(()=>{
-    console.log("LOADED")
+    console.log("LOADED",currentPermission)
   })
   useEffect(()=>{
     if (props.edit){
@@ -148,8 +143,7 @@ function RenderForm (props:any){
     }
   };
   
-  const handleFile = (index:number, id:string, name:string, fileList:[File]) => {
-    const [error, setError] = useState(<></>);
+  const handleFile = (index:number, id:string, name:string) => {
     return (
       <div key={index+name+"f_0"} className="flex flex-row">
         <div key={index+name+"f_-1"} className="font-light text-lg my-7">{name}:</div>
@@ -252,7 +246,7 @@ function RenderForm (props:any){
         else if (field["type"]=="select")
           return handleSelect(index, field["id"], field["name"], field["options"])
         else if (field["type"]=="file")
-          return handleFile(index, field["id"], field["name"], field["fileList"]);
+          return handleFile(index, field["id"], field["name"]);
         else if (field["type"]=="permissions")
           return handlePermissions(index, field["id"], field["name"]);
         else if (field["type"]=="role")
@@ -276,7 +270,7 @@ function RenderForm (props:any){
                 else if (item["type"]=="select")
                   return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"])}</span>
                 else if (item["type"]=="file")
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["id"], item["name"], field["fileList"])} </span>  
+                  return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["id"], item["name"])} </span>  
                 else if (item["type"]=="combobox")
                   return <span key={index+"_"+itemIndex} className="mr-3" style={{position:"relative"}}>{handleCombobox(itemIndex, item["id"], item["name"])}</span>
                 else if (item["type"]=="role")

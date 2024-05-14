@@ -1,7 +1,5 @@
 //FILTER SHOWS VALUE-1
 
-import { useEffect } from "react";
-
 function Filter(props:any){
   /* useEffect(()=>{
     console.log("PROPS ",props);

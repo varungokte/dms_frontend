@@ -9,6 +9,7 @@ import SecurityDetails from "./LoanAccountComponents/SecurityDetails";
 import BankDetails from "./LoanAccountComponents/BankDetails";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious, } from "@/components/ui/carousel"
 
 import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
 import { useLocation } from "react-router-dom";

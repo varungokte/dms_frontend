@@ -1,5 +1,5 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, RatingValues, ZoneList, EnumIteratorValues, FrequencyType } from "./Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes } from "./Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
@@ -84,7 +84,11 @@ function SingleRow(props:any){
         else if (dataType=="ratingOutlook")
           return handleRatingOutlook(Number(item)-1, cellClassName, uniqueIndex);
         else if (dataType=="frequency")
-          return handleFrequency(Number(item)-1, cellClassName, uniqueIndex)
+          return handleFrequency(Number(item)-1, cellClassName, uniqueIndex);
+        else if (dataType=="transaction")
+          return handleTransactionDocumentType(Number(item)-1, cellClassName, uniqueIndex);
+        else if (dataType=="file")
+          return handleFileType(Number(item)-1, cellClassName, uniqueIndex);
       })}
     </TableRow>
   )
@@ -161,6 +165,14 @@ const handleRatingOutlook = (index:number, cellClassName:string, uniqueIndex:str
 
 const handleFrequency = (index:number, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{FrequencyType[index]}</TableCell>
+}
+
+const handleTransactionDocumentType = (index:number, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{TransactionDocumentTypes[index]}</TableCell>
+}
+
+const handleFileType = (index:number, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{FileTypes[index]}</TableCell>
 }
 
 export { HeaderRows, BodyRowsMapping }

@@ -17,7 +17,7 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 function ContactDetails(props:any) {
   //contacts is an object where the keys are the categories (like borrower, lender, promoter) and values are arrays of people
   //Each person is an array: [Name, Designation, Landline Number, Mobile Number, Email, Regitered Address, Billing Address]
-  const [contacts, setContacts] = useState({
+  const [contacts] = useState({
     "Borrower": [["Ben Quadinaros", "Podracer", "123", "123","email@email", "221B Baker Street, London", "221B Baker Street, London"],
                 ["Quinlan Vos", "Jedi Master", "456", "456", "example@email.com", "123 ABC", "123 ABC"],],
     "Lender": [["Cad Bane", "Bounty Hunter", "123", "123", "Email.com","1","2"]],

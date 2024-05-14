@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
 import { CovenantType, EnumIteratorKeys, EnumIteratorValues, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
@@ -10,41 +10,21 @@ import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
+import useGlobalContext from "./../../../GlobalContext";
 
 function LoanCovenants(props:any){
   const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(1);
-  const [newFiles, setNewFiles] = useState<any>([])
+  const [newFiles, setNewFiles] = useState<any>([]);
 
-  const [documentList, setDocumentList] = useState([
+  const [documentList] = useState([
     { "T":1, "D": "An example of a periodic covenant", "F":2, "SD":"1/2/3", "ED":"2/2/3" },
     { "T":2, "D": "An example of an event-based covenant", "P":2 }
   ]);
 
   const [fieldValues, setFieldValues] = useState({});
 
-  useEffect(()=>{
-    console.log("TELEPATH", fieldValues);
-  },[fieldValues])
-
-  const addCovenant = (e:any) => {
-    e.preventDefault();
-  };
-  
-  const uploadFile = async (file:File) => {
-    console.log("Received", file);
-    return 200;
-  }
-
-  const editCovenant = (e:any) => {
-    e.preventDefault();
-  };
-
-  const deleteCovenant = (e:any) => {
-    e.preventDefault();
-  }
-  
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     {category:"grid", row:2, fields:[
       { id: "T", name:"Covenant Type", type:"select", options:EnumIteratorValues(CovenantType) },
       { id: "P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
@@ -57,8 +37,23 @@ function LoanCovenants(props:any){
       { id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType), dependsOn:"T", dependsValue:1 },
     ]},
     { category:"single", id:"D", name:"Description", type:"textarea" },
-    { category:"single", id: "U", name:"Upload Document", type:"file", },
   ]);
+
+  const [uploadField] = useState(
+    { category:"single", id: "U", name:"Upload Document", type:"file", }
+  );
+
+  const addCovenant = (e:any) => {
+    e.preventDefault();
+  };
+
+  const editCovenant = (e:any) => {
+    e.preventDefault();
+  };
+
+  const deleteCovenant = (userIndex:number) => {
+    const userid=0//get user from userIndex
+  }
 
   return(
     <div className="bg-white rounded-xl">
@@ -79,9 +74,9 @@ function LoanCovenants(props:any){
         <div className="mr-3">
           <FormDialogDocuments
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`}
-            formTitle="Covenants" formSubmit={addCovenant} submitButton="Save"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-            fileList={newFiles} fileSetter={setNewFiles} uploadFile={uploadFile}
+            formTitle={props.label} formSubmit={addCovenant}
+            detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+            uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
           />
         </div>
       </div>
@@ -123,7 +118,7 @@ function LoanCovenants(props:any){
                         edit={true} fieldValues={fieldValues}  currentFields={documentList[index]}
                       />
                       <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
-                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCovenant} 
+                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCovenant(index)} 
                       />
                     </div>
                   )

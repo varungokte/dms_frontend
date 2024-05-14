@@ -12,6 +12,8 @@ enum TransactionDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreeme
 
 enum FileStatusValue { "Pending", "In Progress", "Verified", "Overdue"};
 
+enum FileTypes {"PDF", "XLSX", "DOCX"};
+
 enum PriorityValues { "Low", "Medium", "High", };
 
 enum PriorityStyling { "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100", };
@@ -49,7 +51,7 @@ const EnumIteratorValues = (list: any) => {
 export {
   UserRoles, UserStatusValues, UserStatusStyling, 
   DocumentStatusValues, DocumentStatusStyling, 
-  FileStatusValue,
+  FileStatusValue, FileTypes,
   PriorityValues, PriorityStyling,
   CovenantType,
   RatingTypes, RatingOutlook, RatingAgencies, RatingValues,

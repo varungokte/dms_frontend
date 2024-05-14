@@ -43,7 +43,7 @@ function BasicDetails(props:any) {
     "ST": null, "SD": null, "CD": null, "RED": null, 
     "A": null, "F": null, "S": null, "V": null,
   }) 
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     { id:"CN", name:"Company Name", type:"text", required: true },
     { id:"GN", name:"Group Name", type:"text", required: true },
     { id:"I", name:"Industry", type:"select", options:["Banking","Real Estate", "Manufacturing"], required: true },
