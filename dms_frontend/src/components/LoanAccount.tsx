@@ -41,7 +41,7 @@ function LoanAccount() {
       <hr/>
       <br/>
       <div className="flex flex-row">
-        {/* <div className="m-auto flex-auto"> <Search label="Search by Agreement ID" setter={setSearchString}/></div> */}
+        <div className="m-auto flex-auto"> {/* <Search label="Search by Agreement ID" setter={setSearchString}/> */}</div>
         <div className="m-auto"><Link className={`${CreateButtonStyling} p-4`} to="create" state={{linkSource: "CREATE"}}>Add a Loan Account</Link></div>
       </div>
       <div className="m-5 border rounded-xl">
