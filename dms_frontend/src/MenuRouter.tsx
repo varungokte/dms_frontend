@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
-import {socket} from "./socket";
+//import {socket} from "./socket";
 import useGlobalContext from './../GlobalContext';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
@@ -44,9 +44,9 @@ export const MenuRouter = () => {
 	const navigate = useNavigate();
 	const {getDecryptedToken} = useGlobalContext();
 	const [userInfo, setUserInfo] = useState(<div>Loading</div>);
-	const [socketIsConnected, setSocketIsConnected] = useState(socket.connected);
+	//const [socketIsConnected, setSocketIsConnected] = useState( socket.connected);
 
-	const onConnect = () => {
+	/* const onConnect = () => {
 		try{
 			setSocketIsConnected(()=>{const a = true; return a});
 			socket.emit("sendMessage", {message:"Connection established"})
@@ -74,7 +74,7 @@ export const MenuRouter = () => {
 			console.log("RECIEVE",data)
 		})
 	},[])
-
+ */
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
 		navigate("/login");
@@ -108,7 +108,7 @@ export const MenuRouter = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>);
 		})
-	},[socketIsConnected])
+	},[/* socketIsConnected */])
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 
