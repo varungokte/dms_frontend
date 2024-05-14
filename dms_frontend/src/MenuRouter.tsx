@@ -131,22 +131,22 @@ export const MenuRouter = () => {
   ]);
 	const [componentList] = useState([
 		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
-		{ name: "Loan Account", path:"loan", component: LoanAccount, icon: LoanIcon },
-		{ name: "Products", path:"products", component: Products, icon: ProductIcon },
-		{ name: "Transaction Documents", path:"transaction", component: DocumentList, icon: TransIcon },
-		{ name: "Compliance Documents", path:"compliance", component: DocumentList, icon: CompIcon },
-		{ name: "Covenants", path:"covenants", component: DocumentList, icon: CovenantIcon },
-		{ name: "Conditions Precedent", path:"precedent", component: DocumentList, icon: ConditionsIcon },
-		{ name: "Conditions Subsequent", path:"subsequent", component: DocumentList, icon: ConditionsIcon },
-		{ name: "Zones", path:"zones", component: Zones, icon: ZoneIcon },
-		{ name: "Role Management", path:"roles", component: RoleManagement },
-		{ name: "Team Management", path:"teams", component: TeamManagement, icon: MembersIcon },
-		{ name: "User Management", path:"users", component: UserManagement, icon: ManagementIcon },
-		//{ name: "Team Tasks", path:"tasks", component: TeamTasks, icon: TaskIcon },
-		{ name: "Reminders", path:"reminders", component: Reminders, icon: ReminderIcon },
-		{ name: "Default Cases", path:"default", component: Default, icon: DefaultIcon },
-		{ name: "Critical Cases", path:"critical", component: CriticalCases, icon: CriticalIcon },
-		{ name: "Reports", path:"reports", component: Reports, icon: ReportsIcon },
+		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
+		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
+		{ name: "Transaction Documents", path:"/transaction", component: DocumentList, icon: TransIcon },
+		{ name: "Compliance Documents", path:"/compliance", component: DocumentList, icon: CompIcon },
+		{ name: "Covenants", path:"/covenants", component: DocumentList, icon: CovenantIcon },
+		{ name: "Conditions Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
+		{ name: "Conditions Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
+		{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
+		{ name: "Role Management", path:"/roles", component: RoleManagement },
+		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
+		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
+		//{ name: "Team Tasks", path:"/tasks", component: TeamTasks, icon: TaskIcon },
+		{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
+		{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
+		{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
+		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
 	])
 	return (
 		<div className='relative'>
@@ -193,8 +193,8 @@ export const MenuRouter = () => {
 						else
 							return <Route key={index} path={item.path} element={createElement(item.component)} />
 					})}
-					<Route key={"C"} path="loan/create/*" element={<CreateLoanAccount/>} />
-					<Route key={"T"} path="teams/:id" element={<TeamMembers/>} />
+					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
+					<Route key={"T"} path="/teams/:id" element={<TeamMembers/>} />
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>
