@@ -1,6 +1,6 @@
 import { useState } from "react";
-import 'react-date-range/dist/styles.css';
-import 'react-date-range/dist/theme/default.css';
+/* import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css'; */
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 import { Ellipsis } from "lucide-react";
