@@ -130,7 +130,7 @@ export const MenuRouter = () => {
     ]
   ]);
 	const [componentList] = useState([
-		{ name: "Dashboard", path:"", component: Dashboard, icon: DashboardIcon },
+		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
 		{ name: "Loan Account", path:"loan", component: LoanAccount, icon: LoanIcon },
 		{ name: "Products", path:"products", component: Products, icon: ProductIcon },
 		{ name: "Transaction Documents", path:"transaction", component: DocumentList, icon: TransIcon },

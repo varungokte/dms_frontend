@@ -8,7 +8,7 @@ import VerificationPage from './components/AuthPages/VerificationPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename='/'>
       <Routes>
         <Route path="/register" element={<RegistrationPage />} />
         <Route path='/login' element={<LoginPage />} />

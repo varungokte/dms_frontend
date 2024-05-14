@@ -2,7 +2,7 @@ import axios from 'axios'
 import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { useEffect } from 'react';
-const Base_Url = "http://192.168.1.9:3000/api/v1/allAPI";
+const Base_Url = "https://dms-santoshs-projects-ab31069d.vercel.app/api/v1/allAPI";
 const encryption_key = "JAIBAJRANGBALI";
 
 const useTitle = (title:string) => {
