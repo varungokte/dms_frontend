@@ -107,8 +107,7 @@ export const RegistrationPage = () => {
 				<br/>
 				<input
 					type="text"
-					id="name"
-					name="name"
+					id="repman"
 					value={reportingManager}
 					placeholder="Reporting Manager"
 					onChange={(e) => setReportingManager(e.target.value)}

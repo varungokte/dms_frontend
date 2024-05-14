@@ -83,7 +83,7 @@ export const MenuRouter = () => {
 		<DropdownMenuTrigger className='mb-3 mx-6'>
 			<div className="flex flex-row">
 				{/* @ts-ignore */}
-				<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={socketIsConnected}/></div>
+				<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={true /* socketIsConnected */}/></div>
 				<div className="text-left mx-3"> {/* @ts-ignore */}
 					<p>{/* {res["N"]} */}Test User</p>
 					<p className="font-light">No Role</p>
