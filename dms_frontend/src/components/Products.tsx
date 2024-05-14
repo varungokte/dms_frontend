@@ -1,14 +1,14 @@
 import { useState } from "react";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
-import Search from "./BasicComponents/Search";
+//import Search from "./BasicComponents/Search";
 
 import useGlobalContext from "./../../GlobalContext";
 
 function Products(){
 
 	//An object where each key is the name of a product, and its corresponding value is an array of sub-products
-	const [products, setProducts] = useState({
+	const [products] = useState({
 		"Capital Flex Advantage":["P1", "P2", "P3"],
 		"Work Cash Solutions":["Work Cash Express Loan", "Work Cash FlexiCredit", "Work Cash Business Boost", "Work Cash Express Loan", "Work Cash FlexiCredit", "Work Cash Business Boost"],
 		"Biz Boost Express": ["Product 1", "Product 2", "Product 3"],
@@ -17,7 +17,7 @@ function Products(){
 	});
 
 	const [selected, setSelected] = useState(0);
-	const [searchString, setSearchString] = useState("");
+	//const [searchString, setSearchString] = useState("");
 
 	const {useTitle} = useGlobalContext();
 
@@ -26,9 +26,9 @@ function Products(){
 	return(
 		<div>
 			<p className="text-3xl font-bold m-7">Products</p>
-			<div className=''>
+			{/* <div className=''>
 				<Search setter={setSearchString} label="Search"/>
-			</div>
+			</div> */}
 
 			<div className="flex flex-row relative m-10">
 				<div className="mr-9">

@@ -7,7 +7,7 @@ import { PriorityValues, EnumIteratorKeys } from "./BasicComponents/Constants";
 import TableCollapsible from "./BasicComponents/TableCollapsible";
 
 import UploadButton from "./BasicComponents/UploadButton";
-import Search from "./BasicComponents/Search";
+//import Search from "./BasicComponents/Search";
 import ProgressBar from "./BasicComponents/ProgressBar";
 
 function DocumentList(props:any) {
@@ -17,7 +17,7 @@ function DocumentList(props:any) {
   //Document_List is an array of documents detais
   //Each document details is an array: [Doc_Name, Doc_type, Priority, Deal_Date, Status, completed, total, [the actual document files]]
   const [docData] = useState(props.docData)
-  const [searchString, setSearchString] = useState("");
+  //const [searchString, setSearchString] = useState("");
 
   const {useTitle} =useGlobalContext();
 
@@ -27,9 +27,9 @@ function DocumentList(props:any) {
     <div>
 			<p className="text-3xl font-bold m-7">{props.label}</p>
 			<div className="flex flex-row">
-        <div className=''>
+        {/* <div className=''>
           <Search setter={setSearchString} label="Search"/>
-        </div>  
+        </div>   */}
       </div>
 
       <div className="bg-white m-10 rounded-xl">

@@ -11,7 +11,6 @@ import CreateLoanAccount from './components/CreateLoanAccount';
 import Products from './components/Products';
 import TeamMembers from './components/TeamMembers';
 import Zones from './components/Zones';
-import TeamTasks from './components/TeamTasks';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
 import Default from './components/Default';
@@ -32,7 +31,6 @@ import ConditionsIcon from './components/static/PanelIcons/ConditionsIcon';
 import ZoneIcon from './components/static/PanelIcons/ZoneIcon';
 import MembersIcon from './components/static/PanelIcons/MembersIcon';
 import ManagementIcon from './components/static/PanelIcons/ManagementIcon';
-import TaskIcon from './components/static/PanelIcons/TaskIcon';
 import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
 import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
 import LoanAccount from './components/LoanAccount';
@@ -65,7 +63,7 @@ export const MenuRouter = () => {
 	}
 	useEffect(()=>{
 		socket.on("connect", onConnect);
-		socket.on("connect_error",(error:any)=>{	
+		socket.on("connect_error",()=>{	
 			console.log("socketerror")
 		});
 		socket.on("connect_failed", ()=>{
@@ -131,7 +129,7 @@ export const MenuRouter = () => {
       ]
     ]
   ]);
-	const [componentList, setComponentList] = useState([
+	const [componentList] = useState([
 		{ name: "Dashboard", path:"", component: Dashboard, icon: DashboardIcon },
 		{ name: "Loan Account", path:"loan", component: LoanAccount, icon: LoanIcon },
 		{ name: "Products", path:"products", component: Products, icon: ProductIcon },

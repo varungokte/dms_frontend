@@ -17,14 +17,14 @@ function RelationshipMapping(props:any){
 
   const [fieldValues, setFieldValues] = useState([{}]);
 
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     {category:"grid", row: 2, fields:[
       {id:"C", name:"Name/Email", type:"combobox"},
       { id: "R", name: "Role", type: "role" },
     ]},
   ]);
 
-  const { getUserSuggestions, getTeamList, addTeamMember } = useGlobalContext();
+  const { getUserSuggestions, getTeamList } = useGlobalContext();
 
   useEffect(()=>{
     getTeamList(props.loanId).then(res=>{
@@ -67,11 +67,6 @@ function RelationshipMapping(props:any){
       console.log(res)
     }) */
 
-  }
-
-  const editUser = (e:any) => {
-    e.preventDefault();
-    
   }
 
   return (

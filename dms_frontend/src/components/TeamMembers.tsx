@@ -21,7 +21,7 @@ function TeamMembers() {
 	useTitle(id || "Team Members")
 
 	//An object where each key is the category of people, and the value is an array of the people in that category
-	const [members, setMembers] = useState({
+	const [members] = useState({
 		"Chief Executive Officers":["Jean-Luc Picard", "William Riker"],
 		"Relationship Managers": ["Deanna Troi", "Beverly Crusher", "Worf"],
 		"My Team Members": ["?"]
@@ -30,6 +30,8 @@ function TeamMembers() {
 	const [newName, setNewName] = useState("");
 	const [newRole, setNewRole] = useState(-1);
 	const [searchString, setSearchString] = useState("");
+
+	console.log(newName,newRole,searchString)
 
 	const addMember = () =>{
 	}

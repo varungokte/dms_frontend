@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Table } from "@/components/ui/table";
 import useGlobalContext from "./../../../GlobalContext";
 
@@ -31,7 +31,7 @@ function LoanDocuments(props: any) {
   const [priority, setPriority] = useState(-1);
   const [newFiles, setNewFiles] = useState<any>([]);
 
-  const {createDocument, handleEncryption, deleteDocument } = useGlobalContext();
+  const {createDocument, handleEncryption } = useGlobalContext();
   const { toast } = useToast();
 
   const [fieldValues, setFieldValues] = useState({
@@ -40,7 +40,7 @@ function LoanDocuments(props: any) {
     "EL":"", "PL":"",
   });
   
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     {category:"grid", row:2, fields:[
       { id: "N", name:"Document Name", type:"select", options:EnumIteratorValues(TransactionDocumentTypes), required:false },
       { id: "T", name:"Document Type", type:"select", options:["PDF","XLSX"], required:false },
@@ -54,7 +54,7 @@ function LoanDocuments(props: any) {
     { category:"single", id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
   ]);
 
-  const [uploadField, setUploadField] =useState(
+  const [uploadField] =useState(
     { id: "Docs", name:"Document Upload", fileList: newFiles }
   );
 
@@ -75,23 +75,16 @@ function LoanDocuments(props: any) {
     return res;
   }
 
-  const editDocument = (e:any) => {
-    e.preventDefault();
-  }
 
   const obliterateDocument = (userIndex:number) => {
     const userid=0;//get user from index
-
+    console.log(userid+userIndex);
     /* deleteDocument(userid).then(res=>{
       console.log(res);
     }).catch(err=>{
       console.log(err);
     }); */
   }
-
-  const showToast = () => {
-  }
-  
 
   return (
     <div className="bg-white rounded-xl">
@@ -125,6 +118,7 @@ function LoanDocuments(props: any) {
           <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["transaction","file","priority","text","text","text","text","action"]}
             searchRows={searchString==""?[]:[searchString,"N"]} filterRows={priority==-1?[]:[priority,"P"]}
             action = {docData.map((item:any, index:number)=>{
+              console.log(item)
               return(
                 <div className="flex flex-row">
                   <FormDialogDocuments

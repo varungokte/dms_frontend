@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 import { Table } from "@/components/ui/table";
-import Search from "./BasicComponents/Search";
+//import Search from "./BasicComponents/Search";
 import useGlobalContext from "./../../GlobalContext";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import edit_icon from "./static/edit_icon.svg";
-import delete_icon from "./static/delete_icon.svg";
-import ActionDialog from "./BasicComponents/ActionDialog";
+/* import delete_icon from "./static/delete_icon.svg";
+import ActionDialog from "./BasicComponents/ActionDialog"; */
 
 function LoanAccount() {
   const [accountList, setAccountList] = useState([]);
@@ -32,7 +32,7 @@ function LoanAccount() {
     })
   },[])
 
-  const [searchString, setSearchString] = useState("");
+  //const [searchString, setSearchString] = useState("");
   
   return(
     <div className="bg-white rounded-xl m-5">
@@ -41,7 +41,7 @@ function LoanAccount() {
       <hr/>
       <br/>
       <div className="flex flex-row">
-        <div className="m-auto flex-auto"> <Search label="Search by Agreement ID" setter={setSearchString}/></div>
+        {/* <div className="m-auto flex-auto"> <Search label="Search by Agreement ID" setter={setSearchString}/></div> */}
         <div className="m-auto"><Link className={`${CreateButtonStyling} p-4`} to="create" state={{linkSource: "CREATE"}}>Add a Loan Account</Link></div>
       </div>
       <div className="m-5 border rounded-xl">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Table } from "@/components/ui/table"
-import Search from "../BasicComponents/Search";
+//import Search from "../BasicComponents/Search";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../BasicComponents/Constants";
 import FormDialog from "../BasicComponents/FormDialog";
@@ -20,7 +20,7 @@ function Ratings(props:any) {
     "L":"", "R":"",
   });
   
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     { category: "grid", row:2, sectionName:"", fields: [
       { id: "A", type: "select", name: "Rating Agency", options: EnumIteratorValues(RatingAgencies) },
       { id: "T", type: "select", name: "Rating Type", options: EnumIteratorValues(RatingTypes) },
@@ -34,7 +34,7 @@ function Ratings(props:any) {
   const {addRating, getRatingsList} = useGlobalContext();
 
   const [ratingsList, setRatingsList] = useState([])
-  const [searchString, setSearchString] = useState("");
+ // const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
     getRatingsList(props.loanId).then(res=>{
@@ -86,9 +86,9 @@ function Ratings(props:any) {
   return(
     <div className="mt-8">
       <div className="flex flex-row">
-        <div className='flex-auto'>
+        {/* <div className='flex-auto'>
           <Search setter={setSearchString} label="Search" />
-        </div>
+        </div> */}
         <div>
           <FormDialog 
             triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"

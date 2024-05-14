@@ -16,7 +16,7 @@ function TeamTasks() {
   //priority has 3 values: Low, Medium, High
   //Status has 3 values: Complete, In Progress, Overdue
   //Each can be represented by a Number (0,1,2)
-  const [taskList, setTaskList] = useState([
+  const [taskList] = useState([
     ["Lender Agent Agreement", "Bruce Wayne", "01/01/01", 2, 0],
     ["Power Purchase Agreement", "Kal-El", "02/02/02", 1, 2],
     ["Lender Agent Agreement", "Kara Zor-El", "03/03/03", 2, 0 ],
@@ -33,6 +33,7 @@ function TeamTasks() {
   const [newPriority, setNewPriority] = useState(-1);
   const [newDate, setNewDate] = useState("");
   const [data, setData] = useState("DAT")
+  console.log(data);
   const createTask = () => {
     setData("TASK"+" " +newTask+" " +newAssignee+" " +newPriority+" " +newDate)
   };

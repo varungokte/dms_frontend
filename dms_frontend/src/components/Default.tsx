@@ -9,7 +9,7 @@ import useGlobalContext from "./../../GlobalContext";
 function Default() {
   //An array of default cases
   //Each default case is an array where: [Deal Name, Default Type, Date]
-  const [defaultData, setDefaultData] = useState([
+  const [defaultData] = useState([
     ["Mortgage", "Payment", "01/01/01"],
     ["Home Loan", "Covenant", "02/02/02"],
     ["Business Loan", "Bankrupcy", "03/03/03"]

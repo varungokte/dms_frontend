@@ -6,18 +6,17 @@ import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { UserRoles, EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
 import FormDialog from "./BasicComponents/FormDialog";
 import Search from "./BasicComponents/Search";
-import Filter from "./BasicComponents/Filter";
 import ActionDialog from "./BasicComponents/ActionDialog";
 
-import { CreateButtonStyling, SubmitButtonStyling } from "./BasicComponents/PurpleButtonStyling";
+import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import edit_icon from "./static/edit_icon.svg";
 import delete_icon from "./static/delete_icon.svg";
 
 function UserManagement(){
   const [userData, setUserData]= useState<any>([]);
-  const [roleFilter, setRoleFilter] = useState(-1);
+  const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
-  const [selectedUser, setSelectedUser] = useState(-1);
+  const [selectedUser] = useState(-1);
   const [message, setMessage] = useState(<></>);
 
   const [fieldValues, setFieldValues] = useState({
@@ -25,7 +24,7 @@ function UserManagement(){
     "P": "123", "R": "1",
   })
 
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     { category: "grid", row: 2, fields: [
       { id: "N", name: "Name", type: "text", editable: true },
       { id: "E", name: "Email", type: "email", editable: false },
@@ -94,7 +93,7 @@ function UserManagement(){
       return;
     
     const arr = userData[selectedUser];
-    console.log("THE SELECTED USER", selectedUser)
+    console.log("THE SELECTED USER",arr, selectedUser)
     const data = {} as any;
 
     changeUserInfo(data).then(res=>{
@@ -107,7 +106,7 @@ function UserManagement(){
   }
 
   const deleteUser = (index:number) =>{
-
+    console.log(index)
   }
 
   return(
@@ -143,6 +142,7 @@ function UserManagement(){
             list={userData} columns={["N","E", "RM", "Z", "S"]} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
             searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
             action = {userData.map((item:any, index:number)=>{
+              console.log(item)
               return(
                 <div className="flex flex-row">
                   <FormDialog 

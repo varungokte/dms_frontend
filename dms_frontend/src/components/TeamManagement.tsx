@@ -1,11 +1,11 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { Table } from "./ui/table";
 import { Link } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
 
 function TeamManagement(){
-  const [teamList, setTeamList] = useState([
+  const [teamList] = useState([
     {T:"team1", C:20}
   ]);
 

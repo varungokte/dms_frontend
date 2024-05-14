@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Search from "../BasicComponents/Search";
+//import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
 import { CovenantType, EnumIteratorKeys, EnumIteratorValues, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
 import FormDialog from "../BasicComponents/FormDialog";
@@ -10,10 +10,9 @@ import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
-import useGlobalContext from "./../../../GlobalContext";
 
 function LoanCovenants(props:any){
-  const [searchString, setSearchString] = useState("");
+  //const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(1);
   const [newFiles, setNewFiles] = useState<any>([]);
 
@@ -53,6 +52,7 @@ function LoanCovenants(props:any){
 
   const deleteCovenant = (userIndex:number) => {
     const userid=0//get user from userIndex
+    console.log(userIndex,userid);
   }
 
   return(
@@ -61,9 +61,9 @@ function LoanCovenants(props:any){
 			<p className="text-2xl font-bold m-7 mt-5">Covenants</p>
 
       <div className="flex flex-row">
-        <div>
+        {/* <div>
           <Search setter={setSearchString} label="Search" />
-        </div>
+        </div> */}
 
         <div className="flex-auto">
           <Filter setter={setPriority} listsAreSame={false} 
@@ -89,6 +89,7 @@ function LoanCovenants(props:any){
                 list={documentList.filter(document=>document["T"]==1)} columns={["D", "F", "SD", "ED"]} dataType={["text", "frequency", "text", "text", "action"]}
                 searchRows={[]} filterRows={[]}
                 action = {documentList.filter(document=>document["T"]==1).map((item:any, index:number)=>{
+                  console.log(item)
                   return(
                     <div className="flex flex-row">
                       <FormDialog 
@@ -109,6 +110,7 @@ function LoanCovenants(props:any){
               <BodyRowsMapping list={documentList.filter(document=>document["T"]==2)} columns={["D", "P"]} dataType={["text", "priority", "action"]}
                 searchRows={[]} filterRows={[]}
                 action = {documentList.filter(document=>document["T"]==2).map((item:any, index:number)=>{
+                  console.log(item)
                   return(
                     <div className="flex flex-row">
                       <FormDialog 

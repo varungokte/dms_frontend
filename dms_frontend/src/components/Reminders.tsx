@@ -1,9 +1,9 @@
 import { useState } from "react";
-import Search from "./BasicComponents/Search";
+//import Search from "./BasicComponents/Search";
 
 function Reminders() {
 
-  const [reminders, setReminders] = useState([
+  const [reminders] = useState([
     ["Lender Agent Agreement", "Bruce Wayne", "01/01/01", 2, 0],
     ["Power Purchase Agreement", "Kal-El", "02/02/02", 1, 2],
     ["Lender Agent Agreement", "Kara Zor-El", "03/03/03", 2, 0 ],
@@ -12,14 +12,14 @@ function Reminders() {
     ["Pledge Agreement", "Barry Allen", "06/06/07", 2, 0],
   ])
 
-  const [searchString, setSearchString] = useState("");
+  //const [searchString, setSearchString] = useState("");
   return (
     <div>
       <p className="text-3xl font-bold m-7">Reminders</p>
       <div className="flex flex-row m-3">
-        <div className=''>
+        {/* <div className=''>
           <Search setter={setSearchString} label="Search"/>
-        </div>
+        </div> */}
         
         <div className="flex-auto"> 
             Date filter

@@ -5,7 +5,7 @@ function Reports() {
   const [loanType, setLoanType] = useState("");
   const [zonalHead, setZonalHead] = useState("");
   const [date, setDate] = useState("");
-
+  console.log(loanType+zonalHead, date)
   return(
     <div>
       <p className="text-3xl font-bold m-7">Reports</p>

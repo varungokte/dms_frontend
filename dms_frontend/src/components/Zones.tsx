@@ -10,7 +10,7 @@ import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import useGlobalContext from "./../../GlobalContext";
 
 function Zones() {
-	const [zones, setZones] = useState({
+	const [zones] = useState({
 		"West & East Zone": [50, 1000, 122],
 		"South Zone": [21.22,3.1415926, 80],
 		"The Neutral Zone": [75,2,3],
@@ -29,11 +29,11 @@ function Zones() {
 	//value: array where [percent_complete, money(in crores of INR), total_number_of_facilities] NOTE all of these are of Number type
 
 	//Currency array: [currency(INR,USD,etc.), amount(crore,billion,etc.)]
-	const [currency, setCurrency] = useState(["INR", "Cr."])
+	const [currency] = useState(["INR", "Cr."])
 
 	//An array of arrays for details of a specific zone: [deal_1, deal_2, deal_3] where each deal is an array 
 	//Single deal details: [deal_id, deal_name, monitoring_manager, start_date]
-	const [zoneDetails, setZoneDetails] = useState([
+	const [zoneDetails] = useState([
 		[1,"Loan Company", "Loan Person", "01/01/01"],
 		[2,"Construction Company", "Construction Person", "02/02/02"]
 	]);

@@ -1,6 +1,5 @@
 
 import { useEffect, useState } from "react";
-import useGlobalContext from "../../../GlobalContext";
 import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
@@ -16,14 +15,12 @@ function SecurityDetails(props:any){
       setDisableFields(true)
   },[])
 
-  const [fieldList, setFieldList] = useState([
+  const [fieldList] = useState([
     { id:"S", name:"Share Percentage(%)", type:"number" },
     { id:"DV", name:"Date of Valuation", type:"date" },
     { unnecessaryComplication: true, id:"T", name:"Security Type", type:"select", options:["op1","op2"] },
     { unnecessaryComplication: true, id:"V", name:"Security Value", type:"text" }
   ])
-
-  const {createLoan} = useGlobalContext();
 
   const submitForm = (e:any) => {
     e.preventDefault();

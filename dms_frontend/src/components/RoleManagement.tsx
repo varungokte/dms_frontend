@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible"
 import PermissionSetter from "./BasicComponents/PermissionSetter";
 import useGlobalContext from "./../../GlobalContext";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import Search from "./BasicComponents/Search";
+//import Search from "./BasicComponents/Search";
 import FormDialog from "./BasicComponents/FormDialog";
 function RoleManagement(){
   //const {addRole, getRolesList}= useGlobalContext();
 
-  const [searchString, setSearchString] = useState("");
+  //const [searchString, setSearchString] = useState("");
   const [open, setOpen] = useState<boolean[]>([]);
 
-  const [roleList, setRoleList] = useState([
+  const [roleList] = useState([
     { N: "MAKER", P:{
       "Loan Account":["access", "edit"]}
     },
@@ -63,9 +63,9 @@ function RoleManagement(){
 			<p className="text-3xl font-bold m-7">Role Management</p>
       <br/>
       <div className="flex flex-row">
-        <div className="flex-auto">
+        {/* <div className="flex-auto">
           <Search label="Search Role" setter={setSearchString} />
-        </div>
+        </div> */}
         <div>
           <FormDialog
             triggerText="Create New Role" triggerClassName={CreateButtonStyling}

@@ -11,7 +11,7 @@ import useGlobalContext from "./../../GlobalContext";
 function CriticalCases() {
   //An array of critical cases
   //Each critical case is an array where: [Document Name, Document Type, Date, Priority(will always be HIGH)]
-  const [defaultData, setDefaultData] = useState([
+  const [defaultData] = useState([
     ["Lender's Agent Agreeement", "PDF", "01/01/01"],
     ["Lender's Agent Agreeement", "PNG", "02/02/02"],
     ["Power Purchase Agreement", "PDF", "03/03/03"]
