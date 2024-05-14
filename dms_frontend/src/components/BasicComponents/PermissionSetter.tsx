@@ -5,11 +5,11 @@ function PermissionSetter(props:any){
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
   const [permissionList, setPermissionList] = useState({
-    "Loan Account": [],
-    "Product": [],
-    "Transaction Documents": [],
-    "Compliance Documents": [],
-    "Covenants": [],
+    "Loan Account": ["access", "view", "delete","add","edit"],
+    "Product": ["access", "view", "delete","add","edit"],
+    "Transaction Documents": ["access", "view", "delete","add","edit"],
+    "Compliance Documents": ["access", "view", "delete","add","edit"],
+    "Covenants": ["access", "view", "delete","add","edit"],
   });
 
   useEffect(()=>{

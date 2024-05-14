@@ -20,7 +20,14 @@ export const RegistrationPage = () => {
 			P: password,
 			MU: maximumUsers,
 			Z: zone,
-			RM: reportingManager
+			RM: reportingManager,
+			UP:{
+				"Loan Account": ["access", "view", "delete","add","edit"],
+				"Product": ["access", "view", "delete","add","edit"],
+				"Transaction Documents": ["access", "view", "delete","add","edit"],
+				"Compliance Documents": ["access", "view", "delete","add","edit"],
+				"Covenants": ["access", "view", "delete","add","edit"],
+			}
 		}
 
 		RegisterAdmin(data).then((res:any)=>{
