@@ -40,11 +40,14 @@ export const LoginPage = () => {
           return;
         }
         if (res==409){
-          console.log("REDIRECTING TO VERIFY")
-          navigate("/verify")}
+          setErrorMessage(<p className="text-red-600">Inactive User. Contact your admin</p>)
+          /* console.log("REDIRECTING TO VERIFY")
+          navigate("/verify") */
+        }
         else{
           console.log("NAVIGAING TO DASHOARD")
-          navigate('/')}
+          navigate('/')
+        }
 			})
 	}
 

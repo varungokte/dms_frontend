@@ -89,6 +89,7 @@ const getDecryptedToken = async () => {
 }
 
 //Error 503 -> Maintainance Mode
+//Error 409 -> 
 const sendOTP = async () => {
 	try {
 		const token = getEncryptedToken();

@@ -10,7 +10,8 @@ function PrivateRoutes(){
     getDecryptedToken().then(token=>{
       setToken(token);
     });
-  },[])
+  },[token])
+
   if (token)
     return <EmailVerification token={token} />
   else
@@ -18,8 +19,6 @@ function PrivateRoutes(){
 }
 
 function EmailVerification(props:any){
-  if (!props.token){
-    return <Navigate to="/login"/>}
   return props.token["S"]==2?<MenuRouter />:<Navigate to="/verify"/>
 }
 

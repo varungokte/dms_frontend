@@ -32,6 +32,7 @@ function VerificationComponent(){
   const clickSubmit = (e:any) => {
     e.preventDefault();
     verifyOTP(otp).then(res => {
+      console.log("RES",res)
       const decoded = decodeToken(res);
       console.log(decoded);
       if (!res || !decoded)
@@ -67,7 +68,7 @@ function VerificationComponent(){
       <br/>
       <button type="submit" className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Submit</button>
     </form>,
-    <button onClick={clickContinue} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
+    <button onClick={()=>clickContinue()} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
     ]
 
   return (
