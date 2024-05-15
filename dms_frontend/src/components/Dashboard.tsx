@@ -27,7 +27,7 @@ function Dashboard() {
 			<br/>
 			<div>
 				<div >
-				<Tree data={orgChart} draggable={false} zoomable={false} dimensions={{height:100000, width:1000000}} />
+				{/* <Tree data={orgChart} draggable={false} zoomable={false} dimensions={{height:100000, width:1000000}} /> */}
 				</div>
 				
 			</div>

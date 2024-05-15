@@ -8,17 +8,26 @@ function PrivateRoutes(){
   const {getDecryptedToken} = useGlobalContext();
   useEffect(()=>{
     getDecryptedToken().then(token=>{
-      setToken(token);
-    });
+      if (token)
+        setToken(token);
+      else
+        setToken("INVALID");
+    }).catch(()=>{
+      setToken("INVALID");
+    })
   },[token])
 
-  if (token)
+  if (token=="INVALID")
+    return <Navigate to="/login"/>
+  else if (token)
     return <EmailVerification token={token} />
   else
     return <></>
 }
 
 function EmailVerification(props:any){
+  if (!props.token)
+    return <Navigate to="/login"/>
   return props.token["S"]==2?<MenuRouter />:<Navigate to="/verify"/>
 }
 

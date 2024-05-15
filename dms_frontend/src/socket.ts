@@ -4,7 +4,7 @@ import useGlobalContext from "./../GlobalContext";
 const {getEncryptedToken} = useGlobalContext();
 const token =  getEncryptedToken();
 
-const socket = io("https://dms-pbe2.onrender.com", {
+const socket = io("http://192.168.1.9:3000", {
   query:{ data: token }
 })
 
