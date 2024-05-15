@@ -1,8 +1,8 @@
-import Tree from "react-d3-tree";
+//import Tree from "react-d3-tree";
 
 function Dashboard() {	
 
-	const orgChart = {
+	/* const orgChart = {
 		name: "Emperor Palpatine",
 		children: [
 			{
@@ -20,7 +20,7 @@ function Dashboard() {
 				name: "Wilhuff Tarkin"
 			}
 		]
-	}
+	} */
 	return (
 		<div>
 			<div className="text-center my-4 font-bold text-5xl text-custom-1">DASHBOARD</div>
