@@ -1,7 +1,15 @@
 //import Tree from "react-d3-tree";
 
-function Dashboard() {	
+import { useEffect } from "react";
+import useGlobalContext from "./../../GlobalContext";
 
+function Dashboard() {	
+	const {getDecryptedToken} = useGlobalContext();
+	useEffect(()=>{
+		getDecryptedToken().then(res=>{
+			console.log(res);
+		})
+	},[])
 	/* const orgChart = {
 		name: "Emperor Palpatine",
 		children: [

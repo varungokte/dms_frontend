@@ -22,13 +22,14 @@ const handleEncryption = async (data:object) => {
 }
 
 const handleDecryption = async (text:string) => {
+	let decryptedString="";
 	try{
-		const decryptedString = await CryptoJS.AES.decrypt(text, encryption_key).toString(CryptoJS.enc.Utf8);
+		decryptedString = await CryptoJS.AES.decrypt(text, encryption_key).toString(CryptoJS.enc.Utf8);
 		const obj = await JSON.parse(decryptedString);
 		return await obj;
 	}
 	catch (err){
-		console.log(err);
+		return await decryptedString
 	}
 }
 
@@ -81,8 +82,8 @@ const getDecryptedToken = async () => {
 	if (token==null)
 		return null;
 	const decryptedToken = await handleDecryption(token);
-	const decodedToken = await decodeToken(decryptedToken["TKN"]);
-	const valid = isExpired(decryptedToken["TKN"]);
+	const decodedToken = await decodeToken(decryptedToken);
+	const valid = isExpired(decryptedToken);
 	if (!valid)
 		return null;
 	return await decodedToken;
@@ -117,11 +118,15 @@ const verifyOTP = async (otp:any) => {
 		});
 		console.log(response)
 
-		console.log(response["data"])
-		return response["data"];
+		if (response.status==200){
+			return {status:200, data:response["data"]}
+		}
+		else
+			return {status:response.status, data:null}
 	}
-	catch(error){
-		throw error;
+	catch(error:any){
+		if (error.status)
+			return {status:error.status, data:null}
 	}
 }
 

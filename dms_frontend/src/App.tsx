@@ -3,8 +3,6 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { RegistrationPage } from './components/AuthPages/RegistrationPage';
 import { LoginPage } from './components/AuthPages/LoginPage';
 import PrivateRoutes from './PrivateRoutes';
-import VerificationPage from './components/AuthPages/VerificationPage';
-
 
 function App() {
   return (
@@ -12,7 +10,6 @@ function App() {
       <Routes>
         <Route path="/register" element={<RegistrationPage />} />
         <Route path='/login' element={<LoginPage />} />
-        <Route path="/verify" element={<VerificationPage/>} />
         <Route path='/*' element={<PrivateRoutes />} />
       </Routes>
     </BrowserRouter>

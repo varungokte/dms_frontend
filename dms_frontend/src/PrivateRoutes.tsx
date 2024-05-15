@@ -1,13 +1,14 @@
-import { Navigate } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import useGlobalContext from "../GlobalContext";
 import { MenuRouter } from "./MenuRouter";
 import { useEffect, useState } from "react";
+import VerificationPage from "./components/AuthPages/VerificationPage";
 
 function PrivateRoutes(){
   const [token, setToken] = useState<any>(null);  
   const {getDecryptedToken} = useGlobalContext();
   useEffect(()=>{
-    getDecryptedToken().then(token=>{
+    getDecryptedToken().then((token:any)=>{
       if (token)
         setToken(token);
       else
@@ -16,9 +17,8 @@ function PrivateRoutes(){
       setToken("INVALID");
     })
   },[token])
-
   if (token=="INVALID")
-    return <Navigate to="/register"/>
+    return <Navigate to="/login"/>
   else if (token)
     return <EmailVerification token={token} />
   else
@@ -28,7 +28,19 @@ function PrivateRoutes(){
 function EmailVerification(props:any){
   if (!props.token)
     return <Navigate to="/login"/>
-  return props.token["S"]==2?<MenuRouter />:<Navigate to="/verify"/>
+  if (props.token["S"]==2){
+    return <MenuRouter />
+  }
+  else
+    return (
+    <>
+      <Routes>
+        <Route path="/verify" element={<VerificationPage/>} />
+      </Routes>
+      <Navigate to="/verify"/>
+    </>
+      
+  )
 }
 
 export default PrivateRoutes;

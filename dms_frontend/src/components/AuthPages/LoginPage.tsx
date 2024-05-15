@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import useGlobalContext from "../../../GlobalContext";
 
@@ -14,7 +14,17 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState(<></>);
 
 	const navigate = useNavigate();
-	const { LoginUser } = useGlobalContext();
+	const { LoginUser, getDecryptedToken } = useGlobalContext();
+
+  useEffect(()=>{
+    getDecryptedToken().then(res=>{
+      if (!res)
+        return;
+      //@ts-ignore
+      else if (res["S"]==2)
+        navigate("/")
+    })
+  },[])
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();

@@ -1,16 +1,15 @@
 import { useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { decodeToken } from "react-jwt";
 import { useNavigate } from "react-router-dom";
 
 function VerificationComponent(){
-  const {sendOTP, verifyOTP,} = useGlobalContext();
+  const {sendOTP, verifyOTP, getDecryptedToken} = useGlobalContext();
 	const navigate = useNavigate();
 
   const [message, setMessage] = useState(<></>)
   const [otp, setOtp] = useState(0);
-  const [newToken, setNewToken] = useState("");
   const [inputField, setInputField] = useState(0);
+  const [okToContinue, setOkToContinue] = useState(false);
 
   const [heading, setHeading] = useState(
     <div>
@@ -33,21 +32,23 @@ function VerificationComponent(){
   const clickSubmit = (e:any) => {
     e.preventDefault();
     verifyOTP(otp).then(res => {
-      console.log("RES",res)
-      const decoded = decodeToken(res);
-      console.log(decoded);
-      if (!res || !decoded)
-        setMessage(<p className="text-red-600">Try Again</p>)
-      else {
-        //@ts-ignore
-        setNewToken(res);
-        setInputField(2)
+      console.log("RES",res);
+      if (res?.status==412)
+        navigate("/");
+      else if (res?.status==200){
+        localStorage.setItem("Beacon-DMS-token", res.data);
+        getDecryptedToken().then(()=>{
+          setInputField(2);
+          
+          setOkToContinue(true);
+        }).catch(()=>{
+          setMessage(<p className="text-red-600">Try Again</p>)
+        })
       }
     })
   };
 
   const clickContinue = () =>{
-    localStorage.setItem("Beacon-DMS-token", newToken);
     navigate("/");
   }
 
@@ -63,7 +64,7 @@ function VerificationComponent(){
       <br/>
       <button type="submit" className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Submit</button>
     </form>,
-    <button onClick={()=>clickContinue()} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
+    <button disabled={!okToContinue} onClick={()=>clickContinue()} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
     ]
 
   return (
