@@ -10,18 +10,10 @@ function FormDialogDocuments(props:any){
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [currentTab, setCurrentTab] = useState("details");
-
+  const [covType, setCovType] = useState(-1);
   useEffect(()=>{
-    console.log("FIELD VALUES OF THE COVENANT", props.fieldValues)
-    if (props.edit){
-      props.setter(props.currentFields);
-      setPrefillValues(props.currentFields)
-    }
-  },[props.fieldValues]);
-
-  useEffect(()=>{
-    console.log("th prefill values", prefillValues);
-  },[])
+    console.log("THESE are he prefil vla", prefillValues)
+  },[prefillValues])
 
   const validateRequiredFields=()=>{
     const data:any={};
@@ -71,17 +63,17 @@ function FormDialogDocuments(props:any){
           <AlertDialogTitle className="text-2xl font-normal">{props.formTitle}</AlertDialogTitle>
           <hr/>
         </AlertDialogHeader>
-        <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full">
+        <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details">Document Details</TabsTrigger>
             <TabsTrigger value="upload">File Upload</TabsTrigger>
           </TabsList>
-          <TabsContent value="details">
+          <TabsContent value="details" className="border">
             <Card>
               <CardHeader>
                 <CardTitle>Document Details</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
+              <CardContent className="">
                 <form onSubmit={(e)=>{props.formSubmit(e);}}>
                   {props.detailForm.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
@@ -95,16 +87,32 @@ function FormDialogDocuments(props:any){
                         return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]} required={field["required"]?true:false} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
                     }
                     else if (field["category"]=="grid"){
-                      let gridStyle = "grid grid-cols-"; 
-                      if (field["customWidth"])
-                        gridStyle = "flex flex-row"
-                      else
-                        gridStyle = gridStyle + field["row"];
                       return(
                         <div key={index+"grid"}>
                           <div key={index+"grid name"} className="text-2xl font-medium my-2">{field["sectionName"]}</div>
-                          <div key={index+"gridz"} className={gridStyle}>
+                          <div key={index+"gridz"} className={`grid grid-cols-${field["row"]}`}>
                             {field.fields.map((item:any, itemIndex:number)=>{
+                              if (item["id"]=="T")
+                              return(
+                                <div key={index+item["id"]+"s_0"} className="mb-5">
+                                  <label key={index+item["id"]+"s_1"} htmlFor={item["id"]} className="font-light text-lg">{item["name"]} {item["required"]?<span className="text-red-600">*</span>:""}</label>
+                                  <br/>
+                                  <select key={index+item["id"]+"s_2"} id={item["id"]} 
+                                    className="bg-white border rounded-if w-full h-10/12 p-4"
+                                    value={prefillValues[item["id"]]}
+                                    required={item["required"]}
+                                    onChange={(e)=>props.setter((curr:any)=>{curr[item["id"]]=Number(e.target.value)+1; console.log("CURR TYPE",e.target.value); setCovType(Number(e.target.value));  return curr})
+                                    } 
+                                  >
+                                    <option key={index+"_0"} value={""}>Select {item["name"]}</option>
+                                    {item["options"].map((option:any,optionIndex:any)=>{
+                                      return <option key={index+"_"+optionIndex} selected={prefillValues[props.id]==optionIndex} value={optionIndex}>{option}</option>
+                                    })}
+                                  </select>
+                                </div>
+                              )
+                              if (item["id"]=="F" && covType!==0)
+                                  return<></>
                               if (item["type"]=="select")
                                 return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>
                               else
@@ -125,13 +133,15 @@ function FormDialogDocuments(props:any){
               <CardHeader>
                 <CardTitle>File Upload</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-2">
-              <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} required={props.uploadForm["required"]?true:false} fileList={props.fileList} fileSetter={props.fileSetter} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} />
+              <CardContent className="">
+                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} required={props.uploadForm["required"]?true:false} fileList={props.fileList} fileSetter={props.fileSetter} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} />
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-        <AlertDialogFooter>
+        <br/>
+        <br/>
+        <AlertDialogFooter className="bottom-0 h-12 mt-20">
           <AlertDialogCancel className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</AlertDialogCancel>
           <button className={SubmitButtonStyling} onClick={()=>{currentTab=="details"?validateRequiredFields():submitDetails()}}>{currentTab=="details"?"Next":"Save"}</button>
         </AlertDialogFooter>

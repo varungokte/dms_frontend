@@ -18,7 +18,7 @@ function PrivateRoutes(){
   },[token])
 
   if (token=="INVALID")
-    return <Navigate to="/login"/>
+    return <Navigate to="/register"/>
   else if (token)
     return <EmailVerification token={token} />
   else

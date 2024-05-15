@@ -1,7 +1,7 @@
 import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
-import {socket} from "./socket";
+//import {socket} from "./socket";
 import useGlobalContext from './../GlobalContext';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
@@ -43,7 +43,7 @@ export const MenuRouter = () => {
 	const [hover,setHover] = useState(-1);
 	const navigate = useNavigate();
 	const {getDecryptedToken} = useGlobalContext();
-
+/* 
 	const [socketIsConnected, setSocketIsConnected] = useState( socket.connected);
 
 	const onConnect = () => {
@@ -74,7 +74,7 @@ export const MenuRouter = () => {
 			console.log("RECIEVE",data)
 		})
 	},[])
-
+ */
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
 		navigate("/login");
@@ -95,7 +95,7 @@ export const MenuRouter = () => {
 			<DropdownMenu>
 				<DropdownMenuTrigger className='mb-3 mx-6'>
 					<div className="flex flex-row">
-						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={socketIsConnected}/></div>
+						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={true/* socketIsConnected */}/></div>
 						<div className="text-left mx-3">
 							<p>{/* {res["N"]} */}Test User</p>
 							<p className="font-light">No Role</p>
@@ -109,7 +109,7 @@ export const MenuRouter = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>);
 		})
-	},[socketIsConnected])
+	},[/* socketIsConnected */])
 	
 	const [txnTestData] = useState([
     ["ABC123", "Mortgage", "01/01/01", 

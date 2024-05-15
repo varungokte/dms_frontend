@@ -2,9 +2,9 @@ import { useState } from "react";
 import { Table } from "@/components/ui/table";
 import useGlobalContext from "./../../../GlobalContext";
 
-import { PriorityValues, EnumIteratorValues, EnumIteratorKeys, TransactionDocumentTypes } from "../BasicComponents/Constants";
-import Search from "../BasicComponents/Search";
-import Filter from "../BasicComponents/Filter";
+import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes } from "../BasicComponents/Constants";
+/* import Search from "../BasicComponents/Search";
+import Filter from "../BasicComponents/Filter"; */
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
@@ -27,8 +27,8 @@ function LoanDocuments(props: any) {
     { "N":2, "T":1, "P":2, "PL":"Pune", "EL":"Pune", "SD":"15/08/17", "ED":"15/08/17" },
   ]);
   
-  const [searchString, setSearchString] = useState("");
-  const [priority, setPriority] = useState(-1);
+  //const [searchString, setSearchString] = useState("");
+  //const [priority, setPriority] = useState(-1);
   const [newFiles, setNewFiles] = useState<any>([]);
 
   const {createDocument, handleEncryption } = useGlobalContext();
@@ -75,10 +75,9 @@ function LoanDocuments(props: any) {
     return res;
   }
 
-
   const obliterateDocument = (userIndex:number) => {
     const userid=0;//get user from index
-    console.log(userid+userIndex);
+    userid+userIndex;
     /* deleteDocument(userid).then(res=>{
       console.log(res);
     }).catch(err=>{
@@ -89,36 +88,36 @@ function LoanDocuments(props: any) {
   return (
     <div className="bg-white rounded-xl">
       <br/>
-			<p className="text-2xl font-bold m-7 mt-5">{props.label}</p>
+			{/* <p className="text-2xl font-bold m-7 mt-5">{props.name}</p> */}
       <Toaster/>
       <div className="flex flex-row">
         <div className=''>
-          <Search setter={setSearchString} label="Search" />
+          {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
 
         <div className="flex-auto">
-          <Filter setter={setPriority} listsAreSame={false} 
+          {/* <Filter setter={setPriority} listsAreSame={false} 
             labelList={EnumIteratorValues(PriorityValues)} valueList={EnumIteratorKeys(PriorityValues)}
             setPlaceholder={true} placeholderValue={[-1,"Priority"]} 
-          />
+          /> */}
         </div>
       
         <div className="mr-3">
           <FormDialogDocuments
-            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formTitle={props.label} formSubmit={addDocument}
+            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} formSubmit={addDocument}
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
           />
-        </div>        
+        </div>
       </div> 
       <div className="m-5">
         <Table className="border rounded-3xl" style={{borderRadius:"md"}}>
           <HeaderRows className="" headingRows={[["Document Name"],["File Type"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
 
           <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["transaction","file","priority","text","text","text","text","action"]}
-            searchRows={searchString==""?[]:[searchString,"N"]} filterRows={priority==-1?[]:[priority,"P"]}
+            searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
             action = {docData.map((item:any, index:number)=>{
-              console.log(item)
+              item+=1;
               return(
                 <div className="flex flex-row">
                   <FormDialogDocuments

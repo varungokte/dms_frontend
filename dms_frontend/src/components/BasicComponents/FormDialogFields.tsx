@@ -17,7 +17,6 @@ function TextField (props:{index:number, id:string, name: string, type: string, 
 
 function SelectField (props:{index:number, id:string, name: string, options: string[], required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
   try{
-    console.log("THE VALUE OF SELECT ", props.prefillValues[props.id])
     return(
       <div key={props.index+props.id+"s_0"} className="mb-5">
         <label key={props.index+props.id+"s_1"} htmlFor={props.id} className="font-light text-lg">{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>

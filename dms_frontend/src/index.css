@@ -3,20 +3,29 @@
 @tailwind utilities;
 
 body{
-    background-color: rgba(240, 237, 237, 0.815);
+	background-color: rgba(240, 237, 237, 0.815);
 }
 
 .tableCell:hover{
-    color: blue;
-    background-color:#e2e8f0;
-    cursor:pointer
+	color: blue;
+	background-color:#e2e8f0;
+	cursor:pointer
 }
 
 .pageLink:hover{
-    color:rgba(80, 65, 188, 1);
-    background-color: white;
+	color:rgba(80, 65, 188, 1);
+	background-color: white;
 }
 
 .icon:hover{
-    color: yellow;
+	color: yellow;
+}
+
+.page-heading{
+	font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+
+	font-weight: 600;
+	line-height: 32px;
+	letter-spacing: -0.006em;
+	text-align: left;    
 }

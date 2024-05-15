@@ -11,17 +11,18 @@ import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
 
+
 function LoanCovenants(props:any){
   //const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(1);
   const [newFiles, setNewFiles] = useState<any>([]);
 
   const [documentList] = useState([
-    { "T":1, "D": "An example of a periodic covenant", "F":2, "SD":"1/2/3", "ED":"2/2/3" },
-    { "T":2, "D": "An example of an event-based covenant", "P":2 }
+    { T:1, D: "An example of a periodic covenant", F:2, SD:"1/2/3", ED:"2/2/3" },
+    { T:2, D: "An example of an event-based covenant", P:2 }
   ]);
 
-  const [fieldValues, setFieldValues] = useState({});
+  const [fieldValues, setFieldValues] = useState<any>({});
 
   const [fieldList] = useState([
     {category:"grid", row:2, fields:[
@@ -42,8 +43,11 @@ function LoanCovenants(props:any){
     { category:"single", id: "U", name:"Upload Document", type:"file", }
   );
 
-  const addCovenant = (e:any) => {
-    e.preventDefault();
+  const addCovenant = () => {
+    if (fieldValues["F"] && fieldValues["T"]!=1)
+      delete fieldValues["F"];
+
+    console.log(fieldValues)
   };
 
   const editCovenant = (e:any) => {
@@ -58,7 +62,7 @@ function LoanCovenants(props:any){
   return(
     <div className="bg-white rounded-xl">
       <br/>
-			<p className="text-2xl font-bold m-7 mt-5">Covenants</p>
+			{/* <p className="text-2xl font-bold m-7 mt-5">Covenants</p> */}
 
       <div className="flex flex-row">
         {/* <div>
@@ -80,23 +84,24 @@ function LoanCovenants(props:any){
           />
         </div>
       </div>
-
-      <div className="m-5">
-        <Table>
+      <br/>
+      <div className="">
+        <Table className="border rounded-2xl">
           {priority==1
             ?<><HeaderRows headingRows={[["Description"],["Frequency"], ["Start Date"],["End Date"], ["Action"]]} />
               <BodyRowsMapping
                 list={documentList.filter(document=>document["T"]==1)} columns={["D", "F", "SD", "ED"]} dataType={["text", "frequency", "text", "text", "action"]}
                 searchRows={[]} filterRows={[]}
                 action = {documentList.filter(document=>document["T"]==1).map((item:any, index:number)=>{
-                  console.log(item)
+                  item;
                   return(
                     <div className="flex flex-row">
-                      <FormDialog 
-                        triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>} formSize="medium"
-                        formTitle="Edit User" formSubmit={editCovenant} submitButton="Edit User"
-                        form={fieldList} setter={setFieldValues}
-                        edit={true} fieldValues={fieldValues}  currentFields={documentList[index]}
+                      <FormDialogDocuments
+                        triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName=""
+                        formTitle={props.label} formSubmit={addCovenant}
+                        detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+                        uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
+                        edit={true} currentFields={documentList[index]}
                       />
                       <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
                         actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCovenant} 

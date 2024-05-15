@@ -6,7 +6,7 @@ import chevron_down from "./../static/chevron-down.svg";
 
 function HeaderRows(props:any){
   return(
-    <TableHeader className={props.className}>
+    <TableHeader className="bg-custom-h">
       <TableRow>
       {props.headingRows.map((heading:any,index:number)=>{
         return <TableHead key={index} className={heading.length>1?heading[1]:""}>{heading[0]}</TableHead>
@@ -104,7 +104,7 @@ const handleText = (item:String, cellClassName:string, uniqueIndex:string) => {
 const handlePriority = (index:number, cellClassName:string, uniqueIndex:string) => {
   return(
     <TableCell key={uniqueIndex}>
-      <div className={`${PriorityStyling[index]} rounded-lg text-center ${cellClassName}`}>
+      <div className={`${PriorityStyling[index]} text-center ${cellClassName}`} style={{borderRadius:"2.7px"}}>
         {PriorityValues[index]}
       </div>
     </TableCell>

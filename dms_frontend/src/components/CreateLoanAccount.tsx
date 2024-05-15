@@ -14,6 +14,7 @@ import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
 import { useLocation } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
 import LoanCovenants from "./LoanAccountComponents/LoanCovenants";
+import LoanConditions from "./LoanAccountComponents/LoanConditions";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
@@ -57,19 +58,21 @@ function CreateLoanAccount() {
   const [formSections] = useState([
     { name: "Create Agreement ID", component: GenerateLoanID },
     { name: "Basic Details", component: BasicDetails },
-    { name: "Security Details", component: SecurityDetails, show: showSecurityDetails},
-    { name: "Bank Details", component: BankDetails},
-    { name: "Contact Details", component: ContactDetails},
-    { name: "Relationship Mapping", component: RelationshipMapping},
-    { name: "Transaction Documents", component: LoanDocuments, label: "Transaction Documents"},
-    { name: "Compliance Documents", component: LoanDocuments, label: "Compliance Documents"},
+    { name: "Security Details", component: SecurityDetails, show: showSecurityDetails },
+    { name: "Bank Details", component: BankDetails },
+    { name: "Contact Details", component: ContactDetails },
+    { name: "Relationship Mapping", component: RelationshipMapping },
+    { name: "Transaction Documents", component: LoanDocuments },
+    { name: "Compliance Documents", component: LoanDocuments },
     { name: "Covenants", component: LoanCovenants },
-    { name: "Ratings", component: Ratings }
+    { name: "Conditions Precedent", component: LoanConditions },
+    { name: "Conditions Subsequent", component: LoanConditions },
+    { name: "Ratings", component: Ratings },
   ])
 	
   return(
     <div style={{width:"relative"}}>
-			<p className="text-3xl font-bold mx-7 my-2">{(actionType.charAt(0).toUpperCase()+actionType.toLowerCase().slice(1))} Loan Account</p>
+			<p className="text-3xl font-bold mx-7 my-2 page-heading">{(actionType.charAt(0).toUpperCase()+actionType.toLowerCase().slice(1))} Loan Account</p>
       {AID?<p className="mx-7 mt-3 text-lg"><span className="font-normal">Agreement ID: </span><span className="text-custom-1">{AID}</span></p>:""}
       <br/>
       <div className="bg-white mx-7 p-2 rounded-xl">
@@ -103,7 +106,7 @@ function CreateLoanAccount() {
               currentSection: currentSection,
               setCurrentSection: setCurrentSection,
               goToNextSection: goToNextSection,
-              label: (formSections[currentSection].label?formSections[currentSection].label:""),
+              label: formSections[currentSection].name,
               setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:"",
               showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:"",
               setOkToFrolic: currentSection==0?setOkToFrolic:"",

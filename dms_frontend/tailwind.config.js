@@ -19,7 +19,8 @@ module.exports = {
     extend: {
       colors: {
         custom: {
-          1: "rgba(80, 65, 188, 1)"
+          1: "rgba(80, 65, 188, 1)",
+          h: "rgba(248, 250, 252, 1)"
         },
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
