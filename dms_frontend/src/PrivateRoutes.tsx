@@ -8,16 +8,22 @@ function PrivateRoutes(){
   const [token, setToken] = useState<any>(null);  
   const {getDecryptedToken} = useGlobalContext();
   useEffect(()=>{
-    getDecryptedToken().then((token:any)=>{
+    console.log("repeat private routes?")
+    getDecryptedToken().then((resToken:any)=>{
       //console.log("tkn", token)
-      if (token)
-        setToken(token);
+      console.log(token,resToken)
+      if (JSON.stringify(token)===JSON.stringify(resToken)){
+        console.log("DUPLICAT")
+        return}
+      if (resToken)
+        setToken(resToken);
       else
         setToken("INVALID");
     }).catch(()=>{
       setToken("INVALID");
     })
-  },[token])
+  },[token]);
+
   if (token=="INVALID")
     return <Navigate to="/login"/>
   else if (token)

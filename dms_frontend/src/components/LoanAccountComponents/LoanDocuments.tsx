@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table } from "@/components/ui/table";
 import useGlobalContext from "./../../../GlobalContext";
 
@@ -26,6 +26,10 @@ function LoanDocuments(props: any) {
     { "N":1, "T":2, "P":2, "PL":"Surat", "EL":"Surat", "SD":"15/08/17", "ED":"15/08/17" },
     { "N":2, "T":1, "P":2, "PL":"Pune", "EL":"Pune", "SD":"15/08/17", "ED":"15/08/17" },
   ]);
+
+  useEffect(()=>{
+    console.log("RENDERNzg new component")
+  })
   
   //const [searchString, setSearchString] = useState("");
   //const [priority, setPriority] = useState(-1);
@@ -35,7 +39,7 @@ function LoanDocuments(props: any) {
   const { toast } = useToast();
 
   const [fieldValues, setFieldValues] = useState({
-    "N":-1, "T":[],
+    "N":-1, "T":"",
     "SD":"", "ED":"",
     "EL":"", "PL":"",
   });
@@ -43,7 +47,7 @@ function LoanDocuments(props: any) {
   const [fieldList] = useState([
     { category:"single", id: "N", name:"Document Name", type:"select", options:EnumIteratorValues(TransactionDocumentTypes), required:false },
     {category:"grid", row:2, fields:[
-      { id: "T", name:"Document Type", type:"select", options:EnumIteratorValues(FileTypes), multiple:true, required:false },
+      { id: "T", name:"Document Type", type:"select", options:EnumIteratorValues(FileTypes), required:true },
       { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
     ]},
     { category:"grid", row:2, fields:[
@@ -110,7 +114,7 @@ function LoanDocuments(props: any) {
         </div>
       
         <div className="mr-3">
-          <FormDialogDocuments
+          <FormDialogDocuments key={-5} index={-5}
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} formSubmit={addDocument} type="doc"
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
@@ -124,17 +128,16 @@ function LoanDocuments(props: any) {
           <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["transaction","file","priority","text","text","text","text","action"]}
             searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
             action = {docData.map((item:any, index:number)=>{
-              item+=1;
               return(
                 <div className="flex flex-row">
-                  <FormDialogDocuments
-                    triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editDocument} type="doc"
-                    detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-                    uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-                    edit={true} currentFields={docData[index]}
-                  />
+                    <FormDialogDocuments key={index} index={index}
+                      triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editDocument}
+                      detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+                      uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
+                      edit={true} currentFields={docData[index]}
+                    />
                   <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
-                    actionClassName="text-white bg-red-600 rounded-lg hover:bg-red-600" actionLabel="Delete" actionFunction={obliterateDocument} currIndex={index}
+                    actionClassName="text-white bg-red-600 py-2 px-5 rounded-lg hover:bg-red-800" actionLabel="Delete" actionFunction={obliterateDocument} currIndex={index}
                   />
                 </div>
               )

@@ -27,9 +27,9 @@ function SelectField (props:{index:number, id:string, name: string, options: str
           onChange={(e)=>props.setter((curr:any)=>{curr[props.id]=Number(e.target.value)+1;  return curr})
           } 
         >
-          <option key={props.index+"_0"} value={""}>Select {props.name}</option>
+          <option key={props.index+"_0"} value={props.prefillValues[props.id]}>Select {props.name}</option>
           {props.options.map((option:any,optionIndex:any)=>{
-            return <option key={props.index+"_"+optionIndex} selected={props.prefillValues[props.id]==optionIndex} value={optionIndex}>{option}</option>
+            return <option key={props.index+"_"+optionIndex} value={optionIndex}>{option}</option>
           })}
         </select>
       </div>

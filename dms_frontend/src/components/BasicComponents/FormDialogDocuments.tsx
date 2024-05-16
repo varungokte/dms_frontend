@@ -13,6 +13,15 @@ function FormDialogDocuments(props:any){
   const [currentTab, setCurrentTab] = useState("details");
   const [fileType, setFileType] = useState(-1);
   const [covType, setCovType]= useState(-1);
+  const [enableUpload, setEnableUpload] = useState(false);
+
+  useEffect(()=>{
+    console.log("we are rendering the component",props)
+    if (props.edit){
+      props.setter(props.currentFields);
+      setPrefillValues(props.currentFields)
+    }
+  },[props.fieldValues])
 
   const validateRequiredFields=()=>{
     const data:any={};
@@ -28,15 +37,20 @@ function FormDialogDocuments(props:any){
         }
       }
     }
+    console.log("REQ LIST", data)
     for (let i=0; i<Object.keys(data).length; i++){
       const key = Object.keys(data)[i];
+      console.log("props.fieldvalies", props.fieldValues)
       const value = data[key];
+      console.log(key,value && (props.fieldValues[key]=="" || !props.fieldValues[key]))
       if (value && (props.fieldValues[key]=="" || !props.fieldValues[key])){
+        console.log("A")
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
         return false;
       }
     }
     setErrorMessage(<></>);
+    setEnableUpload(true);
     setCurrentTab("upload");
     return true;
   }
@@ -54,10 +68,6 @@ function FormDialogDocuments(props:any){
     setCurrentTab("details");
   },[open])
 
-  useEffect(()=>{
-    console.log()
-  })
-
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger className={props.triggerClassName}>{props.triggerText}</AlertDialogTrigger>
@@ -69,7 +79,7 @@ function FormDialogDocuments(props:any){
         <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="details" className="h-10">Document Details</TabsTrigger>
-            <TabsTrigger value="upload" className="h-10">File Upload</TabsTrigger>
+            <TabsTrigger value="upload" className="h-10" disabled={!enableUpload}>File Upload</TabsTrigger>
           </TabsList>
           <TabsContent value="details">
             <Card>

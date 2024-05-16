@@ -3,7 +3,7 @@ import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { useEffect } from 'react';
 
-const Base_Url = "https://g3117wlb-9000.inc1.devtunnels.ms/api/v1/allAPI/data";
+const Base_Url = "https://g3117wlb-9000.inc1.devtunnels.ms/api/v1/allAPI";
 const encryption_key = "JAIBAJRANGBALI";
 //old url=https://dms-pbe2.onrender.com/api/v1/allAPI
 

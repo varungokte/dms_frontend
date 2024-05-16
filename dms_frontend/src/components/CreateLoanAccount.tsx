@@ -22,7 +22,7 @@ function CreateLoanAccount() {
   const {getLoanFields, useTitle} = useGlobalContext();
 
   useTitle(`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`)
-
+  
   const [actionType] = useState(state.linkSource);
 
   const [loanId, setLoanId] = useState(state.linkSource=="CREATE"?"":state.loanId);
@@ -46,6 +46,10 @@ function CreateLoanAccount() {
       })
     }
   },[]);
+
+  useEffect(()=>{
+    console.log("rerendering create")
+  })
 
   const goToNextSection = () => {
     const sectionCount = formSections.length-1;
@@ -98,6 +102,7 @@ function CreateLoanAccount() {
           {loadingData?
             React.createElement (formSections[currentSection].component, 
             {
+              key:currentSection,
               actionType: actionType,
               loanId: loanId,
               setLoanId: setLoanId,
