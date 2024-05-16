@@ -128,6 +128,7 @@ function LoanDocuments(props: any) {
           <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["transaction","file","priority","text","text","text","text","action"]}
             searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
             action = {docData.map((item:any, index:number)=>{
+              item+1;
               return(
                 <div className="flex flex-row">
                     <FormDialogDocuments key={index} index={index}
