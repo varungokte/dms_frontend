@@ -3,7 +3,7 @@ import useGlobalContext from "../../../GlobalContext";
 import { useNavigate } from "react-router-dom";
 
 function VerificationComponent(){
-  const {sendOTP, verifyOTP, getDecryptedToken} = useGlobalContext();
+  const {sendOTP, verifyOTP} = useGlobalContext();
 	const navigate = useNavigate();
 
   const [message, setMessage] = useState(<></>)
