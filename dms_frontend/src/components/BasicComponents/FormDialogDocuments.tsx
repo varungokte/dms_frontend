@@ -117,6 +117,8 @@ function FormDialogDocuments(props:any){
                                         console.log("CURR",arr);*/
                                         curr[item["id"]]=num; 
                                         setFileType(num);  
+                                        if (props.type=="cov")
+                                          setCovType(num);
                                         return curr
                                       })} 
                                     >
