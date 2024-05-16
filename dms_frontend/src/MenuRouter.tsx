@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink } from 'react-router-dom';
+import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
 //import {socket} from "./socket";
@@ -194,6 +194,7 @@ export const MenuRouter = () => {
 						else
 							return <Route key={index} path={item.path} element={createElement(item.component)} />
 					})}
+					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
 					<Route key={"T"} path="/teams/:id" element={<TeamMembers/>} />
 					<Route key={"N"} path="/*" element={<>Not Found</>} />

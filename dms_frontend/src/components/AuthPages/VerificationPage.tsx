@@ -59,7 +59,7 @@ function VerificationComponent(){
     <form onSubmit={(e)=>clickSubmit(e)}>
       <label htmlFor="otp" className="start-0 text-lg font-medium  ml-5">Enter OTP Below</label>
       <br/>
-      <input id="otp" className="border rounded-xl h-10 w-11/12  ml-5" onChange={(e:any)=>setOtp(e.target.value)} type="text" />
+      <input id="otp" className="border rounded-xl h-10 w-11/12 px-3 ml-5" onChange={(e:any)=>setOtp(e.target.value)} type="text" />
       <br/>
       <br/>
       <button type="submit" className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Submit</button>

@@ -82,13 +82,11 @@ const getDecryptedToken = async () => {
 	if (token==null)
 		return null;
 	const decryptedToken = await handleDecryption(token);
-	console.log("decrypted", decryptedToken)
 	let decodedToken;
 	if (decryptedToken["TKN"])
 		decodedToken = await decodeToken(decryptedToken["TKN"]);
 	else
 		decodedToken = await decodeToken(decryptedToken);
-	console.log("decoded", decodedToken)
 	const valid = isExpired(decryptedToken);
 	if (!valid)
 		return null;
