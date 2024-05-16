@@ -139,7 +139,7 @@ function LoanDocuments(props: any) {
                     edit={true} currentFields={docData[index]}
                   />
                   <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
-                    actionClassName="text-white bg-red-600 py-2 px-5 rounded-lg hover:bg-red-800" actionLabel="Delete"/*  actionFunction={obliterateDocument} */ currIndex={index}
+                    actionClassName="text-white bg-red-600 py-2 px-5 rounded-lg hover:bg-red-800" actionLabel="Delete" actionFunction={obliterateDocument} currIndex={index}
                   />
                 </div>
               )
