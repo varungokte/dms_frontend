@@ -118,6 +118,7 @@ function LoanDocuments(props: any) {
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} formSubmit={addDocument} type="doc"
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
+            currentFields={fieldValues}
           />
         </div>
       </div> 
@@ -131,14 +132,14 @@ function LoanDocuments(props: any) {
               item+1;
               return(
                 <div className="flex flex-row">
-                    <FormDialogDocuments key={index} index={index}
-                      triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editDocument}
-                      detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-                      uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-                      edit={true} currentFields={docData[index]}
-                    />
+                  <FormDialogDocuments key={index} index={index}
+                    triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editDocument}
+                    detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+                    uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
+                    edit={true} currentFields={docData[index]}
+                  />
                   <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
-                    actionClassName="text-white bg-red-600 py-2 px-5 rounded-lg hover:bg-red-800" actionLabel="Delete" actionFunction={obliterateDocument} currIndex={index}
+                    actionClassName="text-white bg-red-600 py-2 px-5 rounded-lg hover:bg-red-800" actionLabel="Delete"/*  actionFunction={obliterateDocument} */ currIndex={index}
                   />
                 </div>
               )

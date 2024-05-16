@@ -18,7 +18,7 @@ function FormDialogDocuments(props:any){
   useEffect(()=>{
     console.log("we are rendering the component",props)
     if (props.edit){
-      props.setter(props.currentFields);
+      //props.setter(props.currentFields);
       setPrefillValues(props.currentFields)
     }
   },[props.fieldValues])
@@ -42,8 +42,8 @@ function FormDialogDocuments(props:any){
       const key = Object.keys(data)[i];
       console.log("props.fieldvalies", props.fieldValues)
       const value = data[key];
-      console.log(key,value && (props.fieldValues[key]=="" || !props.fieldValues[key]))
-      if (value && (props.fieldValues[key]=="" || !props.fieldValues[key])){
+      console.log(key,value && (prefillValues[key]=="" || !prefillValues[key]))
+      if (value && (prefillValues[key]=="" || !prefillValues[key])){
         console.log("A")
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
         return false;
@@ -112,9 +112,7 @@ function FormDialogDocuments(props:any){
                                     <br/>
                                     <select key={index+item["id"]+"s_2"} id={item["id"]} 
                                       className="bg-white border rounded-if w-full h-10/12 p-4"
-                                      value={prefillValues[item["id"]]}
-                                      //multiple={item["multiple"]}
-                                      size={1}
+                                      value={prefillValues[item["id"]]} 
                                       required={item["required"]}
                                       onChange={(e)=>props.setter((curr:any)=>{
                                         const num = Number(e.target.value)+1

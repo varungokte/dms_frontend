@@ -17,6 +17,7 @@ function TextField (props:{index:number, id:string, name: string, type: string, 
 
 function SelectField (props:{index:number, id:string, name: string, options: string[], required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
   try{
+    console.log("Select props",props.prefillValues[props.id]-1)
     return(
       <div key={props.index+props.id+"s_0"} className="mb-5">
         <label key={props.index+props.id+"s_1"} htmlFor={props.id} className="font-light text-lg">{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
@@ -27,7 +28,7 @@ function SelectField (props:{index:number, id:string, name: string, options: str
           onChange={(e)=>props.setter((curr:any)=>{curr[props.id]=Number(e.target.value)+1;  return curr})
           } 
         >
-          <option key={props.index+"_0"} value={props.prefillValues[props.id]}>Select {props.name}</option>
+          <option key={props.index+"_0"} value={props.prefillValues[props.id]-1}>Select {props.name}</option>
           {props.options.map((option:any,optionIndex:any)=>{
             return <option key={props.index+"_"+optionIndex} value={optionIndex}>{option}</option>
           })}

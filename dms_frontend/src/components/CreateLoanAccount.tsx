@@ -40,7 +40,6 @@ function CreateLoanAccount() {
   useEffect(()=>{
     if (actionType=="EDIT"){
       getLoanFields(loanId).then(res=>{
-        console.log("PRE EXISTING FIELDS",res);
         setPreexisting(res);
         setLoadingData(true);
       })

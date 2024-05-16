@@ -39,8 +39,8 @@ function VerificationComponent(){
         localStorage.setItem("Beacon-DMS-token", res.data);
         getDecryptedToken().then(()=>{
           setInputField(2);
-          
           setOkToContinue(true);
+          navigate("/");
         }).catch(()=>{
           setMessage(<p className="text-red-600">Try Again</p>)
         })
