@@ -29,6 +29,9 @@ function PrivateRoutes(){
 }
 
 function EmailVerification(props:any){
+  useEffect(()=>{
+    console.log("WERE here in email verify",props)
+  })
   if (!props.token)
     return <Navigate to="/login"/>
   if (props.token["S"]==2){
