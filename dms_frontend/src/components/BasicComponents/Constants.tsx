@@ -12,7 +12,7 @@ enum TransactionDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreeme
 
 enum FileStatusValue { "Pending", "In Progress", "Verified", "Overdue"};
 
-enum FileTypes {"PDF", "XLSX", "DOCX"};
+enum FileTypes {"Any", "PDF", "DOCX"};
 
 enum PriorityValues { "Low", "Medium", "High", };
 

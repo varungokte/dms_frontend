@@ -77,8 +77,7 @@ function LoanCovenants(props:any){
 
         <div className="mr-3">
           <FormDialogDocuments
-            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`}
-            formTitle={props.label} formSubmit={addCovenant}
+            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formTitle={props.label} formSubmit={addCovenant} type="cov"
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
           />
@@ -97,8 +96,7 @@ function LoanCovenants(props:any){
                   return(
                     <div className="flex flex-row">
                       <FormDialogDocuments
-                        triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName=""
-                        formTitle={props.label} formSubmit={addCovenant}
+                        triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" formTitle={props.label} formSubmit={addCovenant} type="cov"
                         detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
                         uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
                         edit={true} currentFields={documentList[index]}

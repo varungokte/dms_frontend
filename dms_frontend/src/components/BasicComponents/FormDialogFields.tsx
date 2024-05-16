@@ -23,7 +23,6 @@ function SelectField (props:{index:number, id:string, name: string, options: str
         <br/>
         <select key={props.index+props.id+"s_2"} id={props.id} 
           className="bg-white border rounded-if w-full h-10/12 p-4"
-          value={props.prefillValues[props.id]}
           required={props.required}
           onChange={(e)=>props.setter((curr:any)=>{curr[props.id]=Number(e.target.value)+1;  return curr})
           } 

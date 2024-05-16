@@ -4,16 +4,15 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, 
 import { SelectField, TextAreaField, TextField } from "./FormDialogFields";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
+import { FileTypes } from "./Constants";
 
 function FormDialogDocuments(props:any){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [currentTab, setCurrentTab] = useState("details");
-  const [covType, setCovType] = useState(-1);
-  useEffect(()=>{
-    console.log("THESE are he prefil vla", prefillValues)
-  },[prefillValues])
+  const [fileType, setFileType] = useState(-1);
+  const [covType, setCovType]= useState(-1);
 
   const validateRequiredFields=()=>{
     const data:any={};
@@ -55,20 +54,24 @@ function FormDialogDocuments(props:any){
     setCurrentTab("details");
   },[open])
 
+  useEffect(()=>{
+    console.log()
+  })
+
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger className={props.triggerClassName}>{props.triggerText}</AlertDialogTrigger>
-      <AlertDialogContent className={`bg-white overflow-y-scroll max-h-screen min-w-[800px] h-lvh `}>
+      <AlertDialogContent className={`bg-white overflow-y-scroll max-h-screen min-w-[800px] `}>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-normal">{props.formTitle}</AlertDialogTitle>
           <hr/>
         </AlertDialogHeader>
         <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="details">Document Details</TabsTrigger>
-            <TabsTrigger value="upload">File Upload</TabsTrigger>
+            <TabsTrigger value="details" className="h-10">Document Details</TabsTrigger>
+            <TabsTrigger value="upload" className="h-10">File Upload</TabsTrigger>
           </TabsList>
-          <TabsContent value="details" className="border">
+          <TabsContent value="details">
             <Card>
               <CardHeader>
                 <CardTitle>Document Details</CardTitle>
@@ -93,27 +96,40 @@ function FormDialogDocuments(props:any){
                           <div key={index+"gridz"} className={`grid grid-cols-${field["row"]}`}>
                             {field.fields.map((item:any, itemIndex:number)=>{
                               if (item["id"]=="T")
-                              return(
-                                <div key={index+item["id"]+"s_0"} className="mb-5">
-                                  <label key={index+item["id"]+"s_1"} htmlFor={item["id"]} className="font-light text-lg">{item["name"]} {item["required"]?<span className="text-red-600">*</span>:""}</label>
-                                  <br/>
-                                  <select key={index+item["id"]+"s_2"} id={item["id"]} 
-                                    className="bg-white border rounded-if w-full h-10/12 p-4"
-                                    value={prefillValues[item["id"]]}
-                                    required={item["required"]}
-                                    onChange={(e)=>props.setter((curr:any)=>{curr[item["id"]]=Number(e.target.value)+1; console.log("CURR TYPE",e.target.value); setCovType(Number(e.target.value));  return curr})
-                                    } 
-                                  >
-                                    <option key={index+"_0"} value={""}>Select {item["name"]}</option>
-                                    {item["options"].map((option:any,optionIndex:any)=>{
-                                      return <option key={index+"_"+optionIndex} selected={prefillValues[props.id]==optionIndex} value={optionIndex}>{option}</option>
-                                    })}
-                                  </select>
-                                </div>
-                              )
-                              if (item["id"]=="F" && covType!==0)
+                                return(
+                                  <div key={index+item["id"]+"s_0"} className="mb-5 mr-2">
+                                    <label key={index+item["id"]+"s_1"} htmlFor={item["id"]} className="font-light text-lg">{item["name"]} {item["required"]?<span className="text-red-600">*</span>:""}</label>
+                                    <br/>
+                                    <select key={index+item["id"]+"s_2"} id={item["id"]} 
+                                      className="bg-white border rounded-if w-full h-10/12 p-4"
+                                      value={prefillValues[item["id"]]}
+                                      //multiple={item["multiple"]}
+                                      size={1}
+                                      required={item["required"]}
+                                      onChange={(e)=>props.setter((curr:any)=>{
+                                        const num = Number(e.target.value)+1
+                                        /* let arr = curr[item["id"]];
+                                        console.log("OLD CURR",arr)
+                                        if (arr.includes(num))
+                                          arr = arr.filter((val:number)=>val!=num)
+                                        else
+                                          arr.push(num);
+                                        console.log("CURR",arr);*/
+                                        curr[item["id"]]=num; 
+                                        setFileType(num);  
+                                        return curr
+                                      })} 
+                                    >
+                                      <option key={index+"_0"} value={""}>Select {item["name"]}</option>
+                                      {item["options"].map((option:any,optionIndex:any)=>{
+                                        return <option key={index+"_"+optionIndex} value={optionIndex}>{option}</option>
+                                      })}
+                                    </select>
+                                  </div>
+                                )
+                              else if (item["id"]=="F" && covType!==0)
                                   return<></>
-                              if (item["type"]=="select")
+                              else if (item["type"]=="select")
                                 return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>
                               else
                                 return <span key={index+"_"+itemIndex} className="mr-3"><TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} required={item["required"]?true:false} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>  
@@ -134,7 +150,7 @@ function FormDialogDocuments(props:any){
                 <CardTitle>File Upload</CardTitle>
               </CardHeader>
               <CardContent className="">
-                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} required={props.uploadForm["required"]?true:false} fileList={props.fileList} fileSetter={props.fileSetter} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} />
+                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={props.fileList} fileSetter={props.fileSetter} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -150,9 +166,10 @@ function FormDialogDocuments(props:any){
   )
 };
 
-function FileField (props:{index:number, id:string, name:string, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function}) {
+function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function}) {
   const statusList = [<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
-
+  const [filePossibilities] = useState(["","application/pdf"])
+  const [error, setError] = useState(<></>)
   const renderList = () => {
     if (!props.fileList || props.fileList.length<1)
       return <></>;
@@ -174,6 +191,7 @@ function FileField (props:{index:number, id:string, name:string, required:boolea
 
   return (
     <div>
+      <p>Allowed file types: {FileTypes[props.fileType-1]} {/* {props.fileTypes.map(val=>{return FileTypes[val-1]}).toString()} */}</p>
       <div key={props.index+props.name+"f_0"} className="flex flex-row">
         <label key={props.index+props.name+"f_1"} htmlFor={props.id} className="bg-custom-1 text-white my-5 border rounded-if p-3">Choose File(s)</label>
         <input key={props.index+props.name+"f_2"} id={props.id} type="file" style={{width:"0.1px", opacity:"0"}} 
@@ -183,13 +201,20 @@ function FileField (props:{index:number, id:string, name:string, required:boolea
             (e)=>props.fileSetter((curr:any)=>{
               const arr  = [...curr];
               if (e.target.files && e.target.files.length>0)
-                for (let i=0; i<e.target.files.length; i++)
-                  arr.push(e.target.files[i])
+                for (let i=0; i<e.target.files.length; i++){
+                  if (props.fileType==1 || e.target.files[i].type==filePossibilities[props.fileType-1]){
+                    arr.push(e.target.files[i]);
+                    setError(<></>)
+                  }
+                  else
+                    setError(<p className="text-red-700">Invalid file type</p>)
+                }
               return arr;
             })
           }
         />
       </div>
+      {error}
       <div>
         {renderList()}
       </div>
