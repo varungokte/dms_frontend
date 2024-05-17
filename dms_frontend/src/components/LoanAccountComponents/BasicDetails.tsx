@@ -35,13 +35,13 @@ function BasicDetails(props:any) {
     "A": null, "F": null, "S": null, "V": null,
   }) 
 
-  const [fieldValues, setFieldValues] = useState({ 
-    "AID": null, "Z": null, "CN": null, "PN": null, 
-    "GN": null, "GST":null, "CIN": null, "I": null, 
-    "SA": null, "HA":null,"DA": null, "DD": null, 
-    "PS": null, "OA":null,"T": null, "P": null, 
-    "ST": null, "SD": null, "CD": null, "RED": null, 
-    "A": null, "F": null, "S": null, "V": null,
+  const [fieldValues, setFieldValues] = useState({
+    "AID": "", "Z": -1, "CN": "", "PN": "",
+    "GN": "", "GST": "", "CIN": "", "I": -1,
+    "SA": -1, "HA": -1, "DA": -1, "DD": "",
+    "PS": -1, "OA": -1,"T": -1, "P": -1,
+    "ST": -1, "SD": "", "CD": "", "RED": "",
+    "A": -1, "F": -1, "S": -1, "V": -1,
   }) 
   const [fieldList] = useState([
     { id:"CN", name:"Company Name", type:"text", required: true },
@@ -131,11 +131,15 @@ function BasicDetails(props:any) {
           if ((fieldValues["A"]==-1 || fieldValues["A"]==2 || fieldValues["A"]==null) && (field.id=="F" || field.id=="S" || field.id=="V"))
             disabled=true
           if (field.type=="select")
-          //@ts-ignore
-            return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} value={fieldValues[field.id]} optionsList={field.options} required={field.required} disabled={disabled} />
+            return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} 
+            value={/* @ts-ignore */
+            fieldValues[field.id]} 
+            options={field.options} required={field.required} disabled={disabled} />
           else
-          //@ts-ignore
-            return <FormTextField key={field.id}  id={field.id} name={field.name} setter={setFieldValues} value={fieldValues[field.id]} type={field.type} required={field.required} disabled={disabled} />
+            return <FormTextField key={field.id}  id={field.id} name={field.name||""} setter={setFieldValues} 
+            value={/* @ts-ignore */
+            fieldValues[field.id]} 
+            type={field.type||""} required={field.required||false} disabled={disabled} />
         })}
         </div>
         <br/>

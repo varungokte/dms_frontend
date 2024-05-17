@@ -1,10 +1,24 @@
 //import Tree from "react-d3-tree";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
+import DashboardTest from "./DashboardTest";
+
 
 function Dashboard() {	
 	const {getDecryptedToken} = useGlobalContext();
+	const [test,setTest] = useState(<></>)
 	useEffect(()=>{
 		getDecryptedToken().then(res=>{
 			console.log(res);
@@ -37,7 +51,11 @@ function Dashboard() {
 				<div >
 				{/* <Tree data={orgChart} draggable={false} zoomable={false} dimensions={{height:100000, width:1000000}} /> */}
 				</div>
-				
+
+				<div>
+				<button onClick={()=>setTest(<DashboardTest/>)}>Run DashboardTest</button>
+				{test}
+				</div>
 			</div>
 		</div>
 		

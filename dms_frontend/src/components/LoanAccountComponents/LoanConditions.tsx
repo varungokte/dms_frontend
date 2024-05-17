@@ -63,7 +63,7 @@ function LoanConditions(props:any){
         </div>
 
         <div className="mr-3">
-          <FormDialogDocuments
+          <FormDialogDocuments key={-5} index={-5} edit={false} type="con" currentFields={fieldValues}
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} formSubmit={addCondtion}
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
@@ -81,13 +81,13 @@ function LoanConditions(props:any){
                   item;
                   return(
                     <div className="flex flex-row">
-                      <FormDialogDocuments 
+                      <FormDialogDocuments key={index} index={index} edit={true} type="con" 
                         triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editCondtion}
                         detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
                         uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-                        edit={true} currentFields={conditionsList[index]}
+                        currentFields={conditionsList[index]}
                       />
-                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
+                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Condition?" description="Are you sure you want to delete this condition?" 
                         actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCondtion} 
                       />
                     </div>

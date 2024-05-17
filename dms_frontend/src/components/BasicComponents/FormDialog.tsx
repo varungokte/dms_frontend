@@ -12,14 +12,18 @@ function FormDialog(props:any){
     small= "min-w-[600px] min-h-[300px]",
     medium= "min-w-[800px] min-h-[300px]",
     large= "min-w-[1000px] min-h-[300px]"
-  }
+  };
+
+  useEffect(()=>{
+    console.log("the form field component props", props);
+  },[])
   
   const [userNames] = useState([]);
 
   const [repeatForm, setRepeatForm] = useState([<RenderForm {...props} key={"f0"} formIndex={currentForm} userNames={userNames}/>]);
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={setOpen} key={props.index}>
       <DialogTrigger /* onClick={()=>{if (props.apiCallOnClick){callAPI()}}} */ className={props.triggerClassName}>{props.triggerText}</DialogTrigger>
       {/* @ts-ignore */}
       <DialogContent className={`bg-white overflow-y-scroll max-h-screen ${FormSizes[props.formSize]} `}>

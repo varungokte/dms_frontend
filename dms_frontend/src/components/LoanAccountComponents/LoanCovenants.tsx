@@ -18,8 +18,8 @@ function LoanCovenants(props:any){
   const [newFiles, setNewFiles] = useState<any>([]);
 
   const [documentList] = useState([
-    { T:1, D: "An example of a periodic covenant", F:2, SD:"1/2/3", ED:"2/2/3" },
-    { T:2, D: "An example of an event-based covenant", P:2 }
+    { T:1, D: "An example of a periodic covenant", F:2, EL:"A",PL:"B", P:1, SD:"1/2/3", ED:"2/2/3" },
+    { T:2, D: "An example of an event-based covenant",EL:"A",PL:"B", P:2 }
   ]);
 
   const [fieldValues, setFieldValues] = useState<any>({});
@@ -76,10 +76,11 @@ function LoanCovenants(props:any){
         </div>
 
         <div className="mr-3">
-          <FormDialogDocuments
-            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formTitle={props.label} formSubmit={addCovenant} type="cov"
+          <FormDialogDocuments key={-5} index={-5} edit={false} type="cov"
+            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formTitle={props.label} formSubmit={addCovenant}
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
+            currentFields={fieldValues}
           />
         </div>
       </div>
@@ -87,21 +88,21 @@ function LoanCovenants(props:any){
       <div className="">
         <Table className="border rounded-2xl">
           {priority==1
-            ?<><HeaderRows headingRows={[["Description"],["Frequency"], ["Start Date"],["End Date"], ["Action"]]} />
+            ?<><HeaderRows headingRows={[["Description"],["Frequency"], ["Physical Location"], ["Execution Location"], ["Start Date"],["End Date"], ["Priority"], ["Action"]]} />
               <BodyRowsMapping
-                list={documentList.filter(document=>document["T"]==1)} columns={["D", "F", "SD", "ED"]} dataType={["text", "frequency", "text", "text", "action"]}
+                list={documentList.filter(document=>document["T"]==1)} columns={["D", "F","PL","EL", "SD", "ED","P"]} dataType={["text", "frequency", "text", "text", "text", "text", "priority", "action"]}
                 searchRows={[]} filterRows={[]}
                 action = {documentList.filter(document=>document["T"]==1).map((item:any, index:number)=>{
                   item;
                   return(
                     <div className="flex flex-row">
-                      <FormDialogDocuments
-                        triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" formTitle={props.label} formSubmit={addCovenant} type="cov"
+                      <FormDialogDocuments key={index} index={index} edit={true} type="cov"
+                        triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" formTitle={props.label} formSubmit={addCovenant}
                         detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
                         uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-                        edit={true} currentFields={documentList[index]}
+                        currentFields={documentList[index]}
                       />
-                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
+                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Covenant?" description="Are you sure you want to delete this covenant?" 
                         actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCovenant} 
                       />
                     </div>

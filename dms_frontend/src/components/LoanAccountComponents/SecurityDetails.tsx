@@ -16,10 +16,12 @@ function SecurityDetails(props:any){
   },[])
 
   const [fieldList] = useState([
-    { id:"S", name:"Share Percentage(%)", type:"number" },
-    { id:"DV", name:"Date of Valuation", type:"date" },
-    { unnecessaryComplication: true, id:"T", name:"Security Type", type:"select", options:["op1","op2"] },
-    { unnecessaryComplication: true, id:"V", name:"Security Value", type:"text" }
+    { id:"S", name:"Share Percentage(%)", type:"number", required:false },
+    { id:"DV", name:"Date of Valuation", type:"date",required:false },
+    { id:"STV", name:"", type:"repeatable", fields:[
+      { unnecessaryComplication: true, id:"T", name:"Security Type", type:"select", options:[1,2],required:false },
+      { unnecessaryComplication: true, id:"V", name:"Security Value", type:"text",required:false }
+    ]}
   ])
 
   const submitForm = (e:any) => {
@@ -55,10 +57,17 @@ function SecurityDetails(props:any){
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-2">
           {fieldList.map(field=>{
-            if (field.type=="select")
-              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} optionsList={field.options} disabled={disableFields} />
+            if (field.type=="repeatable" && field.fields){
+              field.fields.map(subfield=>{
+                console.log("Subfield",subfield)
+                if (subfield.type=="select")
+                  return <FormSelectField key={subfield.id} id={subfield.id} name={subfield.name} value="" setter={setFieldValues} options={subfield.options} disabled={disableFields} required={subfield.required} />
+                else 
+                  return <FormTextField key={field.id} id={field.id} name={field.name} value="" setter={setFieldValues} type={field.type} disabled={disableFields} required={field.required||false} />
+              })
+            }
             else 
-              return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} disabled={disableFields}  />
+              return <FormTextField key={field.id} id={field.id} name={field.name} value="" setter={setFieldValues} type={field.type} disabled={disableFields} required={field.required||false} />
           })}
         </div>
         <FormSectionNavigation setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />

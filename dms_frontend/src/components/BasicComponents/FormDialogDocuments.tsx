@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { FileTypes } from "./Constants";
 
-function FormDialogDocuments(props:any){
+function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassName:string, formTitle:string, formSubmit:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currentFields:any, type:string }){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
@@ -16,11 +16,14 @@ function FormDialogDocuments(props:any){
   const [enableUpload, setEnableUpload] = useState(false);
 
   useEffect(()=>{
-    console.log("we are rendering the component",props)
     if (props.edit){
-      //props.setter(props.currentFields);
-      setPrefillValues(props.currentFields)
+      setPrefillValues(props.currentFields);
+      setEnableUpload(true);
+      if (props.currentFields["Docs"])
+        props.fileSetter(props.currentFields["Docs"].map((document:any)=>{return {name:document.originalname}}))
     }
+    else
+      setPrefillValues(props.fieldValues);
   },[props.fieldValues])
 
   const validateRequiredFields=()=>{
@@ -37,14 +40,12 @@ function FormDialogDocuments(props:any){
         }
       }
     }
-    console.log("REQ LIST", data)
-    for (let i=0; i<Object.keys(data).length; i++){
+
+    for (let i=0;i<Object.keys(data).length;i++){
       const key = Object.keys(data)[i];
-      console.log("props.fieldvalies", props.fieldValues)
       const value = data[key];
-      console.log(key,value && (prefillValues[key]=="" || !prefillValues[key]))
-      if (value && (prefillValues[key]=="" || !prefillValues[key])){
-        console.log("A")
+      if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1)){
+        console.log("incomplete")
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
         return false;
       }
@@ -91,7 +92,7 @@ function FormDialogDocuments(props:any){
                   {props.detailForm.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
                       if (field["type"]=="select")
-                        return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]?true:false} options={field["options"]} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
+                        return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]?true:false} options={field["options"]} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type} />
                       else if (field["type"]=="file")
                         return <></>
                       else if (field["type"]=="textarea")
@@ -105,42 +106,10 @@ function FormDialogDocuments(props:any){
                           <div key={index+"grid name"} className="text-2xl font-medium my-2">{field["sectionName"]}</div>
                           <div key={index+"gridz"} className={`grid grid-cols-${field["row"]}`}>
                             {field.fields.map((item:any, itemIndex:number)=>{
-                              if (item["id"]=="T")
-                                return(
-                                  <div key={index+item["id"]+"s_0"} className="mb-5 mr-2">
-                                    <label key={index+item["id"]+"s_1"} htmlFor={item["id"]} className="font-light text-lg">{item["name"]} {item["required"]?<span className="text-red-600">*</span>:""}</label>
-                                    <br/>
-                                    <select key={index+item["id"]+"s_2"} id={item["id"]} 
-                                      className="bg-white border rounded-if w-full h-10/12 p-4"
-                                      value={prefillValues[item["id"]]} 
-                                      required={item["required"]}
-                                      onChange={(e)=>props.setter((curr:any)=>{
-                                        const num = Number(e.target.value)+1
-                                        /* let arr = curr[item["id"]];
-                                        console.log("OLD CURR",arr)
-                                        if (arr.includes(num))
-                                          arr = arr.filter((val:number)=>val!=num)
-                                        else
-                                          arr.push(num);
-                                        console.log("CURR",arr);*/
-                                        curr[item["id"]]=num; 
-                                        setFileType(num);  
-                                        if (props.type=="cov")
-                                          setCovType(num);
-                                        return curr
-                                      })} 
-                                    >
-                                      <option key={index+"_0"} value={""}>Select {item["name"]}</option>
-                                      {item["options"].map((option:any,optionIndex:any)=>{
-                                        return <option key={index+"_"+optionIndex} value={optionIndex}>{option}</option>
-                                      })}
-                                    </select>
-                                  </div>
-                                )
-                              else if (item["id"]=="F" && covType!==0)
-                                  return<></>
+                              if (item["id"]=="F" && covType!==1)
+                                return null;
                               else if (item["type"]=="select")
-                                return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>
+                                return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type}/></span>
                               else
                                 return <span key={index+"_"+itemIndex} className="mr-3"><TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} required={item["required"]?true:false} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>  
                             })}
@@ -187,7 +156,7 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
     return (
       props.fileList.map((item:any,index:number)=>{
         return (
-          <div className="border p-3 flex flex-row">
+          <div key={index} className="border p-3 flex flex-row">
             <div key={index} className="flex-auto">
               <p>{item.name}</p>
               {statusList[item[1]]}

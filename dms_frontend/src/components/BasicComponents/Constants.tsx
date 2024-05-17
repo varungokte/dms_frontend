@@ -10,6 +10,8 @@ enum DocumentStatusStyling { "text-green-600", "text-yellow-600", "text-red-600"
 
 enum TransactionDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
 
+enum ComplianceDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
+
 enum FileStatusValue { "Pending", "In Progress", "Verified", "Overdue"};
 
 enum FileTypes {"Any", "PDF", "DOCX"};
@@ -59,5 +61,5 @@ export {
   EnumIteratorKeys, EnumIteratorValues,
   ContactType,
   FrequencyType,
-  TransactionDocumentTypes,
+  TransactionDocumentTypes, ComplianceDocumentTypes
 };

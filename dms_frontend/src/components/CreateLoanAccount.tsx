@@ -46,10 +46,6 @@ function CreateLoanAccount() {
     }
   },[]);
 
-  useEffect(()=>{
-    console.log("rerendering create")
-  })
-
   const goToNextSection = () => {
     const sectionCount = formSections.length-1;
     setCurrentSection((curr:any)=>{

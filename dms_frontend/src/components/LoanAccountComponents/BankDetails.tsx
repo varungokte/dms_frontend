@@ -7,24 +7,24 @@ function BankDetails(props:any) {
   const {createLoan} = useGlobalContext();
 
   const [firstRow] = useState([
-    { id:"AN", name:"Account Name", type:"text" },
-    { id:"BAN", name:"Account Number", type:"text" },
+    { id:"AN", name:"Account Name", type:"text", required:false },
+    { id:"BAN", name:"Account Number", type:"text",required:false },
   ]);
   
   const [secondRow] = useState([
-    { id:"AT", name:"Account Type", type:"select", options:["op1","op2"] },
-    { id:"IFSC", name:"IFSC", type:"text" },
-    { id:"BN", name:"Bank Name", type:"text"},
+    { id:"AT", name:"Account Type", type:"select", options:["op1","op2"],required:false },
+    { id:"IFSC", name:"IFSC", type:"text",required:false },
+    { id:"BN", name:"Bank Name", type:"text",required:false},
   ]);
   const [thirdRow] = useState([
-    { id:"LB", name:"Branch Name", type:"text" },
-    { id:"BA", name:"Branch Address", type:"text" },
+    { id:"LB", name:"Branch Name", type:"text",required:false },
+    { id:"BA", name:"Branch Address", type:"text",required:false },
   ]);
 
   const [fieldValues, setFieldValues] = useState({
-    "AN": null, "BAN": null, 
-    "AT": null, "IFSC": null, "BN": null,
-    "LB": null, "BA": null
+    "AN": "", "BAN": "", 
+    "AT": "", "IFSC": "", "BN": "",
+    "LB": "", "BA": ""
   })
 
   const submitForm = (e:any) =>{
@@ -60,22 +60,26 @@ function BankDetails(props:any) {
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-2">
           {firstRow.map(field=>{
-            return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} />
+            return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} required={field.required} disabled={false} type={field.type} value={/* @ts-ignore */
+            fieldValues[field.id]} />
           })}
         </div>
 
         <div className="grid grid-cols-3">
           {secondRow.map(field=>{
             if (field.type=="select")
-              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} optionsList={field.options} />
+              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} required={field.required} disabled={false} options={field.options} value={/* @ts-ignore */
+              fieldValues[field.id]} />
             else
-              return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} />
+              return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} required={field.required} disabled={false} type={field.type} value={/* @ts-ignore */
+              fieldValues[field.id]} />
           })}
         </div>
 
         <div className="grid grid-cols-2">
           {thirdRow.map(field=>{
-            return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} type={field.type} />
+            return <FormTextField key={field.id} id={field.id} name={field.name} setter={setFieldValues} required={field.required} disabled={false} type={field.type} value={/* @ts-ignore */
+            fieldValues[field.id]} />
           })}
         </div>
         <br/>

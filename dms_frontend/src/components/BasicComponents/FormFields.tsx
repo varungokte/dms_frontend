@@ -1,4 +1,4 @@
-function FormTextField(props:any) {
+function FormTextField(props:{id:string, name:string, type:string, required:boolean, disabled:boolean, value:any, setter:Function}) {
   return (
     <div className="my-3">
       <label htmlFor={props.id}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
@@ -22,7 +22,7 @@ function FormTextField(props:any) {
   )
 }
 
-function FormSelectField(props:any) {
+function FormSelectField(props:{id:string, name:string, required:boolean, disabled:boolean, value:any, setter:Function, options:any}) {
   return (
     <div className="my-3">
       <label htmlFor={props.id}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
@@ -38,7 +38,7 @@ function FormSelectField(props:any) {
         }}
       >
         <option className="font-light" key={-1} value={-1}>Select {props.name}</option>
-        {props.optionsList.map((option:any, index:number)=>{
+        {props.options.map((option:any, index:number)=>{
           return <option key={index} value={index+1}>{option}</option>
         })}
       </select>

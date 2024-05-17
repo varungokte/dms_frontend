@@ -442,7 +442,7 @@ const addTeamMember = async (data:any) => {
 	}
 }
 
-const createDocument = async (data:any) => {
+const createDocument = async (data:any, path:string) => {
 	try {
 		const token = getEncryptedToken();
 
@@ -451,7 +451,7 @@ const createDocument = async (data:any) => {
 		for (const [key, value] of data.entries()) 
 			console.log(`${key}: ${value}, ${typeof value}`);
 
-		const response = await axios.post(`${Base_Url}/uploadTest`, data, {
+		const response = await axios.post(`${Base_Url}/${path}`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 		});
 
@@ -467,11 +467,33 @@ const createDocument = async (data:any) => {
 	}
 }
 
+const getDocumentsList = async (loanId:string,path:string) =>  {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/${path}`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: {_loanId: loanId}
+		});
+		const decryptedObject = handleDecryption(response.data);
+		
+		if (response.status==200)
+			return decryptedObject; 
+		else
+			return null;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
+
 const deleteDocument = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/uploadTest`, {data:enc_data}, {
+		const response = await axios.post(`${Base_Url}/uploadTD`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 
@@ -529,6 +551,7 @@ const useGlobalContext = () => {
 		getTeamList,
 		addTeamMember,
 		createDocument,
+		getDocumentsList,
 		deleteDocument,
 	}
 }

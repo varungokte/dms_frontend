@@ -13,7 +13,7 @@ import edit_icon from "./static/edit_icon.svg";
 import delete_icon from "./static/delete_icon.svg";
 
 function UserManagement(){
-  const [userData, setUserData]= useState<any>([]);
+  const [userData, setUserData]= useState<any>([{N:"Conan O'Brien", E:"1@2", RM:"Person1", Z:1, S:1},{N:"Donna Noble", E:"1@3", RM:"Person2", Z:2, S:1}]);
   const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [selectedUser] = useState(-1);
@@ -49,11 +49,11 @@ function UserManagement(){
   useEffect(()=>{
     getUsers().then((res)=>{
       if (res.length==0)
-        setUserData([{}]);
-      else{
+      setUserData([{}])
+      else
         setUserData(res);
-      }
-    }).catch(err=> console.log(err))
+      
+    }).catch(()=> {}/* console.log(err) */)
   },[userAdded])
 
   const createUser = (e:any) => {
@@ -76,10 +76,8 @@ function UserManagement(){
       }
     }
     
-    console.log("TEST ZE DATA", data);
-
     newUser(data).then(res=>{
-      console.log(res);
+      console.log("new user",res);
       setUserAdded(true);
     }).catch((err)=>{
       if (err=="dupliate_user"){
@@ -106,7 +104,7 @@ function UserManagement(){
   }
 
   const deleteUser = (index:number) =>{
-    console.log(index)
+    console.log("deleting",index)
   }
 
   return(
@@ -124,7 +122,7 @@ function UserManagement(){
         </div>
 
         <div className="">
-          <FormDialog
+          <FormDialog key={-10} index={-10}
             triggerText="+ Add User" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
             form={fieldList} setter={setFieldValues} fieldValues={fieldValues}
@@ -136,28 +134,26 @@ function UserManagement(){
       {message}
         <Table className="bg-white border-2 rounded-xl">
           <HeaderRows headingRows={[["Name"], ["Email Address"],["Reporting Manager"], ["Zone"], /* , ["Role"] */, ["Status"], ["Action"]]} />
-          {userData.length==-1
-          ?<p className="text-center">No users available</p>
-          :<BodyRowsMapping
+          <BodyRowsMapping
             list={userData} columns={["N","E", "RM", "Z", "S"]} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
             searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
             action = {userData.map((item:any, index:number)=>{
-              console.log(item)
+              item;
               return(
                 <div className="flex flex-row">
-                  <FormDialog 
+                  <FormDialog key={index} index={index}
                     triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                     formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
                     form={fieldList} setter={setFieldValues} 
                     edit={false} currentFields={userData[index]}
                   />
                   <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
-                    actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
+                    actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser} currentIndex={index} 
                   />
                 </div>
               )
             })}
-          />}
+          />
           
         </Table>
       </div>
