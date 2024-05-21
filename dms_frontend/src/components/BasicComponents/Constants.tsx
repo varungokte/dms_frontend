@@ -42,6 +42,8 @@ enum LoanProduct { "Term Loan"=1,"Drop-line LOC","WCDL","Debentures" };
 
 enum FrequencyType {"Monthly", "Quarterly", "Half-Yearly", "Yearly"};
 
+enum BankAccountType {"Saving", "Current"};
+
 const EnumIteratorKeys = (list: any) => {
   return Object.keys(list).filter(v=>!isNaN(Number(v)))
 };
@@ -58,8 +60,9 @@ export {
   CovenantType,
   RatingTypes, RatingOutlook, RatingAgencies, RatingValues,
   ZoneList, IndustryList, LoanType, LoanProduct,
-  EnumIteratorKeys, EnumIteratorValues,
   ContactType,
   FrequencyType,
-  TransactionDocumentTypes, ComplianceDocumentTypes
+  TransactionDocumentTypes, ComplianceDocumentTypes,
+  BankAccountType,
+  EnumIteratorKeys, EnumIteratorValues,
 };

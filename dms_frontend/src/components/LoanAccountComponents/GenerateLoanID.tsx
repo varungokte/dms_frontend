@@ -68,7 +68,7 @@ function GenerateLoanID(props:any){
         <hr className="w-7/12 m-auto" />
         <br/>
         <div className="text-center">
-          <button className="text-white bg-green-600 rounded-xl h-12 w-36 my-1" onClick={systemGeneratedId}>Create ID</button>
+          <button className="text-white bg-green-600 rounded-xl h-12 w-36 my-1" onClick={systemGeneratedId}>Generate ID</button>
         </div>
         {errorMessage}
       </div>

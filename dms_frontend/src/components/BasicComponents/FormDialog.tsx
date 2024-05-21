@@ -14,9 +14,6 @@ function FormDialog(props:any){
     large= "min-w-[1000px] min-h-[300px]"
   };
 
-  useEffect(()=>{
-    console.log("the form field component props", props);
-  },[])
   
   const [userNames] = useState([]);
 
@@ -63,7 +60,7 @@ function FormDialog(props:any){
   )
 }
 
-function RenderForm (props:any){
+function RenderForm(props:any){
   const [optionsList, setOptionsList] = useState([]);
   const [rolesList, setRolesList] = useState([]);
   const [permissionList, setPermissionList] = useState([]);
@@ -71,12 +68,8 @@ function RenderForm (props:any){
   const [prefillValues, setPrefillValues] = useState<any>({});
 
   useEffect(()=>{
-    console.log("LOADED",currentPermission)
-  })
-  useEffect(()=>{
     if (props.edit){
       props.setter(props.currentFields);
-      console.log(props.fieldValues);
       setPrefillValues(props.currentFields)
   }
   },[props.fieldValues])
@@ -101,13 +94,12 @@ function RenderForm (props:any){
 
   //to handle inputs of type text, password and email
   const handleText = (index:number, id:string, name: string, type: string, disabled:boolean, required:boolean) => {
-    console.log(required)
     return(
       <div key={index+id+"t_0"} className="mb-5">
-        <label key={index+id+"t_1"} htmlFor={id} className="font-light text-lg">{name}</label>
+        <label key={index+id+"t_1"} htmlFor={id} className="font-light text-lg">{name} {required?<span className="text-red-600">*</span>:""}</label>
         <input key={index+id+"t_2"} name="otp" autoComplete="garbage" id={id} type={type} disabled={disabled} required={required}
           className={`border rounded-if w-full h-full p-4  ${name==""?"mt-7":""}`}
-          value={prefillValues[id]}
+          value={prefillValues[id] || ""}
           onChange={props.repeatFields
             ?(e)=>{
               props.setter((curr:any)=>{curr[props.formIndex][id]=e.target.value; return curr;})
@@ -123,21 +115,24 @@ function RenderForm (props:any){
     )
   };
   
-  const handleSelect = (index:number, id:string, name: string, options: string[]) => {
+  const handleSelect = (index:number, id:string, name: string, options: string[], required:boolean) => {
     try{
     return(
       <div key={index+id+"s_0"} className="mb-5">
-        <label key={index+id+"s_1"} htmlFor={id} className="font-light text-lg">{name}</label>
+        <label key={index+id+"s_1"} htmlFor={id} className="font-light text-lg">{name} {required?<span className="text-red-600">*</span>:""}</label>
         <br/>
         <select key={index+id+"s_2"} id={id} 
           className="bg-white border rounded-if w-full h-10/12 p-4"
+          required={required}
+          value={prefillValues[id]}
           onChange={props.repeatFields
             ?(e)=>props.setter((curr:any)=>{curr[props.formIndex][id]=e.target.value; return curr;})
             :(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; return curr})
           } 
         >
+          <option value={""}>Select {name}</option>
           {options.map((option:any,optionIndex:any)=>{
-            return <option key={index+"_"+optionIndex} selected={prefillValues[id]==optionIndex} value={optionIndex}>{option}</option>
+            return <option key={index+"_"+optionIndex} value={optionIndex}>{option}</option>
           })}
         </select>
       </div>
@@ -155,7 +150,7 @@ function RenderForm (props:any){
         <br/>
         <input key={index+name+"f_2"} id={id} type="file" style={{width:"0.1px", opacity:"0"}} 
           onChange={props.repeatFields
-            ?(e)=>props.setter((curr:any)=>{ if (e.target.files) curr[props.formIndex][id]=(e.target.files[0]); console.log(e.target.files); return curr;})
+            ?(e)=>props.setter((curr:any)=>{ if (e.target.files) curr[props.formIndex][id]=(e.target.files[0]); return curr;})
             :(e)=>props.setter((curr:any)=>{ 
               if (e.target.files) { 
                 if (e.target.files[0].size>500)
@@ -248,7 +243,7 @@ function RenderForm (props:any){
         if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password" || field["type"]=="date" || field["type"]=="number")
           return handleText(index, field["id"], field["name"], field["type"], field["disabled"]?true:false, field["required"]?true:false)
         else if (field["type"]=="select")
-          return handleSelect(index, field["id"], field["name"], field["options"])
+          return handleSelect(index, field["id"], field["name"], field["options"], field["required"])
         else if (field["type"]=="file")
           return handleFile(index, field["id"], field["name"]);
         else if (field["type"]=="permissions")
@@ -272,7 +267,7 @@ function RenderForm (props:any){
                 if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number" || item["type"]=="textarea")
                   return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], item["disabled"]?true:false, item["required"]?true:false)}</span>
                 else if (item["type"]=="select")
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"])}</span>
+                  return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], item["required"])}</span>
                 else if (item["type"]=="file")
                   return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["id"], item["name"])} </span>  
                 else if (item["type"]=="combobox")

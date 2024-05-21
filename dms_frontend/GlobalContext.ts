@@ -3,9 +3,9 @@ import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { useEffect } from 'react';
 
-const Base_Url = "https://g3117wlb-9000.inc1.devtunnels.ms/api/v1/allAPI";
+const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
 const encryption_key = "JAIBAJRANGBALI";
-//old url=https://dms-pbe2.onrender.com/api/v1/allAPI
+//old url=https://dms-pbe2.onrender.com
 
 const useTitle = (title:string) => {
 	useEffect(()=>{

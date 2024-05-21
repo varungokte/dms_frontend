@@ -2,17 +2,6 @@
 
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
 import DashboardTest from "./DashboardTest";
 
 

@@ -129,17 +129,13 @@ function BasicDetails(props:any) {
           if (field.id=="break")
             return<div key={index}></div>
           if ((fieldValues["A"]==-1 || fieldValues["A"]==2 || fieldValues["A"]==null) && (field.id=="F" || field.id=="S" || field.id=="V"))
-            disabled=true
+            disabled=true;
           if (field.type=="select")
             return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} 
-            value={/* @ts-ignore */
-            fieldValues[field.id]} 
-            options={field.options} required={field.required} disabled={disabled} />
+            fieldValues={fieldValues} options={field.options} required={field.required} disabled={disabled} />
           else
             return <FormTextField key={field.id}  id={field.id} name={field.name||""} setter={setFieldValues} 
-            value={/* @ts-ignore */
-            fieldValues[field.id]} 
-            type={field.type||""} required={field.required||false} disabled={disabled} />
+            fieldValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
         })}
         </div>
         <br/>

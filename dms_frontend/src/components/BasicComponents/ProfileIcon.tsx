@@ -1,4 +1,5 @@
 function ProfileIcon(props:any) {
+  try{
   if (props.size=="large")
     return (
       <div 
@@ -48,6 +49,22 @@ function ProfileIcon(props:any) {
         </div>
       </div>
     )
+  }
+  catch(err){
+    return (
+      <div 
+        style={{
+          height:"50px", width:"50px", lineHeight:"50px", 
+          borderRadius:"50%", backgroundColor: "goldenrod", color:"white",
+          zIndex:"2", position:"relative"
+        }}
+      >
+        <div style={{textAlign:"center", fontSize:"15px"}}>
+          {"ERR"}
+        </div>
+      </div>
+    )
+  }
 }
 
 export default ProfileIcon;
