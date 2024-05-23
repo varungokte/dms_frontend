@@ -1,17 +1,17 @@
 //import Tree from "react-d3-tree";
 
 import { useEffect, useState } from "react";
-import useGlobalContext from "./../../GlobalContext";
+//import useGlobalContext from "./../../GlobalContext";
 import DashboardTest from "./DashboardTest";
 
 
 function Dashboard() {	
-	const {getDecryptedToken} = useGlobalContext();
-	const [test,setTest] = useState(<></>)
+	//const { getSingleDocument} = useGlobalContext();
+	const [test,setTest] = useState(<></>);
 	useEffect(()=>{
-		getDecryptedToken().then(res=>{
-			console.log(res);
-		})
+		/* getSingleDocument("rZMwppzO2",TransactionDocumentTypes[4],"1716459086326-data2.pdf").then(res=>{
+			console.log("the response here:",res);
+		}) */
 	},[])
 	/* const orgChart = {
 		name: "Emperor Palpatine",

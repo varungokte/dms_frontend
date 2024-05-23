@@ -1,50 +1,59 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
-function PermissionSetter(props:any){
+function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillValues:Function, permissionSet:any}){
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
   const [permissionList, setPermissionList] = useState({
-    "Loan Account": ["access", "view", "delete","add","edit"],
-    "Product": ["access", "view", "delete","add","edit"],
-    "Transaction Documents": ["access", "view", "delete","add","edit"],
-    "Compliance Documents": ["access", "view", "delete","add","edit"],
-    "Covenants": ["access", "view", "delete","add","edit"],
+    "Loan Account": [],
+    "Product": [],
+    "Transaction Documents": [],
+    "Compliance Documents": [],
+    "Covenants": [],
   });
 
-  useEffect(()=>{
-    if (props.singleRole)
-      setPermissionList(props.singleRole);
-    console.log("PROPS.singlerole",props.singleRole)
-  },[props.singleRole])
+  /* useEffect(()=>{
+    console.log("the permission list has changed", permissionList);
+  },[permissionList]) */
 
   useEffect(()=>{
+    //console.log("props.singleRole",props.permissionSet)
+    if (props.permissionSet)
+      setPermissionList(props.permissionSet);
+    else
+      setPermissionList({
+        "Loan Account": [],
+        "Product": [],
+        "Transaction Documents": [],
+        "Compliance Documents": [],
+        "Covenants": [],
+      })
+  },[props.permissionSet])
+
+  /* useEffect(()=>{
     console.log("CURRENT PERMISSIONS LIST", permissionList)
-  },[permissionList])
+  },[permissionList]) */
 
   const togglePermission = (permissions: string[], action: string, value:boolean, section: string) => {
     if (value)
       permissions.push(action);
-    
     else
      permissions = permissions.filter(name=> name!==action);
     
     if (props.setter){
       props.setter((curr:any)=>{
-        //@ts-ignore
-        curr[section] = [...permissions];
+        curr["P"][section] = [...permissions];
+        console.log("new setter curr", curr)
         return {...curr};
       })
-      setPermissionList(curr=>{
-        //@ts-ignore
+      setPermissionList((curr:any)=>{
         curr[section] = [...permissions];
         console.log("NEW CURR",curr)
         return {...curr};
       })
     }
     else
-      setPermissionList(curr=>{
-        //@ts-ignore
+      setPermissionList((curr:any)=>{
         curr[section] = [...permissions];
         return {...curr};
       })
@@ -72,8 +81,7 @@ function PermissionSetter(props:any){
                   return (
                     <TableCell key={index+action}>
                       <input 
-                        type="checkbox" 
-                        //@ts-ignore
+                        type="checkbox"
                         //@ts-ignore
                         checked={permissionList[section].includes(action)}
                         //@ts-ignore

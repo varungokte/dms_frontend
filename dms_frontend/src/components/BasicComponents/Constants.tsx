@@ -1,34 +1,40 @@
-enum UserRoles { "Maker", "Checker", "Admin", "Superadmin", };
+enum UserRoles { "Maker"=1, "Checker", "Admin", "Superadmin", };
 
 enum UserStatusValues { "Unverified"=1, "Active", "Inactive" };
 
 enum UserStatusStyling { "text-yellow-600 bg-yellow-100"=1, "text-green-600 bg-green-100", "text-red-600 bg-red-100" };
 
-enum DocumentStatusValues { "Pending", "In Progress", "Verified", "Overdue" };
+enum DocumentStatusValues { "Pending"=1, "In Progress", "Verified", "Overdue" };
 
-enum DocumentStatusStyling { "text-green-600", "text-yellow-600", "text-red-600", };
+enum DocumentStatusStyling { "text-green-600"=1, "text-yellow-600", "text-red-600", };
 
-enum TransactionDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
+enum TransactionDocumentTypes {"", "Common Loan Agreements","Security Trustee Agreement","Lenders Agent Agreement","Escrow Agreement","Substitution Agreement","Subordination Agreement","Supplementary Escrow Agreement","Sponsors Undertakings","Security documents","Pledge Agreement","Consent to Assignment","Trust and Retention Account Agreement",};
 
-enum ComplianceDocumentTypes { "Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
+enum ComplianceDocumentTypes { "Common Loan Agreement"=1, "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
 
-enum FileStatusValue { "Pending", "In Progress", "Verified", "Overdue"};
+enum CovenantDocumentTypes {"Covenant Type A"=1,"Covenant Type B"};
 
-enum FileTypes {"Any", "PDF", "DOCX"};
+enum ConditionPrecedentTypes {"Condition A"=1, "Condition B"};
 
-enum PriorityValues { "Low", "Medium", "High", };
+enum ConditionSubsequentTypes {"Condition A"=1, "Condition B"};
 
-enum PriorityStyling { "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100", };
+enum FileStatusValue { "Pending"=1, "In Progress", "Verified", "Overdue"};
 
-enum CovenantType {"Periodic", "Event-Based"};
+enum FileTypes {"Any"=1, "PDF", "DOCX"};
 
-enum RatingAgencies { "ICRA", "CRISIL"};
+enum PriorityValues { "Low"=1, "Medium", "High", };
 
-enum RatingTypes { "Provisional","Final" };
+enum PriorityStyling { "text-green-600 bg-green-100"=1, "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100", };
 
-enum RatingOutlook {"Negative", "Stable", "Positive" };
+enum CovenantType {"Periodic"=1, "Event-Based"};
 
-enum RatingValues { "AA-(Stable)", "A1+", "Gold Status" };
+enum RatingAgencies { "ICRA"=1, "CRISIL"};
+
+enum RatingTypes { "Provisional"=1,"Final" };
+
+enum RatingOutlook {"Negative"=1, "Stable", "Positive" };
+
+enum RatingValues { "AA-(Stable)"=1, "A1+", "Gold Status" };
 
 enum ZoneList {"West"=1, "South", "East", "North"};
 
@@ -40,9 +46,9 @@ enum LoanType { "Long Term"=1, "Short Term" };
 
 enum LoanProduct { "Term Loan"=1,"Drop-line LOC","WCDL","Debentures" };
 
-enum FrequencyType {"Monthly", "Quarterly", "Half-Yearly", "Yearly"};
+enum FrequencyType {"Monthly"=1, "Quarterly", "Half-Yearly", "Yearly"};
 
-enum BankAccountType {"Saving", "Current"};
+enum BankAccountType {"Saving"=1, "Current"};
 
 const EnumIteratorKeys = (list: any) => {
   return Object.keys(list).filter(v=>!isNaN(Number(v)))
@@ -62,7 +68,7 @@ export {
   ZoneList, IndustryList, LoanType, LoanProduct,
   ContactType,
   FrequencyType,
-  TransactionDocumentTypes, ComplianceDocumentTypes,
+  TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes,
   BankAccountType,
   EnumIteratorKeys, EnumIteratorValues,
 };

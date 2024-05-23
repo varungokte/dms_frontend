@@ -1,8 +1,7 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { SubmitButtonStyling } from "./PurpleButtonStyling";
-import PermissionSetter from "./PermissionSetter";
-import Combobox from "./Combobox";
+import { ComboboxField, RoleField, TextAreaField } from "./FormDialogFields";
 
 function FormDialog(props:any){
   const [open, setOpen] = useState(false);
@@ -11,9 +10,8 @@ function FormDialog(props:any){
   enum FormSizes {
     small= "min-w-[600px] min-h-[300px]",
     medium= "min-w-[800px] min-h-[300px]",
-    large= "min-w-[1000px] min-h-[300px]"
+    large= "min-w-[1000px] min-h-[300px]",
   };
-
   
   const [userNames] = useState([]);
 
@@ -21,7 +19,12 @@ function FormDialog(props:any){
 
   return (
     <Dialog open={open} onOpenChange={setOpen} key={props.index}>
-      <DialogTrigger /* onClick={()=>{if (props.apiCallOnClick){callAPI()}}} */ className={props.triggerClassName}>{props.triggerText}</DialogTrigger>
+      <DialogTrigger onClick={()=>{
+        console.log(props.currentField, props.setOldValues?"props.oldValues":"no values");
+        if (props.setOldValues)
+          props.setOldValues({...props.currentField});
+        }} 
+        className={props.triggerClassName}>{props.triggerText}</DialogTrigger>
       {/* @ts-ignore */}
       <DialogContent className={`bg-white overflow-y-scroll max-h-screen ${FormSizes[props.formSize]} `}>
         <DialogHeader>
@@ -51,6 +54,7 @@ function FormDialog(props:any){
             :""
           }
           <br/>
+          <DialogClose className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</DialogClose>
           <button className={`float-right ${SubmitButtonStyling}`} type="submit" /* onClick={doSomeValidation} */ >
             {props.submitButton}
           </button>
@@ -61,39 +65,18 @@ function FormDialog(props:any){
 }
 
 function RenderForm(props:any){
-  const [optionsList, setOptionsList] = useState([]);
-  const [rolesList, setRolesList] = useState([]);
-  const [permissionList, setPermissionList] = useState([]);
-  const [currentPermission, setCurrentPermission] = useState(0);
   const [prefillValues, setPrefillValues] = useState<any>({});
 
   useEffect(()=>{
     if (props.edit){
-      props.setter(props.currentFields);
-      setPrefillValues(props.currentFields)
-  }
+      props.setter(props.currentField);
+      setPrefillValues(props.currentField)
+    }
   },[props.fieldValues])
 
-  /* useEffect(()=>{
-    console.log("GETTING DATA", optionsList);
-    console.log("PROCESSED DATA", optionsList.map(user=>{return {values: user, label:`${user["N"]}<${user["E"]}>`}}))
-  },[optionsList]) */
-
-  useEffect(()=>{
-    if (!props.suggestionsFunction)
-      return;
-    props.suggestionsFunction().then((res:any)=>{
-      if (res.U)
-        setOptionsList(res.U);
-      if (res.R){
-        setRolesList(res.R.map((role:any)=>{return role.N}));
-        setPermissionList(res.R.map((role:any)=>{return JSON.parse(role.P)}))
-      }
-    })
-  },[]);
-
-  //to handle inputs of type text, password and email
-  const handleText = (index:number, id:string, name: string, type: string, disabled:boolean, required:boolean) => {
+  const handleText = (index:number, id:string, name: string, type: string, disabled:boolean, required:boolean, immutable:boolean) => {
+    if (props.edit && immutable)
+      disabled=true;
     return(
       <div key={index+id+"t_0"} className="mb-5">
         <label key={index+id+"t_1"} htmlFor={id} className="font-light text-lg">{name} {required?<span className="text-red-600">*</span>:""}</label>
@@ -115,8 +98,10 @@ function RenderForm(props:any){
     )
   };
   
-  const handleSelect = (index:number, id:string, name: string, options: string[], required:boolean) => {
+  const handleSelect = (index:number, id:string, name: string, options: string[], required:boolean, disabled:boolean, immutable:boolean) => {
     try{
+    if (props.edit && immutable)
+      disabled=true;
     return(
       <div key={index+id+"s_0"} className="mb-5">
         <label key={index+id+"s_1"} htmlFor={id} className="font-light text-lg">{name} {required?<span className="text-red-600">*</span>:""}</label>
@@ -132,7 +117,7 @@ function RenderForm(props:any){
         >
           <option value={""}>Select {name}</option>
           {options.map((option:any,optionIndex:any)=>{
-            return <option key={index+"_"+optionIndex} value={optionIndex}>{option}</option>
+            return <option key={index+"_"+optionIndex} value={optionIndex+1}>{option}</option>
           })}
         </select>
       </div>
@@ -141,117 +126,20 @@ function RenderForm(props:any){
       return <></>
     }
   };
-  
-  const handleFile = (index:number, id:string, name:string) => {
-    return (
-      <div key={index+name+"f_0"} className="flex flex-row">
-        <div key={index+name+"f_-1"} className="font-light text-lg my-7">{name}:</div>
-        <label key={index+name+"f_1"} htmlFor={id} className="bg-custom-1 text-white mx-3 my-5 border rounded-if p-3">Choose File(s)</label>
-        <br/>
-        <input key={index+name+"f_2"} id={id} type="file" style={{width:"0.1px", opacity:"0"}} 
-          onChange={props.repeatFields
-            ?(e)=>props.setter((curr:any)=>{ if (e.target.files) curr[props.formIndex][id]=(e.target.files[0]); return curr;})
-            :(e)=>props.setter((curr:any)=>{ 
-              if (e.target.files) { 
-                if (e.target.files[0].size>500)
-                  console.log("TOO MUCH") 
-                curr[id]=[...curr[id],(e.target.files[0])];
-              } 
-              console.log(curr); 
-              return curr
-            })
-          }
-        />
-        <div key={index+name+"f_3"}>
-          {props.fieldValues?props.fieldValues["F"].map((doc:any, docIndex:number)=>{
-            console.log("CONAN",props.fieldValues)
-            return(
-              <div key={docIndex}>{doc.name}</div>
-            )
-          }):""}
-        </div>        
-      </div>
-    )
-  }
-
-  const handlePermissions = (index:number, id:string, name:string) => {
-    return (
-      <div key={index+"p_0"}>
-        <label htmlFor={id}>{name}</label>
-        <PermissionSetter newRole={true} setter={props.setter} singleRole={permissionList[0]}  />
-      </div>
-    )
-  };
-
-  const handleRole = (index:number, id:string, name:string) => {
-    return(
-      <div key={index+id+"s_0"} className="mb-5">
-        <label key={index+id+"s_1"} htmlFor={id} className="font-light text-lg">{name}</label>
-        <br/>
-        <select key={index+id+"s_2"} id={id} 
-          className="bg-white border rounded-if w-full h-10/12 p-4"
-          onChange={props.repeatFields
-            ?(e)=>{props.setter((curr:any)=>{curr[props.formIndex][id]=e.target.value; return curr;});setCurrentPermission(Number(e.target.value))}
-            :(e)=>{props.setter((curr:any)=>{curr[id]=e.target.value; return curr}); setCurrentPermission(Number(e.target.value))}
-          } 
-        >
-          {rolesList.map((option:any,optionIndex:any)=>{
-            return <option key={index+"_"+optionIndex} value={optionIndex}>{option}</option>
-          })}
-        </select>
-      </div>
-    )
-  }
-
-  const handleCombobox = (index:number, id:string, name:string) =>{
-    const [obj, setObj] = useState({});
-    
-    useEffect(()=>{
-      console.log("OBJ", obj)
-      props.repeatFields
-        ?props.setter((curr:any)=>{curr[props.formIndex][id]=obj; return curr;})
-        :props.setter((curr:any)=>{curr[id]=obj; return curr})
-    },[obj]);
-
-    return(
-      <div key={index+id+"c_0"} className="mb-5">
-        <label key={index+id+"c_1"} htmlFor={id} className="font-light text-lg">{name}</label>
-        <Combobox 
-          type="double"
-          searchFields={["N","E"]}
-          optionsList={optionsList.map(user=>{return {values: user, label:`${user["N"]}<${user["E"]}>`}})} 
-          label="User" 
-          value={obj}
-          setValue={setObj}
-        />
-      </div>
-    )
-  }
-  
-  const handleTextArea = (index:number, id: string, name:string) => {
-    return (
-      <div  key={index}>
-        <label htmlFor={id}>{name}</label>
-        <textarea id={id} className={`border rounded-if w-full h-full p-4`} />
-      </div>
-    )
-  }
 
   return (
     props.form.map((field:any,index:number)=>{
       if (field["category"]=="single"){
-        if (field["type"]=="text" || field["type"]=="email" || field["type"]=="password" || field["type"]=="date" || field["type"]=="number")
-          return handleText(index, field["id"], field["name"], field["type"], field["disabled"]?true:false, field["required"]?true:false)
-        else if (field["type"]=="select")
-          return handleSelect(index, field["id"], field["name"], field["options"], field["required"])
-        else if (field["type"]=="file")
-          return handleFile(index, field["id"], field["name"]);
-        else if (field["type"]=="permissions")
-          return handlePermissions(index, field["id"], field["name"]);
-        else if (field["type"]=="role")
-          return handleRole(index, field["id"], field["name"])
+        if (field["type"]=="select")
+          return handleSelect(index, field["id"], field["name"], field["options"], field["required"], field["disabled"], field["immutable"]?true:false)
         else if (field["type"]=="textarea")
-          return handleTextArea(index,field["id"], field["name"])
+          return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]} disabled={field["disabled"]} setter={props.setter} prefillValues={prefillValues} immutable={field["immutable"]?(props.edit&&true):false} setPrefillValues={setPrefillValues} />
+        else if (field["type"]=="role")
+          return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} required={field["required"]} disabled={field["disabled"]} prefillValues={prefillValues} immutable={field["immutable"]?(props.edit&&true):false} setPrefillValues={setPrefillValues} />
+        else if (field["type"]=="combobox")
+          return <ComboboxField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} prefillValues={prefillValues} immutable={field["immutable"]?(props.edit&&true):false} setPrefillValues={setPrefillValues} />
+        else
+          return handleText(index, field["id"], field["name"], field["type"], field["disabled"]?true:false, field["required"]?true:false, field["immutable"]?true:false)
       }
       else if (field["category"]=="grid"){
         let gridStyle = "grid grid-cols-"; 
@@ -264,16 +152,10 @@ function RenderForm(props:any){
             <div key={index+"grid name"} className="text-2xl font-medium my-2">{field["sectionName"]}</div>
             <div key={index+"gridz"} className={gridStyle}>
               {field.fields.map((item:any, itemIndex:number)=>{
-                if (item["type"]=="text" || item["type"]=="email" || item["type"]=="password" || item["type"]=="date" || item["type"]=="number" || item["type"]=="textarea")
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], item["disabled"]?true:false, item["required"]?true:false)}</span>
-                else if (item["type"]=="select")
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], item["required"])}</span>
-                else if (item["type"]=="file")
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleFile(itemIndex,item["id"], item["name"])} </span>  
-                else if (item["type"]=="combobox")
-                  return <span key={index+"_"+itemIndex} className="mr-3" style={{position:"relative"}}>{handleCombobox(itemIndex, item["id"], item["name"])}</span>
-                else if (item["type"]=="role")
-                  return <span key={index+"_"+itemIndex} className="mr-3" style={{position:"relative"}}>{handleRole(itemIndex, item["id"], item["name"])}</span>
+                if (item["type"]=="select")
+                  return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], item["required"],field["disabled"], item["immutable"]?true:false)}</span>
+                else
+                  return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], item["disabled"]?true:false, item["required"]?true:false, item["immutable"]?true:false)}</span>
               })}
             </div>
           </div> 

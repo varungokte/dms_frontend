@@ -245,14 +245,13 @@ const addContact = async (data:object, actionType:string) => {
 			params: { "type": actionType },
 		});
 		console.log("RESPONSE ",response)
-		if (response.status==200)
-			return response;
+		return response.status;
 	}
 	catch(error:any) {
 		if (!error.response)
 			return;
 		else
-			return error.response
+			return error.response.status
 	}
 }
 
@@ -442,7 +441,7 @@ const addTeamMember = async (data:any) => {
 	}
 }
 
-const createDocument = async (data:any, path:string) => {
+const createDocument = async (data:any, AID:string, section:string, path:string) => {
 	try {
 		const token = getEncryptedToken();
 
@@ -451,8 +450,9 @@ const createDocument = async (data:any, path:string) => {
 		for (const [key, value] of data.entries()) 
 			console.log(`${key}: ${value}, ${typeof value}`);
 
-		const response = await axios.post(`${Base_Url}/${path}`, data, {
+		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
+			params: { "LOC": `${AID}/${section}/${path}` }
 		});
 
 		console.log("Server response, ",response);
@@ -467,25 +467,53 @@ const createDocument = async (data:any, path:string) => {
 	}
 }
 
-const getDocumentsList = async (loanId:string,path:string) =>  {
+//viewDocs
+const getDocumentsList = async (AID:string,section:string) =>  {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/${path}`, {
+		const response = await axios.get(`${Base_Url}/listDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: {_loanId: loanId}
+			params: { LOC: `${AID}/${section}` }
 		});
-		const decryptedObject = handleDecryption(response.data);
+		const decryptedObject = await handleDecryption(response.data);
+
+		console.log("decrypted object", decryptedObject)
 		
 		if (response.status==200)
-			return decryptedObject; 
+			return {status: response.status, obj:decryptedObject}; 
 		else
-			return null;
+			return {status: 0, obj:null};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status: 0, obj:null};
 		else
-			return error.response;
+			return {status: error.status, obj:null};;
+	}
+};
+
+const getSingleDocument = async (AID:string,section:string,filename:string) =>  {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/viewDocs`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { LOC: `${AID}/TD/${section}/${filename}` }
+		});
+		console.log(response.data	)
+		const decryptedObject = await handleDecryption(response.data);
+
+		console.log("decrypted object", decryptedObject)
+		
+		if (response.status==200)
+			return {status: response.status, obj:decryptedObject}; 
+		else
+			return {status: 0, obj:null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else
+			return {status: error.response.status, obj:null};
 	}
 };
 
@@ -553,6 +581,7 @@ const useGlobalContext = () => {
 		createDocument,
 		getDocumentsList,
 		deleteDocument,
+		getSingleDocument,
 	}
 }
 

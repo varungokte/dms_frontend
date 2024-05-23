@@ -6,6 +6,7 @@ import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
+import { EnumIteratorValues, FileTypes, PriorityValues } from "../BasicComponents/Constants";
 
 function LoanConditions(props:any){
   
@@ -18,10 +19,12 @@ function LoanConditions(props:any){
 
   const [fieldList] = useState([
     { category:"grid", row:2, fields:[
-      {id: "SD", name:"Start Date", type:"date" },
-      {id: "ED", name:"End Date", type:"date" },
-      {id: "PL", name:"Physical Location", type:"text" },
-      {id: "EL", name:"Execution Location", type:"text" },
+      { id:"N", name:"Condition Name", type:"select", options:["Condition1", "Condition2"] },
+      { id:"P", name: "Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
+      { id:"SD", name:"Start Date", type:"date" },
+      { id:"ED", name:"End Date", type:"date" },
+      { id:"PL", name:"Physical Location", type:"text" },
+      { id:"EL", name:"Execution Location", type:"text" },
     ]},
     { category:"single", id:"D", name:"Description", type:"textarea" },
   ]);
@@ -33,7 +36,6 @@ function LoanConditions(props:any){
   const addCondtion = () => {
     if (fieldValues["F"] && fieldValues["T"]!=1)
       delete fieldValues["F"];
-
     console.log(fieldValues)
   };
 

@@ -3,7 +3,7 @@ import { SubmitButtonStyling } from "./PurpleButtonStyling";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
 import { SelectField, TextAreaField, TextField } from "./FormDialogFields";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { FileTypes } from "./Constants";
 
 function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassName:string, formTitle:string, formSubmit:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currentFields:any, type:string }){
@@ -72,7 +72,7 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger className={props.triggerClassName}>{props.triggerText}</AlertDialogTrigger>
-      <AlertDialogContent className={`bg-white overflow-y-scroll max-h-screen min-w-[800px] `}>
+      <AlertDialogContent className={`bg-white overflow-y-scroll max-h-screen min-w-[800px]`}>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-normal">{props.formTitle}</AlertDialogTitle>
           <hr/>
@@ -82,23 +82,20 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
             <TabsTrigger value="details" className="h-10">Document Details</TabsTrigger>
             <TabsTrigger value="upload" className="h-10" disabled={!enableUpload}>File Upload</TabsTrigger>
           </TabsList>
-          <TabsContent value="details">
+          <TabsContent value="details" className="h-full" style={{overflowY:"auto"}}>
             <Card>
-              <CardHeader>
-                <CardTitle>Document Details</CardTitle>
-              </CardHeader>
-              <CardContent className="">
+              <CardContent className="mt-5">
                 <form onSubmit={(e)=>{props.formSubmit(e);}}>
                   {props.detailForm.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
                       if (field["type"]=="select")
-                        return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]?true:false} options={field["options"]} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type} />
+                        return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]?true:false} options={field["options"]} immutable={field["immutable"]?(props.edit&&true):false} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type} />
                       else if (field["type"]=="file")
                         return <></>
                       else if (field["type"]=="textarea")
-                        return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
+                        return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} required={field["required"]?true:false} disabled={field["disabled"]?true:false} immutable={field["immutable"]?(props.edit&&true):false} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
                       else
-                        return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]} required={field["required"]?true:false} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
+                        return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]} required={field["required"]?true:false} immutable={field["immutable"]?(props.edit&&true):false} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
                     }
                     else if (field["category"]=="grid"){
                       return(
@@ -109,9 +106,9 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
                               if (item["id"]=="F" && covType!==1)
                                 return null;
                               else if (item["type"]=="select")
-                                return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type}/></span>
+                                return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} immutable={item["immutable"]?(props.edit&&true):false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type}/></span>
                               else
-                                return <span key={index+"_"+itemIndex} className="mr-3"><TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} required={item["required"]?true:false} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>  
+                                return <span key={index+"_"+itemIndex} className="mr-3"><TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} required={item["required"]?true:false} immutable={item["immutable"]?(props.edit&&true):false} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>  
                             })}
                           </div>
                         </div> 
@@ -124,10 +121,7 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
             </Card>
           </TabsContent>
           <TabsContent value="upload">
-            <Card>
-              <CardHeader>
-                <CardTitle>File Upload</CardTitle>
-              </CardHeader>
+            <Card className="mt-5">
               <CardContent className="">
                 <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={props.fileList} fileSetter={props.fileSetter} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} />
               </CardContent>
@@ -136,7 +130,7 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
         </Tabs>
         <br/>
         <br/>
-        <AlertDialogFooter className="bottom-0 h-12 mt-20">
+        <AlertDialogFooter className="bottom-0 h-12">
           <AlertDialogCancel className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</AlertDialogCancel>
           <button className={SubmitButtonStyling} onClick={()=>{currentTab=="details"?validateRequiredFields():submitDetails()}}>{currentTab=="details"?"Next":"Save"}</button>
         </AlertDialogFooter>
@@ -170,7 +164,6 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
 
   return (
     <div>
-      <p>Allowed file types: {FileTypes[props.fileType-1]} {/* {props.fileTypes.map(val=>{return FileTypes[val-1]}).toString()} */}</p>
       <div key={props.index+props.name+"f_0"} className="flex flex-row">
         <label key={props.index+props.name+"f_1"} htmlFor={props.id} className="bg-custom-1 text-white my-5 border rounded-if p-3">Choose File(s)</label>
         <input key={props.index+props.name+"f_2"} id={props.id} type="file" style={{width:"0.1px", opacity:"0"}} 
@@ -181,12 +174,12 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
               const arr  = [...curr];
               if (e.target.files && e.target.files.length>0)
                 for (let i=0; i<e.target.files.length; i++){
-                  if (props.fileType==1 || e.target.files[i].type==filePossibilities[props.fileType-1]){
+                  //if (props.fileType==1 || e.target.files[i].type==filePossibilities[props.fileType-1]){
                     arr.push(e.target.files[i]);
                     setError(<></>)
-                  }
+                  /* }
                   else
-                    setError(<p className="text-red-700">Invalid file type</p>)
+                    setError(<p className="text-red-700">Invalid file type</p>) */
                 }
               return arr;
             })

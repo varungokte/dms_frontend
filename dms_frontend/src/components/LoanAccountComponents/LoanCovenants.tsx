@@ -1,7 +1,7 @@
 import { useState } from "react";
 //import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
-import { CovenantType, EnumIteratorKeys, EnumIteratorValues, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
+import { CovenantDocumentTypes, CovenantType, EnumIteratorKeys, EnumIteratorValues, FileTypes, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
 import FormDialog from "../BasicComponents/FormDialog";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { Table } from "../ui/table";
@@ -25,16 +25,15 @@ function LoanCovenants(props:any){
   const [fieldValues, setFieldValues] = useState<any>({});
 
   const [fieldList] = useState([
-    {category:"grid", row:2, fields:[
-      { id: "T", name:"Covenant Type", type:"select", options:EnumIteratorValues(CovenantType) },
-      { id: "P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
-    ]},
+    { category:"single", id:"N", name:"Covenant Name", type:"select", options:EnumIteratorValues(CovenantDocumentTypes)},
     { category:"grid", row:2, fields:[
+      { id:"T", name:"Covenant Type", type:"select", options:EnumIteratorValues(CovenantType) },
+      { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
+      { id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType), dependsOn:"T", dependsValue:1 },
       { id:"EL", name:"Execution Location", type:"text" },
       { id:"PL", name:"Physical Location", type:"text" },
       { id:"SD", name:"Start Date", type:"date", dependsOn:"T", dependsValue:1 },
       { id:"ED", name:"End Date", type:"date", dependsOn:"T", dependsValue:1 },
-      { id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType), dependsOn:"T", dependsValue:1 },
     ]},
     { category:"single", id:"D", name:"Description", type:"textarea" },
   ]);

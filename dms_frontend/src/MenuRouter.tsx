@@ -88,7 +88,6 @@ export const MenuRouter = () => {
 			return decodedToken;
 	}
 	useEffect(()=>{
-		console.log("A")
 		getUserInfo().then(res=>{
 			if (res)
 			setUserInfo(

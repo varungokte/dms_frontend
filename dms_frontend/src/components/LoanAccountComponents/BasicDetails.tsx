@@ -6,25 +6,27 @@ import {FormSectionNavigation} from "./../BasicComponents/FormSectionNavigation"
 import moment from "moment";
 
 function BasicDetails(props:any) {
-
   useEffect(()=>{
     if (props.actionType=="EDIT" && props.preexistingValues){
       const obj:any ={};
       Object.keys(props.preexistingValues).map(value=>{
         if (value=="SD" || value=="DD" || value=="CD" || value=="RED")
-          obj[value] = moment(props.preexistingValues["SD"]).format("DD/MM/YYYY");
+          obj[value] = moment(props.preexistingValues[value]).format("yyyy-MM-DD");
         else
           obj[value]= props.preexistingValues[value];
       });
+      obj["DA"] = Number(props.preexistingValues["SA"]) - Number(props.preexistingValues["HA"]);
+          
 
-      setFieldValues(curr=>{
+      setFieldValues((curr:any)=>{
         return {...curr, ...obj}
       });
       setOldFieldValues(curr=>{
         return {...curr, ...obj}
       })
     }
-  },[])
+  },[]);
+
 
   const [oldFieldValues, setOldFieldValues] = useState({ 
     "AID": null, "Z": null, "CN": null, "PN": null, 
@@ -35,14 +37,7 @@ function BasicDetails(props:any) {
     "A": null, "F": null, "S": null, "V": null,
   }) 
 
-  const [fieldValues, setFieldValues] = useState({
-    "AID": "", "Z": -1, "CN": "", "PN": "",
-    "GN": "", "GST": "", "CIN": "", "I": -1,
-    "SA": -1, "HA": -1, "DA": -1, "DD": "",
-    "PS": -1, "OA": -1,"T": -1, "P": -1,
-    "ST": -1, "SD": "", "CD": "", "RED": "",
-    "A": -1, "F": -1, "S": -1, "V": -1,
-  }) 
+  const [fieldValues, setFieldValues] = useState<any>({}) 
   const [fieldList] = useState([
     { id:"CN", name:"Company Name", type:"text", required: true },
     { id:"GN", name:"Group Name", type:"text", required: true },
@@ -71,6 +66,13 @@ function BasicDetails(props:any) {
   ]);
 
   const {createLoan} = useGlobalContext();
+
+  useEffect(()=>{
+    if(Object.keys(props.actionType=="EDIT"?oldFieldValues:fieldValues).length==0)
+      props.setOkToSubmit(true);
+    else
+      props.setOkToSubmit(false);
+  },[])
 
   const submitForm = (e:any) => {
     e.preventDefault();
@@ -124,19 +126,20 @@ function BasicDetails(props:any) {
       <br/>
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-4">
-        {fieldList.map((field,index)=>{
-          let disabled = false;
-          if (field.id=="break")
-            return<div key={index}></div>
-          if ((fieldValues["A"]==-1 || fieldValues["A"]==2 || fieldValues["A"]==null) && (field.id=="F" || field.id=="S" || field.id=="V"))
-            disabled=true;
-          if (field.type=="select")
-            return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} 
-            fieldValues={fieldValues} options={field.options} required={field.required} disabled={disabled} />
-          else
-            return <FormTextField key={field.id}  id={field.id} name={field.name||""} setter={setFieldValues} 
-            fieldValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
-        })}
+          {fieldList.map((field,index)=>{
+            let disabled = false;
+            if (field.id=="break")
+              return<div key={index}></div>
+            else if ((!fieldValues["A"] || fieldValues["A"]==-1 || fieldValues["A"]==2) && (field.id=="F" || field.id=="S" || field.id=="V"))
+              disabled=true;
+            else if (field.id=="DA")            
+              disabled=true;
+            
+            if (field.type=="select")
+              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} fieldValues={fieldValues} options={field.options} required={field.required} disabled={disabled} />
+            else
+              return <FormTextField key={field.id}  id={field.id} name={field.name||""} setter={setFieldValues} fieldValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
+          })}
         </div>
         <br/>
         <FormSectionNavigation currentSection={props.currentSection} goToNextSection={props.goToNextSection} isForm={true} />
