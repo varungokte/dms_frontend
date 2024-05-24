@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 //import useGlobalContext from "./../../GlobalContext";
 import DashboardTest from "./DashboardTest";
+import { FormNumberField } from "./BasicComponents/FormFields";
 
 
 function Dashboard() {	
@@ -44,6 +45,7 @@ function Dashboard() {
 				<div>
 				<button onClick={()=>setTest(<DashboardTest/>)}>Run DashboardTest</button>
 				{test}
+				<FormNumberField id={"A"} key={"A"} name={"A"} setter={()=>{}} disabled={false} fieldValues={""} required={true} />
 				</div>
 			</div>
 		</div>

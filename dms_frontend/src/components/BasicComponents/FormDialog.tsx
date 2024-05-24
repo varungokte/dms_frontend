@@ -1,7 +1,7 @@
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import { SubmitButtonStyling } from "./PurpleButtonStyling";
-import { ComboboxField, RoleField, TextAreaField } from "./FormDialogFields";
+import { ComboboxField, RoleField, SelectField, TextAreaField, TextField } from "./FormDialogFields";
 
 function FormDialog(props:any){
   const [open, setOpen] = useState(false);
@@ -73,73 +73,35 @@ function RenderForm(props:any){
       setPrefillValues(props.currentField)
     }
   },[props.fieldValues])
-
-  const handleText = (index:number, id:string, name: string, type: string, disabled:boolean, required:boolean, immutable:boolean) => {
-    if (props.edit && immutable)
-      disabled=true;
-    return(
-      <div key={index+id+"t_0"} className="mb-5">
-        <label key={index+id+"t_1"} htmlFor={id} className="font-light text-lg">{name} {required?<span className="text-red-600">*</span>:""}</label>
-        <input key={index+id+"t_2"} name="otp" autoComplete="garbage" id={id} type={type} disabled={disabled} required={required}
-          className={`border rounded-if w-full h-full p-4  ${name==""?"mt-7":""}`}
-          value={prefillValues[id] || ""}
-          onChange={props.repeatFields
-            ?(e)=>{
-              props.setter((curr:any)=>{curr[props.formIndex][id]=e.target.value; return curr;})
-              setPrefillValues((curr:any)=>{curr[props.formIndex][id]=e.target.value; return {...curr};})
-            }
-            :(e)=>{
-              props.setter((curr:any)=>{curr[id]=e.target.value; return curr});
-              setPrefillValues((curr:any)=>{curr[id]=e.target.value; return {...curr};})
-            }
-          } 
-        />
-      </div>
-    )
-  };
   
-  const handleSelect = (index:number, id:string, name: string, options: string[], required:boolean, disabled:boolean, immutable:boolean) => {
-    try{
-    if (props.edit && immutable)
-      disabled=true;
-    return(
-      <div key={index+id+"s_0"} className="mb-5">
-        <label key={index+id+"s_1"} htmlFor={id} className="font-light text-lg">{name} {required?<span className="text-red-600">*</span>:""}</label>
-        <br/>
-        <select key={index+id+"s_2"} id={id} 
-          className="bg-white border rounded-if w-full h-10/12 p-4"
-          required={required}
-          value={prefillValues[id]}
-          onChange={props.repeatFields
-            ?(e)=>props.setter((curr:any)=>{curr[props.formIndex][id]=e.target.value; return curr;})
-            :(e)=>props.setter((curr:any)=>{curr[id]=e.target.value; return curr})
-          } 
-        >
-          <option value={""}>Select {name}</option>
-          {options.map((option:any,optionIndex:any)=>{
-            return <option key={index+"_"+optionIndex} value={optionIndex+1}>{option}</option>
-          })}
-        </select>
-      </div>
-    )}catch(err){
-      console.log(err);
-      return <></>
-    }
-  };
-
   return (
     props.form.map((field:any,index:number)=>{
       if (field["category"]=="single"){
-        if (field["type"]=="select")
-          return handleSelect(index, field["id"], field["name"], field["options"], field["required"], field["disabled"], field["immutable"]?true:false)
+        if (field["type"]=="select") 
+          return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} options={field["options"]}
+          required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+          setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+          />
         else if (field["type"]=="textarea")
-          return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]} disabled={field["disabled"]} setter={props.setter} prefillValues={prefillValues} immutable={field["immutable"]?(props.edit&&true):false} setPrefillValues={setPrefillValues} />
+          return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} 
+            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+          />
         else if (field["type"]=="role")
-          return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} required={field["required"]} disabled={field["disabled"]} prefillValues={prefillValues} immutable={field["immutable"]?(props.edit&&true):false} setPrefillValues={setPrefillValues} />
+          return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} 
+            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+          />
         else if (field["type"]=="combobox")
-          return <ComboboxField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} prefillValues={prefillValues} immutable={field["immutable"]?(props.edit&&true):false} setPrefillValues={setPrefillValues} />
+          return <ComboboxField key={index} index={index} id={field["id"]} name={field["name"]}
+            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+          />
         else
-          return handleText(index, field["id"], field["name"], field["type"], field["disabled"]?true:false, field["required"]?true:false, field["immutable"]?true:false)
+          return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]}
+          required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+          setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+          />
       }
       else if (field["category"]=="grid"){
         let gridStyle = "grid grid-cols-"; 
@@ -153,9 +115,19 @@ function RenderForm(props:any){
             <div key={index+"gridz"} className={gridStyle}>
               {field.fields.map((item:any, itemIndex:number)=>{
                 if (item["type"]=="select")
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleSelect(itemIndex, item["id"], item["name"], item["options"], item["required"],field["disabled"], item["immutable"]?true:false)}</span>
+                  return <span key={index+"_"+itemIndex} className="mr-3">
+                    <SelectField key={index} index={index} id={item["id"]} name={item["name"]} options={item["options"]}
+                      required={item["required"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                      setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                    />
+                  </span>
                 else
-                  return <span key={index+"_"+itemIndex} className="mr-3">{handleText(itemIndex, item["id"], item["name"], item["type"], item["disabled"]?true:false, item["required"]?true:false, item["immutable"]?true:false)}</span>
+                  return <span key={index+"_"+itemIndex} className="mr-3">
+                    <TextField key={index} index={index} id={item["id"]} name={item["name"]} type={item["type"]}
+                      required={item["required"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                      setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                    />
+                  </span>
               })}
             </div>
           </div> 
@@ -166,45 +138,3 @@ function RenderForm(props:any){
 }
 
 export default FormDialog;
-
-/* props:
-    triggerClassName: {PurpleButtonStyling}
-    triggerText: "Add User"
-    formTitle: "Enter a user name"
-    formSubmit: {createUser}
-    submitButton: "Create User"
-    formSize: "small" || "medium" || "large"
-    form: 
-    [
-      { 
-        category: "single", 
-        label: "Name", 
-        type: "text",
-        setter: setNewName
-      }, 
-      {
-        category: grid, 
-        sectionTitle: "User Info"
-        row:4, //Number of rows
-        fields:
-        [
-          {
-            type: "email"
-            label: "Email",
-            setter: setNewEmail
-          }, 
-          {
-            type: "password",
-            label: "Password",
-            setter: setNewPassword
-          }, 
-          {
-            type: "select",
-            label: "Role",
-            setter: setNewRole
-            options: ["Admin", "Maker", "Checker"]
-          }
-        ]
-      }
-    ]    
-  */

@@ -14,8 +14,9 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { ContactType, EnumIteratorKeys, EnumIteratorValues } from "../BasicComponents/Constants";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "../ui/toaster";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
-function ContactDetails(props:any) {
+function ContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   const [contacts, setContacts] = useState<any>({});
 
   const [fieldValues, setFieldValues]= useState<any>({});
@@ -260,7 +261,7 @@ function ContactDetails(props:any) {
                 </CardContent>
               </Card>
             )
-        }):<p className="m-auto font-medium text-xl text-gray-500">No contacts here</p>}
+        }):<EmptyPageMessage sectionName="contacts" />}
       </div>
       <br/>
       <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />

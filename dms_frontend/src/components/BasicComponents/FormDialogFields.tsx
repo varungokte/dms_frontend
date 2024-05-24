@@ -7,14 +7,14 @@ function FieldLabel (props:{index:number, id:string, name:string, required:boole
   )
 }
 
-function TextField (props:{index:number, id:string, name: string, type: string, required:boolean, disabled:boolean, immutable:boolean, setter:Function, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
+function TextField (props:{index:number, id:string, name: string, type: string, required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
   return(
     <div key={props.index} className="mb-5">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
       <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} 
-        type={props.type} disabled={props.disabled || props.immutable} required={props.required}
+        type={props.type} disabled={props.disabled} required={props.required}
         className={`border rounded-if w-full h-full p-4  ${props.name==""?"mt-7":""}`}
-        value={props.prefillValues[props.id]}
+        value={props.prefillValues[props.id]|| ""}
         onChange={props.repeatFields && props.formIndex
           ?(e)=>{
             props.setter((curr:any)=>{curr[props.formIndex||0][props.id]=e.target.value; return curr;})
@@ -30,7 +30,7 @@ function TextField (props:{index:number, id:string, name: string, type: string, 
   )
 };
 
-function SelectField (props:{index:number, id:string, name: string, options: string[], required:boolean, disabled:boolean, immutable:boolean, setter:Function, prefillValues:any, setPrefillValues:Function, setFileType?:Function, setCovType?:Function, sectionType?:string, repeatFields?:boolean, formIndex?:number}){
+function SelectField (props:{index:number, id:string, name: string, options: string[], required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function, setFileType?:Function, setCovType?:Function, sectionType?:string, repeatFields?:boolean, formIndex?:number}){
   try{
     return(
       <div key={props.index} className="mb-5">
@@ -38,7 +38,7 @@ function SelectField (props:{index:number, id:string, name: string, options: str
         <br/>
         <select key={props.index+props.id+"s_2"} id={props.id} 
           className="bg-white border rounded-if w-full h-10/12 p-4"
-          required={props.required} disabled={props.disabled || props.immutable}
+          required={props.required} disabled={props.disabled}
           value={Number(props.prefillValues[props.id])?Number(props.prefillValues[props.id])-1:-1}
           onChange={props.repeatFields && props.formIndex
             ?(e)=>{
@@ -70,7 +70,7 @@ function SelectField (props:{index:number, id:string, name: string, options: str
   }
 };
 
-function TextAreaField (props:{index:number, id: string, name:string, required:boolean, disabled:boolean, immutable:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}) {
+function TextAreaField (props:{index:number, id: string, name:string, required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}) {
   return (
     <div key={props.index}>
       <FieldLabel key={props.index+"ta_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
@@ -85,7 +85,7 @@ function TextAreaField (props:{index:number, id: string, name:string, required:b
   )
 };
 
-function RoleField (props:{index:number, id: string, name:string, required:boolean, disabled:boolean, immutable:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
+function RoleField (props:{index:number, id: string, name:string, required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
   /* useEffect(()=>{
     if (!props.suggestionsFunction)
       return;
@@ -136,13 +136,13 @@ function RoleField (props:{index:number, id: string, name:string, required:boole
 
   return (
     <div>
-      <SelectField index={props.index} id={"R"} name={"Role"} options={Object.keys(allPermissionsList)} required={props.required} disabled={props.disabled} immutable={props.immutable} setter={props.setter} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
-      <PermissionsField index={props.index} id={"P"} name={"Permission"} permissionPreset={allPermissionsList} required={props.required} disabled={props.disabled} immutable={props.immutable} setter={props.setter} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
+      <SelectField index={props.index} id={"R"} name={"Role"} options={Object.keys(allPermissionsList)} required={props.required} disabled={props.disabled} setter={props.setter} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
+      <PermissionsField index={props.index} id={"P"} name={"Permission"} permissionPreset={allPermissionsList} required={props.required} disabled={props.disabled} setter={props.setter} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
     </div>
   )
 };
 
-function PermissionsField (props:{index:number, id: string, name:string, permissionPreset:any, required:boolean, disabled:boolean, immutable:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
+function PermissionsField (props:{index:number, id: string, name:string, permissionPreset:any, required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
   const [permissionSet, setPermissionSet] = useState<any>();
   
   useEffect(()=>{
@@ -157,7 +157,7 @@ function PermissionsField (props:{index:number, id: string, name:string, permiss
   )
 };
 
-function ComboboxField (props:{index:number, id: string, name:string, immutable:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
+function ComboboxField (props:{index:number, id: string, name:string, required:boolean, disabled:boolean, setter:Function, prefillValues:any, setPrefillValues:Function}){
   return (
     <div key={props.index}></div>
   )

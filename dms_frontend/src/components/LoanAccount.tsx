@@ -7,6 +7,7 @@ import useGlobalContext from "./../../GlobalContext";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import edit_icon from "./static/edit_icon.svg";
+import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 /* import delete_icon from "./static/delete_icon.svg";
 import ActionDialog from "./BasicComponents/ActionDialog"; */
 
@@ -44,26 +45,29 @@ function LoanAccount() {
         <div className="m-auto flex-auto"> {/* <Search label="Search by Agreement ID" setter={setSearchString}/> */}</div>
         <div className="m-auto"><Link className={`${CreateButtonStyling} p-4`} to="create" state={{linkSource: "CREATE"}}>Add a Loan Account</Link></div>
       </div>
-      <div className="m-5 border rounded-xl">
-        <Table className="">
-          <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Company Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["Status"], ["Action"]]} />
-          <BodyRowsMapping 
-            list={accountList} columns={["AID", "CN", "GN", "Z", "SA", "S"]}
-            dataType={["index","text","text","text","text","text","text", "action"]} 
-            cellClassName={["font-medium", "text-custom-1","","","","",""]} 
-            searchRows={[]} filterRows={[]}
-            action = {accountList.map((item:any, index:number)=>{
-              return(
-                <div className="flex flex-row">
-                  <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item.AID}}><img src={edit_icon}/></Link>
-                  {/* <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
-                    actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
-                  /> */}
-                </div>
-              )
-            })}
-          />
-        </Table>
+      <div className="m-5 ">
+        {accountList.length==0
+          ?<EmptyPageMessage sectionName="loan accounts"/>
+          :<Table className="border rounded-xl">
+            <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Company Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["Status"], ["Action"]]} />
+            <BodyRowsMapping 
+              list={accountList} columns={["AID", "CN", "GN", "Z", "SA", "S"]}
+              dataType={["index","text","text","text","text","text","text", "action"]} 
+              cellClassName={["font-medium", "text-custom-1","","","","",""]} 
+              searchRows={[]} filterRows={[]}
+              action = {accountList.map((item:any, index:number)=>{
+                return(
+                  <div className="flex flex-row">
+                    <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item.AID}}><img src={edit_icon}/></Link>
+                    {/* <ActionDialog trigger={<img src={delete_icon}/>} title="Delete User?" description="Are you sure you want to delete this user?" 
+                      actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteUser(index)} 
+                    /> */}
+                  </div>
+                )
+              })}
+            />
+          </Table>
+        }
       </div>
       <br/>
     </div>

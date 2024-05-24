@@ -89,13 +89,22 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
                   {props.detailForm.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
                       if (field["type"]=="select")
-                        return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} required={field["required"]?true:false} options={field["options"]} immutable={field["immutable"]?(props.edit&&true):false} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type} />
-                      else if (field["type"]=="file")
-                        return <></>
+                        return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} 
+                          options={field["options"]} 
+                          required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+                          setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                          setFileType={setFileType} setCovType={setCovType} sectionType={props.type} 
+                        />
                       else if (field["type"]=="textarea")
-                        return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} setter={props.setter} required={field["required"]?true:false} disabled={field["disabled"]?true:false} immutable={field["immutable"]?(props.edit&&true):false} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
+                        return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} 
+                          required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+                          setter={props.setter}  prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                        />
                       else
-                        return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]} required={field["required"]?true:false} immutable={field["immutable"]?(props.edit&&true):false} disabled={field["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} />
+                        return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]} 
+                          required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+                          setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                        />
                     }
                     else if (field["category"]=="grid"){
                       return(
@@ -106,9 +115,20 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
                               if (item["id"]=="F" && covType!==1)
                                 return null;
                               else if (item["type"]=="select")
-                                return <span key={index+"_"+itemIndex} className="mr-3"><SelectField index={index} id={item["id"]} name={item["name"]} required={item["required"]?true:false} immutable={item["immutable"]?(props.edit&&true):false} options={item["options"]} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} setFileType={setFileType} setCovType={setCovType} sectionType={props.type}/></span>
+                                return <span key={index+"_"+itemIndex} className="mr-3">
+                                  <SelectField index={index} id={item["id"]} name={item["name"]} 
+                                    required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                                    setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                                    setFileType={setFileType} setCovType={setCovType} sectionType={props.type}
+                                  />
+                                </span>
                               else
-                                return <span key={index+"_"+itemIndex} className="mr-3"><TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} required={item["required"]?true:false} immutable={item["immutable"]?(props.edit&&true):false} disabled={item["disabled"]?true:false} setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} /></span>  
+                                return <span key={index+"_"+itemIndex} className="mr-3">
+                                  <TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} 
+                                  required={item["required"]?true:false} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                                  setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                                />
+                              </span>  
                             })}
                           </div>
                         </div> 

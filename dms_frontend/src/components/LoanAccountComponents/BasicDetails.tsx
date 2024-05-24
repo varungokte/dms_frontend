@@ -1,63 +1,33 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
+import { FormTextField, FormSelectField, FormNumberField } from "../BasicComponents/FormFields";
 import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
 import {FormSectionNavigation} from "./../BasicComponents/FormSectionNavigation";
 import moment from "moment";
 
-function BasicDetails(props:any) {
-  useEffect(()=>{
-    if (props.actionType=="EDIT" && props.preexistingValues){
-      const obj:any ={};
-      Object.keys(props.preexistingValues).map(value=>{
-        if (value=="SD" || value=="DD" || value=="CD" || value=="RED")
-          obj[value] = moment(props.preexistingValues[value]).format("yyyy-MM-DD");
-        else
-          obj[value]= props.preexistingValues[value];
-      });
-      obj["DA"] = Number(props.preexistingValues["SA"]) - Number(props.preexistingValues["HA"]);
-          
-
-      setFieldValues((curr:any)=>{
-        return {...curr, ...obj}
-      });
-      setOldFieldValues(curr=>{
-        return {...curr, ...obj}
-      })
-    }
-  },[]);
-
-
-  const [oldFieldValues, setOldFieldValues] = useState({ 
-    "AID": null, "Z": null, "CN": null, "PN": null, 
-    "GN": null, "GST":null, "CIN": null, "I": null, 
-    "SA": null, "HA":null,"DA": null, "DD": null, 
-    "PS": null, "OA":null,"T": null, "P": null, 
-    "ST": null, "SD": null, "CD": null, "RED": null, 
-    "A": null, "F": null, "S": null, "V": null,
-  }) 
-
-  const [fieldValues, setFieldValues] = useState<any>({}) 
+function BasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
+  const [fieldValues, setFieldValues] = useState<any>({});
+  
   const [fieldList] = useState([
     { id:"CN", name:"Company Name", type:"text", required: true },
-    { id:"GN", name:"Group Name", type:"text", required: true },
+    { id:"GN", name:"Group Name", type:"text", required: false },
     { id:"I", name:"Industry", type:"select", options:["Banking","Real Estate", "Manufacturing"], required: true },
     { id:"Z", name:"Zone", type:"select", options:EnumIteratorValues(ZoneList), required: true },
     { id:"P", name:"Loan Product", type:"select", options:["Term Loan","Drop-line LOC", "WCDL", "Debentures"], required: false },
     { id:"T", name:"Loan Type", type:"select", options:["Long Term","Short Term"], required: true },
     { id:"ST", name:"Secured", type:"select", options:["Secured","Unsecured"], required: true }, 
     { id:"PS", name:"Project Status", type:"select", options:["Not Started","In Progress","Finished"], required: true },
-    { id:"PN", name:"PAN Number", type:"text", required: true },
+    { id:"PN", name:"PAN Number", type:"text", required: false },
     { id:"GST", name:"GST Number", type:"text", required: false },
     { id:"CIN", name:"CIN Number", type:"text", required: false },
     { id:"break" },
-    { id:"SD", name:"Sanction Date", type:"date", required: true },
+    { id:"SD", name:"Sanction Date", type:"date", required: false },
     { id:"DD", name:"Downsell Date", type:"date", required: false },
-    { id:"CD", name:"Loan Closure Date", type:"date", required: true },
+    { id:"CD", name:"Loan Closure Date", type:"date", required: false },
     { id:"RED", name:"Repayment End Date", type:"date", required: false },
-    { id:"SA", name:"Sanction Amount", type:"number", required: true },
-    { id:"HA", name:"Hold Amount", type:"number", required: true },
-    { id:"DA", name:"Downsell Amount", type:"number", required: true },
+    { id:"SA", name:"Sanction Amount", type:"number", required: false },
+    { id:"HA", name:"Hold Amount", type:"number", required: false },
+    { id:"DA", name:"Downsell Amount", type:"number", required: false },
     { id:"OA", name:"O/S Amount", type:"number", required: false },
     { unnecessaryComplication: true, id:"A", name:"DSRA Applicability", type:"select", options:["Yes","No"], required: false },
     { unnecessaryComplication: true, id:"F", name:"DSRA Form", type:"select", options:["LC","BG", "FD"], required: false },
@@ -67,12 +37,46 @@ function BasicDetails(props:any) {
 
   const {createLoan} = useGlobalContext();
 
+  const compareFieldsToPreexisting = () => {
+    let no_changes = true;
+    for (let i=0; i<fieldList.length; i++){
+      const id = fieldList[i].id;
+      if (id=="break")
+        break;
+      if (fieldValues[id] && props.preexistingValues[id]!=fieldValues[id])
+        no_changes= false;
+    }
+    return no_changes;
+  }
+
   useEffect(()=>{
-    if(Object.keys(props.actionType=="EDIT"?oldFieldValues:fieldValues).length==0)
-      props.setOkToSubmit(true);
+    if (props.actionType=="EDIT" && props.preexistingValues){
+      const obj:any ={};
+      Object.keys(props.preexistingValues).map(value=>{
+        if (value=="SD" || value=="DD" || value=="CD" || value=="RED")
+          obj[value] = moment(props.preexistingValues[value]).format("yyyy-MM-DD");
+        else
+          obj[value]= props.preexistingValues[value];
+      });
+      const num = (Number(props.preexistingValues["SA"]) - Number(props.preexistingValues["HA"]))||0;
+      if (num!=0)
+        obj["DA"] = num;
+          
+      setFieldValues((curr:any)=>{
+        return {...curr, ...obj}
+      });
+
+      props.setOkToChange(true);
+    }
     else
-      props.setOkToSubmit(false);
-  },[])
+      props.setOkToFrolic(false);
+  },[]);
+
+  useEffect(()=>{
+    if (props.actionType=="EDIT" && props.preexistingValues)
+      props.setOkToChange(compareFieldsToPreexisting());
+  },[fieldValues])
+
 
   const submitForm = (e:any) => {
     e.preventDefault();
@@ -84,11 +88,10 @@ function BasicDetails(props:any) {
       if (field=="A" && fieldValues[field]==2)
         dsra[field] = fieldValues[field]
       else if (field=="A" || field=="F" || field=="S" || field=="V"){
-        if (fieldValues[field]!=null && fieldValues[field]==oldFieldValues[field])
+        if (fieldValues[field]!=null && fieldValues[field]==props.preexistingValues[field])
           dsra[field] = fieldValues[field];
       }
-      //@ts-ignore
-      if (fieldValues[field]==null || fieldValues[field]==-1 || (props.actionType=="EDIT" && fieldValues[field]==oldFieldValues[field]))
+      if (fieldValues[field]==null || fieldValues[field]==-1 || (props.actionType=="EDIT" && fieldValues[field]==props.preexistingValues[field]))
         return;
       //@ts-ignore
       data[field] = fieldValues[field];
@@ -107,8 +110,10 @@ function BasicDetails(props:any) {
         props.setShowSecurityDetails(false);
 
       createLoan(data).then(res=> {
-        if (res==200)
+        if (res==200){
           props.goToNextSection();
+          props.setOkToFrolic(true)
+        }
       }   
       ).catch(err=> console.log(err))
     }
@@ -122,7 +127,7 @@ function BasicDetails(props:any) {
   return(
     <div className="">
       <br/>
-      <p className="italic">Fields marked with <span className="text-red-600">*</span> are required fields</p>
+      <p className="italic">Fields marked with <span className="text-red-600">*</span> are <span className="font-bold">required fields</span>.</p>
       <br/>
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-4">

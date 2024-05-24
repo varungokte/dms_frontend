@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 
 import ContactDetails from "./LoanAccountComponents/ContactDetails";
 import Ratings from "./LoanAccountComponents/Ratings";
@@ -32,7 +33,7 @@ function CreateLoanAccount() {
   const [okToFrolic, setOkToFrolic] = useState(state.linkSource=="CREATE"?false:true);
   const [showSecurityDetails, setShowSecurityDetails] = useState(true);
   const [loadingData, setLoadingData] = useState(state.linkSource=="CREATE"?true:false);
-  const [okToSubmit, setOkToSubmit] = useState(true);
+  const [okToChange, setOkToChange] = useState(true);
 
   useEffect(()=>{
     if (actionType=="EDIT"){
@@ -75,24 +76,35 @@ function CreateLoanAccount() {
         <div className="flex flex-row" style={{position:"relative"}}>
           <button><ChevronLeft className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} /* onClick={previousSection} */ /></button>
             <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap' }}>
+
+            <TooltipProvider>
               {formSections.map((section:any, index:number)=>{
                 return(
-                  <button key={index} disabled={!okToFrolic || index==0} 
-                    className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
-                    onClick={()=>{
-                      okToSubmit?setCurrentSection(index):
-                        confirm("WARNING:\nClicking OK will result in any unsaved data being lost.\nTo save your data, close this dialog and click the Save & Next button")
-                          ?setCurrentSection(index):""
-                        
-                      }}>
-                    <div className="flex flex-row">
-                      <div className={`border rounded-full ${index===0?(currentSection===index?"border-white":"border-slate-300"):currentSection===index?"border-white":"border-black"}`} 
-                        style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}</div>
-                      <div className="m-auto">{section.name}</div>
-                    </div>
-                  </button>
+                  <Tooltip key={index}>
+                      <TooltipTrigger key={index} disabled={!okToFrolic || index==0}
+                        className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
+                        onClick={()=>{
+                          okToChange
+                            ?setCurrentSection(index)
+                            :confirm("WARNING:\nYou have unsaved data which will be lost.\nTo save your data, close this dialog and click the Save & Next button")
+                              ?setCurrentSection(index):""
+                        }}
+                      >
+                        <div className="flex flex-row">
+                          <div className={`border rounded-full ${index===0?(currentSection===index?"border-white":"border-slate-300"):currentSection===index?"border-white":"border-black"}`} 
+                            style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}</div>
+                          <div className="m-auto">{section.name}</div>
+                        </div>
+                      </TooltipTrigger>
+                    {!okToFrolic && currentSection==1 && index>1
+                    ?<TooltipContent className="bg-white">
+                      <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
+                    </TooltipContent>
+                    :<></>}
+                  </Tooltip>
                 )
               })}
+              </TooltipProvider>
             </div>
           <button><ChevronRight className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} /* onClick={nextSection} *//></button>
         </div>
@@ -110,11 +122,11 @@ function CreateLoanAccount() {
               currentSection: currentSection,
               setCurrentSection: setCurrentSection,
               goToNextSection: goToNextSection,
-              setOkToSubmit: setOkToSubmit,
+              setOkToChange: setOkToChange,
               label: formSections[currentSection].name,
-              setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:"",
-              showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:"",
-              setOkToFrolic: currentSection==0?setOkToFrolic:"",
+              setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:()=>{},
+              showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:false,
+              setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
               preexistingValues: actionType=="EDIT"?preexisting:"",
             }
           ):""} 

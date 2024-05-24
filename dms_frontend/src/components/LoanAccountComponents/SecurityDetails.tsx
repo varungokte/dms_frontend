@@ -3,7 +3,7 @@ import { FormTextField, FormRepeatableGrid } from "../BasicComponents/FormFields
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
 
-function SecurityDetails(props:any){
+function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
 
@@ -20,18 +20,83 @@ function SecurityDetails(props:any){
   
   const [disableFields, setDisableFields] = useState(false);
   const [preexistingValues, setPreexistingValues] = useState(false);
+
+  const areAllFieldsEmpty = () => {
+    let all_fields_empty=true;
+    for (let i=0; i<fieldList.length; i++){
+      const field = fieldList[i];
+      if (fieldValuesFixed[field.id] && fieldValuesFixed[field.id]!="" && fieldValuesFixed[field.id]!=-1)
+        all_fields_empty = false;
+      if (field.id=="STV"){
+        for (let j=0; j<fieldValuesRepeatable.length; j++){
+          if (fieldValuesRepeatable[j]["T"] && fieldValuesRepeatable[j]["T"]!="" && fieldValuesRepeatable[j]["T"]!=-1)
+            all_fields_empty = false;
+          if (fieldValuesRepeatable[j]["V"] && fieldValuesRepeatable[j]["V"]!="" && fieldValuesRepeatable[j]["V"]!=-1)
+            all_fields_empty = false;
+        }
+      }
+    }
+    return all_fields_empty;
+  }
+
+  const compareFieldsToPreexisting = () => {
+    let no_changes = true;
+    for (let i=0; i<fieldList.length; i++){
+      const id = fieldList[i].id;
+      if (fieldValuesFixed[id] && props.preexistingValues[id]!=fieldValuesFixed[id])
+        no_changes= false;
+      if (id=="STV"){
+        for (let j=0; j<fieldValuesRepeatable.length; j++){
+          if (fieldValuesRepeatable[j]["T"] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues[id])
+          no_changes = false;
+          if (fieldValuesRepeatable[j]["V"] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues[id])
+          no_changes = false;
+        }
+      }
+    }
+    return no_changes;
+  }
   
   useEffect(()=>{
+    console.log(props.preexistingValues)
     if (!props.showSecurityDetails)
       setDisableFields(true)
 
-    if (props.preexistingValues["some data here"]){
-      //setFieldValues(props.preexistingValues["BD"]);
+    const obj:any={};
+
+    if (props.preexistingValues["S"])
+      obj["S"] = props.preexistingValues["S"];
+    
+    if (props.preexistingValues["DV"])
+      obj["DV"] = props.preexistingValues["DV"];
+    
+    if (Object.keys(obj).length!=0){
+      setFieldValuesFixed(obj);
+      setPreexistingValues(true);
+    }
+    
+    if (props.preexistingValues["STV"]){
+      const arr:any=[];
+      props.preexistingValues["STV"].map((element:any)=>{
+        const temp:any={};
+        Object.keys(element).map(value=>{
+          temp[value] = element[value]
+        })
+        arr.push(temp);
+      })
+      setFieldValuesRepeatable(arr);
       setPreexistingValues(true);
     }
     else 
       setFieldValuesRepeatable([{}]);
   },[]);
+
+  useEffect(()=>{
+    let okToChange = areAllFieldsEmpty();
+    if (props.actionType=="EDIT" && props.preexistingValues)
+      okToChange = okToChange && compareFieldsToPreexisting();
+    props.setOkToChange(okToChange);
+  },[fieldValuesFixed,fieldValuesRepeatable]);
 
   const submitForm = (e:any) => {
     e.preventDefault();
@@ -49,14 +114,14 @@ function SecurityDetails(props:any){
       createLoan(data).then(res=> {
         console.log("RES", res);
         if (res==200)
-          props.goToNextSection(props.setCurrentSection, props.sectionCount);
+          props.goToNextSection();
         else
           console.log("ERROR")
       }
       ).catch(err=> console.log(err))
     }
     else
-      props.goToNextSection(props.setCurrentSection, props.sectionCount); 
+      props.goToNextSection(); 
   }
 
   return(

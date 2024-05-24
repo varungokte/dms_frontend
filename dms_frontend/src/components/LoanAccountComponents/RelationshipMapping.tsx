@@ -11,7 +11,7 @@ import ProfileIcon from "../BasicComponents/ProfileIcon";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
 
-function RelationshipMapping(props:any){
+function RelationshipMapping(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
   const [userInfo, setUserInfo] = useState([]);
   const [role, setRole] = useState("");
 

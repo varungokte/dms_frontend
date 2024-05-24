@@ -7,8 +7,9 @@ import FormDialog from "../BasicComponents/FormDialog";
 import useGlobalContext from "./../../../GlobalContext";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
-function Ratings(props:any) {
+function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   //Ratingslist is an array of different ratings
   //Each rating is an array: [Rating Agency, Rating Type, Date,Outlook]
   //Rating Type can be: Provisional (0) or Final (1)
@@ -37,17 +38,14 @@ function Ratings(props:any) {
  // const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
-    getRatingsList(props.loanId).then(res=>{
-      console.log(res, res);
-      const arr:any= [];
-      res.map((rating:any)=>{
-        console.log(rating)
-        arr.push([rating.A, rating.T, rating.DT, rating.O, rating.L, rating.R]);
-        console.log(arr)
-      })
-      setRatingsList(res);
+    getRatingsList(props.loanId).then((res)=>{
+      if (res.status==200)
+        setRatingsList(res.arr);
+      else
+        setRatingsList([]);
     }).catch(err=>{
       console.log(err);
+      setRatingsList([]);
     })
   },[])
 
@@ -86,9 +84,9 @@ function Ratings(props:any) {
   return(
     <div className="mt-8">
       <div className="flex flex-row">
-        {/* <div className='flex-auto'>
-          <Search setter={setSearchString} label="Search" />
-        </div> */}
+        <div className='flex-auto'>
+          {/* <Search setter={setSearchString} label="Search" /> */}
+        </div>
         <div>
           <FormDialog 
             triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
@@ -99,13 +97,16 @@ function Ratings(props:any) {
       </div>
 
       <div className="m-5">
-        <Table className="border">
-          <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
+        {ratingsList.length==0
+          ?<EmptyPageMessage sectionName="ratings" />
+          :<Table className="border">
+            <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
 
-          <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "text", "ratingOutlook", "text", "text"]}
-            searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
-          />
+            <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "text", "ratingOutlook", "text", "text"]}
+              searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
+            />
         </Table>
+        }
       </div>
       <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>

@@ -1,10 +1,10 @@
 import { FormRepeatableGrid } from "../BasicComponents/FormFields";
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 import { BankAccountType, EnumIteratorValues } from "../BasicComponents/Constants";
 
-function BankDetails(props:any) {
+function BankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   const {createLoan} = useGlobalContext();
 
   const [fieldList] = useState([
@@ -18,16 +18,61 @@ function BankDetails(props:any) {
   ]);
   
   const [fieldValues, setFieldValues] = useState<any>([{}]);
-  const [preexistingValues, setPreexistingValues] = useState(false);
+  const [valuesExist, setValuesExist] = useState(false);
+
+  const areAllFieldsEmpty = () => {
+    let all_fields_empty=true;
+    for (let i=0; i<fieldList.length; i++){
+      const field = fieldList[i];
+      for (let j=0; j<fieldValues.length; j++){
+        const singleAccount=fieldValues[j];
+        if (singleAccount[field.id] && singleAccount[field.id]!="" && singleAccount[field.id]!=-1)
+          all_fields_empty=false;
+      }
+    }
+    return all_fields_empty
+  }
   
+  const compareFieldsToPreexisting = () => {
+    let no_changes=true;
+    for (let i=0; i<fieldList.length; i++){
+      const field = fieldList[i];
+      for (let j=0; j<fieldValues.length; j++){
+        if (fieldValues[j][field.id] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
+          no_changes=false;
+      }
+    }
+    return no_changes;
+  }
+
+  useEffect(()=>{
+  },[props.preexistingValues])
+    
   useEffect(()=>{
     if (props.preexistingValues["BD"]){
-      setFieldValues(props.preexistingValues["BD"]);
-      setPreexistingValues(true);
+      const arr:any=[];
+      props.preexistingValues["BD"].map((element:any)=>{
+        const obj:any={};
+        Object.keys(element).map(value=>{
+          obj[value] = element[value];
+        })
+        arr.push(obj);  
+      });
+      setFieldValues(arr);
+
+      setValuesExist(true);
+      props.setOkToChange(true);
     }
     else 
       setFieldValues([{}])
-  },[])
+  },[]);
+
+  useEffect(()=>{
+    if (props.actionType=="EDIT" && props.preexistingValues)
+      props.setOkToChange(compareFieldsToPreexisting());
+    else
+      props.setOkToChange(areAllFieldsEmpty());
+  },[fieldValues]);
   
   const submitForm = (e:any) =>{
     e.preventDefault();
@@ -44,21 +89,21 @@ function BankDetails(props:any) {
       createLoan(data).then(res=> {
         console.log("RES", res);
         if (res==200)
-          props.goToNextSection(props.setCurrentSection, props.sectionCount);
+          props.goToNextSection();
         else
           console.log("error");
       }
       ).catch(err=> console.log(err))
     }
     else
-      props.goToNextSection(props.setCurrentSection, props.sectionCount);
+      props.goToNextSection();
   }
 
   return (
     <div className="">
       <br/>
       <form onSubmit={submitForm}>
-        <FormRepeatableGrid fieldList={fieldList} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={preexistingValues} />
+        <FormRepeatableGrid fieldList={fieldList} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={valuesExist} />
         <FormSectionNavigation setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
     </div>

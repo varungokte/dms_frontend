@@ -6,13 +6,15 @@ import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
-import { EnumIteratorValues, FileTypes, PriorityValues } from "../BasicComponents/Constants";
+import { EnumIteratorValues, PriorityValues } from "../BasicComponents/Constants";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
-function LoanConditions(props:any){
+function LoanConditions(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
   
   const [newFiles, setNewFiles] = useState<any>([]);
   const [conditionsList] = useState([
-    { D:"A description of this condition", SD:"23/09/1222", ED:"21/10/1321", PL:"A", EL:"B" }
+    /* { D:"A description of this condition", SD:"23/09/1222", ED:"21/10/1321", PL:"A", EL:"B" } */
   ]);
 
   const [fieldValues, setFieldValues] = useState<any>({});
@@ -74,30 +76,35 @@ function LoanConditions(props:any){
       </div>
       <br/>
       <div className="">
-        <Table className="border rounded-2xl">
-          <HeaderRows headingRows={[["Description"],["Phyical Location"], ["Execution Location"], ["Start Date"],["End Date"], ["Action"]]} />
-              <BodyRowsMapping
-                list={conditionsList} columns={["D","PL","EL", "SD", "ED"]} dataType={["text", "text","text", "text", "text", "action"]}
-                searchRows={[]} filterRows={[]}
-                action = {conditionsList.map((item:any, index:number)=>{
-                  item;
-                  return(
-                    <div className="flex flex-row">
-                      <FormDialogDocuments key={index} index={index} edit={true} type="con" 
-                        triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editCondtion}
-                        detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-                        uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-                        currentFields={conditionsList[index]}
-                      />
-                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Condition?" description="Are you sure you want to delete this condition?" 
-                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCondtion} 
-                      />
-                    </div>
-                  )
-                })}
-              />
-        </Table>
+        {conditionsList.length==0
+          ?<EmptyPageMessage sectionName="documents" />
+          :<Table className="border rounded-2xl">
+            <HeaderRows headingRows={[["Description"],["Phyical Location"], ["Execution Location"], ["Start Date"],["End Date"], ["Action"]]} />
+            <BodyRowsMapping
+              list={conditionsList} columns={["D","PL","EL", "SD", "ED"]} dataType={["text", "text","text", "text", "text", "action"]}
+              searchRows={[]} filterRows={[]}
+              action = {conditionsList.map((item:any, index:number)=>{
+                item;
+                return(
+                  <div className="flex flex-row">
+                    <FormDialogDocuments key={index} index={index} edit={true} type="con" 
+                      triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editCondtion}
+                      detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+                      uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
+                      currentFields={conditionsList[index]}
+                    />
+                    <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Condition?" description="Are you sure you want to delete this condition?" 
+                      actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCondtion} 
+                    />
+                  </div>
+                )
+              })}
+            />
+          </Table>
+        }
       </div>
+      <br/>
+      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 

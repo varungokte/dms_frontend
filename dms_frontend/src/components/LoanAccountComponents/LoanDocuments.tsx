@@ -15,8 +15,9 @@ import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
-function LoanDocuments(props: any) {
+function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   //docData is an array of documents
   //Each document is a array: [Document Name, Priority, Physical Location, Execution Location, Start Date, End Date, Status]
   const [docData, setDocData] = useState<any>([]);
@@ -67,6 +68,9 @@ function LoanDocuments(props: any) {
   const addDocument = async () =>{
     const formData = new FormData();
     fieldValues["_loanId"]=props.loanId;
+    console.log("the name", fieldValues["N"]);
+    fieldValues["LOC"]=`${props.AID}/${specificDetails.sectionName}/${TransactionDocumentTypes[Number(fieldValues["N"])]}`;
+    console.log("the loc",fieldValues["LOC"])
     const enc_data = await handleEncryption(fieldValues) || "";
     
     formData.append("data", enc_data);
@@ -75,7 +79,7 @@ function LoanDocuments(props: any) {
     
     console.log("the path of the trans doc", Number(fieldValues["N"]),  TransactionDocumentTypes[Number(fieldValues["N"])]);
     
-    const res = await createDocument(formData,props.AID,specificDetails.sectionName,TransactionDocumentTypes[Number(fieldValues["N"])]);
+    const res =  await createDocument(formData);
     
     setFieldValues({});
 
@@ -152,7 +156,7 @@ function LoanDocuments(props: any) {
         </div>
       </div> 
       <div className="m-5">
-        {docData.length==0?<p className="m-auto font-medium text-xl text-gray-500">No documents here</p>
+        {docData.length==0?<EmptyPageMessage sectionName="documents" />
           :<Table className="border rounded-3xl" style={{borderRadius:"md"}}>
             <HeaderRows className="" headingRows={[["Document Name"],["Document Type"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
             <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["transaction","file","priority","text","text","text","text","action"]}

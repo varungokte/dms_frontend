@@ -1,6 +1,6 @@
 import { useEffect, useState, createElement, FormEventHandler } from "react";
 
-function FormTextField(props:{id:string, name:string, type:string, required:boolean, disabled:boolean, fieldValues:any, setter:Function,repeatFields:boolean, formIndex:number}) {
+function FormTextField(props:{id:string, name:string, type:string, required:boolean, disabled:boolean, fieldValues:any, setter:Function,repeatFields?:boolean, formIndex?:number}) {
   return (
     <div className="my-3">
       <label htmlFor={props.id}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
@@ -9,22 +9,20 @@ function FormTextField(props:{id:string, name:string, type:string, required:bool
         id={props.id} type={props.type}
         required={props.required} disabled={props.disabled}
         min={props.type=="number"?0:""}
-        value={props.repeatFields
+        value={props.repeatFields && props.formIndex!=null
           ?(props.id in props.fieldValues[props.formIndex]?(props.fieldValues[props.formIndex][props.id]==-1?"":props.fieldValues[props.formIndex][props.id]):"")
           :props.fieldValues[props.id]==null?"":(props.fieldValues[props.id]==-1?"":props.fieldValues[props.id])
         }
-        onChange={props.repeatFields
+        onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{
             props.setter((curr:any)=>{
-              curr[props.formIndex][props.id] = e.target.value;
+              curr[props.formIndex||0][props.id] = e.target.value;
+              console.log("new curr",curr)
               return [...curr];
             })
           }
           :(e)=>{
             props.setter((curr:any)=>{
-              if (props.id=="SD"){
-                console.log("date format", e.target.value, typeof e.target.value)
-              }
               if (props.id=="HA" && curr["SA"] && Number(e.target.value)>Number(curr["SA"]))
                 return {...curr}
               curr[props.id] = e.target.value;
@@ -39,20 +37,57 @@ function FormTextField(props:{id:string, name:string, type:string, required:bool
   )
 }
 
-function FormSelectField(props:{id:string, name:string, required:boolean, disabled:boolean, fieldValues:any, setter:Function, options:any,repeatFields:boolean, formIndex:number}) {
+function FormNumberField(props:{id:string, name:string, required:boolean, disabled:boolean, fieldValues:any, setter:Function,repeatFields?:boolean, formIndex?:number}) {
   return (
     <div className="my-3">
       <label htmlFor={props.id}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
       <br/>
-      <select className="border-2 bg-white w-4/5 p-4 rounded-xl" id={props.id} disabled={props.disabled}
-        value={props.repeatFields
+      <input className="border-2 p-4 w-4/5 rounded-xl" 
+        id={props.id}
+        required={props.required} disabled={props.disabled}
+        min={0}
+        value={props.repeatFields && props.formIndex!=null
+          ?(props.id in props.fieldValues[props.formIndex]?(props.fieldValues[props.formIndex][props.id]==-1?"":props.fieldValues[props.formIndex][props.id]):"")
+          :props.fieldValues[props.id]==null?"":(props.fieldValues[props.id]==-1?-1:Number(props.fieldValues[props.id]))
+        }
+        onChange={props.repeatFields && props.formIndex!=null
+          ?(e)=>{
+            props.setter((curr:any)=>{
+              curr[props.formIndex||0][props.id] = e.target.value;
+              console.log("new curr",curr)
+              return [...curr];
+            })
+          }
+          :(e)=>{
+            props.setter((curr:any)=>{
+              if (props.id=="HA" && curr["SA"] && Number(e.target.value)>Number(curr["SA"]))
+                return {...curr}
+              curr[props.id] = e.target.value;
+              if ((props.id=="SA" || props.id=="HA") && (curr["HA"] && curr["SA"]))
+                curr["DA"] = Number(curr["SA"])-Number(curr["HA"]);
+              return {...curr};
+          })
+          }
+        } 
+      />
+    </div>
+  )
+}
+
+function FormSelectField(props:{id:string, name:string, required:boolean, disabled:boolean, fieldValues:any, setter:Function, options:any,repeatFields?:boolean, formIndex?:number}) {
+  return (
+    <div className="my-3">
+      <label htmlFor={props.id}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
+      <br/>
+      <select className="border-2 bg-white w-4/5 p-4 rounded-xl" id={props.id} disabled={props.disabled} required={props.required}
+        value={props.repeatFields && props.formIndex!=null
           ?props.fieldValues[props.formIndex][props.id]==null?-1:props.fieldValues[props.formIndex][props.id]
           :props.fieldValues[props.id]==null?-1:props.fieldValues[props.id]
         } 
-        onChange={props.repeatFields?
-          (e)=>{
+        onChange={props.repeatFields && props.formIndex!=null
+          ?(e)=>{
             props.setter((curr:any)=>{
-              curr[props.formIndex][props.id] = e.target.value;
+              curr[props.formIndex||0][props.id] = e.target.value;
               return [...curr];
           })}
           :(e)=>{
@@ -62,7 +97,7 @@ function FormSelectField(props:{id:string, name:string, required:boolean, disabl
           })
         }}
       >
-        <option className="font-light" key={-1} value={-1}>Select {props.name}</option>
+        <option className="font-light" key={-1} value={""}>Select {props.name}</option>
         {props.options.map((option:any, index:number)=>{
           return <option key={index} value={index+1}>{option}</option>
         })}
@@ -73,29 +108,27 @@ function FormSelectField(props:{id:string, name:string, required:boolean, disabl
 
 function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValues:Function, submitForm:FormEventHandler, fieldsInRow:number, preexistingValues?:boolean}) {
   const [currentForm, setCurrentForm] = useState(0);
-  const [repeatForm, setRepeatForm] = useState<any>([{ key:"f0", grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm, repeatFields:true }]);
+  const [repeatForm, setRepeatForm] = useState<any>([]);
   const [renderRepeatForm, setRenderRepeatForm] = useState<any>([]);
-
+  
   useEffect(()=>{
     if (props.preexistingValues){
       setCurrentForm(props.fieldValues.length-1);
-      setRepeatForm(()=>{
-        return (props.fieldValues.map((acc:any,index:number)=>{
-          return { key:"f"+index, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:index, repeatFields:true }
-        }));
-      });
+      const arr =  (props.fieldValues.map((acc:any,index:number)=>{
+        return { key:"f"+index, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:index, repeatFields:true }
+      }));
+      setRepeatForm(arr);
     }
     else {
       setRepeatForm ([{ key:"f0", grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm, repeatFields:true }]);
       props.setFieldValues([{}])
     }
-  },[]);
-
+  },[props.preexistingValues]);
 
   useEffect(()=>{
     setRenderRepeatForm((curr:any)=>{
-      curr = repeatForm.map((form:any)=>{
-        form.fieldValues = props.fieldValues;
+      curr = repeatForm.map((form:any,index:number)=>{
+        form.fieldValues= props.fieldValues;
         return createElement(RenderForm, form);
       });
       return curr;
@@ -107,7 +140,8 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
       <br/>
       <div>
         {renderRepeatForm.map((grid:any,index:number)=>{
-          return <div key={index} className={`grid grid-cols-${props.fieldsInRow}`}>{grid}</div>;
+          const fieldsInRow =props.fieldsInRow==2?`grid grid-cols-2`:`grid grid-cols-3`;
+          return <div key={index} className={fieldsInRow}>{grid}</div>;
         })}
       </div>
       <div>
@@ -134,7 +168,6 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
 }
 
 function RenderForm(props:{grid:any, fieldValues:any, setter:Function, formIndex:number, repeatFields:boolean}) {
-  //console.log("render form props", props)
   return props.grid.map((item:any,index:number)=>{
     return item.type=="select"?
       <FormSelectField id={item.id} key={index} name={item.name} options={item.options} setter={props.setter} disabled={false} fieldValues={props.fieldValues} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
@@ -142,4 +175,4 @@ function RenderForm(props:{grid:any, fieldValues:any, setter:Function, formIndex
   })
 }
 
-export { FormTextField, FormSelectField, FormRepeatableGrid };
+export { FormTextField, FormSelectField, FormRepeatableGrid, FormNumberField };

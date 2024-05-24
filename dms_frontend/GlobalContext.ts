@@ -332,14 +332,14 @@ const getRatingsList = async (loanId:string) => {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_loanId": loanId },
 		});
-		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject; 
+		const decryptedObject = await handleDecryption(response.data);
+		return {status:response.status, arr:decryptedObject}; 
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0, arr:[]};
 		else
-			return error.response;
+			return{status: error.reponse.status, arr:[]};
 	}
 }
 
@@ -441,7 +441,7 @@ const addTeamMember = async (data:any) => {
 	}
 }
 
-const createDocument = async (data:any, AID:string, section:string, path:string) => {
+const createDocument = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 
@@ -451,9 +451,7 @@ const createDocument = async (data:any, AID:string, section:string, path:string)
 			console.log(`${key}: ${value}, ${typeof value}`);
 
 		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
-			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
-			params: { "LOC": `${AID}/${section}/${path}` }
-		});
+			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' }});
 
 		console.log("Server response, ",response);
 		return response.status;
@@ -499,7 +497,7 @@ const getSingleDocument = async (AID:string,section:string,filename:string) =>  
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { LOC: `${AID}/TD/${section}/${filename}` }
 		});
-		console.log(response.data	)
+		console.log(response.data)
 		const decryptedObject = await handleDecryption(response.data);
 
 		console.log("decrypted object", decryptedObject)

@@ -1,7 +1,7 @@
 import { useState } from "react";
 //import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
-import { CovenantDocumentTypes, CovenantType, EnumIteratorKeys, EnumIteratorValues, FileTypes, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
+import { CovenantDocumentTypes, CovenantType, EnumIteratorKeys, EnumIteratorValues, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
 import FormDialog from "../BasicComponents/FormDialog";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { Table } from "../ui/table";
@@ -10,16 +10,18 @@ import edit_icon from "./../static/edit_icon.svg";
 import delete_icon from "./../static/delete_icon.svg";
 import ActionDialog from "../BasicComponents/ActionDialog";
 import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 
 
-function LoanCovenants(props:any){
+function LoanCovenants(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
   //const [searchString, setSearchString] = useState("");
   const [priority, setPriority] = useState(1);
   const [newFiles, setNewFiles] = useState<any>([]);
 
   const [documentList] = useState([
-    { T:1, D: "An example of a periodic covenant", F:2, EL:"A",PL:"B", P:1, SD:"1/2/3", ED:"2/2/3" },
-    { T:2, D: "An example of an event-based covenant",EL:"A",PL:"B", P:2 }
+    /* { T:1, D: "An example of a periodic covenant", F:2, EL:"A",PL:"B", P:1, SD:"1/2/3", ED:"2/2/3" },
+    { T:2, D: "An example of an event-based covenant",EL:"A",PL:"B", P:2 } */
   ]);
 
   const [fieldValues, setFieldValues] = useState<any>({});
@@ -85,7 +87,9 @@ function LoanCovenants(props:any){
       </div>
       <br/>
       <div className="">
-        <Table className="border rounded-2xl">
+        {documentList.length==0
+          ?<EmptyPageMessage sectionName="covenants" />
+          :<Table className="border rounded-2xl">
           {priority==1
             ?<><HeaderRows headingRows={[["Description"],["Frequency"], ["Physical Location"], ["Execution Location"], ["Start Date"],["End Date"], ["Priority"], ["Action"]]} />
               <BodyRowsMapping
@@ -113,7 +117,7 @@ function LoanCovenants(props:any){
               <BodyRowsMapping list={documentList.filter(document=>document["T"]==2)} columns={["D", "P"]} dataType={["text", "priority", "action"]}
                 searchRows={[]} filterRows={[]}
                 action = {documentList.filter(document=>document["T"]==2).map((item:any, index:number)=>{
-                  console.log(item)
+                  item;
                   return(
                     <div className="flex flex-row">
                       <FormDialog 
@@ -131,8 +135,10 @@ function LoanCovenants(props:any){
               />
             </>
           }
-        </Table>
+        </Table>}
       </div>
+      <br/>
+      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }
