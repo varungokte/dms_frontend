@@ -140,7 +140,7 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
             if (field.type=="repeatable")
               return <FormRepeatableGrid key={index} fieldList={field.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} preexistingValues={preexistingValues} />
           })}
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       <br/>
       </form>
     </div>

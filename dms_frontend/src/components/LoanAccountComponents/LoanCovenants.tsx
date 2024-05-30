@@ -7,8 +7,7 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { Table } from "../ui/table";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import edit_icon from "./../static/edit_icon.svg";
-import delete_icon from "./../static/delete_icon.svg";
-import ActionDialog from "../BasicComponents/ActionDialog";
+import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
 import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
@@ -105,9 +104,7 @@ function LoanCovenants(props:{key:number,actionType: string, loanId: string, set
                         uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
                         currentFields={documentList[index]}
                       />
-                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Covenant?" description="Are you sure you want to delete this covenant?" 
-                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCovenant} 
-                      />
+                      <DeleteConfirmation thing="covenant" deleteFunction={deleteCovenant} currIndex={index}/>
                     </div>
                   )
                 })}
@@ -126,9 +123,7 @@ function LoanCovenants(props:{key:number,actionType: string, loanId: string, set
                         form={fieldList} setter={setFieldValues}
                         edit={true} fieldValues={fieldValues}  currentFields={documentList[index]}
                       />
-                      <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description="Are you sure you want to delete this document?" 
-                        actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCovenant(index)} 
-                      />
+                      <DeleteConfirmation thing="covenant" deleteFunction={deleteCovenant} currIndex={index}/>
                     </div>
                   )
                 })}
@@ -138,7 +133,7 @@ function LoanCovenants(props:{key:number,actionType: string, loanId: string, set
         </Table>}
       </div>
       <br/>
-      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

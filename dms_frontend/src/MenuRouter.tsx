@@ -13,7 +13,7 @@ import TeamMembers from './components/TeamMembers';
 import Zones from './components/Zones';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
-import Default from './components/Default';
+import Default from './components/DefaultCases';
 import CriticalCases from './components/CriticalCases';
 import Reports from './components/Reports';
 import Reminders from './components/Reminders';
@@ -37,12 +37,14 @@ import LoanAccount from './components/LoanAccount';
 import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
 import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 import TeamManagement from './components/TeamManagement';
+import DocumentViewer from './components/BasicComponents/DocumentViewer';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
 	const [hover,setHover] = useState(-1);
 	const navigate = useNavigate();
 	const {getDecryptedToken} = useGlobalContext();
+
 /* 
 	const [socketIsConnected, setSocketIsConnected] = useState( socket.connected);
 
@@ -87,6 +89,7 @@ export const MenuRouter = () => {
 		if (decodedToken)
 			return decodedToken;
 	}
+	
 	useEffect(()=>{
 		getUserInfo().then(res=>{
 			if (res)
@@ -108,27 +111,8 @@ export const MenuRouter = () => {
 				</DropdownMenuContent>
 			</DropdownMenu>);
 		})
-	},[/* socketIsConnected */])
+	},[/* socketIsConnected */]);
 	
-	const [txnTestData] = useState([
-    ["ABC123", "Mortgage", "01/01/01", 
-      [
-        ["Lender's Agent Agreement", "PDF", 2, "02/02/02", 1, 12, ["lenderagreement.pdf" /* Will get the actual file(s) */]],
-        ["Escrow Agent Agreement", "XLSX", 1, "03/03/02", 0, 0, []],
-        ["Subordination Agreement", "PDF", 0, "03/03/02", 1, 1, ["subord.pdf"]],
-        ["Agreement 1", "PDF", 2, "11/11/11", 1,3,[]],
-        ["Agreement 2", "PDF", 1, "11/11/11", 2,3,["lender.pdf"]]
-      ]
-    ],
-
-    ["DOC123", "Home Equity Loans", "02/05/07", 
-      [
-        ["Lender's Agent Agreement", "PDF", 2, "02/02/02", 1, 2, ["lenderagreement.pdf"]],
-        ["Escrow Agent Agreement", "XLSX", 0, "03/03/02", 1, 1, ["escrow.pdf"]],
-        ["Subordination Agreement", "PDF", 0, "03/03/02", 1, 1, ["subord.pdf"]],
-      ]
-    ]
-  ]);
 	const [componentList] = useState([
 		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
 		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
@@ -147,7 +131,8 @@ export const MenuRouter = () => {
 		{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
 		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
-	])
+	]);
+	
 	return (
 		<div className='relative'>
 			<div style={{ width: "17%", float: "left", height: "100vh", position: "fixed", overflowY:"scroll"}} className='bg-custom-1' >
@@ -179,7 +164,7 @@ export const MenuRouter = () => {
 				</div>
 			</div>
 			
-			<div style={{ width: "83%", float: "right" }}>
+			<div style={ {width: "83%", float: "right"} }>
 				<div className='relative h-20 w-100 bg-white'>
 					<div className=' absolute inset-y-5 right-0 w-50'>
 						{userInfo}
@@ -188,14 +173,12 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					{componentList.map((item,index)=>{
-						if (item.component==DocumentList)
-							return <Route key={index} path={item.path} element={createElement(item.component, { label: item.name, docData: txnTestData })}  />
-						else
-							return <Route key={index} path={item.path} element={createElement(item.component)} />
+							return <Route key={index} path={item.path} element={createElement(item.component, { label: item.name })} />
 					})}
 					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
 					<Route key={"T"} path="/teams/:id" element={<TeamMembers/>} />
+					<Route key={"D"} path="/view/:id" element={<DocumentViewer />} />
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

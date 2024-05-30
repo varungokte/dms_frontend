@@ -104,7 +104,7 @@ function BankDetails(props:{key:number,actionType: string, loanId: string, setLo
       <br/>
       <form onSubmit={submitForm}>
         <FormRepeatableGrid fieldList={fieldList} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={valuesExist} />
-        <FormSectionNavigation setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
     </div>
   )

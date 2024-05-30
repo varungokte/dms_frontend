@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 //import useGlobalContext from "./../../GlobalContext";
 import DashboardTest from "./DashboardTest";
-import { FormNumberField } from "./BasicComponents/FormFields";
-
+import { Link } from "react-router-dom";
 
 function Dashboard() {	
 	//const { getSingleDocument} = useGlobalContext();
@@ -43,9 +42,12 @@ function Dashboard() {
 				</div>
 
 				<div>
-				<button onClick={()=>setTest(<DashboardTest/>)}>Run DashboardTest</button>
-				{test}
-				<FormNumberField id={"A"} key={"A"} name={"A"} setter={()=>{}} disabled={false} fieldValues={""} required={true} />
+					<button onClick={()=>setTest(<DashboardTest/>)}>Run DashboardTest</button>
+					{test}
+				</div>
+				
+				<div>
+					<Link to="view/data.pdf">GO </Link>	
 				</div>
 			</div>
 		</div>

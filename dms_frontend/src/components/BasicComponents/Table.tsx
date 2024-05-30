@@ -4,19 +4,19 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 
 import chevron_down from "./../static/chevron-down.svg";
 
-function HeaderRows(props:any){
+function HeaderRows(props:{headingRows:any[]}){
   return(
-    <TableHeader className="bg-custom-h">
+    <TableHeader>
       <TableRow>
       {props.headingRows.map((heading:any,index:number)=>{
-        return <TableHead key={index} className={heading.length>1?heading[1]:""}>{heading[0]}</TableHead>
+        return <TableHead key={index}>{heading[0]}</TableHead>
       })}
       </TableRow>
     </TableHeader>
   )
 }
 
-function BodyRowsMapping(props:any){
+function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellClassName?:any, dataType:any, action?:any, columns:any}){
   return(
     <TableBody>
       {props.list.map((singleRow:any, index:number)=>{
@@ -29,18 +29,18 @@ function BodyRowsMapping(props:any){
             searchValid=true;
         }
 
-        let filterValid = true
+        let filterValid = true;
         if (props.filterRows.length>0){
           filterValid = false;
           const filter = props.filterRows[0];
           for (let i=1; i<props.filterRows.length; i++){
-            if ((singleRow[props.filterRows[i]])==Number(filter)+1)
+            if ((singleRow[props.filterRows[i]])==Number(filter))
               filterValid = true;
           }
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName} dataType={props.dataType} action={props.action} columns={props.columns} />
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} />
         else
           return ""
       })}
@@ -48,13 +48,13 @@ function BodyRowsMapping(props:any){
   )
 }
 
-function SingleRow(props:any){
+function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, singleRow:any, action:any, columns:any}){
   return(
-    <TableRow key={props.rowIndex}>
+    <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
         let cellClassName="";
         const uniqueIndex = props.rowIndex+"_"+index;
-        if (props.cellClassName)
+        if (props.cellClassName.length!=0)
           cellClassName = props.cellClassName[index];
       
         if (dataType=="index")
@@ -63,12 +63,12 @@ function SingleRow(props:any){
         else if (dataType=="action")
           return handleAction(props.action[props.rowIndex], cellClassName, uniqueIndex)
     
-        const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
+        const item = props.singleRow[props.columns[props.dataType[0]=="index"?index:index]];
 
         if (dataType=="text")
           return handleText(item, cellClassName, uniqueIndex);
         else if (dataType=="priority")
-          return handlePriority(Number(item)-1, cellClassName, uniqueIndex);
+          return handlePriority(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="docStatus")
           return handleDocStatus(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="userStatus")
@@ -78,17 +78,17 @@ function SingleRow(props:any){
         else if(dataType=="zone")
           return handleZone(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="ratingAgency")
-          return handleRatingAgency(Number(item)-1, cellClassName, uniqueIndex);
+          return handleRatingAgency(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="ratingType")
-          return handleRatingType(Number(item)-1, cellClassName, uniqueIndex);
+          return handleRatingType(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="ratingOutlook")
-          return handleRatingOutlook(Number(item)-1, cellClassName, uniqueIndex);
+          return handleRatingOutlook(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="frequency")
-          return handleFrequency(Number(item)-1, cellClassName, uniqueIndex);
+          return handleFrequency(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="transaction")
-          return handleTransactionDocumentType(Number(item)-1, cellClassName, uniqueIndex);
+          return handleTransactionDocumentType(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="file")
-          return handleFileType(Number(item)-1, cellClassName, uniqueIndex);
+          return handleFileType(Number(item), cellClassName, uniqueIndex);
       })}
     </TableRow>
   )
@@ -144,7 +144,7 @@ const handleRole = (index:number, cellClassName:string, uniqueIndex:string) => {
 }
 
 const handleZone = (index:number, cellClassName:string, uniqueIndex:string) => {
-  return <TableCell key={uniqueIndex} className={cellClassName}>{EnumIteratorValues(ZoneList)[index+1]}</TableCell>
+  return <TableCell key={uniqueIndex} className={cellClassName}>{EnumIteratorValues(ZoneList)[index]}</TableCell>
 }
 
 const handleAction = (action:any, cellClassName:string, uniqueIndex:string) => {
@@ -175,29 +175,4 @@ const handleFileType = (index:number, cellClassName:string, uniqueIndex:string) 
   return <TableCell key={uniqueIndex} className={cellClassName}>{FileTypes[index]}</TableCell>
 }
 
-export { HeaderRows, BodyRowsMapping }
-
-/* 
-  props to HeaderRows:
-    headingRows= [
-      ["Title","text-white bg-white"],
-      ["Name"],
-    ],
-
-  props to BodyRows:
-    bodyRows = [
-      [row1 Style, ROw1 Label],
-      [Row2 Style, Row2 Label]
-    ]
-
-  props to BodyRowsMapping:
-    list = {[
-      [singleRow1],
-      [singleRow2]
-    ]}  REQ
-    dataType =  ["text", "priority"]  cloumn data type  REQ
-    searchRows = [] if searchString is "", else [searchString, 0,1] do regExp search in columns 0 and 1  REQ
-    filterRows = [[priority, 2], [companyName, 1]]  REQ
-    action ={<>Component to be rendered</>}
-    cellClassName={["Styling for Col1", "Styling for Col2"]}
- */
+export { HeaderRows, BodyRowsMapping };

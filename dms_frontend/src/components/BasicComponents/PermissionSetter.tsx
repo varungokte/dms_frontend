@@ -4,7 +4,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from ".
 function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillValues:Function, permissionSet:any}){
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
-  const [permissionList, setPermissionList] = useState({
+  const [permissionList, setPermissionList] = useState<any>({
     "Loan Account": [],
     "Product": [],
     "Transaction Documents": [],
@@ -82,11 +82,8 @@ function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillVal
                     <TableCell key={index+action}>
                       <input 
                         type="checkbox"
-                        //@ts-ignore
                         checked={permissionList[section].includes(action)}
-                        //@ts-ignore
                         onChange={(e)=>{
-                          //@ts-ignore
                           togglePermission(permissionList[section],action,e.target.checked,section);
                         }}
                       />

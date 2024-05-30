@@ -1,4 +1,4 @@
-function Search(props:any){
+function Search(props:{label:string, setter:Function}){
   return(
     <input 
       type="text" 

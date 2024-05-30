@@ -1,107 +1,152 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
 
-import { Table, TableBody } from "@/components/ui/table"
+import { Table } from "@/components/ui/table"
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { PriorityValues, EnumIteratorKeys } from "./BasicComponents/Constants";
 import TableCollapsible from "./BasicComponents/TableCollapsible";
 
-import UploadButton from "./BasicComponents/UploadButton";
-//import Search from "./BasicComponents/Search";
+import {UploadButton, ViewFilesButton} from "./BasicComponents/UploadButton";
+import Search from "./BasicComponents/Search";
 import ProgressBar from "./BasicComponents/ProgressBar";
+import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 
-function DocumentList(props:any) {
-  //This can be for Transaction Documents, Compliance Documents, Covenants, and others
-  //Data about documents: An array where each element represents the details of a single transaction
-  //Each transaction is an array: [Sanction_No, Deal_Name, Date, Document_List]
-  //Document_List is an array of documents detais
-  //Each document details is an array: [Doc_Name, Doc_type, Priority, Deal_Date, Status, completed, total, [the actual document files]]
-  const [docData] = useState(props.docData)
-  //const [searchString, setSearchString] = useState("");
+function DocumentList(props:{label:string}) {	
+  
+  const [dealData] = useState([
+    {AID:"ABC123", CN:"Company 1", SD:"01/01/01", },
+    {AID:"AGMT123", CN:"Company 2", SD:"01/01/01", },
+  ]);
+  const [searchString, setSearchString] = useState("");
 
-  const {useTitle} =useGlobalContext();
+  const {useTitle} = useGlobalContext();
 
-  useTitle(props.label)
+  useTitle(props.label);
 
   return(
     <div>
 			<p className="text-3xl font-bold m-7">{props.label}</p>
 			<div className="flex flex-row">
-        {/* <div className=''>
+        <div className=''>
           <Search setter={setSearchString} label="Search"/>
-        </div>   */}
+        </div>
       </div>
 
       <div className="bg-white m-10 rounded-xl">
         <br/>
-        <Table>
-          <TableBody>
-            {docData.map((deal:any)=>{
-              return (<DealDetails deal={deal}/>)
+        {dealData.length==0
+          ?<EmptyPageMessage sectionName="deals"/>
+          :<>
+            {dealData.map((deal:Object, index:number)=>{
+              return (<SingleDealDetails key={index} deal={deal} label={props.label} searchString={searchString} />)
             })}
-          </TableBody>
-        </Table>
+          </> 
+        }
         <br/>
       </div>
     </div>
   )
 }
 
-function DealDetails(props:any) {
-
+function SingleDealDetails(props:{deal:any, label:string, searchString:string}) {
   return(
     <TableCollapsible
       topRow={[
-        [props.deal[1], "w-[20%] font-medium text-base"],
-        [props.deal[0], "w-[20%] font-medium text-base"], 
-        [props.deal[2], "w-[30%] font-medium text-base"],
+        [props.deal["AID"], "w-[20%] font-medium text-base"],
+        [props.deal["CN"], "w-[20%] font-medium text-base"], 
+        [props.deal["SD"], "w-[30%] font-medium text-base"],
         ["Document Upload", "w-[26.70%] font-medium text-base text-justify"],
       ]}
       bottomRow={[
-        ["Sanction No.", "font-light"], 
-        ["Deal Name", "font-light"],
-        ["Date", "font-light"],
+        ["Agreement ID", "font-light"], 
+        ["Company Name", "font-light"],
+        ["Sanction Date", "font-light"],
         [<ProgressBar value={50} />, "content-center"],
       ]}
-      content={<SingleDealDocuments documents={props.deal[3]}/>}
+      content={props.label=="Transaction Documents" || props.label=="Compliance Documents"
+        ?<SingleDealDocuments AID={props.deal["AID"]}  />
+        :(props.label=="Covenants"
+          ?<SingleDealCovenants AID={props.deal["AID"]} />
+          :<SingleDealConditions AID={props.deal["AID"]} />
+        )
+      }
+      searchString={props.searchString}
     />
-  )  
+  )
 }
 
-function SingleDealDocuments(props:any){
-  const [priority, setPriority] = useState(2);
+function SingleDealDocuments(props:{AID:string}){
+  //const [priority, setPriority] = useState(3);
+  const [docData, setDocData] = useState<any>([]);
+
+  useEffect(()=>{
+    props.AID
+    setDocData([
+      {N: 3, P:1, PL:"Mumbai", EL:"Mumbai", SD:"02/02/02", ED:"03/03/03", S:1 },
+      {N: 1, P:3, PL:"Jaipur", EL:"Jaipur", SD:"02/02/02", ED:"03/03/03", S:2 },
+      {N: 5, P:2, PL:"Coruscant", EL:"Coruscant", SD:"02/02/02", ED:"03/03/03", S:2 },
+      {N: 2, P:2, PL:"Tipoca City", EL:"Coruscant", SD:"02/02/02", ED:"03/03/03", S:1 },
+    ]);
+  },[]);
 
   return(
     <div className="p-5 mx-3 my-2 ">
-      <div className="float-right">
+      {/* <div className="float-right">
         <div className="text-base">
-          Priority:{`  `}             
-          <select className="p-3 rounded-xl" onChange={(e:any)=>setPriority(e.target.value)}>
-            {EnumIteratorKeys(PriorityValues).map(val=>{
-              if (Number(val)==priority)
-                return <option value={val} selected>{PriorityValues[Number(val)]}</option>
-              else
-                return <option value={val}>{PriorityValues[Number(val)]}</option>
+          Priority:{`  `}
+          <select className="p-3 rounded-xl"
+            value={priority} 
+            onChange={(e:any)=>setPriority(e.target.value)}
+          >
+            {EnumIteratorKeys(PriorityValues).map((val,index)=>{
+              return <option key={index} value={val}>{PriorityValues[Number(val)]}</option>
             })}
           </select>
         </div>
-      <br/> 
+        <br/> 
       </div> 
-      <br/> 
+      <br/>  */}
       <br/>
-      <Table className="bg-gray-100 rounded-xl">
-        <HeaderRows headingRows={[["Document Name", "w-[20%]"], ["Document Type", "w-[10%]"],["Priority","w-[15%] text-center"],["Deal Date", "w-[20%]"],["Status","w-[20%]"], ["Action"]]} />
-        <BodyRowsMapping 
-          list={props.documents} dataType={["text","text","priority","text","text","action"]}
-          searchRows={[]} filterRows={[priority,2]}
-          action={
-            props.documents.map((doc: any)=>{
-              return doc[6].length===0?<UploadButton fileType={doc[1]+""}/>:<></>
-            })
-          }
-        />
-      </Table>
+      {docData.length==0
+        ?<EmptyPageMessage sectionName="documents" />
+        :<Table>
+          <HeaderRows headingRows={[["Document Name", "w-[20%] text-center"], ["Priority","w-[10%] text-center"], ["Physical Location", "w-[15%] text-center"], ["Execution Location", "w-[15%] text-center"], ["Start Date", "w-[15%] text-center"],["End Date", "w-[15%] text-center"], ["Status","w-[20%] text-center"], ["Action","text-center"]]} />
+          <BodyRowsMapping list={docData} 
+            dataType={["transaction","priority","text","text","text","text","docStatus","action"]} 
+            columns={["N","P","PL","EL","SD","ED","S"]}
+            cellClassName={["text-center","","text-center","text-center","text-center","text-center","text-center",""]}
+            searchRows={[]} filterRows={[]}
+            action={
+              docData.map((doc: any)=>{
+                if (doc["S"]==1)
+                  return <UploadButton />
+                else
+                  return <ViewFilesButton />
+              })
+            }
+          />
+        </Table>
+      }
     </div>
+  )
+}
+
+function SingleDealCovenants(props:{AID:string}){
+  useEffect(()=>{
+    props.AID
+  },[]);
+
+  return (
+    <div>Cov</div>
+  )
+}
+
+function SingleDealConditions(props:{AID:string}){
+  useEffect(()=>{
+    props.AID
+  },[]);
+  
+  return (
+    <div></div>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FormTextField, FormSelectField, FormNumberField } from "../BasicComponents/FormFields";
+import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
 import {FormSectionNavigation} from "./../BasicComponents/FormSectionNavigation";
 import moment from "moment";
@@ -147,7 +147,7 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
           })}
         </div>
         <br/>
-        <FormSectionNavigation currentSection={props.currentSection} goToNextSection={props.goToNextSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
       <br/>
     </div>

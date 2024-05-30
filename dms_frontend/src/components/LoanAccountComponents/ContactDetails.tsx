@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 
-import { CircleUserIcon, Edit2Icon } from "lucide-react";
+import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
@@ -93,7 +93,6 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       else if (field.category=="grid"){
         for (let j=0; j<field.fields.length; j++){
           const gridField = field.fields[j];
-          //@ts-ignore
           if (fieldValues[gridField.id]!=null){
             data[gridField.id] = fieldValues[gridField.id];
           }
@@ -105,9 +104,9 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       data["_loanId"]= loanId;
 
       addContact(data, "").then(res=>{
-        if (res==200){
+        if (res==200)
           setAdded(true);
-        }
+        
         else if (res==422){
           toast({
             title: "Error!",
@@ -166,7 +165,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       
         <div className="mr-3">
           <FormDialog key={-5} index={-5} edit={false}
-            triggerText="+ Add Contact" triggerClassName={CreateButtonStyling} formSize="large"
+            triggerText={<div className="flex flex-row"><Plus className="mt-1"/> <p className="">Add Contact</p></div>} triggerClassName={CreateButtonStyling} formSize="large"
             formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
             form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentField={fieldValues}
           />
@@ -264,7 +263,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
         }):<EmptyPageMessage sectionName="contacts" />}
       </div>
       <br/>
-      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

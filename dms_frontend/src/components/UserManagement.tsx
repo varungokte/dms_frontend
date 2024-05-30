@@ -6,7 +6,7 @@ import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
 import FormDialog from "./BasicComponents/FormDialog";
 import Search from "./BasicComponents/Search";
-import ActionDialog from "./BasicComponents/ActionDialog";
+import ActionDialog from "./BasicComponents/DeleteConfirmation";
 
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import edit_icon from "./static/edit_icon.svg";

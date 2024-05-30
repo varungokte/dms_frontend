@@ -466,14 +466,14 @@ const createDocument = async (data:any) => {
 }
 
 //viewDocs
-const getDocumentsList = async (AID:string,section:string) =>  {
+const getDocumentsList = async (AID:string,section_name:string, document_category:string) =>  {
 	try {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/listDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/${section}` }
+			params: { LOC: `${AID}/${section_name}/${document_category}` }
 		});
-		const decryptedObject = await handleDecryption(response.data);
+		const decryptedObject = /* await handleDecryption */(response.data);
 
 		console.log("decrypted object", decryptedObject)
 		
@@ -490,12 +490,12 @@ const getDocumentsList = async (AID:string,section:string) =>  {
 	}
 };
 
-const getSingleDocument = async (AID:string,section:string,filename:string) =>  {
+const getSingleDocument = async (AID:string,section_name:string, document_category:string,file_name:string) =>  {
 	try {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/viewDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/TD/${section}/${filename}` }
+			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}`  }
 		});
 		console.log(response.data)
 		const decryptedObject = await handleDecryption(response.data);
@@ -534,6 +534,32 @@ const deleteDocument = async (data:any) => {
 			return error.response;
 	}
 }
+
+const fetchDocument = async (AID:string,section_name:string, document_category:string,file_name:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/viewDocs`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}` },
+			responseType: 'blob',
+		});
+		console.log("the fetch response", response);
+		//const decryptedObject = await handleDecryption(response.data);
+		console.log("the decrypted object",response.data)
+		const blob = new Blob([response.data], {type:"application/pdf"});
+		let url = URL.createObjectURL(blob);
+		//URL.revokeObjectURL(url);
+		console.log("the returned url", url);
+
+		return {status:response.status, url:url};
+	} 
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
 
 //addMember, getTeam
 
@@ -580,6 +606,7 @@ const useGlobalContext = () => {
 		getDocumentsList,
 		deleteDocument,
 		getSingleDocument,
+		fetchDocument,
 	}
 }
 

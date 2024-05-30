@@ -104,6 +104,7 @@ function RoleField (props:{index:number, id: string, name:string, required:boole
 
   useEffect(()=>{
     //call function to get role list
+    console.log(singleRolePermission)
     setAllPermissionsList(
       {"Maker":
         {

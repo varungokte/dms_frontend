@@ -114,7 +114,7 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
           )
         })}
       </div>
-      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

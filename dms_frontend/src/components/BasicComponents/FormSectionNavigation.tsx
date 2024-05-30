@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-function FormSectionNavigation(props:any) {
+
+function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, goToNextSection:Function, isForm:boolean}) {
 	const navigate = useNavigate();
 
   const previousSection = () =>{
@@ -24,7 +25,7 @@ function FormSectionNavigation(props:any) {
         
         {props.isForm
           ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1 p-3" type="submit"><div className="flex flex-row place-content-center"><div>Save & Next</div><ChevronRight/></div></button>
-          :<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1" onClick={()=>props.goToNextSection(props.setCurrentSection,props.sectionCount)}><div className="flex flex-row place-content-center"><div>Save & Next</div><ChevronRight/></div></button>
+          :<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1" onClick={()=>props.goToNextSection()}><div className="flex flex-row place-content-center"><div>Save & Next</div><ChevronRight/></div></button>
         }
       </div>
   </div>

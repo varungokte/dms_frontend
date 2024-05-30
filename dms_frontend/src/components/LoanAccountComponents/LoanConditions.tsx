@@ -4,8 +4,7 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { Table } from "../ui/table";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import edit_icon from "./../static/edit_icon.svg";
-import delete_icon from "./../static/delete_icon.svg";
-import ActionDialog from "../BasicComponents/ActionDialog";
+import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
 import { EnumIteratorValues, PriorityValues } from "../BasicComponents/Constants";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
@@ -93,9 +92,7 @@ function LoanConditions(props:{key:number,actionType: string, loanId: string, se
                       uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
                       currentFields={conditionsList[index]}
                     />
-                    <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Condition?" description="Are you sure you want to delete this condition?" 
-                      actionClassName="text-white bg-red-600 rounded-lg" actionLabel="Delete" actionFunction={deleteCondtion} 
-                    />
+                    <DeleteConfirmation thing="covenant" deleteFunction={deleteCondtion} currIndex={index}/>
                   </div>
                 )
               })}
@@ -104,7 +101,7 @@ function LoanConditions(props:{key:number,actionType: string, loanId: string, se
         }
       </div>
       <br/>
-      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 

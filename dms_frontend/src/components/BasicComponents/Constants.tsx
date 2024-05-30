@@ -1,67 +1,69 @@
-enum UserRoles { "Maker"=1, "Checker", "Admin", "Superadmin", };
+enum UserRoles { "-","Maker", "Checker", "Admin", "Superadmin", };
 
-enum UserStatusValues { "Unverified"=1, "Active", "Inactive" };
+enum UserStatusValues { "-","Unverified", "Active", "Inactive" };
 
-enum UserStatusStyling { "text-yellow-600 bg-yellow-100"=1, "text-green-600 bg-green-100", "text-red-600 bg-red-100" };
+enum UserStatusStyling { "-","text-yellow-600 bg-yellow-100", "text-green-600 bg-green-100", "text-red-600 bg-red-100" };
 
-enum DocumentStatusValues { "Pending"=1, "In Progress", "Verified", "Overdue" };
+enum DocumentStatusValues { "-","Pending", "In Progress", "Verified", "Overdue" };
 
-enum DocumentStatusStyling { "text-green-600"=1, "text-yellow-600", "text-red-600", };
+enum DocumentStatusStyling { "-","text-yellow-500", "text-blue-500", "text-green-600", "text-red-600" };
 
-enum TransactionDocumentTypes {"", "Common Loan Agreements","Security Trustee Agreement","Lenders Agent Agreement","Escrow Agreement","Substitution Agreement","Subordination Agreement","Supplementary Escrow Agreement","Sponsors Undertakings","Security documents","Pledge Agreement","Consent to Assignment","Trust and Retention Account Agreement",};
+enum TransactionDocumentTypes { "-", "Common Loan Agreements","Security Trustee Agreement","Lenders Agent Agreement","Escrow Agreement","Substitution Agreement","Subordination Agreement","Supplementary Escrow Agreement","Sponsors Undertakings","Security documents","Pledge Agreement","Consent to Assignment","Trust and Retention Account Agreement",};
 
-enum ComplianceDocumentTypes { "Common Loan Agreement"=1, "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
+enum ComplianceDocumentTypes { "-","Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
 
-enum CovenantDocumentTypes {"Covenant Type A"=1,"Covenant Type B"};
+enum CovenantDocumentTypes { "-", "Covenant Type A","Covenant Type B"};
 
-enum ConditionPrecedentTypes {"Condition A"=1, "Condition B"};
+enum ConditionPrecedentTypes {"-", "Condition A", "Condition B"};
 
-enum ConditionSubsequentTypes {"Condition A"=1, "Condition B"};
+enum ConditionSubsequentTypes {"-", "Condition A", "Condition B"};
 
-enum FileStatusValue { "Pending"=1, "In Progress", "Verified", "Overdue"};
+enum FileStatusValue { "-", "Pending", "Verified"};
 
-enum FileTypes {"Any"=1, "PDF", "DOCX"};
+enum FileStatusStyling { "-", "text-yellow-500", "text-green-600" };
 
-enum PriorityValues { "Low"=1, "Medium", "High", };
+enum FileTypes { "-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG" };
 
-enum PriorityStyling { "text-green-600 bg-green-100"=1, "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100", };
+enum PriorityValues { "-", "Low", "Medium", "High", };
 
-enum CovenantType {"Periodic"=1, "Event-Based"};
+enum PriorityStyling { "-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100", };
 
-enum RatingAgencies { "ICRA"=1, "CRISIL"};
+enum CovenantType { "-", "Periodic", "Event-Based"};
 
-enum RatingTypes { "Provisional"=1,"Final" };
+enum RatingAgencies { "-", "ICRA", "CRISIL"};
 
-enum RatingOutlook {"Negative"=1, "Stable", "Positive" };
+enum RatingTypes { "-", "Provisional","Final" };
 
-enum RatingValues { "AA-(Stable)"=1, "A1+", "Gold Status" };
+enum RatingOutlook { "-", "Negative", "Stable", "Positive" };
 
-enum ZoneList {"West"=1, "South", "East", "North"};
+enum RatingValues { "-", "AA-(Stable)", "A1+", "Gold Status" };
 
-enum ContactType { "Borrower"=1 , "Promotor", "Lender", "Lender Agent", "Legal Council", "Banks Legal Team", "Lender Insurance Agent", "Lenders Independent Engineer" };
+enum ZoneList { "-", "West", "South", "East", "North"};
 
-enum IndustryList { "Real Estate"=1,"NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others" };
+enum ContactType { "-", "Borrower" , "Promotor", "Lender", "Lender Agent", "Legal Council", "Banks Legal Team", "Lender Insurance Agent", "Lenders Independent Engineer" };
 
-enum LoanType { "Long Term"=1, "Short Term" };
+enum IndustryList { "-", "Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others" };
 
-enum LoanProduct { "Term Loan"=1,"Drop-line LOC","WCDL","Debentures" };
+enum LoanType { "-", "Long Term", "Short Term" };
 
-enum FrequencyType {"Monthly"=1, "Quarterly", "Half-Yearly", "Yearly"};
+enum LoanProduct { "-", "Term Loan","Drop-line LOC","WCDL","Debentures" };
 
-enum BankAccountType {"Saving"=1, "Current"};
+enum FrequencyType { "-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"};
+
+enum BankAccountType {"-", "Saving", "Current"};
 
 const EnumIteratorKeys = (list: any) => {
-  return Object.keys(list).filter(v=>!isNaN(Number(v)))
+  return Object.keys(list).filter(v=>!isNaN(Number(v)) && v!="0")
 };
 
 const EnumIteratorValues = (list: any) => {
-  return Object.keys(list).filter(v=>isNaN(Number(v)))
+  return Object.keys(list).filter(v=>isNaN(Number(v)) && v!="-")
 };
 
 export {
   UserRoles, UserStatusValues, UserStatusStyling, 
   DocumentStatusValues, DocumentStatusStyling, 
-  FileStatusValue, FileTypes,
+  FileStatusValue, FileStatusStyling, FileTypes,
   PriorityValues, PriorityStyling,
   CovenantType,
   RatingTypes, RatingOutlook, RatingAgencies, RatingValues,

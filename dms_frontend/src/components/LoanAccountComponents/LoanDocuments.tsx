@@ -12,15 +12,16 @@ import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "../ui/toaster";
 
 import edit_icon from "./../static/edit_icon.svg";
-import delete_icon from "./../static/delete_icon.svg";
-import ActionDialog from "../BasicComponents/ActionDialog";
+import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   //docData is an array of documents
   //Each document is a array: [Document Name, Priority, Physical Location, Execution Location, Start Date, End Date, Status]
-  const [docData, setDocData] = useState<any>([]);
+  const [docData, setDocData] = useState<any>([
+    {N:1, P:2, SD:"A", ED:"B", EL:"EL", }
+  ]);
   
   const [specificDetails] = useState(props.label=="Transaction Documents"
     ?{
@@ -36,7 +37,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
   //const [priority, setPriority] = useState(-1);
   const [newFiles, setNewFiles] = useState<any>([{}]);
 
-  const {createDocument, handleEncryption, getDocumentsList } = useGlobalContext();
+  const {createDocument, handleEncryption, getDocumentsList, fetchDocument } = useGlobalContext();
   const { toast } = useToast();
 
   const [fieldValues, setFieldValues] = useState<any>({
@@ -45,13 +46,25 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     EL:"", PL:"",
   });
 
+  const [showDoc, setShowDoc] = useState(<></>)
+
+  useEffect(()=>{
+    console.log("fetching the document",props.AID, specificDetails.sectionName,TransactionDocumentTypes[Number(3)],"1716803032797-data2.pdf");
+    fetchDocument(props.AID, specificDetails.sectionName,TransactionDocumentTypes[Number(3)],"1716803032797-data2.pdf").then(res=>{
+      console.log(res);
+      setShowDoc(<iframe src={res.url} width="100%" height="600px" title="Document Viewer"></iframe>)
+    }).catch(err=>{
+      console.log("an error", err)
+    })
+  },[])
+
   useEffect(()=>{
     console.log("the filed valiues in the loan page", fieldValues);
   },[fieldValues])
   
   const [fieldList] = useState([
     { category:"grid", row:2, fields:[
-      { id: "N", name:"Document Name", type:"select", options:EnumIteratorValues(specificDetails.docNameList), required:false, immutable:true },
+      { id:"N", name:"Document Name", type:"select", options:EnumIteratorValues(specificDetails.docNameList), required:false, immutable:true },
       { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
       { id:"SD", name:"Start Date", type:"date", required:false },
       { id:"ED", name:"End Date", type:"date", required:false },
@@ -77,7 +90,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     for (let i=0; i<newFiles.length; i++)
       formData.append("file", newFiles[i]);
     
-    console.log("the path of the trans doc", Number(fieldValues["N"]),  TransactionDocumentTypes[Number(fieldValues["N"])]);
+    console.log("the path of the trans doc", Number(fieldValues["N"]), TransactionDocumentTypes[Number(fieldValues["N"])]);
     
     const res =  await createDocument(formData);
     
@@ -90,7 +103,6 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         className:"bg-white"
       })
     }
-
     return res;
   }
 
@@ -99,8 +111,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
   },[])
 
   const showList=()=>{
-    getDocumentsList(props.AID,specificDetails.sectionName).then(res=>{
-      console.log("the res we got back", res)
+    getDocumentsList(props.AID,specificDetails.sectionName, TransactionDocumentTypes[Number(3)]).then(res=>{
         if (res.status==200)
           setDocData([]/* res.obj */)
         else
@@ -158,10 +169,11 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
       <div className="m-5">
         {docData.length==0?<EmptyPageMessage sectionName="documents" />
           :<Table className="border rounded-3xl" style={{borderRadius:"md"}}>
-            <HeaderRows className="" headingRows={[["Document Name"],["Document Type"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
-            <BodyRowsMapping list={docData} columns={["N", "T", "P", "PL","EL","SD","ED"]} dataType={["transaction","file","priority","text","text","text","text","action"]}
+            <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
+            <BodyRowsMapping list={docData} columns={["N", "P", "PL","EL","SD","ED"]} dataType={["transaction","priority","text","text","text","text","action"]}
               searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
               action = {docData.map((item:any, index:number)=>{
+                item;
                 return(
                   <div className="flex flex-row">
                     <FormDialogDocuments key={index} index={index} edit={true} type="doc"
@@ -170,9 +182,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
                       uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
                       currentFields={docData[index]}
                     />
-                    <ActionDialog trigger={<img src={delete_icon}/>} title="Delete Document?" description={`Are you sure you want to delete the ${specificDetails.docNameList[item.N]}?`} 
-                      actionClassName="text-white bg-red-600 py-2 px-5 rounded-lg hover:bg-red-800" actionLabel="Delete" actionFunction={obliterateDocument} currIndex={index}
-                    />
+                    <DeleteConfirmation thing="document" deleteFunction={obliterateDocument} currIndex={index}/>
                   </div>
                 )
               })}
@@ -180,8 +190,9 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
           </Table>
         }
       </div>
+      {showDoc}
       <br/>
-      <FormSectionNavigation isForm={false} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

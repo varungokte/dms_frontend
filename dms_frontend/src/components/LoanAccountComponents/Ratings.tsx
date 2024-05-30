@@ -34,7 +34,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
 
   const {addRating, getRatingsList} = useGlobalContext();
 
-  const [ratingsList, setRatingsList] = useState([])
+  const [ratingsList, setRatingsList] = useState([]);
  // const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
