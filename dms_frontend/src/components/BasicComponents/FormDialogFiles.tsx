@@ -89,12 +89,10 @@ function FormDialogFiles(props:{triggerText:any}){
                 :<></>
               }
             </div>
-            <div className="bg-custom-1 text-white w-[100px] rounded-[8px] pl-5">
-              <label htmlFor="upload">
-                <span className="inline-block align-middle"><Plus/></span>
-                <span className="inline-block align-middle">Add</span>
-              </label>
-            </div>
+            <label className="bg-custom-1 text-white w-[100px] rounded-[8px] pl-5" htmlFor="upload">
+              <span className="inline-block align-middle"><Plus/></span>
+              <span className="inline-block align-middle">Add</span>
+            </label>
             <input id="upload" type="file" style={{width:"0.1px", opacity:"0"}}
               onChange={
                 (e)=>setFiles((curr:any)=>{
@@ -105,7 +103,7 @@ function FormDialogFiles(props:{triggerText:any}){
                   return arr;
                 })
               }
-            />
+            />            
           </div>
         </DialogTitle>
         <div>

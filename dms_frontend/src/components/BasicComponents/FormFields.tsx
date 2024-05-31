@@ -175,4 +175,4 @@ function RenderForm(props:{grid:any, fieldValues:any, setter:Function, formIndex
   })
 }
 
-export { FormTextField, FormSelectField, FormRepeatableGrid, FormNumberField };
+export { FormSelectField, FormTextField, FormRepeatableGrid, FormNumberField };

@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { SubmitButtonStyling } from "./PurpleButtonStyling";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
-import { SelectField, TextAreaField, TextField } from "./FormDialogFields";
+import { DateField, SelectField, TextAreaField, TextField } from "./FormFieldsDialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
+import {useDropzone} from "react-dropzone";
+import { Upload } from "lucide-react";
+import { ComplianceDocumentTypes, EnumIteratorValues, FileTypes, TransactionDocumentTypes } from "./Constants";
+import useGlobalContext from "./../../../GlobalContext";
+import { toast } from "../ui/use-toast";
 
-function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassName:string, formTitle:string, formSubmit:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currentFields:any, type:string }){
+function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassName:string, formTitle:string, formSubmit:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, docPath:string[], currentFields?:any, type:string }){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
+  const [fileList, setFileList] = useState<any>([]);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [currentTab, setCurrentTab] = useState("details");
   const [fileType, setFileType] = useState(-1);
@@ -18,12 +24,10 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
     if (props.edit){
       setPrefillValues(props.currentFields);
       setEnableUpload(true);
-      if (props.currentFields["Docs"])
-        props.fileSetter(props.currentFields["Docs"].map((document:any)=>{return {name:document.originalname}}))
     }
     else
       setPrefillValues(props.fieldValues);
-  },[props.fieldValues])
+  },[props.fieldValues,props.currentFields]);
 
   const validateRequiredFields=()=>{
     const data:any={};
@@ -44,7 +48,6 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
       const key = Object.keys(data)[i];
       const value = data[key];
       if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1)){
-        console.log("incomplete")
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
         return false;
       }
@@ -57,7 +60,11 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
 
   const submitDetails = async () => {
     console.log("Reached submit")
-    const res = await props.formSubmit();
+    let res;
+    if (props.edit)
+      res = await props.formSubmit(prefillValues,fileList,props.currIndex);
+    else
+      res = await props.formSubmit(prefillValues,fileList);
     if (res==200)
       setOpen(false);
     else
@@ -71,19 +78,19 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger className={props.triggerClassName}>{props.triggerText}</AlertDialogTrigger>
-      <AlertDialogContent className={`bg-white overflow-y-scroll max-h-screen min-w-[800px]`}>
+      <AlertDialogContent className={`bg-white overflow-y-auto max-h-screen min-w-[800px]`}>
         <AlertDialogHeader>
           <AlertDialogTitle className="text-2xl font-normal">{props.formTitle}</AlertDialogTitle>
           <hr/>
         </AlertDialogHeader>
         <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
-          <TabsList className="grid w-full grid-cols-2">
+          <TabsList className="grid w-full grid-cols-2 border-0">
             <TabsTrigger value="details" className="h-10">Document Details</TabsTrigger>
             <TabsTrigger value="upload" className="h-10" disabled={!enableUpload}>File Upload</TabsTrigger>
           </TabsList>
-          <TabsContent value="details" className="h-full" style={{overflowY:"auto"}}>
-            <Card>
-              <CardContent className="mt-5">
+          <TabsContent value="details" className="h-full border-0" style={{overflowY:"auto"}}>
+            <Card className="border-0">
+              <CardContent className="mt-5"  style={{borderWidth:"0px", borderColor:"white"}}>
                 <form onSubmit={(e)=>{props.formSubmit(e);}}>
                   {props.detailForm.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
@@ -91,18 +98,23 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
                         return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} 
                           options={field["options"]} 
                           required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-                          setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                          prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
                           setFileType={setFileType} setCovType={setCovType} sectionType={props.type} 
                         />
                       else if (field["type"]=="textarea")
                         return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} 
                           required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-                          setter={props.setter}  prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                          prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                        />
+                      else if (field["type"]=="date")
+                        return <DateField key={index} index={index} id={field["id"]} name={field["name"]} 
+                          required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+                          prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
                         />
                       else
                         return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]} 
                           required={field["required"]?true:false} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-                          setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                          prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
                         />
                     }
                     else if (field["category"]=="grid"){
@@ -117,20 +129,27 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
                                 return <span key={index+"_"+itemIndex} className="mr-3">
                                   <SelectField index={index} id={item["id"]} name={item["name"]} 
                                     required={item["required"]?true:false} options={item["options"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
-                                    setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                                    prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
                                     setFileType={setFileType} setCovType={setCovType} sectionType={props.type}
+                                  />
+                                </span>
+                              else if (item["type"]=="date")
+                                return <span key={index+"_"+itemIndex} className="mr-3">
+                                  <DateField index={index} id={item["id"]} name={item["name"]} 
+                                    required={item["required"]?true:false} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                                    prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
                                   />
                                 </span>
                               else
                                 return <span key={index+"_"+itemIndex} className="mr-3">
                                   <TextField index={index} id={item["id"]} name={item["name"]} type={item["type"]} 
-                                  required={item["required"]?true:false} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
-                                  setter={props.setter} prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
-                                />
-                              </span>  
+                                    required={item["required"]?true:false} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                                    prefillValues={prefillValues} setPrefillValues={setPrefillValues} 
+                                  />
+                                </span>  
                             })}
                           </div>
-                        </div> 
+                        </div>
                       )
                     }
                   })}
@@ -140,9 +159,9 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
             </Card>
           </TabsContent>
           <TabsContent value="upload">
-            <Card className="mt-5">
-              <CardContent className="">
-                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={props.fileList} fileSetter={props.fileSetter} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} />
+            <Card className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
+              <CardContent className="border-0">
+                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} edit={props.edit} docPath={props.docPath} prefillValues={prefillValues} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -158,56 +177,106 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
   )
 };
 
-function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function}) {
-  const statusList = [<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
+function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function, docPath:string[], prefillValues:any, edit?:boolean}) {
+	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
+
+  const [sectionDocumentLists] = useState<any>({ "TD":EnumIteratorValues(TransactionDocumentTypes), "CD":EnumIteratorValues(ComplianceDocumentTypes) })
+  
+  const statusList = [<></>,<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
   //const [filePossibilities] = useState(["","application/pdf"])
   const [error, setError] = useState(<></>)
-  const renderList = () => {
-    if (!props.fileList || props.fileList.length<1)
-      return <></>;
+  const [renderedFileList, setRenderedFileList] = useState(<></>);
 
-    return (
-      props.fileList.map((item:any,index:number)=>{
-        return (
-          <div key={index} className="border p-3 flex flex-row">
-            <div key={index} className="flex-auto">
-              <p>{item.name}</p>
-              {statusList[item[1]]}
-            </div>
-            <button type="button">x</button>
+  const {getFileList, deleteDocument} = useGlobalContext();
+
+  useEffect(()=>{
+    props.fileSetter((curr:any)=>{
+      const arr  = [...curr];
+      if (acceptedFiles && acceptedFiles.length>0)
+        for (let i=0; i<acceptedFiles.length; i++){
+          arr.push([acceptedFiles[i],0]);
+          setError(<></>);
+        }
+      return arr;
+    });
+  },[acceptedFiles]);
+
+
+
+  useEffect(()=>{
+    console.log(props.fileList);
+    setRenderedFileList (props.fileList.map((item:any,index:number)=>{
+      return (
+        <div key={index} className="border p-3 flex flex-row">
+          <div key={index} className="flex-auto">
+            <p>{item[0].name?item[0].name:item[0]}</p>
+            {statusList[item[1]]}
           </div>
-        )
-      })
-    )
-  };
+          <button type="button" onClick={()=>deleteFile(item[0].name?item[0].name:item[0])}>x</button>
+        </div>
+      )
+    }))
+  },[props.fileList]);
+
+  const deleteFile = (fileName:string) => {
+    deleteDocument(props.docPath[2],props.docPath[0],props.docPath[1], sectionDocumentLists[props.docPath[1]][Number(props.prefillValues["N"]-1)], fileName).then(res=>{
+      if (res==200){
+        toast({
+          title: "Success!",
+          description: <p className="text-black">Your document has been successfully deleted</p>,
+          className:"bg-white",
+          color:"text-green-500"
+        })
+        getUploadedFiles();
+      }
+      else
+        setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>); 
+    }).catch(()=>{
+      setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>);
+    })
+  }
+
+  const getUploadedFiles = () => {
+    getFileList(props.docPath[0],props.docPath[1], sectionDocumentLists[props.docPath[1]][Number(props.prefillValues["N"]-1)]).then(res=>{
+      console.log("here are the files",res);
+      if(res.status==200)
+        props.fileSetter(()=>{
+          const arr  = [];
+          if (res.obj["files"] && res.obj["files"].length>0)
+            for (let i=0; i<res.obj["files"].length; i++){
+              console.log("file name",res.obj["files"][i])
+              arr.push([res.obj["files"][i],0]);
+              setError(<></>);
+            }
+          return arr;
+        });
+      else
+        setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
+    }).catch(err=>{
+      setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
+      console.log(err);
+    })
+  }
 
   return (
     <div>
-      <div key={props.index+props.name+"f_0"} className="flex flex-row">
-        <label key={props.index+props.name+"f_1"} htmlFor={props.id} className="bg-custom-1 text-white my-5 border rounded-if p-3">Choose File(s)</label>
-        <input key={props.index+props.name+"f_2"} id={props.id} type="file" style={{width:"0.1px", opacity:"0"}} 
-          required={props.required}
-          multiple
-          onChange={
-            (e)=>props.fileSetter((curr:any)=>{
-              const arr  = [...curr];
-              if (e.target.files && e.target.files.length>0)
-                for (let i=0; i<e.target.files.length; i++){
-                  //if (props.fileType==1 || e.target.files[i].type==filePossibilities[props.fileType-1]){
-                    arr.push(e.target.files[i]);
-                    setError(<></>)
-                  /* }
-                  else
-                    setError(<p className="text-red-700">Invalid file type</p>) */
-                }
-              return arr;
-            })
-          }
-        />
+      <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
+        <input {...getInputProps()} />
+        <div className="my-2 text-center">
+          <span className="inline-block align-middle text-custom-1"><Upload/></span>
+          <p className="text-custom-1">Choose File to Upload</p>
+        </div>
       </div>
+      <br/>
+      <div className="flex flex-row">
+        <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{EnumIteratorValues(FileTypes).map(ft=>" "+ft).toString()}</p>
+        {props.edit?<button className="text-custom-1" onClick={()=>getUploadedFiles()}>Get Uploaded Files</button>:<></>}
+      </div>
+      <br/>
       {error}
+      <br/>
       <div>
-        {renderList()}
+        {renderedFileList}
       </div>
     </div>
   )

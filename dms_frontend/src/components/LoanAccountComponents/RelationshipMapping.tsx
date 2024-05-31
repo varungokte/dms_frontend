@@ -10,6 +10,7 @@ import { Edit2Icon } from "lucide-react";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
 function RelationshipMapping(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
   const [userInfo, setUserInfo] = useState([]);
@@ -31,8 +32,7 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
       const arr:any = [];
       if (res){
         for (let i=0; i<res.M.length; i++)
-          arr.push([res.M[i].N, res.M[i].E, "NOROLE"])
-        
+          arr.push([res.M[i].N, res.M[i].E, "NOROLE"])        
         setUserInfo(arr);
       }
     });
@@ -83,36 +83,38 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
             formTitle="Relationship Mapping" formSubmit={addUser} submitButton="Save"
             form = {fieldList} setter={setFieldValues} fieldValues={fieldValues}
             repeatFields={true} 
-            suggestions={true} suggestionsFunction={getUserSuggestions}
           />  
         </div>
       </div>
 
       <div className="flex flex-row flex-wrap">
-        {userInfo.map((user,index)=>{
-          return (
-            <Card key={index} className="mr-5 my-5 w-72 rounded-xl">
-              <CardHeader>
-                <CardTitle>	
-                  <div className="flex flex-row">
-                    <div className="flex-auto">
-                      <ProfileIcon name={user[0]} size="small" />
+        {userInfo.length==0
+          ?<EmptyPageMessage sectionName="users" />
+          :userInfo.map((user,index)=>{
+            return (
+              <Card key={index} className="mr-5 my-5 w-72 rounded-xl">
+                <CardHeader>
+                  <CardTitle>	
+                    <div className="flex flex-row">
+                      <div className="flex-auto">
+                        <ProfileIcon name={user[0]} size="small" />
+                      </div>
+                      
+                      <div className="">
+                        <Edit2Icon size="20px"/>
+                      </div>
                     </div>
-                    
-                    <div className="">
-                      <Edit2Icon size="20px"/>
-                    </div>
-                  </div>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="text-left">
-                <p className="font-medium">{user[0]}</p>
-                <p className="font-light">{user[1]}</p>
-                <p className="font-light">{role}</p>
-              </CardContent>
-            </Card>
-          )
-        })}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="text-left">
+                  <p className="font-medium">{user[0]}</p>
+                  <p className="font-light">{user[1]}</p>
+                  <p className="font-light">{role}</p>
+                </CardContent>
+              </Card>
+            )
+          })
+        }
       </div>
       <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>

@@ -17,86 +17,73 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
-  //docData is an array of documents
-  //Each document is a array: [Document Name, Priority, Physical Location, Execution Location, Start Date, End Date, Status]
-  const [docData, setDocData] = useState<any>([
-    {N:1, P:2, SD:"A", ED:"B", EL:"EL", }
-  ]);
+  const [docData, setDocData] = useState<any>([]);
   
-  const [specificDetails] = useState(props.label=="Transaction Documents"
-    ?{
-      docNameList: TransactionDocumentTypes,
-      sectionName: "TD",
-    }
-    :{
-      docNameList: ComplianceDocumentTypes,
-      sectionName: "CD",
-    });
+  const [sectionDetails] = useState(props.label=="Transaction Documents"
+    ?{ docNameList: TransactionDocumentTypes, sectionName: "TD", }
+    :{ docNameList: ComplianceDocumentTypes, sectionName: "CD", }
+  );
   
   //const [searchString, setSearchString] = useState("");
   //const [priority, setPriority] = useState(-1);
-  const [newFiles, setNewFiles] = useState<any>([{}]);
-
-  const {createDocument, handleEncryption, getDocumentsList, fetchDocument } = useGlobalContext();
+  const [docPath] = useState([props.AID,sectionDetails.sectionName, props.loanId]);
+  
+  const {createDocument, handleEncryption, getDocumentsList, editDocument } = useGlobalContext();
   const { toast } = useToast();
 
-  const [fieldValues, setFieldValues] = useState<any>({
-    N:-1, P:-1,
-    SD:"", ED:"",
-    EL:"", PL:"",
-  });
+  const [added, setAdded] = useState(true);
 
-  const [showDoc, setShowDoc] = useState(<></>)
-
-  useEffect(()=>{
-    console.log("fetching the document",props.AID, specificDetails.sectionName,TransactionDocumentTypes[Number(3)],"1716803032797-data2.pdf");
-    fetchDocument(props.AID, specificDetails.sectionName,TransactionDocumentTypes[Number(3)],"1716803032797-data2.pdf").then(res=>{
-      console.log(res);
-      setShowDoc(<iframe src={res.url} width="100%" height="600px" title="Document Viewer"></iframe>)
-    }).catch(err=>{
-      console.log("an error", err)
-    })
-  },[])
-
-  useEffect(()=>{
-    console.log("the filed valiues in the loan page", fieldValues);
-  },[fieldValues])
+  const [fieldValues, setFieldValues] = useState<any>({});
+  const [fileList, setFileList] = useState<any>([]);
   
   const [fieldList] = useState([
     { category:"grid", row:2, fields:[
-      { id:"N", name:"Document Name", type:"select", options:EnumIteratorValues(specificDetails.docNameList), required:false, immutable:true },
+      { id:"N", name:"Document Name", type:"select", options:EnumIteratorValues(sectionDetails.docNameList), required:false, immutable:true },
       { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
       { id:"SD", name:"Start Date", type:"date", required:false },
       { id:"ED", name:"End Date", type:"date", required:false },
-      { id:"EL", name:"Execution Location", type:"text" },
       { id:"PL", name:"Physical Location", type:"text" },
-    ]},
-    
+      { id:"EL", name:"Execution Location", type:"text" },
+    ]},    
   ]);
-
   const [uploadField] = useState(
-    { id: "Docs", name:"Document Upload", fileList: newFiles }
+    { id: "Docs", name:"Document Upload", fileList: fileList }
   );
 
-  const addDocument = async () =>{
+  useEffect(()=>{
+    if (added){
+      showList();
+      setAdded(false);
+    }
+  },[added]);
+
+  const showList = ()=>{
+    getDocumentsList(props.loanId,sectionDetails.sectionName).then(res=>{
+      if (res.status==200){console.log(res.obj)
+        setDocData(res.obj)}
+      else
+        setDocData([{N:5,P:1,SD:"23/12/12",ED:"29/12/12", PL:"Coruscant", EL:"Sundari"}])  
+    }).catch(()=>{
+      setDocData([]);
+    })
+  }
+
+  const addDocument = async (userValues:any, userFiles:any) =>{
+    console.log("here's what will be sent", userValues, userFiles);
+
     const formData = new FormData();
-    fieldValues["_loanId"]=props.loanId;
-    console.log("the name", fieldValues["N"]);
-    fieldValues["LOC"]=`${props.AID}/${specificDetails.sectionName}/${TransactionDocumentTypes[Number(fieldValues["N"])]}`;
-    console.log("the loc",fieldValues["LOC"])
-    const enc_data = await handleEncryption(fieldValues) || "";
-    
+    userValues["_loanId"] = props.loanId;
+    userValues["LOC"] = `${docPath[0]}/${docPath[1]}/${TransactionDocumentTypes[Number(userValues["N"])]}`;
+    const enc_data = await handleEncryption(userValues) || "";
     formData.append("data", enc_data);
-    for (let i=0; i<newFiles.length; i++)
-      formData.append("file", newFiles[i]);
+    for (let i=0; i<userFiles.length; i++)
+      formData.append("file", userFiles[i][0]);
     
-    console.log("the path of the trans doc", Number(fieldValues["N"]), TransactionDocumentTypes[Number(fieldValues["N"])]);
-    
-    const res =  await createDocument(formData);
-    
-    setFieldValues({});
+    const res = await createDocument(formData);
 
     if (res==200){
+      setAdded(true);
+      setFieldValues({});
       toast({
         title: "Success!",
         description: "Your document has been successfully added",
@@ -106,24 +93,57 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     return res;
   }
 
-  useEffect(()=>{
-    showList();
-  },[])
+  const changeDocument = async (userValues:any, userFiles:any,currIndex:number) => {
+    console.log("on edit curr index", currIndex)
+    console.log("on edit field values", userValues);
+    console.log("on edit file list", uploadField);
+    console.log("preexisitng data", docData[currIndex])
 
-  const showList=()=>{
-    getDocumentsList(props.AID,specificDetails.sectionName, TransactionDocumentTypes[Number(3)]).then(res=>{
-        if (res.status==200)
-          setDocData([]/* res.obj */)
-        else
-          setDocData([])
-        
-    }).catch(()=>{
-      setDocData([]);
-    })
-  }
+    const formData = new FormData();
+    const data:any={};
 
-  const editDocument = () => {
-    console.log("EDITING")
+    for (let i=0; i<Object.keys(userValues).length; i++){
+      const key = Object.keys(userValues)[i];
+      const val = userValues[key];
+      console.log(key,val,docData[currIndex][key])
+      if (docData[currIndex][key]==val)
+        continue;
+      data[key] = val;
+    }
+    console.log("Data value",data)
+    if (Object.keys(data).length!=0 || Object.keys(userFiles[0]).length!=0 )
+    {
+      data["LOC"] = `${props.AID}/${sectionDetails.sectionName}/${TransactionDocumentTypes[Number(docData[currIndex]["N"])]}`;
+      data["_loanId"] = props.loanId;
+      data["_id"] = docData[currIndex]["_id"];
+
+      console.log("final data",data)
+    
+      const enc_data = await handleEncryption(data) || "";
+      formData.append("data", enc_data);
+      if (userFiles.length!=0)
+        for (let i=0; i<userFiles.length; i++){
+          console.log("file",i,userFiles[i][0])
+          formData.append("file", userFiles[i][0]);
+        }
+
+      console.log ("EDITTED", data)
+      const res = await editDocument(formData);
+      setFieldValues({});
+
+      if (res==200){
+        setAdded(true);
+        setFieldValues({});
+        toast({
+          title: "Success!",
+          description: "Your document has been successfully updated",
+          className:"bg-white"
+        })
+      }
+
+      return res;
+    }
+    return 200;
   }
 
   const obliterateDocument = (index:number) => {
@@ -137,7 +157,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     }).catch(err=>{
       console.log(err);
     }); */
-    console.log(index)
+    console.log(index);
   }
 
   return (
@@ -158,11 +178,11 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         </div>
       
         <div className="mr-3">
-          <FormDialogDocuments key={-5} index={-5} edit={false} type="doc"
+          <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.sectionName}
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} formSubmit={addDocument}
             detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-            uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-            currentFields={fieldValues}
+            uploadForm={uploadField} fileSetter={setFileList} fileList={fileList}
+            currentFields={{}} docPath={docPath}
           />
         </div>
       </div> 
@@ -170,27 +190,26 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         {docData.length==0?<EmptyPageMessage sectionName="documents" />
           :<Table className="border rounded-3xl" style={{borderRadius:"md"}}>
             <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
-            <BodyRowsMapping list={docData} columns={["N", "P", "PL","EL","SD","ED"]} dataType={["transaction","priority","text","text","text","text","action"]}
+            <BodyRowsMapping list={docData} columns={["N", "P", "PL","EL","SD","ED"]} dataType={["transaction","priority","text","text","date","date","action"]}
               searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
               action = {docData.map((item:any, index:number)=>{
                 item;
                 return(
                   <div className="flex flex-row">
-                    <FormDialogDocuments key={index} index={index} edit={true} type="doc"
-                      triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={editDocument}
+                    <FormDialogDocuments key={index} index={index} edit={true} type={sectionDetails.sectionName}
+                      triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={changeDocument}
                       detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-                      uploadForm={uploadField} fileSetter={setNewFiles} fileList={newFiles}
-                      currentFields={docData[index]}
+                      uploadForm={uploadField} fileSetter={setFileList} fileList={fileList}
+                      currentFields={docData[index]} currIndex={index} docPath={docPath}
                     />
                     <DeleteConfirmation thing="document" deleteFunction={obliterateDocument} currIndex={index}/>
                   </div>
                 )
               })}
-            />          
+            />
           </Table>
         }
       </div>
-      {showDoc}
       <br/>
       <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>

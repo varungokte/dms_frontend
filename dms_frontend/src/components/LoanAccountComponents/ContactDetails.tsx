@@ -1,20 +1,22 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 
-import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
-import ProfileIcon from "../BasicComponents/ProfileIcon";
-
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
-import FormDialog from "../BasicComponents/FormDialog";
-import Filter from "../BasicComponents/Filter";
-import Search from "../BasicComponents/Search";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import { ContactType, EnumIteratorKeys, EnumIteratorValues } from "../BasicComponents/Constants";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "../ui/toaster";
+
+import { ContactType, EnumIteratorKeys, EnumIteratorValues } from "../BasicComponents/Constants";
+import ProfileIcon from "../BasicComponents/ProfileIcon";
+import Filter from "../BasicComponents/Filter";
+import FormDialog from "../BasicComponents/FormDialog";
+import Search from "../BasicComponents/Search";
+import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
+
 
 function ContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   const [contacts, setContacts] = useState<any>({});
@@ -81,8 +83,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
   },[added]);
 
 
-  const createContact = (e:any) => {
-    e.preventDefault();
+  const createContact = () => {
     const data:any = {};
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
@@ -119,8 +120,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
     }    
   }
 
-  const editContact = (e:any) =>{
-    e.preventDefault();
+  const editContact = () =>{
     const data:any = {};
 
     console.log("inside edit, oldValues", oldValues)
@@ -167,7 +167,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
           <FormDialog key={-5} index={-5} edit={false}
             triggerText={<div className="flex flex-row"><Plus className="mt-1"/> <p className="">Add Contact</p></div>} triggerClassName={CreateButtonStyling} formSize="large"
             formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentField={fieldValues}
+            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={fieldValues}
           />
         </div>
       </div>
@@ -186,10 +186,10 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
                       </div>
                       <div className="">
                         <div className="flex flex-row">
-                        <FormDialog key={index} index={index} edit={true} type="cont"
+                        <FormDialog key={index} index={index} edit={true}
                           triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
                           formTitle="Edit Contact" formSubmit={editContact} submitButton="Edit Contact"
-                          form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentField={person} setOldValues={setOldValues}
+                          form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={person}
                         />
                         <div className="ml-2">
                         <Dialog>

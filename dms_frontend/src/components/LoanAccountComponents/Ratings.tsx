@@ -88,10 +88,10 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
           {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
         <div>
-          <FormDialog 
+          <FormDialog index={-1}
             triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
-            form = {fieldList} setter={setFieldValues}
+            form={fieldList} fieldValues={fieldValues} setter={setFieldValues} currentFields={{}}
           />
         </div>
       </div>

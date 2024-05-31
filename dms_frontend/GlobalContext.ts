@@ -7,6 +7,7 @@ const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
 const encryption_key = "JAIBAJRANGBALI";
 //old url=https://dms-pbe2.onrender.com
 
+//HELPERS
 const useTitle = (title:string) => {
 	useEffect(()=>{
 		document.title=title+" | Beacon DMS"
@@ -33,46 +34,7 @@ const handleDecryption = async (text:string) => {
 	catch (err){
 		return await decryptedString
 	}
-}
-
-const RegisterAdmin = async (data:object) => {
-	try {
-		console.log(data);
-		const req_body = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
-		console.log(response);
-		return response;
-	} 
-	catch (error) {
-		throw error;
-	}
-}	
-
-//Conflict Error 409 -> User inactive; contact admin
-//Precondition Failed 412 -> Incorrect Password
-//Unauthorized 401 -> Incorrect Username
-const LoginUser = async (data: object) => {
-	try {
-		const req_body = await handleEncryption(data);
-		console.log("req_body", req_body);
-		const response = await axios.post(`${Base_Url}/login`, {data:req_body}, {
-			headers:{ "Content-type": "application/json" }
-		});
-		console.log("response", response)
-		console.log(response.status)
-		if (response.status == 200){
-			localStorage.setItem("Beacon-DMS-token",response["data"]);
-			return 200;
-		}	
-		else
-			return response.status;
-	} 
-	catch (error) {
-		console.log(error);
-		//@ts-ignore
-		return  error.response.status
-	}
-}
+};
 
 const getEncryptedToken = () => {
 	const token = localStorage.getItem('Beacon-DMS-token');
@@ -95,9 +57,49 @@ const getDecryptedToken = async () => {
 	return await decodedToken;
 }
 
-//Error 503 -> Maintainance Mode
-//Error 409 -> 
+//AUTH
+const RegisterAdmin = async (data:object) => {
+	try {
+		console.log(data);
+		const req_body = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
+		console.log(response);
+		return response;
+	} 
+	catch (error) {
+		throw error;
+	}
+}	
+
+const LoginUser = async (data: object) => {
+	//Conflict Error 409 -> User inactive; contact admin
+	//Precondition Failed 412 -> Incorrect Password
+	//Unauthorized 401 -> Incorrect Username
+	try {
+		const req_body = await handleEncryption(data);
+		console.log("req_body", req_body);
+		const response = await axios.post(`${Base_Url}/login`, {data:req_body}, {
+			headers:{ "Content-type": "application/json" }
+		});
+		console.log("response", response)
+		console.log(response.status)
+		if (response.status == 200){
+			localStorage.setItem("Beacon-DMS-token",response["data"]);
+			return 200;
+		}	
+		else
+			return response.status;
+	} 
+	catch (error) {
+		console.log(error);
+		//@ts-ignore
+		return  error.response.status
+	}
+}
+
 const sendOTP = async () => {
+	//Error 503 -> Maintainance Mode
+	//Error 409 -> 
 	try {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/sendOTP`, {
@@ -114,8 +116,9 @@ const sendOTP = async () => {
 	}
 }
 
-//Error 412 -> User already verified
+
 const verifyOTP = async (otp:any) => {
+	//Error 412 -> User already verified
 	try {
 		const token = await getEncryptedToken();
 		const enc_otp = await handleEncryption({otp});
@@ -136,9 +139,10 @@ const verifyOTP = async (otp:any) => {
 	}
 }
 
-//Conflict Error 409 -> Duplicate User
-//Forbidden 403 -> User is not admin
+//USER MANAGEMENT
 const createUser = async (data:object) => {
+	//Conflict Error 409 -> Duplicate User
+	//Forbidden 403 -> User is not admin
 	try {
 		console.log(data)
 		const req_body = await handleEncryption(data);
@@ -197,6 +201,44 @@ const getAllUsers = async () => {
 	}
 }
 
+//LOAN ACCOUNT
+const getLoanList = async () => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listLoan`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
+
+const getLoanFields = async (loanId:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/getLoan`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { "_loanId": loanId },
+		});
+		const decryptedObject = handleDecryption(response.data);
+		return decryptedObject;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
+
+
+//CREATE LOAN ACCOUNT
 const createLoan = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
@@ -234,6 +276,7 @@ const createAID = async (data:object) =>{
 	}
 }
 
+//CONTACT DETAILS
 const addContact = async (data:object, actionType:string) => {
 	try {
 		const token = getEncryptedToken();
@@ -273,41 +316,7 @@ const getContacts = async (loanId:string) => {
 	}
 };
 
-const getLoanList = async () => {
-	try {
-		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listLoan`, {
-			headers:{ "Authorization": `Bearer ${token}` },
-		});
-		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject;
-	}
-	catch(error:any) {
-		if (!error.response)
-			return;
-		else
-			return error.response;
-	}
-};
-
-const getLoanFields = async (loanId:string) => {
-	try {
-		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/getLoan`, {
-			headers:{ "Authorization": `Bearer ${token}` },
-			params: { "_loanId": loanId },
-		});
-		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject;
-	}
-	catch(error:any) {
-		if (!error.response)
-			return;
-		else
-			return error.response;
-	}
-}
-
+//RATINGS
 const addRating = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
@@ -343,6 +352,7 @@ const getRatingsList = async (loanId:string) => {
 	}
 }
 
+//ROLE MANAGEMENT
 const addRole = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
@@ -380,6 +390,8 @@ const getRolesList = async () => {
 	}
 }
 
+
+//SUGGESTIONS
 const getUserSuggestions = async () => {
 	try {
 		const token = getEncryptedToken();
@@ -401,7 +413,7 @@ const getUserSuggestions = async () => {
 	}
 };
 
-
+//TEAM MANAGEMENT
 const getTeamList = async (loanId:string) => {
 	try {
 		const token = getEncryptedToken();
@@ -441,6 +453,7 @@ const addTeamMember = async (data:any) => {
 	}
 }
 
+//DOCUMENTS
 const createDocument = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
@@ -465,17 +478,14 @@ const createDocument = async (data:any) => {
 	}
 }
 
-//viewDocs
-const getDocumentsList = async (AID:string,section_name:string, document_category:string) =>  {
+const getDocumentsList = async (loanId:string, sectionName:string) =>  {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listDocs`, {
+		const response = await axios.get(`${Base_Url}/listDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/${section_name}/${document_category}` }
+			params: {"_loanId": loanId, SN:sectionName }
 		});
-		const decryptedObject = /* await handleDecryption */(response.data);
-
-		console.log("decrypted object", decryptedObject)
+		const decryptedObject = await handleDecryption(response.data);
 		
 		if (response.status==200)
 			return {status: response.status, obj:decryptedObject}; 
@@ -490,37 +500,17 @@ const getDocumentsList = async (AID:string,section_name:string, document_categor
 	}
 };
 
-const getSingleDocument = async (AID:string,section_name:string, document_category:string,file_name:string) =>  {
+const editDocument = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/viewDocs`, {
-			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}`  }
-		});
-		console.log(response.data)
-		const decryptedObject = await handleDecryption(response.data);
 
-		console.log("decrypted object", decryptedObject)
-		
-		if (response.status==200)
-			return {status: response.status, obj:decryptedObject}; 
-		else
-			return {status: 0, obj:null};
-	}
-	catch(error:any) {
-		if (!error.response)
-			return {status: 0, obj:null};
-		else
-			return {status: error.response.status, obj:null};
-	}
-};
+		console.log("theta",data);
 
-const deleteDocument = async (data:any) => {
-	try {
-		const token = getEncryptedToken();
-		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/uploadTD`, {data:enc_data}, {
-			headers:{ "Authorization": `Bearer ${token}` },
+		for (const [key, value] of data.entries()) 
+			console.log(`${key}: ${value}, ${typeof value}`);
+
+		const response = await axios.post(`${Base_Url}/updateDocs`, data, {
+			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 		});
 
 		console.log("Server response, ",response);
@@ -535,6 +525,28 @@ const deleteDocument = async (data:any) => {
 	}
 }
 
+const getFileList = async (AID:string,section_name:string, document_category:string) => {
+	try {
+		const token = getEncryptedToken();
+
+		const response = await axios.get(`${Base_Url}/listDocs`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { LOC: `${AID}/${section_name}/${document_category}` }
+		});
+		const decryptedObject = await handleDecryption(response.data);
+		if (response.status==200)
+			return {status: response.status, obj:decryptedObject}; 
+		else
+			return {status: 0, obj:null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else
+			return {status: error.status, obj:null};;
+	}
+}
+
 const fetchDocument = async (AID:string,section_name:string, document_category:string,file_name:string) => {
 	try {
 		const token = getEncryptedToken();
@@ -543,14 +555,11 @@ const fetchDocument = async (AID:string,section_name:string, document_category:s
 			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}` },
 			responseType: 'blob',
 		});
-		console.log("the fetch response", response);
-		//const decryptedObject = await handleDecryption(response.data);
-		console.log("the decrypted object",response.data)
+
 		const blob = new Blob([response.data], {type:"application/pdf"});
 		let url = URL.createObjectURL(blob);
 		//URL.revokeObjectURL(url);
-		console.log("the returned url", url);
-
+		
 		return {status:response.status, url:url};
 	} 
 	catch(error:any) {
@@ -560,6 +569,25 @@ const fetchDocument = async (AID:string,section_name:string, document_category:s
 			return error.response;
 	}
 };
+
+const deleteDocument = async (AID:string, loanId:string, section_name:string, document_category:string,file_name:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.delete(`${Base_Url}/deleteDocs`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}`, _loanId:loanId },
+		});
+
+		return response.status;
+	}
+
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+}
 
 //addMember, getTeam
 
@@ -578,35 +606,18 @@ const fetchDocument = async (AID:string,section_name:string, document_category:s
 const useGlobalContext = () => {
 	return {
 		useTitle,
-		getEncryptedToken,
-		getDecryptedToken,
-		handleEncryption,
-		handleDecryption,
-		RegisterAdmin,
-		LoginUser,
-		sendOTP,
-		verifyOTP,
-		createUser,
-		editUser,
-		getAllUsers,
-		createLoan,
-		createAID,
-		addContact,
-		getContacts,
-		getLoanList,
-		getLoanFields,
-		addRating,
-		getRatingsList,
-		addRole,
-		getRolesList,
+		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
+		RegisterAdmin, LoginUser,
+		sendOTP, verifyOTP,
+		createUser, editUser, getAllUsers,
+		createLoan, createAID,
+		addContact, getContacts,
+		getLoanList, getLoanFields,
+		addRating, getRatingsList,
+		addRole, getRolesList,
 		getUserSuggestions,
-		getTeamList,
-		addTeamMember,
-		createDocument,
-		getDocumentsList,
-		deleteDocument,
-		getSingleDocument,
-		fetchDocument,
+		getTeamList, addTeamMember,
+		createDocument, getDocumentsList, editDocument, getFileList, deleteDocument, fetchDocument,
 	}
 }
 

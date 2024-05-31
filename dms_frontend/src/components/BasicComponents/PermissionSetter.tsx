@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
-function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillValues:Function, permissionSet:any}){
+function PermissionSetter(props:{ setter:Function, permissionSet:any}){
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
-  const [permissionList, setPermissionList] = useState<any>({
+  /* const [permissionList, setPermissionList] = useState<any>({
     "Loan Account": [],
     "Product": [],
     "Transaction Documents": [],
@@ -12,12 +12,7 @@ function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillVal
     "Covenants": [],
   });
 
-  /* useEffect(()=>{
-    console.log("the permission list has changed", permissionList);
-  },[permissionList]) */
-
   useEffect(()=>{
-    //console.log("props.singleRole",props.permissionSet)
     if (props.permissionSet)
       setPermissionList(props.permissionSet);
     else
@@ -28,7 +23,7 @@ function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillVal
         "Compliance Documents": [],
         "Covenants": [],
       })
-  },[props.permissionSet])
+  },[props.permissionSet]) */
 
   /* useEffect(()=>{
     console.log("CURRENT PERMISSIONS LIST", permissionList)
@@ -39,24 +34,11 @@ function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillVal
       permissions.push(action);
     else
      permissions = permissions.filter(name=> name!==action);
-    
-    if (props.setter){
-      props.setter((curr:any)=>{
-        curr["P"][section] = [...permissions];
-        console.log("new setter curr", curr)
-        return {...curr};
-      })
-      setPermissionList((curr:any)=>{
-        curr[section] = [...permissions];
-        console.log("NEW CURR",curr)
-        return {...curr};
-      })
-    }
-    else
-      setPermissionList((curr:any)=>{
-        curr[section] = [...permissions];
-        return {...curr};
-      })
+
+    props.setter((curr:any)=>{
+      curr[section] = [...permissions];
+      return {...curr};
+    })
   }
   
   return (
@@ -73,7 +55,7 @@ function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillVal
           </TableRow>
         </TableHeader>
         <TableBody>
-          {Object.keys(permissionList).map((section,index)=>{
+          {Object.keys(props.permissionSet).map((section,index)=>{
             return (
               <TableRow key={index}>
                 <TableCell key={index+"s"}>{section}</TableCell>
@@ -82,9 +64,9 @@ function PermissionSetter(props:{newRole:boolean, setter:Function, setPrefillVal
                     <TableCell key={index+action}>
                       <input 
                         type="checkbox"
-                        checked={permissionList[section].includes(action)}
+                        checked={props.permissionSet[section].includes(action)}
                         onChange={(e)=>{
-                          togglePermission(permissionList[section],action,e.target.checked,section);
+                          togglePermission(props.permissionSet[section],action,e.target.checked,section);
                         }}
                       />
                     </TableCell>

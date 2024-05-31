@@ -3,6 +3,7 @@ import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusSty
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
+import moment from "moment";
 
 function HeaderRows(props:{headingRows:any[]}){
   return(
@@ -16,7 +17,7 @@ function HeaderRows(props:{headingRows:any[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellClassName?:any, dataType:any, action?:any, columns:any}){
+function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellClassName?:any, dataType:any, action?:any, columns:string[]}){
   return(
     <TableBody>
       {props.list.map((singleRow:any, index:number)=>{
@@ -48,7 +49,7 @@ function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellCl
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, singleRow:any, action:any, columns:any}){
+function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, singleRow:any, action:any, columns:string[]}){
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
@@ -63,10 +64,12 @@ function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, sing
         else if (dataType=="action")
           return handleAction(props.action[props.rowIndex], cellClassName, uniqueIndex)
     
-        const item = props.singleRow[props.columns[props.dataType[0]=="index"?index:index]];
+        const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
 
         if (dataType=="text")
           return handleText(item, cellClassName, uniqueIndex);
+        else if (dataType=="date")
+          return handleDate(item, cellClassName,uniqueIndex);
         else if (dataType=="priority")
           return handlePriority(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="docStatus")
@@ -97,8 +100,12 @@ function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, sing
 const handleIndex = (index:number, cellClassName:string, uniqueIndex:string) =>{
   return <TableCell key={uniqueIndex}  className={cellClassName}>{index}</TableCell>
 }
-const handleText = (item:String, cellClassName:string, uniqueIndex:string) => {
+const handleText = (item:string, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{item}</TableCell>
+}
+
+const handleDate = (item:string, cellClassName:string, uniqueIndex:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>{moment(item).format("yyyy-MM-DD")}</TableCell>
 }
 
 const handlePriority = (index:number, cellClassName:string, uniqueIndex:string) => {
