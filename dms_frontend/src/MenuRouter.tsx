@@ -3,13 +3,14 @@ import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
 //import {socket} from "./socket";
 import useGlobalContext from './../GlobalContext';
+import './styling.css';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
 import Dashboard from './components/Dashboard';
 import CreateLoanAccount from './components/CreateLoanAccount';
 import Products from './components/Products';
-import TeamMembers from './components/TeamMembers';
+import TeamMembers from './components/UnusedComponents/TeamMembers';
 import Zones from './components/Zones';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
@@ -37,7 +38,7 @@ import LoanAccount from './components/LoanAccount';
 import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
 import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 import TeamManagement from './components/TeamManagement';
-import DocumentViewer from './components/BasicComponents/DocumentViewer';
+//import DocumentViewer from './components/BasicComponents/DocumentViewer';
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -135,36 +136,34 @@ export const MenuRouter = () => {
 	
 	return (
 		<div className='relative'>
-			<div style={{ width: "17%", float: "left", height: "100vh", position: "fixed", overflowY:"scroll"}} className='bg-custom-1' >
-				<div className=''>
-					<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
-					<div className='mx-8 my-5'>
-						{componentList.map((item:any,index:number)=>{
-							return (
-								<NavLink to={item.path} key={index}
-									onClick={()=>setCurrLink(item.path)}
-									onMouseEnter={()=>setHover(index)} 
-									onMouseLeave={()=>setHover(-1)}
-									className={({ isActive, }) => {
-										if (isActive)
-											setCurrLink(item.path);
-										return "bg-red-800";
-									}}
-								>
-									<div className={`p-3 text-sm pageLink py-3 my-3 rounded-xl ${(currLink===item.path)?"bg-white text-custom-1":"text-white"}`}>
-										<div className='flex flex-row'>
-											{item.icon?createElement(item.icon, {fill: (currLink===item.path || hover===index)?"rgba(80, 65, 188, 1)":"white"}):""}
-											<div className="mx-5">{item.name}</div>
-										</div>
+			<div style={{ width: "320px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1" >
+				<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
+				<div className='mx-8 my-5'>
+					{componentList.map((item:any,index:number)=>{
+						return (
+							<NavLink to={item.path} key={index}
+								onClick={()=>setCurrLink(item.path)}
+								onMouseEnter={()=>setHover(index)} 
+								onMouseLeave={()=>setHover(-1)}
+								className={({ isActive, }) => {
+									if (isActive)
+										setCurrLink(item.path);
+									return "bg-red-800";
+								}}
+							>
+								<div className={`p-3 text-sm pageLink py-3 my-3 rounded-xl ${(currLink===item.path)?"bg-white text-custom-1":"text-white"}`}>
+									<div className='flex flex-row'>
+										{item.icon?createElement(item.icon, {fill: (currLink===item.path || hover===index)?"rgba(80, 65, 188, 1)":"white"}):""}
+										<div className="mx-5">{item.name}</div>
 									</div>
-								</NavLink>
-							)
-						})}
-					</div>
+								</div>
+							</NavLink>
+						)
+					})}
 				</div>
 			</div>
 			
-			<div style={ {width: "83%", float: "right"} }>
+			<div style={ {marginLeft:"320px"} }>
 				<div className='relative h-20 w-100 bg-white'>
 					<div className=' absolute inset-y-5 right-0 w-50'>
 						{userInfo}
@@ -178,7 +177,7 @@ export const MenuRouter = () => {
 					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
 					<Route key={"T"} path="/teams/:id" element={<TeamMembers/>} />
-					<Route key={"D"} path="/view/:id" element={<DocumentViewer />} />
+					{/* <Route key={"D"} path="/view/:id" element={<DocumentViewer />} /> */}
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

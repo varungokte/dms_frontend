@@ -4,6 +4,7 @@ import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
 import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
 import {FormSectionNavigation} from "./../BasicComponents/FormSectionNavigation";
 import moment from "moment";
+import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 
 function BasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   const [fieldValues, setFieldValues] = useState<any>({});
@@ -127,7 +128,7 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
   return(
     <div className="">
       <br/>
-      <p className="italic">Fields marked with <span className="text-red-600">*</span> are <span className="font-bold">required fields</span>.</p>
+      <RequiredFieldsNote />
       <br/>
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-4">

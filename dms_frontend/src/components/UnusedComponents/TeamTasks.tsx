@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { Table } from "@/components/ui/table";
 
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import FormDialog from "./BasicComponents/FormDialog";
-import Search from "./BasicComponents/Search";
-import Filter from "./BasicComponents/Filter";
+import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
+import FormDialog from "../BasicComponents/FormDialog";
+import Search from "../BasicComponents/Search";
+import Filter from "../BasicComponents/Filter";
 
-import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
-import { PriorityValues, EnumIteratorKeys, EnumIteratorValues } from "./BasicComponents/Constants";
-import useGlobalContext from "./../../GlobalContext";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { PriorityValues, EnumIteratorKeys, EnumIteratorValues } from "../BasicComponents/Constants";
+import useGlobalContext from "../../../GlobalContext";
 
 function TeamTasks() {
   //An array which contains many tasks; each task is an array

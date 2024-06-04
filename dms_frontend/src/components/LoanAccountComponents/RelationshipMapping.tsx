@@ -78,10 +78,10 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
           />
         </div>
         <div className=" m-auto">
-          <FormDialog 
+          <FormDialog key={-1} index={-1} id="RM"
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formSize="medium"
             formTitle="Relationship Mapping" formSubmit={addUser} submitButton="Save"
-            form = {fieldList} setter={setFieldValues} fieldValues={fieldValues}
+            form = {fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}}
             repeatFields={true} 
           />  
         </div>

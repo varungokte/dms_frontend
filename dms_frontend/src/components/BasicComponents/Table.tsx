@@ -5,12 +5,12 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import chevron_down from "./../static/chevron-down.svg";
 import moment from "moment";
 
-function HeaderRows(props:{headingRows:any[]}){
+function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   return(
     <TableHeader>
       <TableRow>
       {props.headingRows.map((heading:any,index:number)=>{
-        return <TableHead key={index}>{heading[0]}</TableHead>
+        return <TableHead key={index} className={props.headingClassNames && props.headingClassNames[index]?props.headingClassNames[index]:""}>{heading}</TableHead>
       })}
       </TableRow>
     </TableHeader>
@@ -63,6 +63,9 @@ function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, sing
       
         else if (dataType=="action")
           return handleAction(props.action[props.rowIndex], cellClassName, uniqueIndex)
+
+        else if (dataType=="countTeam")
+          return handleCountTeam(props.singleRow, cellClassName, uniqueIndex);
     
         const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
 
@@ -92,6 +95,8 @@ function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, sing
           return handleTransactionDocumentType(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="file")
           return handleFileType(Number(item), cellClassName, uniqueIndex);
+        else if (dataType=="objName")
+          return handleObjName(item, cellClassName, uniqueIndex);
       })}
     </TableRow>
   )
@@ -105,7 +110,7 @@ const handleText = (item:string, cellClassName:string, uniqueIndex:string) => {
 }
 
 const handleDate = (item:string, cellClassName:string, uniqueIndex:string) => {
-  return <TableCell key={uniqueIndex} className={cellClassName}>{moment(item).format("yyyy-MM-DD")}</TableCell>
+  return <TableCell key={uniqueIndex} className={cellClassName}>{moment(item).format("DD-MM-yyyy")}</TableCell>
 }
 
 const handlePriority = (index:number, cellClassName:string, uniqueIndex:string) => {
@@ -137,9 +142,9 @@ const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem className="bg-white text-yellow-600">{UserStatusValues[1]}</DropdownMenuItem>
-        <DropdownMenuItem className="bg-white text-green-600">{UserStatusValues[2]}</DropdownMenuItem>
-        <DropdownMenuItem className="bg-white text-red-600">{UserStatusValues[3]}</DropdownMenuItem>
+        <DropdownMenuItem className={`${UserStatusStyling[1]} bg-white`}>{UserStatusValues[1]}</DropdownMenuItem>
+        <DropdownMenuItem className={`${UserStatusStyling[2]} bg-white`}>{UserStatusValues[2]}</DropdownMenuItem>
+        <DropdownMenuItem className={`${UserStatusStyling[3]} bg-white`}>{UserStatusValues[3]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>
@@ -180,6 +185,19 @@ const handleTransactionDocumentType = (index:number, cellClassName:string, uniqu
 
 const handleFileType = (index:number, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{FileTypes[index]}</TableCell>
+}
+
+const handleObjName = (item:any, cellClassName:string, uniqueIndex:string) =>{
+  return <TableCell key={uniqueIndex} className={cellClassName}>{item.N}</TableCell>
+}
+
+const handleCountTeam = (obj:any, cellClassName:string, uniqueIndex:string) => {
+  const sections = ["TD","CD","C","CP","CS"];
+  let count = 1;
+  sections.map(name=>{
+    count+=obj[name]["M"].length+obj[name]["C"].length
+  });
+  return <TableCell key={uniqueIndex} className={cellClassName}>{count}</TableCell>
 }
 
 export { HeaderRows, BodyRowsMapping };

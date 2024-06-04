@@ -131,7 +131,7 @@ function UserManagement(){
         {userData.length==0
           ?<EmptyPageMessage sectionName="users" emotion={true} />
           :<Table className="bg-white border-2 rounded-xl">
-            <HeaderRows headingRows={[["Name"], ["Email Address"],["Reporting Manager"], ["Zone"], ["Role"], ["Status"], ["Action"]]} />
+            <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
             <BodyRowsMapping
               list={userData} columns={["N","E", "RM", "Z", "S"]} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
               searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}

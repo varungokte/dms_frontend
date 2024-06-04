@@ -57,6 +57,29 @@ const getDecryptedToken = async () => {
 	return await decodedToken;
 }
 
+//SUGGESTIONS
+const getUserSuggestions = async (type:"AU"|"UM"|"TT") => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/suggestion`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: {type: type}
+		});
+		const decryptedObject = handleDecryption(response.data);
+		console.log("decrypted object", decryptedObject)
+		if (response.status==200)
+			return decryptedObject; 
+		else
+			return null;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response;
+	}
+};
+
 //AUTH
 const RegisterAdmin = async (data:object) => {
 	try {
@@ -390,57 +413,31 @@ const getRolesList = async () => {
 	}
 }
 
-
-//SUGGESTIONS
-const getUserSuggestions = async () => {
-	try {
-		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/suggestion`, {
-			headers:{ "Authorization": `Bearer ${token}` },
-			params: {type: "UM"}
-		});
-		const decryptedObject = handleDecryption(response.data);
-		if (response.status==200)
-			return decryptedObject; 
-		else
-			return null;
-	}
-	catch(error:any) {
-		if (!error.response)
-			return;
-		else
-			return error.response;
-	}
-};
-
 //TEAM MANAGEMENT
-const getTeamList = async (loanId:string) => {
+const getTeamsList = async () => {
+	//viewTeam
 	try {
-		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/getTeam`, {
+		const token = await getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listTeam`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: {_loanId: loanId}
 		});
-		const decryptedObject = handleDecryption(response.data);
-		
-		if (response.status==200)
-			return decryptedObject; 
-		else
-			return null;
+		const decryptedObject = await handleDecryption(response.data);
+
+		return {status:response.status,obj:decryptedObject};	
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0, obj:null}
 		else
-			return error.response;
+			return {status:error.response.status,obj:null};
 	}
 };
 
-const addTeamMember = async (data:any) => {
+const addTeam = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addMember`, {data: enc_data}, {
+		const response = await axios.post(`${Base_Url}/addTeam`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -449,7 +446,7 @@ const addTeamMember = async (data:any) => {
 		if (!error.response)
 			return;
 		else
-			return error.response;
+			return error.response.status;
 	}
 }
 
@@ -509,7 +506,7 @@ const editDocument = async (data:any) => {
 		for (const [key, value] of data.entries()) 
 			console.log(`${key}: ${value}, ${typeof value}`);
 
-		const response = await axios.post(`${Base_Url}/updateDocs`, data, {
+		const response = await axios.post(`${Base_Url}/editDocs`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 		});
 
@@ -543,7 +540,7 @@ const getFileList = async (AID:string,section_name:string, document_category:str
 		if (!error.response)
 			return {status: 0, obj:null};
 		else
-			return {status: error.status, obj:null};;
+			return {status: error.status, obj:null};
 	}
 }
 
@@ -616,7 +613,7 @@ const useGlobalContext = () => {
 		addRating, getRatingsList,
 		addRole, getRolesList,
 		getUserSuggestions,
-		getTeamList, addTeamMember,
+		getTeamsList, addTeam,
 		createDocument, getDocumentsList, editDocument, getFileList, deleteDocument, fetchDocument,
 	}
 }

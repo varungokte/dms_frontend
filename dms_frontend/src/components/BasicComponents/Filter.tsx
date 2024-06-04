@@ -8,7 +8,7 @@ function Filter(props:{setter:Function, placeholderValue?:any[], setPlaceholder?
   },[props]); */
   
   return(
-    <select className="bg-white border-2 p-3 rounded-xl" onChange={(e:any)=>{console.log(e.target.value); props.setter(e.target.value)}}>
+    <select className="bg-white border-2 p-1 h-[50px] rounded-xl" onChange={(e:any)=>{console.log(e.target.value); props.setter(e.target.value)}}>
       {props.setPlaceholder && props.placeholderValue!=undefined?<option value={props.placeholderValue[0]}>{props.placeholderValue[1]}</option>:""}
       
       {props.labelList.map((item:any,index:number)=>{

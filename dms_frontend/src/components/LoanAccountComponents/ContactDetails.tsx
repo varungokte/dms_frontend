@@ -34,7 +34,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       { id: "MN", type:"text", name: "Mobile Number" },
       { id: "LN", type:"text", name: "Landline Number" },
     ]}, 
-    { category: "grid", row: 2, sectionName:"Billing Address", customWidth:'[70%_auto]', fields:[
+    { category: "grid", row: 2, sectionName:"Billing Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "BA", type:"text", name: "Bulding/Street/Locality Name" },
       { id: "BP", type:"number", name: "Pincode" },
     ]},
@@ -43,7 +43,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       { id: "BS", type:"text", name: "State" },
       { id: "BC", type:"text", name: "City" },
     ]}, 
-    { category: "grid", row: 2, sectionName:"Registered Address", customWidth:'[70%_auto]', fields:[
+    { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "RA", type:"text", name: "Bulding/Street/Locality Name" },
       { id: "RP", type:"number", name: "Pincode" },
     ]},

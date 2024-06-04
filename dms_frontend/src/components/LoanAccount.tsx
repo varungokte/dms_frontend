@@ -46,7 +46,9 @@ function LoanAccount() {
         {accountList.length==0
           ?<EmptyPageMessage sectionName="loan accounts"/>
           :<Table className="border rounded-xl">
-            <HeaderRows headingRows={[["Sr. No.", "w-[100px]"], ["Agreement ID"], ["Company Name"], ["Group Name"], ["Zone"], ["Sanction Amount"], ["Status"], ["Action"]]} />
+            <HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount", "Status", "Action"]}
+              headingClassNames={["w-[100px]"]}
+            />
             <BodyRowsMapping 
               list={accountList} columns={["AID", "CN", "GN", "Z", "SA", "S"]}
               dataType={["index","text","text","text","text","text","text", "action"]} 

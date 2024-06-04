@@ -78,7 +78,7 @@ function LoanConditions(props:{key:number,actionType: string, loanId: string, se
         {conditionsList.length==0
           ?<EmptyPageMessage sectionName="documents" />
           :<Table className="border rounded-2xl">
-            <HeaderRows headingRows={[["Description"],["Phyical Location"], ["Execution Location"], ["Start Date"],["End Date"], ["Action"]]} />
+            <HeaderRows headingRows={["Description","Phyical Location", "Execution Location", "Start Date","End Date", "Action"]} />
             <BodyRowsMapping
               list={conditionsList} columns={["D","PL","EL", "SD", "ED"]} dataType={["text", "text","text", "text", "text", "action"]}
               searchRows={[]} filterRows={[]}

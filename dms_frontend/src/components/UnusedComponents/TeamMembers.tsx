@@ -1,16 +1,16 @@
 import { useState } from "react";
 
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import FormDialog from "./BasicComponents/FormDialog";
+import FormDialog from "../BasicComponents/FormDialog";
 
-import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
-import Search from "./BasicComponents/Search";
-import ProfileIcon from "./BasicComponents/ProfileIcon";
-import Filter from "./BasicComponents/Filter";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import Search from "../BasicComponents/Search";
+import ProfileIcon from "../BasicComponents/ProfileIcon";
+import Filter from "../BasicComponents/Filter";
 import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft } from "lucide-react";
 
-import useGlobalContext from "./../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 
 function TeamMembers() {
 	const {id} =  useParams();

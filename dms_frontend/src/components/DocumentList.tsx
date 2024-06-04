@@ -109,7 +109,9 @@ function SingleDealDocuments(props:{AID:string}){
       {docData.length==0
         ?<EmptyPageMessage sectionName="documents" />
         :<Table>
-          <HeaderRows headingRows={[["Document Name", "w-[20%] text-center"], ["Priority","w-[10%] text-center"], ["Physical Location", "w-[15%] text-center"], ["Execution Location", "w-[15%] text-center"], ["Start Date", "w-[15%] text-center"],["End Date", "w-[15%] text-center"], ["Status","w-[20%] text-center"], ["Action","text-center"]]} />
+          <HeaderRows headingRows={["Document Name", "Priority", "Physical Location","Execution Location", "Start Date", "End Date", "Status", "Action"]}
+            headingClassNames={[ "w-[20%] text-center","w-[10%] text-center", "w-[15%] text-center", "w-[15%] text-center", "w-[15%] text-center", "w-[15%] text-center","w-[20%] text-center","text-center"]} 
+          />
           <BodyRowsMapping list={docData} 
             dataType={["transaction","priority","text","text","text","text","docStatus","action"]} 
             columns={["N","P","PL","EL","SD","ED","S"]}

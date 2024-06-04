@@ -10,60 +10,55 @@ import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation"
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
 function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
-  //Ratingslist is an array of different ratings
-  //Each rating is an array: [Rating Agency, Rating Type, Date,Outlook]
-  //Rating Type can be: Provisional (0) or Final (1)
-  //Outlook can be Positive (2), Stable (1), or Negative (0)
-  
-  const [fieldValues, setFieldValues] = useState({
-    "A":1, "T":1,
-    "DT":null, "O":1,
+  const [fieldValues, setFieldValues] = useState<any>({
+    "A":-1, "T":-1,
+    "DT":null, "O":-1,
     "L":"", "R":"",
   });
   
-  const [fieldList] = useState([
+  const [fieldList] = useState<any>([
     { category: "grid", row:2, sectionName:"", fields: [
-      { id: "A", type: "select", name: "Rating Agency", options: EnumIteratorValues(RatingAgencies) },
-      { id: "T", type: "select", name: "Rating Type", options: EnumIteratorValues(RatingTypes) },
-      { id: "DT", type: "date", name: "Date" },
-      { id: "O", type: "select", name: "Outlook", options: EnumIteratorValues(RatingOutlook) },
-      { id: "L", type: "text", name: "Link" },
-      { id: "R", type: "text", name: "Rating" },
+      { id: "A", type: "select", name: "Rating Agency", options: EnumIteratorValues(RatingAgencies), required:true },
+      { id: "T", type: "select", name: "Rating Type", options: EnumIteratorValues(RatingTypes), required:true },
+      { id: "DT", type: "date", name: "Date", required:true },
+      { id: "O", type: "select", name: "Outlook", options: EnumIteratorValues(RatingOutlook), required:true },
+      { id: "L", type: "text", name: "Link", required:true },
+      { id: "R", type: "text", name: "Rating", required:true },
     ]}
   ]);
 
   const {addRating, getRatingsList} = useGlobalContext();
 
   const [ratingsList, setRatingsList] = useState([]);
+  const [added, setAdded] = useState(true);
  // const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
-    getRatingsList(props.loanId).then((res)=>{
-      if (res.status==200)
-        setRatingsList(res.arr);
-      else
+    if (added){
+      getRatingsList(props.loanId).then((res)=>{
+        if (res.status==200)
+          setRatingsList(res.arr);
+        else
+          setRatingsList([]);
+      }).catch(err=>{
+        console.log(err);
         setRatingsList([]);
-    }).catch(err=>{
-      console.log(err);
-      setRatingsList([]);
-    })
-  },[])
+      })
+      setAdded(false);
+    }
+  },[added])
 
-  const createRating = (e:any) =>{
-    e.preventDefault();
+  const createRating = (userValues:any) =>{
     const data:any = {};
 
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
-      if (field.category=="single"){
-        //@ts-ignore
-        data[field.id] = fieldValues[field.id];
-      }
+      if (field.category=="single")
+        data[field.id] = userValues[field.id];
       else if (field.category=="grid"){
         for (let j=0; j<field.fields.length; j++){
           const gridField = field.fields[j];
-          //@ts-ignore
-          data[gridField.id] = fieldValues[gridField.id]
+          data[gridField.id] = userValues[gridField.id]
         }
       }
     }
@@ -75,6 +70,8 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
 
       addRating(data).then(res=>{
         console.log("RESPONSE",res);
+        setFieldValues({});
+        setAdded(true);
       }).catch(err=>{
         console.log(err);
       })
@@ -100,9 +97,9 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
         {ratingsList.length==0
           ?<EmptyPageMessage sectionName="ratings" />
           :<Table className="border">
-            <HeaderRows headingRows={[["Rating Agency"],["Rating Type"], ["Date"],["Outlook"],["Link"],["Rating"]]} />
+            <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating"]} />
 
-            <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "text", "ratingOutlook", "text", "text"]}
+            <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "date", "ratingOutlook", "text", "text"]}
               searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
             />
         </Table>

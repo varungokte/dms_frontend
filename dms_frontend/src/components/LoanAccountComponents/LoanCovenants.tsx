@@ -117,11 +117,11 @@ function LoanCovenants(props:{key:number,actionType: string, loanId: string, set
                   item;
                   return(
                     <div className="flex flex-row">
-                      <FormDialog key={index} index={index} 
+                      <FormDialog key={index} index={index} id="LC" 
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>} formSize="medium"
                         formTitle="Edit User" formSubmit={editCovenant} submitButton="Edit User"
                         form={fieldList} setter={setFieldValues}
-                        edit={true} fieldValues={fieldValues} currentField={documentList[index]}
+                        edit={true} fieldValues={fieldValues} currentFields={documentList[index]}
                       />
                       <DeleteConfirmation thing="covenant" deleteFunction={deleteCovenant} currIndex={index}/>
                     </div>

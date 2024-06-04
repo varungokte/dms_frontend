@@ -189,7 +189,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
       <div className="m-5">
         {docData.length==0?<EmptyPageMessage sectionName="documents" />
           :<Table className="border rounded-3xl" style={{borderRadius:"md"}}>
-            <HeaderRows headingRows={[["Document Name"],["Priority"], ["Physical Location"],["Execution Location"], ["Start Date"],["End Date"],["Action"]]} />
+            <HeaderRows headingRows={["Document Name", "Priority", "Physical Location", "Execution Location", "Start Date", "End Date", "Action"]} />
             <BodyRowsMapping list={docData} columns={["N", "P", "PL","EL","SD","ED"]} dataType={["transaction","priority","text","text","date","date","action"]}
               searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
               action = {docData.map((item:any, index:number)=>{
