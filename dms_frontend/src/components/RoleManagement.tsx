@@ -4,15 +4,9 @@ import PermissionSetter from "./BasicComponents/PermissionSetter";
 import useGlobalContext from "./../../GlobalContext";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { ChevronDown, ChevronRight } from "lucide-react";
-//import Search from "./BasicComponents/Search";
-import FormDialog from "./BasicComponents/FormDialog";
+import FormDialog from "./FormComponents/FormDialog";
 function RoleManagement(){
-  //const {addRole, getRolesList}= useGlobalContext();
-
-  //const [searchString, setSearchString] = useState("");
-  const [open, setOpen] = useState<boolean[]>([]);
-
-  const [roleList] = useState([
+  const [roleList] = useState<any>([
     { N: "MAKER", P:{
       "Loan Account":["access", "edit"]}
     },
@@ -25,7 +19,15 @@ function RoleManagement(){
     }}
   ]);
 
-  const [newRole, setNewRole] = useState<any>({});
+  const [fieldList] = useState([
+    { category: "single", id: "N", name:"Role Name", type: "text" },
+    { category: "single", id: "P", name: "Permissions", type: "permissions"}
+  ]);
+
+  const [fieldValues, setFieldValues] = useState<any>({});
+  const [newRole, setNewRole] = useState<any>();
+
+  const [open, setOpen] = useState<boolean[]>([]);
 
 	const {useTitle} = useGlobalContext();
 
@@ -45,7 +47,7 @@ function RoleManagement(){
   const createRole = (e:any) =>{
     e.preventDefault();
     console.log("CREATINGG")
-    console.log(newRole)
+    console.log(fieldValues)
 
     /* addRole(data).then(res=>{
       console.log(res);
@@ -67,18 +69,15 @@ function RoleManagement(){
           <Search label="Search Role" setter={setSearchString} />
         </div> */}
         <div>
-          <FormDialog
+          <FormDialog index={-1} type="role"
             triggerText="Create New Role" triggerClassName={CreateButtonStyling}
             formTitle="Create a New Role" formSize="small"
-            formSubmit={createRole} submitButton="Create Role" setter={setNewRole}
-            form={[
-              { category: "single", id: "N", name:"Role Name", type: "text" },
-              { category: "single", id: "P", name: "Permissions", type: "permissions"}
-            ]}
+            formSubmit={createRole} submitButton="Create Role" setter={setFieldValues}
+            form={fieldList} fieldValues={fieldValues} currentFields={{}}
           />
         </div>
       </div>
-      {roleList.map((role,index)=>{
+      {roleList.map((role:any,index:number)=>{
         return(
         <Collapsible key={index} className="mx-7 my-3">
           <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...open]; arr[index]=!open[index]; setOpen(arr)}}>
@@ -88,7 +87,7 @@ function RoleManagement(){
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <PermissionSetter singleRole={role["P"]} />
+            <PermissionSetter setter={setNewRole} permissionSet={role.P} />
           </CollapsibleContent>
         </Collapsible>
         )

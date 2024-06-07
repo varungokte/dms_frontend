@@ -1,15 +1,18 @@
 import { useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function VerificationComponent(){
-  const {sendOTP, verifyOTP} = useGlobalContext();
+  const {sendOTP, verifyOTP,getDecryptedToken,useTitle, getEncryptedToken} = useGlobalContext();
 	const navigate = useNavigate();
+
+  useTitle("Verify Email");
 
   const [message, setMessage] = useState(<></>)
   const [otp, setOtp] = useState(0);
   const [inputField, setInputField] = useState(0);
   const [okToContinue, setOkToContinue] = useState(false);
+  const [move, setMove] = useState(<></>);
 
   const [heading, setHeading] = useState(
     <div>
@@ -32,23 +35,30 @@ function VerificationComponent(){
   const clickSubmit = (e:any) => {
     e.preventDefault();
     verifyOTP(otp).then(res => {
-      console.log("RES",res);
-      if (res?.status==412)
+      console.log("otp verified",res);
+      if (res.status==412)
         navigate("/");
       else if (res?.status==200){
+        console.log("strong the token",res.data)
         localStorage.setItem("Beacon-DMS-token", res.data);
         setInputField(2);
-        setOkToContinue(true);
-        navigate("/");
+        getDecryptedToken().then(()=>{
+          setOkToContinue(true);
+        })
       }
       else
         setMessage(<p className="text-red-600">Try Again</p>)
-    
     })
   };
 
-  const clickContinue = () =>{
-    navigate("/");
+  const clickContinue = async () =>{
+    console.log("reached clickContinue");
+    const token = await getDecryptedToken();
+    const enc_token = await getEncryptedToken();
+    console.log("encrypted token",enc_token)
+    console.log("OUR decoded token",token);
+
+    setMove( <Navigate to="/" />)
   }
 
   const stages = [
@@ -63,7 +73,7 @@ function VerificationComponent(){
       <br/>
       <button type="submit" className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Submit</button>
     </form>,
-    <button disabled={!okToContinue} onClick={()=>clickContinue()} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
+    <button disabled={!okToContinue} onClick={clickContinue} className="bg-custom-1 text-white h-12 ml-5 w-11/12 rounded-xl">Continue</button>
     ]
 
   return (
@@ -73,6 +83,8 @@ function VerificationComponent(){
       {stages[inputField]}
       <br/>
       {message}
+      {move}
+      <button onClick={clickContinue}>A</button>
     </div>
   )
 }

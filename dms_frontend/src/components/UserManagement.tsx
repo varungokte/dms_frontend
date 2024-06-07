@@ -4,60 +4,59 @@ import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
-import FormDialog from "./BasicComponents/FormDialog";
+import FormDialog from "./FormComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import edit_icon from "./static/edit_icon.svg";
-import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
+//import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicComponents/LoadingMessage";
 
 function UserManagement(){
-  const [userData, setUserData]= useState<any>([]);
+  const [userData, setUserData]= useState<any>();
   
-  const [fieldValues, setFieldValues] = useState<any>({X:"some bizarre value"});
+  const [fieldValues, setFieldValues] = useState<any>({});
 
   const [fieldList] = useState<any>([
     { category: "grid", row: 2, fields: [
-      { id: "N", name: "Name", type: "text", },
-      { id: "E", name: "Email", type: "email", immutable: true },
-      { id: "P", name: "Password", type: "password" },
-      { id: "Z", name: "Zone", type: "select", options: EnumIteratorValues(ZoneList) },
+      { id: "N", name: "Name", type: "text", required:true },
+      { id: "E", name: "Email", type: "email", immutable: true, required:true },
+      { id: "P", name: "Password", type: "password", required:true },
+      { id: "Z", name: "Zone", type: "select", options: EnumIteratorValues(ZoneList), required:true },
     ]},
-    { category:"single", id: "RM", name: "Reporting Manager", type:"text" },
-    { category:"single", id:"RP", name:"", type:"role" },
+    { category:"single", id: "RM", name: "Reporting Manager", type:"combobox", required:true },
+    { category:"single", id: "M", name: "User is a Manager", type:"checkbox", required:false },
+    { category:"single", id: "perm", name:"", type:"role", required:true },
   ]);
 
   const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [selectedUser] = useState(-1);
   const [message, setMessage] = useState(<></>);
-  const [userAdded, setUserAdded] = useState(false);
+  const [added, setAdded] = useState(false);
 
   const newUser = useGlobalContext().createUser;
   const changeUserInfo = useGlobalContext().editUser;
   const getUsers = useGlobalContext().getAllUsers;
 
-  const {useTitle, /* getUserSuggestions */} = useGlobalContext();
+  const {useTitle} = useGlobalContext();
 
   useTitle("User Management");
 
   useEffect(()=>{
-    console.log("user management field values", fieldValues);
-  },[fieldValues])
-
-  useEffect(()=>{
     getUsers().then((res)=>{
-      if (res.length==0)
-        setUserData([]);
+      console.log(res)
+      if (res.status==200)
+        setUserData(res.obj);
       else
-        setUserData(res);
+        setUserData([]);
     }).catch(()=> {
       setUserData([])
     })
-  },[userAdded])
+  },[added])
 
-  const createUser = (userValues:any) => {
+  const createUser = async (userValues:any) => {
     console.log("creating user", userValues);
 
     const data:any={};
@@ -72,15 +71,28 @@ function UserManagement(){
         }
       }
     }
-    
-    newUser(data).then(res=>{
-      console.log("new user",res);
-      setUserAdded(true);
-    }).catch((err)=>{
-      if (err=="dupliate_user"){
-        setMessage(<p>Duplicate User</p>)
+    if (userValues["RM"]){
+      if (userValues["RM"]["values"]["E"]=="root")
+        userValues["RM"]["root"]="root";
+      else {
+        const obj = userValues["RM"]["values"];
+        userValues["RM"]={...obj}
       }
-    })
+    }
+    
+    console.log ("SUBMITTING DATA", userValues)
+    
+    if (userValues["UP"]){
+      const obj = userValues["UP"];
+      userValues["UP"] = JSON.stringify(obj);
+    }
+
+    const res = await newUser(userValues);
+
+    if (res==200)
+      setAdded(true);
+    
+    return res;
   }
 
   const editUser = () => {
@@ -100,9 +112,9 @@ function UserManagement(){
     })
   }
 
-  const deleteUser = (index:number) =>{
+  /* const deleteUser = (index:number) =>{
     console.log("deleting",index)
-  }
+  } */
 
   return(
     <div>
@@ -119,37 +131,38 @@ function UserManagement(){
         </div>
 
         <div className="">
-          <FormDialog key={-10} index={-10} edit={false}
+          <FormDialog key={-10} index={-10} edit={false} type="user"
             triggerText="+ Add User" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}}
+            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}} suggestions="RM"
           />
         </div>
       </div>
       <div className="m-7">
         {message}
-        {userData.length==0
-          ?<EmptyPageMessage sectionName="users" emotion={true} />
-          :<Table className="bg-white border-2 rounded-xl">
-            <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
-            <BodyRowsMapping
-              list={userData} columns={["N","E", "RM", "Z", "S"]} dataType={["text", "text", "text", "zone", "userStatus", "action"]}
-              searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
-              action = {userData.map((item:any, index:number)=>{
-                item;
-                return(
-                  <div className="flex flex-row">
-                    <FormDialog key={index} index={index} edit={true}
-                      triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                      formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
-                      form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]}
-                    />
-                    <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} />
-                  </div>
-                )
-              })}
-            />
-          </Table>
+        {userData
+          ?userData.length==0
+            ?<EmptyPageMessage sectionName="users" emotion={true} />
+            :<Table className="bg-white border-2 rounded-xl">
+              <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
+              <BodyRowsMapping
+                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "objName", "zone","text", "userStatus", "action"]}
+                searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
+                action = {userData.map((_:any, index:number)=>{
+                  return(
+                    <div className="flex flex-row">
+                      <FormDialog key={index} index={index} type="user" edit={true}
+                        triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                        formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
+                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]}
+                      />
+                      {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */}
+                    </div>
+                  )
+                })}
+              />
+            </Table>
+          :<LoadingMessage sectionName="users" />
         }
       </div>
     </div>

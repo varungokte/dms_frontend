@@ -3,7 +3,7 @@ import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import { Table } from "./ui/table";
 
 import useGlobalContext from "./../../GlobalContext";
-import FormDialog from "./BasicComponents/FormDialog";
+import FormDialog from "./FormComponents/FormDialog";
 import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import edit_icon from "./static/edit_icon.svg";
 import Search from "./BasicComponents/Search";
@@ -11,9 +11,10 @@ import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { useToast } from "./ui/use-toast";
 import { Toaster } from "./ui/toaster";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicComponents/LoadingMessage";
 
 function TeamManagement(){
-  const [teamList,setTeamList] = useState<any>([]);
+  const [teamList,setTeamList] = useState<any>();
 
   const [fieldList] = useState<any>([
     { category:"grid", row:2, fields:[
@@ -54,20 +55,20 @@ function TeamManagement(){
   const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
-    if (added)
+    if (added){
       getTeamsList().then(res=>{
-        console.log("response",res.obj);
         if (res.status==200 && res.obj.length!=0)
-         setTeamList(res.obj);
+         setTeamList(res.obj.list);
         else
           setTeamList([])
       }).catch(()=>{
         setTeamList([])
       })
+      setAdded(false);
+    }
   },[added])
 
-  const createTeam = (userValues:any) => {
-    console.log("userValues",userValues);
+  const createTeam = async (userValues:any) => {
     const data:any={};
     data["N"] = userValues["N"];
     data["L"] = userValues["L"].values;
@@ -79,28 +80,19 @@ function TeamManagement(){
       }
     });
     console.log("SUBMITTED",data);
-    addTeam(data).then(res=>{
-      if (res==200){
-        setAdded(false);
-        toast({
-          title: "Success!",
-          description: "The team has been created",
-          className:"bg-white"
-        })}
-      else
-        toast({
-          title: "Error!",
-          description: "The team has not been created",
-          className:"bg-white"
-        })
-    }).catch(()=>{
+
+    const res = await addTeam(data);
+
+    if (res==200){
+      setAdded(true);
       toast({
-        title: "Error!",
-        description: "The team has not been created",
+        title: "Success!",
+        description: "The team has been created",
         className:"bg-white"
       })
-    })
-    
+    };
+
+    return res;
   }
 
   const editTeam = () => {}
@@ -115,37 +107,41 @@ function TeamManagement(){
       <div className="flex flex-row">
         <div className="flex-auto"><Search label={"Search by Team Name"} setter={setSearchString} /></div>
         <div>
-          <FormDialog key={-1} index={-1}
+          <FormDialog key={-1} index={-1} type="team"
             triggerText="Add Team" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add Team" formSubmit={createTeam} submitButton="Add"
             form={fieldList} fieldValues={fieldValues} setter={setFieldValues} currentFields={{}}
-            suggestions="AU"
+            suggestions="RM"
           />
         </div>
       </div>
-      <div >
-        {teamList.length==0
-          ?<EmptyPageMessage sectionName="teams"/>
-          :<Table className="bg-white rounded-xl m-5">
-            <HeaderRows headingRows={["Team Name", "Team Lead", "Total Members", "Created At", "Status","Action"]} />
-            <BodyRowsMapping 
-              list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "objName", "countTeam","date", "userStatus", "action"]}
-              searchRows={[]} filterRows={[]}
-              action={teamList.map((item:any, index:number)=>{
-                console.log("ITEM",item)
-                return(
-                  <div className="flex flex-row">
-                    <FormDialog key={index} index={index} edit={true}
-                      triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                      formTitle="Edit User" formSubmit={editTeam} submitButton="Edit User" formSize="medium"
-                      form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={teamList[index]}
-                    />
-                    <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} />
-                  </div>
-                )
-              })}
-            />
-          </Table>
+      <div className="m-7">
+        {teamList
+          ?teamList.length==0
+            ?<EmptyPageMessage sectionName="teams"/>
+            :<Table className="bg-white rounded-xl">
+              <HeaderRows
+                headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}
+                headingClassNames={[""]}
+              />
+              <BodyRowsMapping 
+                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "objName", "countTeam","date", "userStatus", "action"]}
+                searchRows={[]} filterRows={[]}
+                action={teamList.map((_:any, index:number)=>{
+                  return(
+                    <div className="flex flex-row">
+                      <FormDialog key={index} index={index} edit={true} type="team"
+                        triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                        formTitle="Edit User" formSubmit={editTeam} submitButton="Edit User" formSize="medium"
+                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={teamList[index]}
+                      />
+                      <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} />
+                    </div>
+                  )
+                })}
+              />
+            </Table>  
+          :<LoadingMessage sectionName="teams" />
         }
       </div>
     </div>

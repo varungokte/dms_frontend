@@ -14,7 +14,9 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState(<></>);
 
 	const navigate = useNavigate();
-	const { LoginUser } = useGlobalContext();
+	const { LoginUser, useTitle } = useGlobalContext();
+
+  useTitle("Login");
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
@@ -35,16 +37,12 @@ export const LoginPage = () => {
 
 		LoginUser(data)
 			.then((res:any) => {
-        console.log("RES",res)
         if (res==401 || res==412){
           setErrorMessage(<p className="text-red-600">Incorrect Username or Password</p>)
           return;
         }
-        if (res==409){
-          setErrorMessage(<p className="text-red-600">Inactive User. Contact your admin.</p>)
-          /* console.log("REDIRECTING TO VERIFY")
-          navigate("/verify") */
-        }
+        if (res==409)
+          setErrorMessage(<p className="text-red-600">Inactive User. Contact your administrator.</p>)
         else{
           console.log("NAVIGAING TO DASHOARD")
           navigate('/')
@@ -77,8 +75,8 @@ export const LoginPage = () => {
           <br/>
           <div className="flex flex-row relative">
             <div style={{marginRight:"55%"}}>
-              <input type="checkbox" id="remember"/>
-              <label htmlFor="remember">Remember me</label>
+              {/* <input type="checkbox" id="remember"/>
+              <label htmlFor="remember">Remember me</label> */}
             </div>
           </div>
           <br/>

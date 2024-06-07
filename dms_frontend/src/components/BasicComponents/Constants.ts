@@ -12,7 +12,7 @@ enum TransactionDocumentTypes { "-", "Common Loan Agreements","Security Trustee 
 
 enum ComplianceDocumentTypes { "-","Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement" };
 
-enum CovenantDocumentTypes { "-", "Covenant Type A","Covenant Type B"};
+enum CovenantDocumentTypes { "-", "Financial Covenant","Non-Financial Covenant"};
 
 enum ConditionPrecedentTypes {"-", "Condition A", "Condition B"};
 

@@ -110,11 +110,11 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
   const [currentForm, setCurrentForm] = useState(0);
   const [repeatForm, setRepeatForm] = useState<any>([]);
   const [renderRepeatForm, setRenderRepeatForm] = useState<any>([]);
-  
+
   useEffect(()=>{
     if (props.preexistingValues){
       setCurrentForm(props.fieldValues.length-1);
-      const arr =  (props.fieldValues.map((acc:any,index:number)=>{
+      const arr =  (props.fieldValues.map((_:any,index:number)=>{
         return { key:"f"+index, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:index, repeatFields:true }
       }));
       setRepeatForm(arr);
@@ -127,7 +127,7 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
 
   useEffect(()=>{
     setRenderRepeatForm((curr:any)=>{
-      curr = repeatForm.map((form:any,index:number)=>{
+      curr = repeatForm.map((form:any)=>{
         form.fieldValues= props.fieldValues;
         return createElement(RenderForm, form);
       });
@@ -161,6 +161,7 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
             setRepeatForm((curr:any)=>{return [...curr,{key:"f"+currentForm+1, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm+1, repeatFields:true }]}); 
           }}
         >+</button>
+        
       </div>
       <br/>
     </div>

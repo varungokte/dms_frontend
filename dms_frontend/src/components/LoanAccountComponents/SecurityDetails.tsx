@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { FormTextField, FormRepeatableGrid } from "../BasicComponents/FormFields";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import { TextField, FormRepeatableGrid } from "../FormComponents/FormFields";
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
 
 function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
@@ -127,17 +127,19 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
   return(
     <div className="">
       <br/>
-      {disableFields?<p className="text-red-600">These fields are not applicable because the security type was marked unsecured in the previous section.<br/>Please move on to the next section</p>:""}
+      {disableFields?<p className="text-red-600 m-5">These fields are not applicable because the security type was marked unsecured in the previous section.<br/>Please move on to the next section</p>:""}
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-2">
           {fieldList.map((field,index)=>{
-            if (field.type!="repeatable")
-              return <FormTextField key={index} id={field.id} name={field.name} fieldValues={fieldValuesFixed} setter={setFieldValuesFixed} type={field.type} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+            if (field.type!="repeatable" && !disableFields)
+              return <span className="mx-2">
+                <TextField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} type={field.type} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+              </span>
           })}
           </div>
 
           {fieldList.map((field,index)=>{
-            if (field.type=="repeatable")
+            if (field.type=="repeatable" && !disableFields)
               return <FormRepeatableGrid key={index} fieldList={field.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} preexistingValues={preexistingValues} />
           })}
         <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />

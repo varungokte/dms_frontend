@@ -38,6 +38,7 @@ import LoanAccount from './components/LoanAccount';
 import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
 import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 import TeamManagement from './components/TeamManagement';
+import Masters from './components/Masters';
 //import DocumentViewer from './components/BasicComponents/DocumentViewer';
 
 export const MenuRouter = () => {
@@ -127,16 +128,16 @@ export const MenuRouter = () => {
 		{ name: "Role Management", path:"/roles", component: RoleManagement },
 		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
 		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
-		//{ name: "Team Tasks", path:"/tasks", component: TeamTasks, icon: TaskIcon },
 		{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
 		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
+		{ name: "Masters", path:"/masters", component: Masters, }
 	]);
 	
 	return (
 		<div className='relative'>
-			<div style={{ width: "320px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1" >
+			<div style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1" >
 				<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
 				<div className='mx-8 my-5'>
 					{componentList.map((item:any,index:number)=>{
@@ -163,7 +164,7 @@ export const MenuRouter = () => {
 				</div>
 			</div>
 			
-			<div style={ {marginLeft:"320px"} }>
+			<div style={ {marginLeft:"280px",} }>
 				<div className='relative h-20 w-100 bg-white'>
 					<div className=' absolute inset-y-5 right-0 w-50'>
 						{userInfo}
@@ -177,7 +178,6 @@ export const MenuRouter = () => {
 					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
 					<Route key={"T"} path="/teams/:id" element={<TeamMembers/>} />
-					{/* <Route key={"D"} path="/view/:id" element={<DocumentViewer />} /> */}
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

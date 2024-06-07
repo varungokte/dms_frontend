@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Table } from "@/components/ui/table";
 
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
-import FormDialog from "../BasicComponents/FormDialog";
+import FormDialog from "../FormComponents/FormDialog";
 import Search from "../BasicComponents/Search";
 import Filter from "../BasicComponents/Filter";
 

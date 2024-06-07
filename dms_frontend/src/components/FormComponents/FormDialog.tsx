@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { ComboboxField, DateField, NumberField, RoleField, SelectField, TextAreaField, TextField } from "./FormFieldsDialog";
-import { SubmitButtonStyling } from "./PurpleButtonStyling";
-import RequiredFieldsNote from "./RequiredFieldsNote";
-import useGlobalContext from "./../../../GlobalContext";
+import { CheckboxField, ComboboxField, DateField, MultiTextField, NumberField, RoleField, SelectField, TextAreaField, TextField } from "./FormFields";
+import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
+import useGlobalContext from "../../../GlobalContext";
 
-function FormDialog(props:{index:number, edit?:boolean, triggerText:any, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:any, fieldValues:any, setter:Function, currentFields:any, repeatFields?:boolean, suggestions?:"AU"|"TT"|"UM" }){
+function FormDialog(props:{index:number, type:"team"|"user"|"role"|"cont"|"rate", edit?:boolean, triggerText:any, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:any, fieldValues:any, setter:Function, currentFields:any, repeatFields?:boolean, suggestions?:"AU"|"TL"|"RM" }){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [suggestions, setSuggestions] = useState<any>([]);
+  const [zone, setZone] = useState(-1);
 
   enum FormSizes {
     small= "min-w-[600px] min-h-[300px]",
@@ -17,26 +18,46 @@ function FormDialog(props:{index:number, edit?:boolean, triggerText:any, trigger
     large= "min-w-[1000px] min-h-[300px]",
   };
 
-  const {getUserSuggestions} = useGlobalContext();
+  const {getUserSuggestions, getSingleUser} = useGlobalContext();
 
   useEffect(()=>{
-    if (props.suggestions)
+    if (props.edit){
+      getSingleUser(props.currentFields["_id"]);
+    }
+  },[])
+
+  useEffect(()=>{
+    if (props.suggestions){
+      console.log("ZONE",zone)
       getUserSuggestions(props.suggestions).then(res=>{
-        const arr = res.map((obj:any)=> {return{label:`${obj.N}<${obj.E}>`, values:obj}})
+        const arr:any=[];
+        if (props.type=="user")
+          arr.push({label:"root",values:{E:"root"}});
+        let restrictByZone = false;
+        if (props.type=="user")
+          restrictByZone=true;
+        for (let i=0; i<res.obj.length; i++){
+          const obj = res.obj[i];
+          if (!restrictByZone)
+            arr.push({label:`${obj.N}<${obj.E}>`, values:obj})
+          else if (restrictByZone && obj.Z==zone)
+            arr.push({label:`${obj.N}<${obj.E}>`, values:obj})
+        }
         setSuggestions(arr);
+        console.log(res);
+        console.log("suggestions",arr)
       }).catch(()=>{
         setSuggestions([]);
       });
-  },[]);
+    }
+  },[zone]);
 
-
-  const validateRequiredFields=()=>{
+  const findMissingFields = () => {
     const data:any={};
     for (let i=0; i<props.form.length; i++){
       const field = props.form[i];
       if (field.category=="single")
         data[field.id] = field["required"]?true:false;
-
       else if (field.category=="grid"){
         for (let j=0; j<field.fields.length; j++){
           const gridField = field.fields[j];
@@ -44,26 +65,41 @@ function FormDialog(props:{index:number, edit?:boolean, triggerText:any, trigger
         }
       }
     }
+    return data;
+  }
 
-    for (let i=0;i<Object.keys(data).length;i++){
-      const key = Object.keys(data)[i];
-      const value = data[key];
+  const validateRequiredFields=()=>{
+    console.log("fieldVAlues",prefillValues)
+    const requiredList = findMissingFields();
+    for (let i=0;i<Object.keys(requiredList).length;i++){
+      let key = Object.keys(requiredList)[i];
+      let value = requiredList[key];
+      if (key=="perm"){
+        key="R"
+        value=true
+      }
+      console.log(key,value)
       if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1)){
+        console.log(key,value)
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }
     };
-
     setErrorMessage(<></>);
     return true;
   }
 
-  const submitFunction = () => {
+  const submitFunction = async () => {
     const okToSubmit = validateRequiredFields();
     if(okToSubmit){
-      //console.log("pre submit prefil values", prefillValues);
-      props.formSubmit(prefillValues);
-      setOpen(false);
+      console.log("pre submit prefil values", prefillValues);
+      const res = await props.formSubmit(prefillValues);
+      if (res==200)
+        setOpen(false);
+      else if (res==422)
+        setErrorMessage(<p className="text-red-600">Already exists.</p>);
+      else
+        setErrorMessage(<p className="text-yellow-600">Something went wrong.</p>);
     }
   }
 
@@ -76,7 +112,7 @@ function FormDialog(props:{index:number, edit?:boolean, triggerText:any, trigger
           <hr/>
         </DialogHeader>
           <RequiredFieldsNote />
-          <RenderForm key={"f0"} setter={props.setter} edit={props.edit||false} currentFields={props.currentFields} fieldValues={props.fieldValues} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestionsList={props.suggestions?suggestions:[]} />
+          <RenderForm key={"f0"} setter={props.setter} edit={props.edit||false} currentFields={props.currentFields} fieldValues={props.fieldValues} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestionsList={props.suggestions?suggestions:[]} setZone={setZone} />
           {errorMessage}
           <br/>
           <div className="flex flex-row">
@@ -91,7 +127,7 @@ function FormDialog(props:{index:number, edit?:boolean, triggerText:any, trigger
   )
 }
 
-function RenderForm(props:{setter:Function, edit:boolean, currentFields:any, fieldValues:any, form:any, prefillValues:any, setPrefillValues:Function, suggestionsList?:any}){
+function RenderForm(props:{setter:Function, edit:boolean, currentFields:any, fieldValues:any, form:any, prefillValues:any, setPrefillValues:Function, suggestionsList?:any, setZone?:Function}){
   useEffect(()=>{
     if (props.edit)
       props.setPrefillValues(props.currentFields);
@@ -123,22 +159,32 @@ function RenderForm(props:{setter:Function, edit:boolean, currentFields:any, fie
         else if (field["type"]=="date")
           return <DateField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatField={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatFields={field["repeatable"]}
           />
         else if (field["type"]=="number")
           return <NumberField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatField={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatFields={field["repeatable"]}
+          />
+        else if (field["type"]=="multitext")
+          return <MultiTextField key={index} index={index} id={field["id"]} name={field["name"]} 
+            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatFields={field["repeatable"]}
+          />
+        else if (field["type"]=="checkbox")
+          return <CheckboxField key={index} index={index} id={field["id"]} name={field["name"]} 
+            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatFields={field["repeatable"]}
           />
         else if (field["type"]=="select") 
           return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} options={field["options"]}
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatField={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatFields={field["repeatable"]}
           />
         else
           return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]}
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatField={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatFields={field["repeatable"]}
           />
       }
       else if (field["category"]=="grid"){
@@ -164,6 +210,7 @@ function RenderForm(props:{setter:Function, edit:boolean, currentFields:any, fie
                     <SelectField key={index} index={index} id={item["id"]} name={item["name"]} options={item["options"]}
                       required={item["required"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
                       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
+                      setZone={item["id"]=="Z"?props.setZone:undefined}
                     />
                   </span>
                 else

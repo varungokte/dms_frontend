@@ -9,13 +9,12 @@ import BasicDetails from "./LoanAccountComponents/BasicDetails";
 import SecurityDetails from "./LoanAccountComponents/SecurityDetails";
 import BankDetails from "./LoanAccountComponents/BankDetails";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+//import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
 import { useLocation } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
-import LoanCovenants from "./LoanAccountComponents/LoanCovenants";
-import LoanConditions from "./LoanAccountComponents/LoanConditions";
+import LoadingMessage from "./BasicComponents/LoadingMessage";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
@@ -28,7 +27,7 @@ function CreateLoanAccount() {
 
   const [loanId, setLoanId] = useState(state.linkSource=="CREATE"?"":state.loanId);
   const [AID, setAID] = useState(state.linkSource=="CREATE"?"":state.AID);
-  const [preexisting, setPreexisting] = useState([]);
+  const [preexisting, setPreexisting] = useState<any>();
   const [currentSection, setCurrentSection] = useState(state.linkSource=="CREATE"?0:1);
   const [okToFrolic, setOkToFrolic] = useState(state.linkSource=="CREATE"?false:true);
   const [showSecurityDetails, setShowSecurityDetails] = useState(true);
@@ -38,6 +37,8 @@ function CreateLoanAccount() {
   useEffect(()=>{
     if (actionType=="EDIT"){
       getLoanFields(loanId).then(res=>{
+        if (res["ST"] && res["ST"]==2)
+          setShowSecurityDetails(false);
         setPreexisting(res);
         setLoadingData(true);
       })
@@ -61,9 +62,9 @@ function CreateLoanAccount() {
     { name: "Relationship Mapping", component: RelationshipMapping },
     { name: "Transaction Documents", component: LoanDocuments },
     { name: "Compliance Documents", component: LoanDocuments },
-    { name: "Covenants", component: LoanCovenants },
-    { name: "Conditions Precedent", component: LoanConditions },
-    { name: "Conditions Subsequent", component: LoanConditions },
+    { name: "Covenants", component: LoanDocuments },
+    { name: "Condition Precedent", component: LoanDocuments },
+    { name: "Condition Subsequent", component: LoanDocuments },
     { name: "Ratings", component: Ratings },
   ])
 	
@@ -74,7 +75,7 @@ function CreateLoanAccount() {
       <br/>
       <div className="bg-white mx-7 p-2 rounded-xl">
         <div className="flex flex-row" style={{position:"relative"}}>
-          <button><ChevronLeft className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} /* onClick={previousSection} */ /></button>
+          {/* <button><ChevronLeft className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={previousSection} /></button> */}
             <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap' }}>
 
             <TooltipProvider>
@@ -106,7 +107,7 @@ function CreateLoanAccount() {
               })}
               </TooltipProvider>
             </div>
-          <button><ChevronRight className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} /* onClick={nextSection} *//></button>
+          {/* <button><ChevronRight className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={nextSection}/></button> */}
         </div>
 
         <div className="mx-10">
@@ -129,7 +130,7 @@ function CreateLoanAccount() {
               setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
               preexistingValues: actionType=="EDIT"?preexisting:"",
             }
-          ):""} 
+          ):<LoadingMessage sectionName="details" />} 
         </div>
       </div> 
     </div>

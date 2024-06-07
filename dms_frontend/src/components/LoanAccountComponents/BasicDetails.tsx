@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FormTextField, FormSelectField } from "../BasicComponents/FormFields";
+import { TextField, SelectField } from "../FormComponents/FormFields";
 import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
-import {FormSectionNavigation} from "./../BasicComponents/FormSectionNavigation";
+import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import moment from "moment";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 
@@ -30,10 +30,10 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
     { id:"HA", name:"Hold Amount", type:"number", required: false },
     { id:"DA", name:"Downsell Amount", type:"number", required: false },
     { id:"OA", name:"O/S Amount", type:"number", required: false },
-    { unnecessaryComplication: true, id:"A", name:"DSRA Applicability", type:"select", options:["Yes","No"], required: false },
-    { unnecessaryComplication: true, id:"F", name:"DSRA Form", type:"select", options:["LC","BG", "FD"], required: false },
-    { unnecessaryComplication: true, id:"S", name:"DSRA Created or Not", type:"select", options:["Yes","No"], required: false },
-    { unnecessaryComplication: true, id:"V", name:"DSRA Amount", type:"number", required: false },
+    { id:"A", name:"DSRA Applicability", type:"select", options:["Yes","No"], required: false },
+    { id:"F", name:"DSRA Form", type:"select", options:["LC","BG", "FD"], required: false },
+    { id:"S", name:"DSRA Created or Not", type:"select", options:["Yes","No"], required: false },
+    { id:"V", name:"DSRA Amount", type:"number", required: false },
   ]);
 
   const {createLoan} = useGlobalContext();
@@ -94,7 +94,6 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
       }
       if (fieldValues[field]==null || fieldValues[field]==-1 || (props.actionType=="EDIT" && fieldValues[field]==props.preexistingValues[field]))
         return;
-      //@ts-ignore
       data[field] = fieldValues[field];
     })
 
@@ -109,6 +108,8 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
 
       if (fieldValues["ST"]==2)
         props.setShowSecurityDetails(false);
+      else if (fieldValues["ST"]==1)
+        props.setShowSecurityDetails(true);
 
       createLoan(data).then(res=> {
         if (res==200){
@@ -142,9 +143,9 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
               disabled=true;
             
             if (field.type=="select")
-              return <FormSelectField key={field.id} id={field.id} name={field.name} setter={setFieldValues} fieldValues={fieldValues} options={field.options} required={field.required} disabled={disabled} />
+              return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required} disabled={disabled} />
             else
-              return <FormTextField key={field.id}  id={field.id} name={field.name||""} setter={setFieldValues} fieldValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
+              return <TextField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
           })}
         </div>
         <br/>

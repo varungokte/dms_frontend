@@ -58,25 +58,25 @@ const getDecryptedToken = async () => {
 }
 
 //SUGGESTIONS
-const getUserSuggestions = async (type:"AU"|"UM"|"TT") => {
+const getUserSuggestions = async (type:"AU"|"RM"|"TL") => {
 	try {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/suggestion`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: {type: type}
 		});
-		const decryptedObject = handleDecryption(response.data);
+		const decryptedObject = await handleDecryption(response.data);
 		console.log("decrypted object", decryptedObject)
 		if (response.status==200)
-			return decryptedObject; 
+			return {status:200, obj:decryptedObject}
 		else
-			return null;
+			return {status:response.status, obj:null}
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+		return {status:0, obj:null}
 		else
-			return error.response;
+		return {status:error.response.status, obj:null}
 	}
 };
 
@@ -107,16 +107,19 @@ const LoginUser = async (data: object) => {
 		console.log("response", response)
 		console.log(response.status)
 		if (response.status == 200){
+			console.log("login token",response.data);
 			localStorage.setItem("Beacon-DMS-token",response["data"]);
 			return 200;
 		}	
 		else
 			return response.status;
 	} 
-	catch (error) {
-		console.log(error);
-		//@ts-ignore
-		return  error.response.status
+	catch (error:any) {
+		console.log ("login error",error)
+		if (!error.response)
+			return 0;
+		else
+			return error.response.status;
 	}
 }
 
@@ -157,8 +160,10 @@ const verifyOTP = async (otp:any) => {
 			return {status:response.status, data:null}
 	}
 	catch(error:any){
-		if (error.status)
+		if (error.response.status)
 			return {status:error.status, data:null}
+		else	
+			return {status:0, data:null}
 	}
 }
 
@@ -176,13 +181,13 @@ const createUser = async (data:object) => {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
 		console.log(response)
-		return response;
+		return response.status;
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
-		if (error.response.status===409)
-			return "duplicate_user"
+			return 0;
+		else
+			return error.response.status
 	}
 }
 
@@ -194,33 +199,48 @@ const editUser = async (data:object) => {
 				"Authorization": `Bearer ${token}`
 			}
 		});
-		return response;
+		return response.status;
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
-		if (error.response.status===409)
-			return "duplicate_user"
+			return 0;
+		else
+			return error.response.status
 	}
 }
 
 const getAllUsers = async () => {
 	try {
 		const token = await getEncryptedToken();
-		console.log("ENCRYPTED", token);
 		const response = await axios.get(`${Base_Url}/listUser`, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		console.log("Response: ",response);
-		const decryptedObject = handleDecryption(response["data"]);
-		console.log("DECRYPTED VALUE BACK FROM FUNCTION", decryptedObject);
-		return decryptedObject;
+		const decryptedObject = await handleDecryption(response["data"]);
+		return {status:response.status, obj:decryptedObject||{}};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
-		if (error.response.status===409)
-			return "duplicate_user"
+			return {status:0, obj:{}};
+		else
+			return {status:error.response.status, obj:{}}
+	}
+}
+const getSingleUser = async (id:string) => {
+	try {
+		const token = await getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/getUser`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params:{"_id":id}
+		});
+		const decryptedObject = await handleDecryption(response["data"]);
+		console.log("single user", decryptedObject);
+		return {status:response.status, obj:decryptedObject||{}};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status:0, obj:{}};
+		else
+			return {status:error.response.status, obj:{}}
 	}
 }
 
@@ -414,13 +434,19 @@ const getRolesList = async () => {
 }
 
 //TEAM MANAGEMENT
-const getTeamsList = async () => {
-	//viewTeam
+const getTeamsList = async (loanId?:string) => {
 	try {
 		const token = await getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listTeam`, {
-			headers:{ "Authorization": `Bearer ${token}` },
-		});
+		let response;
+		if (loanId)
+			response = await axios.get(`${Base_Url}/listTeam`, {
+				headers:{ "Authorization": `Bearer ${token}` },
+				params:{ "_loanId":loanId}
+			});
+		else
+			response = await axios.get(`${Base_Url}/listTeam`, {
+				headers:{ "Authorization": `Bearer ${token}` },
+			});
 		const decryptedObject = await handleDecryption(response.data);
 
 		return {status:response.status,obj:decryptedObject};	
@@ -450,18 +476,79 @@ const addTeam = async (data:any) => {
 	}
 }
 
+const getSingleTeam = async () => {
+	try {
+		const token = await getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/getTeam`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		const decryptedObject = await handleDecryption(response.data);
+
+		return {status:response.status,obj:decryptedObject};	
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status:0, obj:null}
+		else
+			return {status:error.response.status,obj:null};
+	}
+};
+
 //DOCUMENTS
-const createDocument = async (data:any) => {
+const addDocument =  async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 
-		console.log("theta",data);
+		const enc_data = await handleEncryption(data);
 
-		for (const [key, value] of data.entries()) 
-			console.log(`${key}: ${value}, ${typeof value}`);
+		const response = await axios.post(`${Base_Url}/addDocsDetails`, {data:enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}`}});
 
+		console.log("Server response, ",response);
+		const decryptedObject = await handleDecryption(response.data);
+		console.log("decrypted object", decryptedObject)
+		return {status:response.status, id:decryptedObject["_id"]||""};
+	}
+
+	catch(error:any) {
+		if (!error.response)
+			return {status:0, id:""};
+		else
+			return {status:error.response.status, id:""};
+	}
+};
+
+const editDocument =  async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+
+		const enc_data = await handleEncryption(data);
+
+		const response = await axios.post(`${Base_Url}/addDocsDetails`, {data:enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}`}});
+
+		console.log("Server response, ",response);
+		const decryptedObject = await handleDecryption(response.data);
+		console.log("decrypted object", decryptedObject)
+		return {status:response.status, id:decryptedObject["_id"]||""};
+	}
+
+	catch(error:any) {
+		if (!error.response)
+			return {status:0, id:""};
+		else
+			return {status:error.response.status, id:""};
+	}
+};
+
+const uploadFile = async (data:any,loc:string,docId:string) => {
+	try {
+		const token = getEncryptedToken();
+		console.log("DOCID",docId)
 		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
-			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' }});
+			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
+			params: { "LOC":loc, "_id":docId }
+		});
 
 		console.log("Server response, ",response);
 		return response.status;
@@ -473,7 +560,7 @@ const createDocument = async (data:any) => {
 		else
 			return error.response;
 	}
-}
+};
 
 const getDocumentsList = async (loanId:string, sectionName:string) =>  {
 	try {
@@ -496,31 +583,6 @@ const getDocumentsList = async (loanId:string, sectionName:string) =>  {
 			return {status: error.status, obj:null};;
 	}
 };
-
-const editDocument = async (data:any) => {
-	try {
-		const token = getEncryptedToken();
-
-		console.log("theta",data);
-
-		for (const [key, value] of data.entries()) 
-			console.log(`${key}: ${value}, ${typeof value}`);
-
-		const response = await axios.post(`${Base_Url}/editDocs`, data, {
-			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
-		});
-
-		console.log("Server response, ",response);
-		return response.status;
-	}
-
-	catch(error:any) {
-		if (!error.response)
-			return;
-		else
-			return error.response;
-	}
-}
 
 const getFileList = async (AID:string,section_name:string, document_category:string) => {
 	try {
@@ -567,12 +629,12 @@ const fetchDocument = async (AID:string,section_name:string, document_category:s
 	}
 };
 
-const deleteDocument = async (AID:string, loanId:string, section_name:string, document_category:string,file_name:string) => {
+const deleteDocument = async (AID:string, docId:string, section_name:string, file_name:string) => {
 	try {
-		const token = getEncryptedToken();
+		const token = getEncryptedToken()
 		const response = await axios.delete(`${Base_Url}/deleteDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}`, _loanId:loanId },
+			params: { LOC: `${AID}/${section_name}/${file_name}`, _id:docId },
 		});
 
 		return response.status;
@@ -585,6 +647,45 @@ const deleteDocument = async (AID:string, loanId:string, section_name:string, do
 			return error.response;
 	}
 }
+
+//RELATIONSHING MAPPING
+const selectTeam = async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/selectTeam`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response.status;
+	}
+}
+
+//MASTERS
+//addMST
+
+const addToMasters = async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addTeam`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response.status;
+	}
+}
+
 
 //addMember, getTeam
 
@@ -606,15 +707,17 @@ const useGlobalContext = () => {
 		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
 		RegisterAdmin, LoginUser,
 		sendOTP, verifyOTP,
-		createUser, editUser, getAllUsers,
+		createUser, editUser, getAllUsers, getSingleUser,
 		createLoan, createAID,
 		addContact, getContacts,
 		getLoanList, getLoanFields,
 		addRating, getRatingsList,
 		addRole, getRolesList,
 		getUserSuggestions,
-		getTeamsList, addTeam,
-		createDocument, getDocumentsList, editDocument, getFileList, deleteDocument, fetchDocument,
+		getTeamsList, addTeam, getSingleTeam,
+		addDocument, uploadFile, getDocumentsList, editDocument, getFileList, deleteDocument, fetchDocument,
+		selectTeam,
+		addToMasters,
 	}
 }
 

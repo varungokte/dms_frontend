@@ -3,7 +3,7 @@ import upload_icon from "./../static/upload_icon.svg";
 import info_icon from "./../static/info_icon.svg";
 import view_icon from "./../static/view_files_icon.svg";
 import { useEffect, useState } from "react";
-import FormDialogFiles from "./FormDialogFiles";
+import FormDialogFiles from "../FormComponents/FormDialogFiles";
 
 function UploadButton(){
   const [files, setFiles] = useState<any>([]);

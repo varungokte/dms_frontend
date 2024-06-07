@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import FormDialog from "../BasicComponents/FormDialog";
+import FormDialog from "../FormComponents/FormDialog";
 
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import Search from "../BasicComponents/Search";

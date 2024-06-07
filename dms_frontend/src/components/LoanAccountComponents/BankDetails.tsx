@@ -1,7 +1,7 @@
-import { FormRepeatableGrid } from "../BasicComponents/FormFields";
+import { FormRepeatableGrid } from "../FormComponents/FormFields";
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { BankAccountType, EnumIteratorValues } from "../BasicComponents/Constants";
 
 function BankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {

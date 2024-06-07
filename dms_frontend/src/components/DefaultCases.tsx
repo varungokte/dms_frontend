@@ -33,7 +33,7 @@ function Default() {
 
       <div className="m-7">
         <Table className="rounded-xl bg-white">
-          <HeaderRows headingRows={[["Sr. No.","w-[100px]"],["Deal"],["Default Type"],["Date"]]} />
+          <HeaderRows headingRows={["Sr. No.","Deal","Default Type","Date"]} />
           <BodyRowsMapping list={defaultData} dataType={["index","text","text","text"]} columns={["AID","N","T", "D"]}
             searchRows={searchString==""?[]:[searchString,0]} filterRows={[]} 
             action={<Ellipsis/>} cellClassName={["font-medium","","","",""]}

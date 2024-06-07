@@ -8,10 +8,10 @@ import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import edit_icon from "./static/edit_icon.svg";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicComponents/LoadingMessage";
 
 function LoanAccount() {
-  const [accountList, setAccountList] = useState([]);
-
+  const [accountList, setAccountList] = useState<any>();
   const [ids, setIds] = useState([]);
 
   const {getLoanList, useTitle} = useGlobalContext();
@@ -27,6 +27,7 @@ function LoanAccount() {
       setAccountList(res);
       setIds(idarr);
     })
+    
   },[])
 
 
@@ -42,27 +43,29 @@ function LoanAccount() {
         <div className="m-auto flex-auto"> {/* <Search label="Search by Agreement ID" setter={setSearchString}/> */}</div>
         <div className="m-auto"><Link className={`${CreateButtonStyling} p-4`} to="create" state={{linkSource: "CREATE"}}>Add a Loan Account</Link></div>
       </div>
-      <div className="m-5 ">
-        {accountList.length==0
-          ?<EmptyPageMessage sectionName="loan accounts"/>
-          :<Table className="border rounded-xl">
-            <HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount", "Status", "Action"]}
-              headingClassNames={["w-[100px]"]}
-            />
-            <BodyRowsMapping 
-              list={accountList} columns={["AID", "CN", "GN", "Z", "SA", "S"]}
-              dataType={["index","text","text","text","text","text","text", "action"]} 
-              cellClassName={["font-medium", "text-custom-1","","","","",""]} 
-              searchRows={[]} filterRows={[]}
-              action = {accountList.map((item:any, index:number)=>{
-                return(
-                  <div className="flex flex-row">
-                    <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item.AID}}><img src={edit_icon}/></Link>
-                  </div>
-                )
-              })}
-            />
-          </Table>
+      <div className="m-5">
+        {accountList
+          ?accountList.length==0
+            ?<EmptyPageMessage sectionName="loan accounts"/>
+            :<Table className="border rounded-xl">
+              <HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount", "Action"]}
+                headingClassNames={["w-[100px]"]}
+              />
+              <BodyRowsMapping 
+                list={accountList} columns={["AID", "CN", "GN", "Z", "SA"]}
+                dataType={["index","text","text","text","zone","text", "action"]} 
+                cellClassName={["font-medium", "text-custom-1","","","","",""]} 
+                searchRows={[]} filterRows={[]}
+                action = {accountList.map((item:any, index:number)=>{
+                  return(
+                    <div className="flex flex-row">
+                      <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item.AID}}><img src={edit_icon}/></Link>
+                    </div>
+                  )
+                })}
+              />
+            </Table>
+          : <LoadingMessage sectionName="loan accounts"/>
         }
       </div>
       <br/>

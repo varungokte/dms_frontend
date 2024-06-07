@@ -3,11 +3,12 @@ import { Table } from "@/components/ui/table"
 //import Search from "../BasicComponents/Search";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../BasicComponents/Constants";
-import FormDialog from "../BasicComponents/FormDialog";
+import FormDialog from "../FormComponents/FormDialog";
 import useGlobalContext from "./../../../GlobalContext";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
+import LoadingMessage from "../BasicComponents/LoadingMessage";
 
 function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   const [fieldValues, setFieldValues] = useState<any>({
@@ -29,7 +30,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
 
   const {addRating, getRatingsList} = useGlobalContext();
 
-  const [ratingsList, setRatingsList] = useState([]);
+  const [ratingsList, setRatingsList] = useState<any>();
   const [added, setAdded] = useState(true);
  // const [searchString, setSearchString] = useState("");
 
@@ -85,7 +86,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
           {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
         <div>
-          <FormDialog index={-1}
+          <FormDialog index={-1} type="rate"
             triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
             form={fieldList} fieldValues={fieldValues} setter={setFieldValues} currentFields={{}}
@@ -94,15 +95,17 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
       </div>
 
       <div className="m-5">
-        {ratingsList.length==0
-          ?<EmptyPageMessage sectionName="ratings" />
-          :<Table className="border">
-            <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating"]} />
+        {ratingsList
+          ?ratingsList.length==0
+            ?<EmptyPageMessage sectionName="ratings" />
+            :<Table className="border">
+              <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating"]} />
 
-            <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "date", "ratingOutlook", "text", "text"]}
-              searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
-            />
-        </Table>
+              <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "date", "ratingOutlook", "text", "text"]}
+                searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
+              />
+          </Table>
+          :<LoadingMessage sectionName="ratings" />
         }
       </div>
       <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />

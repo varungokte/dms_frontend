@@ -1,122 +1,83 @@
 import { useEffect, useState } from "react";
-
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import FormDialog from "../BasicComponents/FormDialog";
-import Filter from "../BasicComponents/Filter";
-
-import { EnumIteratorKeys, EnumIteratorValues, UserRoles } from "../BasicComponents/Constants";
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import { Edit2Icon } from "lucide-react";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
+import LoadingMessage from "../BasicComponents/LoadingMessage";
 
 function RelationshipMapping(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
-  const [userInfo, setUserInfo] = useState([]);
-  const [role, setRole] = useState("");
+  const [teamsList, setTeamList] = useState<any>();
 
-  const [fieldValues, setFieldValues] = useState([{}]);
+  const { getTeamsList, selectTeam } = useGlobalContext();
 
-  const [fieldList] = useState([
-    {category:"grid", row: 2, fields:[
-      {id:"C", name:"Name/Email", type:"combobox"},
-      { id: "R", name: "Role", type: "role" },
-    ]},
-  ]);
-
-  const { getUserSuggestions, getTeamList } = useGlobalContext();
+  const [selectedTeam, setSelectedTeam] = useState("");
 
   useEffect(()=>{
-    getTeamList(props.loanId).then(res=>{
-      const arr:any = [];
-      if (res){
-        for (let i=0; i<res.M.length; i++)
-          arr.push([res.M[i].N, res.M[i].E, "NOROLE"])        
-        setUserInfo(arr);
-      }
-    });
+    getTeamsList(props.loanId).then(res=>{
+      if (res.status==200){ console.log("response",res.obj)  
+        setTeamList(res.obj.list);}
+      else
+        setTeamList([]);
+    }).catch(()=>{
+      setTeamList([]);
+    })
   },[]);
 
-  useEffect(()=>{
-    console.log("THE FIELD VALUES", fieldValues)
-  },[fieldValues])
-
-  const addUser = (e:any) =>{
+  const sendTeam = (e:any) =>{
     e.preventDefault();
-
-    const arr:any=[];
-
-    for (let i=0; i<Object.keys(fieldValues).length; i++){
-      console.log(Object.keys(fieldValues)[0])
-      //@ts-ignore
-      arr.push({"N":fieldValues[i]["0"].N, "E": fieldValues[i]["0"].E, "R":(fieldValues[i].R)?Number(fieldValues[i].R):1})
+    const data = {
+      "_loanId":props.loanId,
+      "_teamId": selectedTeam
     }
+    console.log("data",data)
+    selectTeam(data).then(res=>{
+      console.log("res",res);
+    }).catch(err=>{
+      console.log("err",err);
+    })
+  };
 
-    
-    console.log("SENDING THE DATA",arr);
-
-    const data={
-      "M":arr,
-      "_loanId": props.loanId
-    };
-
-    console.log("DATA", data)
-
-    /* addTeamMember(data).then(res=>{
-      console.log(res)
-    }) */
-
-  }
+  useEffect(()=>{
+    console.log("selectedTeam",selectedTeam)
+  },[selectedTeam])
+  
 
   return (
     <div className="mt-8">
       <div className="flex flex-row">
-        <div className='flex-auto'>
-          <Filter setter={setRole} listsAreSame={false} labelList={EnumIteratorValues(UserRoles)} valueList={EnumIteratorKeys(UserRoles)}
-            setPlaceholder={true} placeholderValue={[-1, "All Roles"]}
-          />
-        </div>
-        <div className=" m-auto">
-          <FormDialog key={-1} index={-1} id="RM"
-            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} px-5 py-3`} formSize="medium"
-            formTitle="Relationship Mapping" formSubmit={addUser} submitButton="Save"
-            form = {fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}}
-            repeatFields={true} 
-          />  
-        </div>
       </div>
 
-      <div className="flex flex-row flex-wrap">
-        {userInfo.length==0
-          ?<EmptyPageMessage sectionName="users" />
-          :userInfo.map((user,index)=>{
-            return (
-              <Card key={index} className="mr-5 my-5 w-72 rounded-xl">
-                <CardHeader>
-                  <CardTitle>	
-                    <div className="flex flex-row">
-                      <div className="flex-auto">
-                        <ProfileIcon name={user[0]} size="small" />
-                      </div>
-                      
-                      <div className="">
-                        <Edit2Icon size="20px"/>
-                      </div>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="text-left">
-                  <p className="font-medium">{user[0]}</p>
-                  <p className="font-light">{user[1]}</p>
-                  <p className="font-light">{role}</p>
-                </CardContent>
-              </Card>
-            )
-          })
-        }
-      </div>
-      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <form onSubmit={sendTeam}>
+        <div className="flex flex-row flex-wrap">
+          {teamsList
+            ?teamsList.length==0
+              ?<EmptyPageMessage sectionName="teams" />
+              :teamsList.map((team:any,index:number)=>{
+                console.log("team",team)
+                return (
+                  <Card key={index} className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2":""}`} onClick={()=>setSelectedTeam(team["_id"])}>
+                    <CardHeader>
+                      <CardTitle>	
+                        <div className="flex flex-row">
+                          <div className="flex-auto">
+                            <ProfileIcon name={team["N"]} size="small" />
+                          </div>
+                        </div>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-left">
+                      <p className="font-medium">{team["N"]}</p>
+                      <p className="font-light">{team["L"]["N"]}</p>
+                    </CardContent>
+                  </Card>
+                )
+              })  
+            :<LoadingMessage sectionName="a list of teams" />
+          }
+        </div>
+        <FormSectionNavigation isForm={true} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      </form>
     </div>
   )
 }

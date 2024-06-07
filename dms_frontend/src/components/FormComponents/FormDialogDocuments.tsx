@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import { SubmitButtonStyling } from "./PurpleButtonStyling";
+import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
-import { DateField, SelectField, TextAreaField, TextField } from "./FormFieldsDialog";
+import { DateField, SelectField, TextAreaField, TextField } from "./FormFields";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import {useDropzone} from "react-dropzone";
 import { Upload } from "lucide-react";
-import { ComplianceDocumentTypes, EnumIteratorValues, FileTypes, TransactionDocumentTypes } from "./Constants";
-import useGlobalContext from "./../../../GlobalContext";
+import { EnumIteratorValues, FileTypes } from "../BasicComponents/Constants";
 import { toast } from "../ui/use-toast";
+import { LinearProgress } from "@mui/material";
 
-function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassName:string, formTitle:string, formSubmit:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, docPath:string[], currentFields?:any, type:string }){
+function FormDialogDocuments(props:{index:number, type:"doc"|"cov"|"con", triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any }){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [fileList, setFileList] = useState<any>([]);
@@ -19,9 +19,13 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
   const [fileType, setFileType] = useState(-1);
   const [covType, setCovType]= useState(-1);
   const [enableUpload, setEnableUpload] = useState(false);
+  const [docId, setDocId] = useState("");
 
   useEffect(()=>{
     if (props.edit){
+      if (props.currentFields["FD"])
+        setFileList(props.currentFields["FD"])
+      setDocId(props.currentFields["_id"]||"")
       setPrefillValues(props.currentFields);
       setEnableUpload(true);
     }
@@ -29,7 +33,7 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
       setPrefillValues(props.fieldValues);
   },[props.fieldValues,props.currentFields]);
 
-  const validateRequiredFields=()=>{
+  const validateRequiredFields = async()=>{
     const data:any={};
     for (let i=0; i<props.detailForm.length; i++){
       const field = props.detailForm[i];
@@ -52,23 +56,42 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
         return false;
       }
     }
-    setErrorMessage(<></>);
-    setEnableUpload(true);
-    setCurrentTab("upload");
-    return true;
+    setErrorMessage(<span><LinearProgress /></span>)
+    let res;
+    if (props.edit)
+      res = await props.detailSubmit(prefillValues, props.currIndex);
+    else 
+      res = await props.detailSubmit(prefillValues);
+    if (res.status==200){
+      setEnableUpload(true);
+      setCurrentTab("upload");
+      setErrorMessage(<></>);
+      if (res["id"]!="")
+        setDocId(res["id"]);
+      console.log("res.id",res["id"],res)
+      return true;
+    }
+    else if (res.status==422){
+      setErrorMessage(<p className="text-red-600">The Category name is taken. Please enter another one.</p>)
+      return false;
+    }
+    else {
+      setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
+      return false;
+    }
   }
 
   const submitDetails = async () => {
-    console.log("Reached submit")
-    let res;
-    if (props.edit)
-      res = await props.formSubmit(prefillValues,fileList,props.currIndex);
-    else
-      res = await props.formSubmit(prefillValues,fileList);
+    console.log("Reached submit");
+    console.log("docId",docId);
+    let res=200;
+    if (fileList && fileList.length>0)
+      res = await props.fileSubmit(fileList,docId);
     if (res==200)
       setOpen(false);
-    else
-      console.log("You've got a problem, si ",res);
+    else{
+      setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
+      console.log("You've got a problem, si ",res);}
   }
 
   useEffect(()=>{
@@ -91,9 +114,11 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
           <TabsContent value="details" className="h-full border-0" style={{overflowY:"auto"}}>
             <Card className="border-0">
               <CardContent className="mt-5"  style={{borderWidth:"0px", borderColor:"white"}}>
-                <form onSubmit={(e)=>{props.formSubmit(e);}}>
+                <form onSubmit={(e)=>{props.detailSubmit(e);}}>
                   {props.detailForm.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
+                      if (field["id"]=="F" && covType!==1)
+                        return null;
                       if (field["type"]=="select")
                         return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} 
                           options={field["options"]} 
@@ -161,7 +186,7 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
           <TabsContent value="upload">
             <Card className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
               <CardContent className="border-0">
-                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.formSubmit} edit={props.edit} docPath={props.docPath} prefillValues={prefillValues} />
+                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -177,17 +202,13 @@ function FormDialogDocuments(props:{index:number, triggerText:any, triggerClassN
   )
 };
 
-function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function, docPath:string[], prefillValues:any, edit?:boolean}) {
+function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
-
-  const [sectionDocumentLists] = useState<any>({ "TD":EnumIteratorValues(TransactionDocumentTypes), "CD":EnumIteratorValues(ComplianceDocumentTypes) })
   
   const statusList = [<></>,<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
   //const [filePossibilities] = useState(["","application/pdf"])
   const [error, setError] = useState(<></>)
   const [renderedFileList, setRenderedFileList] = useState(<></>);
-
-  const {getFileList, deleteDocument} = useGlobalContext();
 
   useEffect(()=>{
     props.fileSetter((curr:any)=>{
@@ -201,43 +222,38 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
     });
   },[acceptedFiles]);
 
-
-
   useEffect(()=>{
-    console.log(props.fileList);
-    setRenderedFileList (props.fileList.map((item:any,index:number)=>{
-      return (
-        <div key={index} className="border p-3 flex flex-row">
-          <div key={index} className="flex-auto">
-            <p>{item[0].name?item[0].name:item[0]}</p>
-            {statusList[item[1]]}
+    if (props.fileList)
+      setRenderedFileList (props.fileList.map((item:any,index:number)=>{
+        return (
+          <div key={index} className="border p-3 flex flex-row">
+            <div key={index} className="flex-auto">
+              <p>{item.filename?item.filename:item.name}</p>
+              {statusList[item[1]]}
+            </div>
+            <button type="button" onClick={()=>obliterateFile(item.filename?item.filename:item.name)}>x</button>
           </div>
-          <button type="button" onClick={()=>deleteFile(item[0].name?item[0].name:item[0])}>x</button>
-        </div>
-      )
-    }))
+        )
+      }))
   },[props.fileList]);
 
-  const deleteFile = (fileName:string) => {
-    deleteDocument(props.docPath[2],props.docPath[0],props.docPath[1], sectionDocumentLists[props.docPath[1]][Number(props.prefillValues["N"]-1)], fileName).then(res=>{
-      if (res==200){
-        toast({
-          title: "Success!",
-          description: <p className="text-black">Your document has been successfully deleted</p>,
-          className:"bg-white",
-          color:"text-green-500"
-        })
-        getUploadedFiles();
-      }
-      else
-        setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>); 
-    }).catch(()=>{
+  const obliterateFile = async (fileName:string) => {
+    const res = await props.deleteFile(props.docId,fileName);
+    if (res==200){
+      toast({
+        title: "Success!",
+        description: <p className="text-black">Your document has been successfully deleted</p>,
+        className:"bg-white",
+        color:"text-green-500"
+      })
+      getUploadedFiles();
+    }
+    else
       setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>);
-    })
   }
 
   const getUploadedFiles = () => {
-    getFileList(props.docPath[0],props.docPath[1], sectionDocumentLists[props.docPath[1]][Number(props.prefillValues["N"]-1)]).then(res=>{
+    /* getFileList(props.docPath[0],props.docPath[1], sectionDocumentLists[props.docPath[1]][Number(props.prefillValues["N"]-1)]).then(res=>{
       console.log("here are the files",res);
       if(res.status==200)
         props.fileSetter(()=>{
@@ -255,7 +271,7 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
     }).catch(err=>{
       setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
       console.log(err);
-    })
+    }) */
   }
 
   return (

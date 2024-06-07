@@ -5,7 +5,6 @@ import 'react-circular-progressbar/dist/styles.css';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Table } from "@/components/ui/table"
 import Search from "./BasicComponents/Search";
-import Filter from "./BasicComponents/Filter";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import useGlobalContext from "./../../GlobalContext";
 
@@ -34,8 +33,8 @@ function Zones() {
 	//An array of arrays for details of a specific zone: [deal_1, deal_2, deal_3] where each deal is an array 
 	//Single deal details: [deal_id, deal_name, monitoring_manager, start_date]
 	const [zoneDetails] = useState([
-		[1,"Loan Company", "Loan Person", "01/01/01"],
-		[2,"Construction Company", "Construction Person", "02/02/02"]
+		{ AID:1, CN:"Loan Company" },
+		{ AID:2,	CN:"Construction Company" }
 	]);
 
 	const [searchString, setSearchString] = useState("");
@@ -49,7 +48,7 @@ function Zones() {
 				</div>
 				
 				<div>
-					<Filter currentValue={currentZone} setter={setCurrentZone} listsAreSame={true} labelList={Object.keys(zones)} setPlaceholder={true} placeholderValue={["", "All Zones"]} />
+					{/* <Filter currentValue={currentZone} setter={setCurrentZone} listsAreSame={true} labelList={Object.keys(zones)} setPlaceholder={true} placeholderValue={["", "All Zones"]} /> */}
 				</div>
 			</div>
 
@@ -97,8 +96,13 @@ function AllZones(props:any){
 function SingleZone(props:any){
 	return(
 	<Table>
-		<HeaderRows headingRows = {[["Deal Id", "w-[100px"], ["Deal Name"], ["Monitoring Manager"], ["Start Date", "text-right"]]} />
-		<BodyRowsMapping list={props.zoneDetails} cellClassName={["font-medium","","","text-right"]} dataType={["text", "text", "text", "text"]} searchRows={[]} filterRows={[]}  />
+		<HeaderRows headingRows = {["Deal Id", "Deal Name", "Start Date"]}
+			headingClassNames={["w-[100px","","text-right"]} 
+		/>
+		<BodyRowsMapping list={props.zoneDetails} columns={["AID", "CN","SD"]} 
+			cellClassName={["font-medium","","","text-right"]} dataType={["text", "text", "text", "text"]} 
+			searchRows={[]} filterRows={[]}  
+		/>
 	</Table>
 	)
 }

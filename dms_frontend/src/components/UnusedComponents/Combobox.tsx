@@ -14,7 +14,7 @@ function Combobox(props:{type:"single"|"multiple", label:string, placeholder:str
   return (
     <Autocomplete 
       multiple={props.type==="multiple"}
-      onChange={(event,temp)=>props.setResults(temp)} 
+      onChange={(_,temp)=>props.setResults(temp)} 
       options={props.options} 
       getOptionLabel={(option)=>option.label} 
       filterOptions={(optionsList)=>{

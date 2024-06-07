@@ -1,213 +1,222 @@
 import { useEffect, useState } from "react";
-import { Table } from "@/components/ui/table";
 import useGlobalContext from "./../../../GlobalContext";
 
-import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes } from "../BasicComponents/Constants";
-/* import Search from "../BasicComponents/Search";
-import Filter from "../BasicComponents/Filter"; */
-import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
-import { FormSectionNavigation } from "../BasicComponents/FormSectionNavigation";
-import FormDialogDocuments from "../BasicComponents/FormDialogDocuments";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "../ui/toaster";
-
-import edit_icon from "./../static/edit_icon.svg";
-import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import FormDialogDocuments from "../FormComponents/FormDialogDocuments";
+import LoanDocumentView from "./LoanDocumentComponents/LoanDocumentView";
+import LoanCovenantView from "./LoanDocumentComponents/LoanCovenantView";
+import LoanConditionView from "./LoanDocumentComponents/LoanConditionView";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
+import LoadingMessage from "../BasicComponents/LoadingMessage";
+import Filter from "../BasicComponents/Filter";
+
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
+import { Toaster } from "../ui/toaster";
+import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../BasicComponents/Constants";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
-  const [docData, setDocData] = useState<any>([]);
-  
-  const [sectionDetails] = useState(props.label=="Transaction Documents"
-    ?{ docNameList: TransactionDocumentTypes, sectionName: "TD", }
-    :{ docNameList: ComplianceDocumentTypes, sectionName: "CD", }
-  );
-  
-  //const [searchString, setSearchString] = useState("");
-  //const [priority, setPriority] = useState(-1);
-  const [docPath] = useState([props.AID,sectionDetails.sectionName, props.loanId]);
-  
-  const {createDocument, handleEncryption, getDocumentsList, editDocument } = useGlobalContext();
-  const { toast } = useToast();
+  const [docData, setDocData] = useState<any>();
 
+  const setSection = () =>{
+    const documentFieldList= (documentOptions:string[]) =>{
+      return [
+        { category:"single", id:"N", name:"Document Name", type:"text", required:true },
+        { category:"grid", row:2, fields:[
+          { id:"C", name:"Document Category", type:"select", options:documentOptions, required:false, immutable:true },
+          { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
+          { id:"SD", name:"Start Date", type:"date", required:false },
+          { id:"ED", name:"End Date", type:"date", required:false },
+          { id:"PL", name:"Physical Location", type:"text" },
+          { id:"EL", name:"Execution Location", type:"text" },
+        ]},    
+      ]
+    }
+    
+    const covenantFieldList = () => {
+      return [
+        { category:"grid", row:2, fields:[
+          { id:"N", name:"Covenant Name", type:"text", required:true },
+          { id:"T", name:"Covenant Type", type:"select", options:EnumIteratorValues(CovenantType), required:true },
+          { id:"C", name:"Category Type", type:"select", options:EnumIteratorValues(CovenantDocumentTypes), required:true},
+          { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true},
+        ]},
+        { category:"single", id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType), dependsOn:"T", dependsValue:1 },
+        { category:"grid", row:2, fields:[  
+          { id:"EL", name:"Execution Location", type:"text" },
+          { id:"PL", name:"Physical Location", type:"text" },
+          { id:"SD", name:"Start Date", type:"date", dependsOn:"T", dependsValue:1, required:true },
+          { id:"ED", name:"End Date", type:"date", dependsOn:"T", dependsValue:1, required:true },
+        ]},
+        { category:"single", id:"D", name:"Description", type:"textarea" },
+      ];
+    }
+
+    const conditionsFieldList = (documentOptions:string[]) => {
+      return [
+        { category:"single", id:"N", name:"Condition Name", type:"text" },
+        { category:"grid", row:2, fields:[
+          { id:"C", name:"Condition Category", type:"select", options:documentOptions },
+          { id:"P", name: "Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
+          { id:"SD", name:"Start Date", type:"date" },
+          { id:"ED", name:"End Date", type:"date" },
+          { id:"PL", name:"Physical Location", type:"text" },
+          { id:"EL", name:"Execution Location", type:"text" },
+        ]},
+        { category:"single", id:"D", name:"Description", type:"textarea" },
+      ]
+    }
+
+    if (props.label=="Transaction Documents")
+      return { sectionName: "TD", type:"doc", fieldList: documentFieldList(EnumIteratorValues(TransactionDocumentTypes)) }
+    
+    else if (props.label=="Compliance Documents")
+      return { sectionName: "CD", type:"doc", fieldList: documentFieldList(EnumIteratorValues(ComplianceDocumentTypes)) }
+    
+    else if (props.label=="Covenants")
+      return { sectionName: "C", type:"cov", fieldList: covenantFieldList() }
+    
+    else if (props.label=="Condition Precedent")
+      return { sectionName: "CP", type:"con", fieldList: conditionsFieldList(EnumIteratorValues(ConditionPrecedentTypes)) }
+    
+    else if (props.label=="Condition Subsequent")
+      return { sectionName: "CS", type:"con",fieldList: conditionsFieldList(EnumIteratorValues(ConditionSubsequentTypes)) }
+    else 
+      return { sectionName: "Unknown", type:"unknown", fieldList: [] }
+  }
+  
+  const [sectionDetails] = useState(setSection());
   const [added, setAdded] = useState(true);
-
   const [fieldValues, setFieldValues] = useState<any>({});
   const [fileList, setFileList] = useState<any>([]);
+  const [priority, setPriority] = useState(1);
   
-  const [fieldList] = useState([
-    { category:"grid", row:2, fields:[
-      { id:"N", name:"Document Name", type:"select", options:EnumIteratorValues(sectionDetails.docNameList), required:false, immutable:true },
-      { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
-      { id:"SD", name:"Start Date", type:"date", required:false },
-      { id:"ED", name:"End Date", type:"date", required:false },
-      { id:"PL", name:"Physical Location", type:"text" },
-      { id:"EL", name:"Execution Location", type:"text" },
-    ]},    
-  ]);
   const [uploadField] = useState(
     { id: "Docs", name:"Document Upload", fileList: fileList }
   );
 
   useEffect(()=>{
     if (added){
-      showList();
+      getDocumentsList().then(res=>{
+        setDocData(res);
+      })
       setAdded(false);
     }
   },[added]);
 
-  const showList = ()=>{
-    getDocumentsList(props.loanId,sectionDetails.sectionName).then(res=>{
-      if (res.status==200){console.log(res.obj)
-        setDocData(res.obj)}
-      else
-        setDocData([{N:5,P:1,SD:"23/12/12",ED:"29/12/12", PL:"Coruscant", EL:"Sundari"}])  
-    }).catch(()=>{
-      setDocData([]);
-    })
+  const getDocumentsList = async () =>{
+    const { getDocumentsList } = useGlobalContext();
+
+    const res = await getDocumentsList(props.loanId,sectionDetails.sectionName);
+    console.log("REPSONE",res)
+
+    if (res.status==200)
+      return await res.obj;
+    else 
+      return [];
   }
 
-  const addDocument = async (userValues:any, userFiles:any) =>{
-    console.log("here's what will be sent", userValues, userFiles);
+  const addDocument = async (userValues:any) =>{
+    const { addDocument } = useGlobalContext();
 
-    const formData = new FormData();
     userValues["_loanId"] = props.loanId;
-    userValues["LOC"] = `${docPath[0]}/${docPath[1]}/${TransactionDocumentTypes[Number(userValues["N"])]}`;
-    const enc_data = await handleEncryption(userValues) || "";
-    formData.append("data", enc_data);
-    for (let i=0; i<userFiles.length; i++)
-      formData.append("file", userFiles[i][0]);
-    
-    const res = await createDocument(formData);
-
-    if (res==200){
+    userValues["SN"] = sectionDetails.sectionName;
+    console.log("FINAL SUBMIT")
+    const res = await addDocument(userValues);
+  
+    if (res.status==200){
       setAdded(true);
       setFieldValues({});
-      toast({
-        title: "Success!",
-        description: "Your document has been successfully added",
-        className:"bg-white"
-      })
     }
     return res;
   }
 
-  const changeDocument = async (userValues:any, userFiles:any,currIndex:number) => {
-    console.log("on edit curr index", currIndex)
-    console.log("on edit field values", userValues);
-    console.log("on edit file list", uploadField);
-    console.log("preexisitng data", docData[currIndex])
+  const editDocument = async (userValues:any,currIndex:number) => {
+    const { addDocument } = useGlobalContext();
 
-    const formData = new FormData();
-    const data:any={};
-
-    for (let i=0; i<Object.keys(userValues).length; i++){
-      const key = Object.keys(userValues)[i];
-      const val = userValues[key];
-      console.log(key,val,docData[currIndex][key])
-      if (docData[currIndex][key]==val)
-        continue;
-      data[key] = val;
-    }
-    console.log("Data value",data)
-    if (Object.keys(data).length!=0 || Object.keys(userFiles[0]).length!=0 )
-    {
-      data["LOC"] = `${props.AID}/${sectionDetails.sectionName}/${TransactionDocumentTypes[Number(docData[currIndex]["N"])]}`;
-      data["_loanId"] = props.loanId;
-      data["_id"] = docData[currIndex]["_id"];
-
-      console.log("final data",data)
-    
-      const enc_data = await handleEncryption(data) || "";
-      formData.append("data", enc_data);
-      if (userFiles.length!=0)
-        for (let i=0; i<userFiles.length; i++){
-          console.log("file",i,userFiles[i][0])
-          formData.append("file", userFiles[i][0]);
-        }
-
-      console.log ("EDITTED", data)
-      const res = await editDocument(formData);
+    userValues["_id"] = currIndex;
+    userValues["SN"] = sectionDetails.sectionName; 
+  
+   const res = await addDocument(userValues);
+  
+    if (res.status==200){
+      setAdded(true);
       setFieldValues({});
-
-      if (res==200){
-        setAdded(true);
-        setFieldValues({});
-        toast({
-          title: "Success!",
-          description: "Your document has been successfully updated",
-          className:"bg-white"
-        })
-      }
-
-      return res;
     }
-    return 200;
+    return res;
   }
 
-  const obliterateDocument = (index:number) => {
-    toast({
-      title: "Success!",
-      description: "Your document has been successfully deleted",
-      className:"bg-white"
-    })
-    /* deleteDocument(userid).then(res=>{
-      console.log(res);
-    }).catch(err=>{
-      console.log(err);
-    }); */
-    console.log(index);
+  const addFile = async (userFiles:any, docId:string) => {
+    const { uploadFile } = useGlobalContext();
+
+    const formData = new FormData();
+    
+    for (let i=0; i<userFiles.length; i++)
+      formData.append("file", userFiles[i][0]);
+    
+    const res = await uploadFile(formData, `${props.AID}/${sectionDetails.sectionName}`,docId);
+    
+    return res;
+  }
+
+  const deleteFile = async (docId:string,fileName:string) => {
+    const { deleteDocument } = useGlobalContext();
+
+    console.log("DELETE",props.AID,docId, fileName,sectionDetails.sectionName)
+
+    const res = await deleteDocument(props.AID, docId, sectionDetails.sectionName, fileName);
+    return res;
+  }
+
+  const deleteDocument = () => {
+  }
+
+  const getFileList = async () => {
   }
 
   return (
     <div className="bg-white rounded-xl">
       <br/>
-			{/* <p className="text-2xl font-bold m-7 mt-5">{props.name}</p> */}
       <Toaster/>
       <div className="flex flex-row">
-        <div className=''>
-          {/* <Search setter={setSearchString} label="Search" /> */}
-        </div>
-
         <div className="flex-auto">
-          {/* <Filter setter={setPriority} listsAreSame={false} 
-            labelList={EnumIteratorValues(PriorityValues)} valueList={EnumIteratorKeys(PriorityValues)}
-            setPlaceholder={true} placeholderValue={[-1,"Priority"]} 
-          /> */}
+          {sectionDetails.type=="doc"
+            ?<></>
+            :sectionDetails.type=="cov"
+              ?<Filter setter={setPriority} listsAreSame={false} 
+                labelList={EnumIteratorValues(CovenantType)} valueList={EnumIteratorKeys(CovenantType).map(val=>{return Number(val)+1})}
+              />
+              :<></>
+          }
         </div>
       
         <div className="mr-3">
           <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.sectionName}
-            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} formSubmit={addDocument}
-            detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
+            triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} 
+            detailSubmit={addDocument} fileSubmit={addFile} deleteFile={deleteFile} getFiles={getFileList}
+            detailForm={sectionDetails.fieldList} setter={setFieldValues} fieldValues={fieldValues}
             uploadForm={uploadField} fileSetter={setFileList} fileList={fileList}
-            currentFields={{}} docPath={docPath}
+            currentFields={{}}
           />
         </div>
       </div> 
       <div className="m-5">
-        {docData.length==0?<EmptyPageMessage sectionName="documents" />
-          :<Table className="border rounded-3xl" style={{borderRadius:"md"}}>
-            <HeaderRows headingRows={["Document Name", "Priority", "Physical Location", "Execution Location", "Start Date", "End Date", "Action"]} />
-            <BodyRowsMapping list={docData} columns={["N", "P", "PL","EL","SD","ED"]} dataType={["transaction","priority","text","text","date","date","action"]}
-              searchRows={[]/* searchString==""?[]:[searchString,"N"] */} filterRows={[]/* priority==-1?[]:[priority,"P"] */}
-              action = {docData.map((item:any, index:number)=>{
-                item;
-                return(
-                  <div className="flex flex-row">
-                    <FormDialogDocuments key={index} index={index} edit={true} type={sectionDetails.sectionName}
-                      triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName={""} formTitle={props.label} formSubmit={changeDocument}
-                      detailForm={fieldList} setter={setFieldValues} fieldValues={fieldValues}
-                      uploadForm={uploadField} fileSetter={setFileList} fileList={fileList}
-                      currentFields={docData[index]} currIndex={index} docPath={docPath}
-                    />
-                    <DeleteConfirmation thing="document" deleteFunction={obliterateDocument} currIndex={index}/>
-                  </div>
-                )
-              })}
+        {docData
+        ?docData.length==0?<EmptyPageMessage sectionName="documents" />
+        :sectionDetails.type=="doc"
+          ?<LoanDocumentView docData={docData} label={props.label} 
+            fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
+            editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+          />
+          :sectionDetails.type=="cov"
+            ?<LoanCovenantView covData={docData} label={props.label} priority={priority}
+              fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
+              editCovenantFunction={editDocument} deleteCovenantFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
             />
-          </Table>
+            :<LoanConditionView conData={docData} label={props.label}
+              fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
+              editConditionFunction={editDocument} deleteConditionFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+            />
+        :<LoadingMessage sectionName="list" />
         }
       </div>
       <br/>

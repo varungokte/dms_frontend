@@ -5,9 +5,9 @@ export const RegistrationPage = () => {
 	const [companyName, setCompanyName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
-	const [maximumUsers, setMaximumUsers] = useState(0);
-	const [zone, setZone] = useState(-1);
-	const [reportingManager,setReportingManager] = useState("ABC");
+	const [maximumUsers, /* setMaximumUsers */] = useState(1);
+	const [zone, /* setZone */] = useState(1);
+	const [reportingManager,/* setReportingManager */] = useState("ABC");
 	const [message, setMessage] = useState("");
 
 	const {RegisterAdmin} = useGlobalContext()
@@ -81,7 +81,7 @@ export const RegistrationPage = () => {
 					onChange={(e) => setPassword(e.target.value)}
 				/>
 
-				<br/>
+				{/* <br/>
 				<br/>
 				<label htmlFor="cname">Maximum Users</label>
 				<br/>
@@ -111,7 +111,7 @@ export const RegistrationPage = () => {
 					value={reportingManager}
 					placeholder="Reporting Manager"
 					onChange={(e) => setReportingManager(e.target.value)}
-				/>
+				/> */}
 				<br/>
 				<br/>
 				<input type="submit" value="Register" />

@@ -10,7 +10,7 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
     <TableHeader>
       <TableRow>
       {props.headingRows.map((heading:any,index:number)=>{
-        return <TableHead key={index} className={props.headingClassNames && props.headingClassNames[index]?props.headingClassNames[index]:""}>{heading}</TableHead>
+        return <TableHead key={index} className={(props.headingClassNames && props.headingClassNames[index])?props.headingClassNames[index]:""}>{heading}</TableHead>
       })}
       </TableRow>
     </TableHeader>
@@ -124,6 +124,7 @@ const handlePriority = (index:number, cellClassName:string, uniqueIndex:string) 
 }
 
 const handleDocStatus = (index:number, cellClassName:string, uniqueIndex:string) => {
+  console.log(DocumentStatusStyling[index])
   return(
     <TableCell key={uniqueIndex} className={`${DocumentStatusStyling[index]} ${cellClassName}`}>
       {DocumentStatusValues[index]}
