@@ -1,9 +1,10 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes } from "./Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes } from "../../../Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
 import moment from "moment";
+import { ReactElement } from "react";
 
 function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   return(
@@ -17,7 +18,7 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellClassName?:any, dataType:any, action?:any, columns:string[]}){
+function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, searchRows:any, filterRows:any, dataType:any, action?:(HTMLElement|ReactElement)[], setUserStatus?:Function, setSelectedUser?:Function}){
   return(
     <TableBody>
       {props.list.map((singleRow:any, index:number)=>{
@@ -41,7 +42,7 @@ function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellCl
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} />
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setUserStatus={props.setUserStatus} setSelectedUser={props.setSelectedUser} />
         else
           return ""
       })}
@@ -49,7 +50,7 @@ function BodyRowsMapping(props:{list:any, searchRows:any, filterRows:any, cellCl
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, singleRow:any, action:any, columns:string[]}){
+function SingleRow(props:{rowIndex:number, dataType:any, columns:string[], cellClassName:any, singleRow:any, action?:any, setUserStatus?:Function,setSelectedUser?:Function}){
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
@@ -78,7 +79,7 @@ function SingleRow(props:{rowIndex:number, dataType:any, cellClassName:any, sing
         else if (dataType=="docStatus")
           return handleDocStatus(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="userStatus")
-          return handleUserStatus(Number(item), cellClassName, uniqueIndex);
+          return handleUserStatus(Number(item), cellClassName, uniqueIndex, props.rowIndex, props.setSelectedUser||(()=>{}), props.setUserStatus||(()=>{}));
         else if (dataType=="role")
           return handleRole(Number(item), cellClassName, uniqueIndex);
         else if(dataType=="zone")
@@ -124,7 +125,6 @@ const handlePriority = (index:number, cellClassName:string, uniqueIndex:string) 
 }
 
 const handleDocStatus = (index:number, cellClassName:string, uniqueIndex:string) => {
-  console.log(DocumentStatusStyling[index])
   return(
     <TableCell key={uniqueIndex} className={`${DocumentStatusStyling[index]} ${cellClassName}`}>
       {DocumentStatusValues[index]}
@@ -132,7 +132,7 @@ const handleDocStatus = (index:number, cellClassName:string, uniqueIndex:string)
   )
 }
 
-const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string) => {
+const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string, selectedUser:number, setSelectedUser:Function, setUserStatus:Function) => {
   return (
     <TableCell key={uniqueIndex} className={cellClassName}>
       <DropdownMenu>
@@ -143,9 +143,9 @@ const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem className={`${UserStatusStyling[1]} bg-white`}>{UserStatusValues[1]}</DropdownMenuItem>
-        <DropdownMenuItem className={`${UserStatusStyling[2]} bg-white`}>{UserStatusValues[2]}</DropdownMenuItem>
-        <DropdownMenuItem className={`${UserStatusStyling[3]} bg-white`}>{UserStatusValues[3]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(1)}} className={`${UserStatusStyling[1]} bg-white`}>{UserStatusValues[1]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(2)}} className={`${UserStatusStyling[2]} bg-white`}>{UserStatusValues[2]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(3)}} className={`${UserStatusStyling[3]} bg-white`}>{UserStatusValues[3]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>

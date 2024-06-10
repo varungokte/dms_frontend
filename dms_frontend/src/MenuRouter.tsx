@@ -10,15 +10,15 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import Dashboard from './components/Dashboard';
 import CreateLoanAccount from './components/CreateLoanAccount';
 import Products from './components/Products';
-import TeamMembers from './components/UnusedComponents/TeamMembers';
-import Zones from './components/Zones';
+//import TeamMembers from './components/UnusedComponents/TeamMembers';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
-import Default from './components/DefaultCases';
-import CriticalCases from './components/CriticalCases';
-import Reports from './components/Reports';
-import Reminders from './components/Reminders';
 import RoleManagement from './components/RoleManagement';
+//import Zones from './components/Zones';
+//import Default from './components/DefaultCases';
+//import CriticalCases from './components/CriticalCases';
+//import Reports from './components/Reports';
+//import Reminders from './components/Reminders';
 
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
@@ -29,16 +29,16 @@ import TransIcon from './components/static/PanelIcons/TransIcon';
 import CompIcon from './components/static/PanelIcons/CompIcon';
 import CovenantIcon from './components/static/PanelIcons/CovenantIcon';
 import ConditionsIcon from './components/static/PanelIcons/ConditionsIcon';
-import ZoneIcon from './components/static/PanelIcons/ZoneIcon';
 import MembersIcon from './components/static/PanelIcons/MembersIcon';
 import ManagementIcon from './components/static/PanelIcons/ManagementIcon';
-import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
-import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
-import LoanAccount from './components/LoanAccount';
-import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
-import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
 import TeamManagement from './components/TeamManagement';
-import Masters from './components/Masters';
+import LoanAccount from './components/LoanAccount';
+//import ZoneIcon from './components/static/PanelIcons/ZoneIcon';
+//import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
+//import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
+//import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
+//import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
+//import Masters from './components/Masters';
 //import DocumentViewer from './components/BasicComponents/DocumentViewer';
 
 export const MenuRouter = () => {
@@ -99,9 +99,9 @@ export const MenuRouter = () => {
 			<DropdownMenu>
 				<DropdownMenuTrigger className='mb-3 mx-6'>
 					<div className="flex flex-row">
-						<div><ProfileIcon name="T U"/* {res["N"]} */ size="small" showStatus={true/* socketIsConnected */}/></div>
+						<div><ProfileIcon name={res["N"]} size="small" showStatus={true/* socketIsConnected */}/></div>
 						<div className="text-left mx-3">
-							<p>{/* {res["N"]} */}Test User</p>
+							<p>{res["N"]}</p>
 							<p className="font-light">No Role</p>
 						</div>
 					</div>
@@ -117,22 +117,22 @@ export const MenuRouter = () => {
 	
 	const [componentList] = useState([
 		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
+		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
+		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
 		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
-		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
 		{ name: "Transaction Documents", path:"/transaction", component: DocumentList, icon: TransIcon },
 		{ name: "Compliance Documents", path:"/compliance", component: DocumentList, icon: CompIcon },
 		{ name: "Covenants", path:"/covenants", component: DocumentList, icon: CovenantIcon },
-		{ name: "Conditions Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
-		{ name: "Conditions Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
-		{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
+		{ name: "Condition Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
+		{ name: "Condition Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
+		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
 		{ name: "Role Management", path:"/roles", component: RoleManagement },
-		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
-		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
-		{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
-		{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
-		{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
-		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
-		{ name: "Masters", path:"/masters", component: Masters, }
+		//{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
+		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
+		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
+		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
+		//{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
+		//{ name: "Masters", path:"/masters", component: Masters, },
 	]);
 	
 	return (
@@ -173,11 +173,11 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					{componentList.map((item,index)=>{
-							return <Route key={index} path={item.path} element={createElement(item.component, { label: item.name })} />
+						return <Route key={index} path={item.path} element={createElement(item.component, { key:index, label: item.name })} />
 					})}
 					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
-					<Route key={"T"} path="/teams/:id" element={<TeamMembers/>} />
+					{/* <Route key={"T"} path="/teams/:id" element={<TeamMembers/>} /> */}
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

@@ -3,7 +3,7 @@ import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
+import { EnumIteratorValues, ZoneList } from "../../Constants";
 import FormDialog from "./FormComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 
@@ -32,9 +32,9 @@ function UserManagement(){
 
   const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
-  const [selectedUser] = useState(-1);
-  const [message, setMessage] = useState(<></>);
+  const [selectedUser,setSelectedUser] = useState(-1);
   const [added, setAdded] = useState(false);
+  const [userStatus, setUserStatus] = useState(-1);
 
   const newUser = useGlobalContext().createUser;
   const changeUserInfo = useGlobalContext().editUser;
@@ -71,14 +71,16 @@ function UserManagement(){
         }
       }
     }
-    if (userValues["RM"]){
-      if (userValues["RM"]["values"]["E"]=="root")
+    /* if (userValues["RM"]){
+      if (userValues["RM"]["values"]["E"]=="root"){
+        userValues["RM"]={};
         userValues["RM"]["root"]="root";
+      }
       else {
         const obj = userValues["RM"]["values"];
         userValues["RM"]={...obj}
       }
-    }
+    } */
     
     console.log ("SUBMITTING DATA", userValues)
     
@@ -95,22 +97,35 @@ function UserManagement(){
     return res;
   }
 
-  const editUser = () => {
-    if (selectedUser==-1) 
+  const editUser = async (userValues:any) => {
+    console.log("reached edit user");
+    if (selectedUser==-1)
       return;
 
     const arr = userData[selectedUser];
-    console.log("THE SELECTED USER",arr, selectedUser)
-    const data = {} as any;
+    const id = userData[selectedUser]["_id"];
 
-    changeUserInfo(data).then(res=>{
-      console.log(res);
-    }).catch((err)=>{
-      if (err=="dupliate_user"){
-        setMessage(<p>Duplicate User</p>)
-      }
-    })
+    console.log("THE SELECTED USER",arr, selectedUser,id)
+    
+    userValues["_id"] = id;
+
+    console.log("SUBMITTING", userValues);
+
+    const res = await changeUserInfo(userValues);
+
+    if (res==200)
+      setAdded(true);
+
+    return res;
   }
+
+  useEffect(()=>{
+    console.log("new user status",userStatus);
+    editUser({"S":userStatus}).then(res=>{
+      console.log ("changes made? ", res);
+    }).catch(err=>{console.log(err)})
+    ;
+  },[userStatus]);
 
   /* const deleteUser = (index:number) =>{
     console.log("deleting",index)
@@ -139,7 +154,6 @@ function UserManagement(){
         </div>
       </div>
       <div className="m-7">
-        {message}
         {userData
           ?userData.length==0
             ?<EmptyPageMessage sectionName="users" emotion={true} />
@@ -148,6 +162,7 @@ function UserManagement(){
               <BodyRowsMapping
                 list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "objName", "zone","text", "userStatus", "action"]}
                 searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
+                setUserStatus={setUserStatus} setSelectedUser={setSelectedUser}
                 action = {userData.map((_:any, index:number)=>{
                   return(
                     <div className="flex flex-row">

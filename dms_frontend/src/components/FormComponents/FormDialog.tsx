@@ -30,6 +30,7 @@ function FormDialog(props:{index:number, type:"team"|"user"|"role"|"cont"|"rate"
     if (props.suggestions){
       console.log("ZONE",zone)
       getUserSuggestions(props.suggestions).then(res=>{
+        console.log("suggestion res",res)
         const arr:any=[];
         if (props.type=="user")
           arr.push({label:"root",values:{E:"root"}});
@@ -69,7 +70,6 @@ function FormDialog(props:{index:number, type:"team"|"user"|"role"|"cont"|"rate"
   }
 
   const validateRequiredFields=()=>{
-    console.log("fieldVAlues",prefillValues)
     const requiredList = findMissingFields();
     for (let i=0;i<Object.keys(requiredList).length;i++){
       let key = Object.keys(requiredList)[i];
@@ -78,9 +78,7 @@ function FormDialog(props:{index:number, type:"team"|"user"|"role"|"cont"|"rate"
         key="R"
         value=true
       }
-      console.log(key,value)
       if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1)){
-        console.log(key,value)
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }

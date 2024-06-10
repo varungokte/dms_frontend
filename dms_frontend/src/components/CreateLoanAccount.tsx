@@ -82,7 +82,7 @@ function CreateLoanAccount() {
               {formSections.map((section:any, index:number)=>{
                 return(
                   <Tooltip key={index}>
-                      <TooltipTrigger key={index} /* disabled={!okToFrolic || index==0} */
+                      <TooltipTrigger key={index} disabled={!okToFrolic || index==0}
                         className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
                         onClick={()=>{
                           okToChange

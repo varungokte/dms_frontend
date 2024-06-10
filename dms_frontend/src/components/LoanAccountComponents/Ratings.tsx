@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Table } from "@/components/ui/table"
 //import Search from "../BasicComponents/Search";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
-import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../BasicComponents/Constants";
+import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../../../Constants";
 import FormDialog from "../FormComponents/FormDialog";
 import useGlobalContext from "./../../../GlobalContext";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";

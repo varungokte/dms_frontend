@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 import { useNavigate, useParams } from "react-router-dom";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
 
 function DocumentViewer(props:{filename:string}){
   const [showDoc, setShowDoc] = useState(<></>);

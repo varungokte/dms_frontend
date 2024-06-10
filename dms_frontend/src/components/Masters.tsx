@@ -23,7 +23,7 @@ function Masters(){
     
     <div className="flex flex-row">
       <div className="flex-auto"></div>
-      <FormDialog key={-1} index={-1}
+      <FormDialog key={-1} index={-1} type="cont"
         triggerText="Add" triggerClassName={CreateButtonStyling} formSize="medium"
         formTitle="Add To Masters" formSubmit={createMaster} submitButton="Add" 
         form={fieldList} fieldValues={fieldValues} setter={setFieldValues} currentFields={{}}

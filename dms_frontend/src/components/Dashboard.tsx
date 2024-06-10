@@ -1,11 +1,19 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import useGlobalContext from "../../GlobalContext";
 
 function Dashboard() {
 	const [show, setShow] = useState(false);
 
-	const reloadPage = () =>{
+	const {getDecryptedToken} = useGlobalContext();
+
+	/* const reloadPage = () =>{
 		window.location.reload();
+	} */
+
+	const showToken = async () => {
+		const res = await getDecryptedToken();
+		console.log("Res",res);
 	}
 
 	return (
@@ -19,7 +27,7 @@ function Dashboard() {
 						{show?<FormDialog/>:""}
 					</Dialog>
 				</div>
-				<div><button onClick={reloadPage}>click</button></div>
+				<div><button onClick={showToken}>click</button></div>
 			</div>
 		</div>
 		

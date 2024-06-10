@@ -12,11 +12,12 @@ import { useToast } from "./ui/use-toast";
 import { Toaster } from "./ui/toaster";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+import { FormFieldDetails } from "../../DataTypes";
 
 function TeamManagement(){
   const [teamList,setTeamList] = useState<any>();
 
-  const [fieldList] = useState<any>([
+  const [fieldList] = useState<FormFieldDetails>([
     { category:"grid", row:2, fields:[
       { id:"N", name:"Team Name", type:"text", required:true },
       { id:"L", name:"Team Lead", type:"combobox", multiple:false, required:true },
@@ -38,7 +39,7 @@ function TeamManagement(){
       { id: "CPM", name:"Maker", type:"combobox", multiple:true, required:true},
       { id: "CPC", name:"Checker", type:"combobox", multiple:true, required:true},
     ]},
-    { category:"grid", row:2, sectionName:"Condition Subsequent", sectionClassName:"text-xl font-medium my-2", repeatable:true, fields:[
+    { category:"grid", row:2, sectionName:"Condition Subsequent", sectionClassName:"text-xl font-medium my-2", fields:[
       { id: "CSM", name:"Maker", type:"combobox", multiple:true, required:true},
       { id: "CSC", name:"Checker", type:"combobox", multiple:true, required:true},
     ]}
@@ -55,6 +56,7 @@ function TeamManagement(){
   const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
+    searchString;
     if (added){
       getTeamsList().then(res=>{
         if (res.status==200 && res.obj.length!=0)
@@ -71,12 +73,12 @@ function TeamManagement(){
   const createTeam = async (userValues:any) => {
     const data:any={};
     data["N"] = userValues["N"];
-    data["L"] = userValues["L"].values;
+    data["L"] = userValues["L"];
     const sections = ["TD","CD","C","CP","CS"];
     sections.map(name=>{
       data[name]={
-        M:userValues[`${name}M`].map((obj:any)=>obj.values),
-        C:userValues[`${name}M`].map((obj:any)=>obj.values)
+        M:userValues[`${name}M`].map((obj:any)=>obj),
+        C:userValues[`${name}M`].map((obj:any)=>obj)
       }
     });
     console.log("SUBMITTED",data);

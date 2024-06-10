@@ -8,9 +8,10 @@ export const RegistrationPage = () => {
 	const [maximumUsers, /* setMaximumUsers */] = useState(1);
 	const [zone, /* setZone */] = useState(1);
 	const [reportingManager,/* setReportingManager */] = useState("ABC");
+	const [isManager, /* setIsManager */]  = useState(true);
 	const [message, setMessage] = useState("");
 
-	const {RegisterAdmin} = useGlobalContext()
+	const {RegisterAdmin} = useGlobalContext();
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
@@ -20,6 +21,7 @@ export const RegistrationPage = () => {
 			P: password,
 			MU: maximumUsers,
 			Z: zone,
+			M: isManager,
 			RM: reportingManager,
 			UP:{
 				"Loan Account": ["access", "view", "delete","add","edit"],

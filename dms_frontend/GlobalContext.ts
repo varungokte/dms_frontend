@@ -43,14 +43,17 @@ const getEncryptedToken = () => {
 
 const getDecryptedToken = async () => {
 	const token = getEncryptedToken();
+	//console.log("Encrypted token",token);
 	if (token==null)
 		return null;
 	const decryptedToken = await handleDecryption(token);
+	//console.log("Decrypted token", decryptedToken)
 	let decodedToken;
 	if (decryptedToken["TKN"])
 		decodedToken = await decodeToken(decryptedToken["TKN"]);
 	else
 		decodedToken = await decodeToken(decryptedToken);
+	//console.log("Decoded token", decodedToken)
 	const valid = isExpired(decryptedToken);
 	if (!valid)
 		return null;
@@ -172,15 +175,14 @@ const createUser = async (data:object) => {
 	//Conflict Error 409 -> Duplicate User
 	//Forbidden 403 -> User is not admin
 	try {
-		console.log(data)
-		const req_body = await handleEncryption(data);
-		console.log("REQ_BODY", req_body)
-		//@ts-ignore
+		const enc_data = await handleEncryption(data);
+		
 		const token = getEncryptedToken();
-		const response = await axios.post(`${Base_Url}/addUser`,{data:req_body}, {
+		
+		const response = await axios.post(`${Base_Url}/addUser`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		console.log(response)
+		
 		return response.status;
 	}
 	catch(error:any) {
@@ -194,7 +196,8 @@ const createUser = async (data:object) => {
 const editUser = async (data:object) => {
 	try {
 		const token = await getEncryptedToken();
-		const response = await axios.post(`${Base_Url}/editUser`,data, {
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/editUser`,{data:enc_data}, {
 			headers:{
 				"Authorization": `Bearer ${token}`
 			}
@@ -212,6 +215,7 @@ const editUser = async (data:object) => {
 const getAllUsers = async () => {
 	try {
 		const token = await getEncryptedToken();
+		console.log("token",token)
 		const response = await axios.get(`${Base_Url}/listUser`, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
@@ -565,6 +569,7 @@ const uploadFile = async (data:any,loc:string,docId:string) => {
 const getDocumentsList = async (loanId:string, sectionName:string) =>  {
 	try {
 		const token = getEncryptedToken();
+		console.log("SENDING", loanId, sectionName)
 		const response = await axios.get(`${Base_Url}/listDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: {"_loanId": loanId, SN:sectionName }
@@ -648,6 +653,29 @@ const deleteDocument = async (AID:string, docId:string, section_name:string, fil
 	}
 }
 
+
+const getDealList = async (sectionName:string) =>  {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/assignlistDocsDetail`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { SN:sectionName }
+		});
+		const decryptedObject = await handleDecryption(response.data);
+		
+		if (response.status==200)
+			return {status: response.status, obj:decryptedObject}; 
+		else
+			return {status: 0, obj:null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else
+			return {status: error.status, obj:null};;
+	}
+};
+
 //RELATIONSHING MAPPING
 const selectTeam = async (data:any) => {
 	try {
@@ -717,7 +745,7 @@ const useGlobalContext = () => {
 		getTeamsList, addTeam, getSingleTeam,
 		addDocument, uploadFile, getDocumentsList, editDocument, getFileList, deleteDocument, fetchDocument,
 		selectTeam,
-		addToMasters,
+		addToMasters,getDealList,
 	}
 }
 

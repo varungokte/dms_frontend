@@ -15,7 +15,8 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
 
   useEffect(()=>{
     getTeamsList(props.loanId).then(res=>{
-      if (res.status==200){ console.log("response",res.obj)  
+      if (res.status==200){ console.log("response",res.obj)
+        setSelectedTeam(res.obj.currentTeam._teamId)
         setTeamList(res.obj.list);}
       else
         setTeamList([]);
@@ -33,15 +34,11 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
     console.log("data",data)
     selectTeam(data).then(res=>{
       console.log("res",res);
+      props.goToNextSection();
     }).catch(err=>{
       console.log("err",err);
     })
-  };
-
-  useEffect(()=>{
-    console.log("selectedTeam",selectedTeam)
-  },[selectedTeam])
-  
+  };  
 
   return (
     <div className="mt-8">
@@ -56,7 +53,7 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
               :teamsList.map((team:any,index:number)=>{
                 console.log("team",team)
                 return (
-                  <Card key={index} className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2":""}`} onClick={()=>setSelectedTeam(team["_id"])}>
+                  <Card key={index} className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2 border-double border-violet-800	":""}`} onClick={()=>setSelectedTeam(team["_id"])}>
                     <CardHeader>
                       <CardTitle>	
                         <div className="flex flex-row">

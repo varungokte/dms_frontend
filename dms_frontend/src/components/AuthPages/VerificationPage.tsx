@@ -58,6 +58,8 @@ function VerificationComponent(){
     console.log("encrypted token",enc_token)
     console.log("OUR decoded token",token);
 
+		window.location.reload();
+    
     setMove( <Navigate to="/" />)
   }
 

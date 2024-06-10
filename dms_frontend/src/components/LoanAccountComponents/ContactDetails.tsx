@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "../ui/toaster";
 
-import { ContactType, EnumIteratorKeys, EnumIteratorValues } from "../BasicComponents/Constants";
+import { ContactType, EnumIteratorKeys, EnumIteratorValues } from "../../../Constants";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import Filter from "../BasicComponents/Filter";
 import FormDialog from "../FormComponents/FormDialog";
@@ -61,7 +61,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
   const [searchString, setSearchString] = useState("");
   const [role, setRole] = useState(1);
   const [added, setAdded] = useState(true);
-  const [oldValues, setOldValues] = useState<any>({});
+  const [oldValues, /* setOldValues */] = useState<any>({});
 
   const {addContact, getContacts} = useGlobalContext();
   const { toast } = useToast();

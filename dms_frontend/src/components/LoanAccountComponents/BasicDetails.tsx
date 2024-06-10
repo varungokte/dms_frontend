@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 import { TextField, SelectField } from "../FormComponents/FormFields";
-import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
+import { EnumIteratorValues, ZoneList } from "../../../Constants";
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import moment from "moment";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
@@ -22,11 +22,11 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
     { id:"GST", name:"GST Number", type:"text", required: false },
     { id:"CIN", name:"CIN Number", type:"text", required: false },
     { id:"break" },
-    { id:"SD", name:"Sanction Date", type:"date", required: false },
+    { id:"SD", name:"Sanction Date", type:"date", required: true },
     { id:"DD", name:"Downsell Date", type:"date", required: false },
     { id:"CD", name:"Loan Closure Date", type:"date", required: false },
     { id:"RED", name:"Repayment End Date", type:"date", required: false },
-    { id:"SA", name:"Sanction Amount", type:"number", required: false },
+    { id:"SA", name:"Sanction Amount", type:"number", required: true },
     { id:"HA", name:"Hold Amount", type:"number", required: false },
     { id:"DA", name:"Downsell Amount", type:"number", required: false },
     { id:"OA", name:"O/S Amount", type:"number", required: false },
@@ -143,9 +143,13 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
               disabled=true;
             
             if (field.type=="select")
-              return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required} disabled={disabled} />
+              return <span key={field.id} className="">
+                <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required} disabled={disabled} />
+              </span> 
             else
-              return <TextField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
+              return <span key={field.id} className="">
+                <TextField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} />
+              </span> 
           })}
         </div>
         <br/>

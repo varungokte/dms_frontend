@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import pdf_icon from "./../static/pdf_icon.svg";
 import xlsx_icon from "./../static/xlsx_icon.svg";
 
-import { FileStatusStyling, FileStatusValue } from "../BasicComponents/Constants";
+import { FileStatusStyling, FileStatusValue } from "../../../Constants";
 import { Plus } from "lucide-react";
 import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
 import { DialogTitle } from "@radix-ui/react-dialog";

@@ -1,9 +1,9 @@
 import { useState } from "react";
 
 import {Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import FormDialog from "../FormComponents/FormDialog";
+/* import FormDialog from "../FormComponents/FormDialog";
 
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling"; */
 import Search from "../BasicComponents/Search";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import Filter from "../BasicComponents/Filter";
@@ -27,14 +27,14 @@ function TeamMembers() {
 		"My Team Members": ["?"]
 	});
 
-	const [newName, setNewName] = useState("");
-	const [newRole, setNewRole] = useState(-1);
+	const [newName/* , setNewName */] = useState("");
+	const [newRole/* , setNewRole */] = useState(-1);
 	const [searchString, setSearchString] = useState("");
 
 	console.log(newName,newRole,searchString)
 
-	const addMember = () =>{
-	}
+	/* const addMember = () =>{
+	} */
 	
 	return(
 		<div>
@@ -51,7 +51,7 @@ function TeamMembers() {
 
 				<div className="">
 					<span className="font-light">{`${Object.values(members).map((value)=>{return value.length}).reduce((accumulator, curr)=>accumulator+curr)} members`}</span>
-					<FormDialog
+					{/* <FormDialog key={-1} index={-1} type="cont" currentFields={}
 						triggerText={<><span className="text-xl">+ </span><span>Add Member</span></>} triggerClassName={CreateButtonStyling}
 						formTitle="Add Team Member" formSubmit= {addMember} submitButton= "Create User"  formSize="small"
 						form= {[
@@ -59,7 +59,7 @@ function TeamMembers() {
 							{ category: "single", label: "Role", type: "select", setter: setNewRole, options: ["Maker", "Checker"] }
 						]}
 					/>
-				</div>
+ */}				</div>
 			</div>
 
 			<div className="mx-10 mt-5">

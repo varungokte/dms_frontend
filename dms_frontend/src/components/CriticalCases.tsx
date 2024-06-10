@@ -31,9 +31,9 @@ function CriticalCases() {
           <Search setter={setSearchString} label="Search"/>
         </div>
 
-        <div>
+        {/* <div>
           Date Range
-        </div>
+        </div> */}
       </div>
       <div className="m-7">
       <Table className="rounded-xl bg-white">

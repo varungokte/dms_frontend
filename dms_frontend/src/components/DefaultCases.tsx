@@ -36,7 +36,7 @@ function Default() {
           <HeaderRows headingRows={["Sr. No.","Deal","Default Type","Date"]} />
           <BodyRowsMapping list={defaultData} dataType={["index","text","text","text"]} columns={["AID","N","T", "D"]}
             searchRows={searchString==""?[]:[searchString,0]} filterRows={[]} 
-            action={<Ellipsis/>} cellClassName={["font-medium","","","",""]}
+            action={[<Ellipsis/>]} cellClassName={["font-medium","","","",""]}
           />
         </Table>
 

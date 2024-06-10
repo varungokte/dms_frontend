@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
+import { FormFieldDetails } from "../../../DataTypes";
 
 import FormDialogDocuments from "../FormComponents/FormDialogDocuments";
 import LoanDocumentView from "./LoanDocumentComponents/LoanDocumentView";
@@ -11,28 +12,34 @@ import Filter from "../BasicComponents/Filter";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { Toaster } from "../ui/toaster";
-import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../BasicComponents/Constants";
+import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../../../Constants";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
   const [docData, setDocData] = useState<any>();
 
-  const setSection = () =>{
-    const documentFieldList= (documentOptions:string[]) =>{
+  type SectionDetails = {
+    sectionName: "TD" | "CD" | "C" | "CP" | "CS" | "Unknown",
+    type:"doc"|"cov"|"con",
+    fieldList:FormFieldDetails
+  }
+
+  const setSection = (): SectionDetails =>{
+    const documentFieldList= (documentOptions:string[]):FormFieldDetails =>{
       return [
         { category:"single", id:"N", name:"Document Name", type:"text", required:true },
         { category:"grid", row:2, fields:[
           { id:"C", name:"Document Category", type:"select", options:documentOptions, required:false, immutable:true },
           { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
-          { id:"SD", name:"Start Date", type:"date", required:false },
-          { id:"ED", name:"End Date", type:"date", required:false },
+          { id:"SD", name:"Start Date", type:"date", required:true },
+          { id:"ED", name:"End Date", type:"date", required:true },
           { id:"PL", name:"Physical Location", type:"text" },
           { id:"EL", name:"Execution Location", type:"text" },
         ]},    
       ]
     }
     
-    const covenantFieldList = () => {
+    const covenantFieldList = ():FormFieldDetails => {
       return [
         { category:"grid", row:2, fields:[
           { id:"N", name:"Covenant Name", type:"text", required:true },
@@ -40,25 +47,25 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
           { id:"C", name:"Category Type", type:"select", options:EnumIteratorValues(CovenantDocumentTypes), required:true},
           { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true},
         ]},
-        { category:"single", id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType), dependsOn:"T", dependsValue:1 },
+        { category:"single", id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType) },
         { category:"grid", row:2, fields:[  
+          { id:"SD", name:"Start Date", type:"date", required:true },
+          { id:"ED", name:"End Date", type:"date", required:true },
           { id:"EL", name:"Execution Location", type:"text" },
           { id:"PL", name:"Physical Location", type:"text" },
-          { id:"SD", name:"Start Date", type:"date", dependsOn:"T", dependsValue:1, required:true },
-          { id:"ED", name:"End Date", type:"date", dependsOn:"T", dependsValue:1, required:true },
         ]},
         { category:"single", id:"D", name:"Description", type:"textarea" },
       ];
     }
 
-    const conditionsFieldList = (documentOptions:string[]) => {
+    const conditionsFieldList = (documentOptions:string[]):FormFieldDetails => {
       return [
         { category:"single", id:"N", name:"Condition Name", type:"text" },
         { category:"grid", row:2, fields:[
           { id:"C", name:"Condition Category", type:"select", options:documentOptions },
           { id:"P", name: "Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
-          { id:"SD", name:"Start Date", type:"date" },
-          { id:"ED", name:"End Date", type:"date" },
+          { id:"SD", name:"Start Date", type:"date", required:true },
+          { id:"ED", name:"End Date", type:"date", required:true },
           { id:"PL", name:"Physical Location", type:"text" },
           { id:"EL", name:"Execution Location", type:"text" },
         ]},
@@ -81,7 +88,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     else if (props.label=="Condition Subsequent")
       return { sectionName: "CS", type:"con",fieldList: conditionsFieldList(EnumIteratorValues(ConditionSubsequentTypes)) }
     else 
-      return { sectionName: "Unknown", type:"unknown", fieldList: [] }
+      return { sectionName: "Unknown", type:"con", fieldList: [] }
   }
   
   const [sectionDetails] = useState(setSection());
@@ -190,7 +197,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         </div>
       
         <div className="mr-3">
-          <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.sectionName}
+          <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.type}
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} formTitle={props.label} 
             detailSubmit={addDocument} fileSubmit={addFile} deleteFile={deleteFile} getFiles={getFileList}
             detailForm={sectionDetails.fieldList} setter={setFieldValues} fieldValues={fieldValues}
@@ -201,22 +208,22 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
       </div> 
       <div className="m-5">
         {docData
-        ?docData.length==0?<EmptyPageMessage sectionName="documents" />
-        :sectionDetails.type=="doc"
-          ?<LoanDocumentView docData={docData} label={props.label} 
-            fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
-            editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
-          />
-          :sectionDetails.type=="cov"
-            ?<LoanCovenantView covData={docData} label={props.label} priority={priority}
+          ?docData.length==0?<EmptyPageMessage sectionName="documents" />
+          :sectionDetails.type=="doc"
+            ?<LoanDocumentView docData={docData} label={props.label} 
               fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
-              editCovenantFunction={editDocument} deleteCovenantFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+              editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
             />
-            :<LoanConditionView conData={docData} label={props.label}
-              fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
-              editConditionFunction={editDocument} deleteConditionFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
-            />
-        :<LoadingMessage sectionName="list" />
+            :sectionDetails.type=="cov"
+              ?<LoanCovenantView covData={docData} label={props.label} priority={priority}
+                fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
+                editCovenantFunction={editDocument} deleteCovenantFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+              />
+              :<LoanConditionView conData={docData} label={props.label}
+                fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
+                editConditionFunction={editDocument} deleteConditionFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+              />
+          :<LoadingMessage sectionName="list" />
         }
       </div>
       <br/>

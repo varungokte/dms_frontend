@@ -11,7 +11,7 @@ function FieldLabel (props:{index:number|string, id:string, name:string, require
 
 function TextField (props:{index:number|string, id:string, name: string, type: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
   return(
-    <div key={props.index} className="mb-5">
+    <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
       <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} 
         type={props.type} disabled={props.disabled} required={props.required}
@@ -32,7 +32,7 @@ function TextField (props:{index:number|string, id:string, name: string, type: s
 
 function NumberField (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
   return(
-    <div key={props.index} className="mb-5">
+    <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
       <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} type="number"
         placeholder="0"
@@ -64,7 +64,7 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
 function SelectField (props:{index:number|string, id:string, name: string, options: string[], required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, sectionType?:string, setFileType?:Function, setCovType?:Function, setRole?:Function, setZone?:Function}){
   try{
     return(
-      <div key={props.index} className="mb-5">
+      <div key={props.index} className="mb-5 mx-2">
         <FieldLabel key={props.index+"s_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
         <br/>
         <select key={props.index+props.id+"s_2"} id={props.id} 
@@ -109,7 +109,7 @@ function SelectField (props:{index:number|string, id:string, name: string, optio
 
 function DateField (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
   return(
-    <div key={props.index} className="mb-5">
+    <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
       <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} type="date" 
         disabled={props.disabled} required={props.required}
@@ -200,8 +200,8 @@ function PermissionsField (props:{index:number|string, id: string, name:string, 
 function ComboboxField (props:{index:number|string, id: string, name:string, suggestions:any, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, multiple?:boolean}){
   const [value, setValue] = useState("");
 	const [results, setResults] = useState<any>([]);
-console.log(props)
   useEffect(()=>{
+    console.log("result",results)
     props.setPrefillValues((curr:any)=>{
       curr[props.id]=results; 
       return {...curr};
@@ -216,7 +216,7 @@ console.log(props)
         disabled={props.disabled}
         options={props.suggestions}
 
-        onChange={(_,temp)=>setResults(temp)} 
+        onChange={(_,temp)=>{setResults(props.multiple?temp.map((val:any)=>val["values"]["E"]):temp["values"]["E"])}} 
         getOptionLabel={(option:any)=>option.label} 
         
         filterOptions={(optionsList)=>{
