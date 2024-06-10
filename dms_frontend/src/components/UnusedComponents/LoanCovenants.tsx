@@ -7,7 +7,7 @@ import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import Filter from "../BasicComponents/Filter";
 //import Search from "../BasicComponents/Search";
 
-import { CovenantDocumentTypes, CovenantType, EnumIteratorKeys, EnumIteratorValues, FrequencyType, PriorityValues } from "../../../Constants";
+import { CovenantDocumentTypes, CovenantType, EnumIteratorKeys, EnumIteratorValues, FrequencyType, PriorityValues } from "../BasicComponents/Constants";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import useGlobalContext from "../../../GlobalContext";
 import { toast } from "../ui/use-toast";

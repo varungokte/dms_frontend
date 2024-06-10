@@ -86,7 +86,7 @@ function VerificationComponent(){
       <br/>
       {message}
       {move}
-      <button onClick={clickContinue}>A</button>
+      {/* <button onClick={clickContinue}>A</button> */}
     </div>
   )
 }

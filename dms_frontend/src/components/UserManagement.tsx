@@ -3,7 +3,7 @@ import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { EnumIteratorValues, ZoneList } from "../../Constants";
+import { EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
 import FormDialog from "./FormComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 

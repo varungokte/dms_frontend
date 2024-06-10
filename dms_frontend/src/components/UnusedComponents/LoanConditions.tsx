@@ -5,7 +5,7 @@ import { Table } from "../ui/table";
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
 import edit_icon from "./../static/edit_icon.svg";
 import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
-import { ConditionPrecedentTypes, EnumIteratorValues, PriorityValues } from "../../../Constants";
+import { ConditionPrecedentTypes, EnumIteratorValues, PriorityValues } from "../BasicComponents/Constants";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "../../../GlobalContext";

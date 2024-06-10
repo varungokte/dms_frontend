@@ -28,6 +28,6 @@
       ]
     }
   },
-  "include": ["src", "Constants.ts", "DataTypes.ts"],
+  "include": ["src", "src/components/BasicComponents/Constants.ts", "DataTypes.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

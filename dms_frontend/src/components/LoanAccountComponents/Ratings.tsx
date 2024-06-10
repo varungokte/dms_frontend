@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../../../Constants";
+import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../BasicComponents/Constants";
 import { FieldValues, FormFieldDetails } from "DataTypes";
 
 import { Table } from "@/components/ui/table"

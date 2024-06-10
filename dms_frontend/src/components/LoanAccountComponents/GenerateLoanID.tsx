@@ -73,8 +73,8 @@ function GenerateLoanID(props:any){
         {errorMessage}
       </div>
       <br/>
-      <button onClick={()=>{props.setOkToFrolic(true);
-        props.setCurrentSection(1);}}>Skip</button>
+      {/* <button onClick={()=>{props.setOkToFrolic(true);
+        props.setCurrentSection(1);}}>Skip</button> */}
     </div>
   )
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 import { TextField, SelectField } from "../FormComponents/FormFields";
-import { EnumIteratorValues, ZoneList } from "../../../Constants";
+import { EnumIteratorValues, ZoneList } from "../BasicComponents/Constants";
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import moment from "moment";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";

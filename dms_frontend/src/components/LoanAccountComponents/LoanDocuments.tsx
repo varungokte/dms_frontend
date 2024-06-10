@@ -12,7 +12,7 @@ import Filter from "../BasicComponents/Filter";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { Toaster } from "../ui/toaster";
-import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../../../Constants";
+import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../BasicComponents/Constants";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
@@ -93,7 +93,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
   
   const [sectionDetails] = useState(setSection());
   const [added, setAdded] = useState(true);
-  const [fieldValues, setFieldValues] = useState<any>({});
+  const [fieldValues, setFieldValues] = useState<FieldValues>({});
   const [fileList, setFileList] = useState<any>([]);
   const [priority, setPriority] = useState(1);
   

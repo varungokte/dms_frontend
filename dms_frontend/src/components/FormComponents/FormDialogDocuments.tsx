@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import {useDropzone} from "react-dropzone";
 import { Upload } from "lucide-react";
-import { EnumIteratorValues, FileTypes } from "../../../Constants";
+import { EnumIteratorValues, FileTypes } from "../BasicComponents/Constants";
 import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
 

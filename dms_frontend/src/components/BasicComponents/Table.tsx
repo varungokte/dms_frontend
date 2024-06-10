@@ -1,5 +1,5 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes, TeamStatusStyling, TeamStatusValues } from "../../../Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes, TeamStatusStyling, TeamStatusValues } from "./Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
