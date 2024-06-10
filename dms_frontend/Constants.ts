@@ -62,6 +62,10 @@ enum UserStatusValues { "-","Unverified", "Active", "Inactive" };
 
 enum UserStatusStyling { "-","text-yellow-600 bg-yellow-100", "text-green-600 bg-green-100", "text-red-600 bg-red-100" };
 
+enum TeamStatusValues { "-", "Active", "Inactive" };
+
+enum TeamStatusStyling { "-", "text-green-600 bg-green-100", "text-red-600 bg-red-100" };
+
 enum DocumentStatusValues { "-","Pending", "In Progress", "Verified", "Overdue" };
 
 enum DocumentStatusStyling { "-","text-yellow-500", "text-blue-500", "text-green-600", "text-red-600" };
@@ -121,6 +125,7 @@ const EnumIteratorValues = (list: any) => {
 
 export {
   UserRoles, UserStatusValues, UserStatusStyling, 
+  TeamStatusValues, TeamStatusStyling,
   DocumentStatusValues, DocumentStatusStyling, 
   FileStatusValue, FileStatusStyling, FileTypes,
   PriorityValues, PriorityStyling,

@@ -26,7 +26,7 @@ function RoleManagement(){
 
   const [fieldValues, setFieldValues] = useState<any>({});
   const [newRole, setNewRole] = useState<any>();
-
+  newRole;
   const [open, setOpen] = useState<boolean[]>([]);
 
 	const {useTitle} = useGlobalContext();
@@ -46,6 +46,7 @@ function RoleManagement(){
  */
   const createRole = (e:any) =>{
     e.preventDefault();
+  
     console.log("CREATINGG")
     console.log(fieldValues)
 

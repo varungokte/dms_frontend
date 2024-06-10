@@ -33,7 +33,7 @@ function UserManagement(){
   const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [selectedUser,setSelectedUser] = useState(-1);
-  const [added, setAdded] = useState(false);
+  const [added, setAdded] = useState(true);
   const [userStatus, setUserStatus] = useState(-1);
 
   const newUser = useGlobalContext().createUser;
@@ -45,15 +45,18 @@ function UserManagement(){
   useTitle("User Management");
 
   useEffect(()=>{
-    getUsers().then((res)=>{
-      console.log(res)
-      if (res.status==200)
-        setUserData(res.obj);
-      else
-        setUserData([]);
-    }).catch(()=> {
-      setUserData([])
-    })
+    if (added)
+      getUsers().then((res)=>{
+        console.log(res)
+        if (res.status==200){
+          setUserData(res.obj);
+          setAdded(false);
+        }
+        else
+          setUserData([]);
+      }).catch(()=> {
+        setUserData([])
+      })
   },[added])
 
   const createUser = async (userValues:any) => {
@@ -162,7 +165,7 @@ function UserManagement(){
               <BodyRowsMapping
                 list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "objName", "zone","text", "userStatus", "action"]}
                 searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
-                setUserStatus={setUserStatus} setSelectedUser={setSelectedUser}
+                setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
                 action = {userData.map((_:any, index:number)=>{
                   return(
                     <div className="flex flex-row">

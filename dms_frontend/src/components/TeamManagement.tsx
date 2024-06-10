@@ -47,6 +47,8 @@ function TeamManagement(){
   const [fieldValues, setFieldValues] = useState<any>({});
   
   const [added, setAdded] = useState(true);
+  const [selectedTeam, setSelectedTeam] = useState("");
+  const [teamStatus, setTeamStatus] = useState(-1);
   
   const {useTitle, addTeam, getTeamsList} = useGlobalContext();
   const { toast } = useToast();
@@ -57,6 +59,8 @@ function TeamManagement(){
 
   useEffect(()=>{
     searchString;
+    selectedTeam;
+    teamStatus;
     if (added){
       getTeamsList().then(res=>{
         if (res.status==200 && res.obj.length!=0)
@@ -127,8 +131,9 @@ function TeamManagement(){
                 headingClassNames={[""]}
               />
               <BodyRowsMapping 
-                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "objName", "countTeam","date", "userStatus", "action"]}
+                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "objName", "countTeam","date", "teamStatus", "action"]}
                 searchRows={[]} filterRows={[]}
+                setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
                 action={teamList.map((_:any, index:number)=>{
                   return(
                     <div className="flex flex-row">

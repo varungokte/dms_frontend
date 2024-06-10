@@ -1,5 +1,5 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes } from "../../../Constants";
+import { PriorityValues, PriorityStyling,DocumentStatusValues, DocumentStatusStyling, UserStatusValues, UserStatusStyling, UserRoles, RatingTypes, RatingOutlook, RatingAgencies, ZoneList, EnumIteratorValues, FrequencyType, TransactionDocumentTypes, FileTypes, TeamStatusStyling, TeamStatusValues } from "../../../Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
@@ -18,7 +18,7 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, searchRows:any, filterRows:any, dataType:any, action?:(HTMLElement|ReactElement)[], setUserStatus?:Function, setSelectedUser?:Function}){
+function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, searchRows:any, filterRows:any, dataType:any, action?:(HTMLElement|ReactElement)[], setEntityStatus?:Function, setSelectedEntity?:Function}){
   return(
     <TableBody>
       {props.list.map((singleRow:any, index:number)=>{
@@ -42,7 +42,7 @@ function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, 
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setUserStatus={props.setUserStatus} setSelectedUser={props.setSelectedUser} />
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} />
         else
           return ""
       })}
@@ -50,7 +50,7 @@ function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, 
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:any, columns:string[], cellClassName:any, singleRow:any, action?:any, setUserStatus?:Function,setSelectedUser?:Function}){
+function SingleRow(props:{rowIndex:number, dataType:any, columns:string[], cellClassName:any, singleRow:any, action?:any, setEntityStatus?:Function,setSelectedEntity?:Function}){
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
@@ -79,7 +79,9 @@ function SingleRow(props:{rowIndex:number, dataType:any, columns:string[], cellC
         else if (dataType=="docStatus")
           return handleDocStatus(Number(item), cellClassName, uniqueIndex);
         else if (dataType=="userStatus")
-          return handleUserStatus(Number(item), cellClassName, uniqueIndex, props.rowIndex, props.setSelectedUser||(()=>{}), props.setUserStatus||(()=>{}));
+          return handleUserStatus(Number(item), cellClassName, uniqueIndex, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
+        else if (dataType=="teamStatus")
+            return handleTeamStatus(Number(item), cellClassName, uniqueIndex, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
         else if (dataType=="role")
           return handleRole(Number(item), cellClassName, uniqueIndex);
         else if(dataType=="zone")
@@ -146,6 +148,25 @@ const handleUserStatus = (index:number, cellClassName:string, uniqueIndex:string
         <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(1)}} className={`${UserStatusStyling[1]} bg-white`}>{UserStatusValues[1]}</DropdownMenuItem>
         <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(2)}} className={`${UserStatusStyling[2]} bg-white`}>{UserStatusValues[2]}</DropdownMenuItem>
         <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(3)}} className={`${UserStatusStyling[3]} bg-white`}>{UserStatusValues[3]}</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  </TableCell>
+  )
+}
+
+const handleTeamStatus = (index:number, cellClassName:string, uniqueIndex:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function) => {
+  return (
+    <TableCell key={uniqueIndex} className={cellClassName}>
+      <DropdownMenu>
+      <DropdownMenuTrigger className={`${TeamStatusStyling[index]} w-28 h-10 text-center rounded-xl `}>
+        <div className="flex flex-row w-full" >
+          <p className=" m-auto">{TeamStatusValues[index]}</p>
+          <img className="mr-2" src={chevron_down} />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent className="bg-white">
+        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(1)}} className={`${TeamStatusStyling[1]} bg-white`}>{TeamStatusValues[1]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(2)}} className={`${TeamStatusStyling[2]} bg-white`}>{TeamStatusValues[2]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>

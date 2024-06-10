@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
-import useGlobalContext from "./../../../GlobalContext";
-import { useNavigate, useParams } from "react-router-dom";
+//import { useEffect, useState } from "react";
+//import useGlobalContext from "./../../../GlobalContext";
+//import { useNavigate, useParams } from "react-router-dom";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
 
-function DocumentViewer(props:{filename:string}){
-  const [showDoc, setShowDoc] = useState(<></>);
+function DocumentViewer(/* props:{filename:string} */){
+  /* const [showDoc, setShowDoc] = useState(<></>);
   const [filename,setFileName] = useState("1717389810902-data2.pdf")
 
 	const {id} =  useParams();
@@ -30,14 +30,14 @@ function DocumentViewer(props:{filename:string}){
   const exitViewer = () => {
     navigate("/")
   }
-
+ */
   return (
     <AlertDialog>
       <AlertDialogTrigger>Open</AlertDialogTrigger>
       <AlertDialogContent className="bg-white ">
         <AlertDialogHeader className="">
         </AlertDialogHeader>
-        <FileTitleBar filename={filename} />
+        <FileTitleBar filename={/* filename */"A"} />
         {/* <div>
           {showDoc}
         </div> */}
