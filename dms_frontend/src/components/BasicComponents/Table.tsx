@@ -5,6 +5,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import chevron_down from "./../static/chevron-down.svg";
 import moment from "moment";
 import { ReactElement } from "react";
+import { TableDataTypes } from "DataTypes";
 
 function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   return(
@@ -18,7 +19,7 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, searchRows:any, filterRows:any, dataType:any, action?:(HTMLElement|ReactElement)[], setEntityStatus?:Function, setSelectedEntity?:Function}){
+function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:string[], searchRows:any, filterRows:any, dataType:TableDataTypes, action?:(HTMLElement|ReactElement)[], setEntityStatus?:Function, setSelectedEntity?:Function}){
   return(
     <TableBody>
       {props.list.map((singleRow:any, index:number)=>{
@@ -50,13 +51,13 @@ function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:any, 
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:any, columns:string[], cellClassName:any, singleRow:any, action?:any, setEntityStatus?:Function,setSelectedEntity?:Function}){
+function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:string[], cellClassName?:string[], singleRow:any, action?:any, setEntityStatus?:Function,setSelectedEntity?:Function}){
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
         let cellClassName="";
         const uniqueIndex = props.rowIndex+"_"+index;
-        if (props.cellClassName.length!=0)
+        if (props.cellClassName && props.cellClassName[index])
           cellClassName = props.cellClassName[index];
       
         if (dataType=="index")

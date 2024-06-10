@@ -157,32 +157,32 @@ function RenderForm(props:{setter:Function, edit:boolean, currentFields:any, fie
         else if (field["type"]=="date")
           return <DateField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatFields={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
         else if (field["type"]=="number")
           return <NumberField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatFields={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="multitext")
           return <MultiTextField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatFields={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="checkbox")
           return <CheckboxField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}  repeatFields={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="select") 
           return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} options={field["options"]}
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatFields={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
         else
           return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]}
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} repeatFields={field["repeatable"]}
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
       }
       else if (field["category"]=="grid"){

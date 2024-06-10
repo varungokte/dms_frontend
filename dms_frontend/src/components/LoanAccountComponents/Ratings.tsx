@@ -1,23 +1,26 @@
 import { useEffect, useState } from "react";
-import { Table } from "@/components/ui/table"
-//import Search from "../BasicComponents/Search";
-import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
-import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../../../Constants";
-import FormDialog from "../FormComponents/FormDialog";
 import useGlobalContext from "./../../../GlobalContext";
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../../../Constants";
+import { FieldValues, FormFieldDetails } from "DataTypes";
+
+import { Table } from "@/components/ui/table"
+import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
+import FormDialog from "../FormComponents/FormDialog";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
 
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+//import Search from "../BasicComponents/Search";
+
 function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
-  const [fieldValues, setFieldValues] = useState<any>({
+  const [fieldValues, setFieldValues] = useState<FieldValues>({
     "A":-1, "T":-1,
     "DT":null, "O":-1,
     "L":"", "R":"",
   });
-  
-  const [fieldList] = useState<any>([
+
+  const [fieldList] = useState<FormFieldDetails>([
     { category: "grid", row:2, sectionName:"", fields: [
       { id: "A", type: "select", name: "Rating Agency", options: EnumIteratorValues(RatingAgencies), required:true },
       { id: "T", type: "select", name: "Rating Type", options: EnumIteratorValues(RatingTypes), required:true },
@@ -30,7 +33,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
 
   const {addRating, getRatingsList} = useGlobalContext();
 
-  const [ratingsList, setRatingsList] = useState<any>();
+  const [ratingsList, setRatingsList] = useState<FieldValues[]>();
   const [added, setAdded] = useState(true);
  // const [searchString, setSearchString] = useState("");
 
@@ -50,7 +53,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
   },[added])
 
   const createRating = (userValues:any) =>{
-    const data:any = {};
+    const data:FieldValues = {};
 
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];

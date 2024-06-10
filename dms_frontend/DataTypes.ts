@@ -1,16 +1,14 @@
-type FieldType = "text" | "email" | "password" | "select" | "role" | "combobox" | "multitext"| "date" | "textarea" ;
-
 type FormFieldsCommon = {
   id:string,
   name:string,
-  type: FieldType
+  type: "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext"| "textarea"
   required?: boolean,
   immutable?: boolean,
   options?:string[],
   multiple?:boolean,
 }
 
-type FormSingleFieldDetails = FormFieldsCommon & {category:"single"}
+type FormSingleFieldDetails = {category:"single"} & FormFieldsCommon
 
 type FormGridFieldDetails = {
   category:"grid",
@@ -26,7 +24,24 @@ type FormLabelFieldDetails = {
   sectionClassName:string,
 }
 
+type FieldValues = {
+  [key:string]: string | number | Date | null
+}
 
-type FormFieldDetails = (FormGridFieldDetails | FormSingleFieldDetails | FormLabelFieldDetails)[]
+type TableDataTypes = (
+  "index" | "text" | "date" | 
+  "priority" | "frequency" |
+  "docStatus" | "userStatus" | "teamStatus" | 
+  "role" | "zone" | 
+  "ratingAgency" | "ratingType" | "ratingOutlook"| 
+  "transaction" | "file" | 
+  "objName" | "action" | "countTeam"
+)[]
 
-export {type FormFieldDetails}
+type FormFieldDetails = (FormSingleFieldDetails | FormGridFieldDetails | FormLabelFieldDetails)[]
+
+export {
+  type FormFieldDetails,
+  type TableDataTypes,
+  type FieldValues
+}

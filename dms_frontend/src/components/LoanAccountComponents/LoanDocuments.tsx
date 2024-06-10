@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FormFieldDetails } from "../../../DataTypes";
+import { FieldValues, FormFieldDetails } from "../../../DataTypes";
 
 import FormDialogDocuments from "../FormComponents/FormDialogDocuments";
 import LoanDocumentView from "./LoanDocumentComponents/LoanDocumentView";
@@ -16,7 +16,7 @@ import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, Complianc
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
-  const [docData, setDocData] = useState<any>();
+  const [docData, setDocData] = useState<FieldValues[]>();
 
   type SectionDetails = {
     sectionName: "TD" | "CD" | "C" | "CP" | "CS" | "Unknown",

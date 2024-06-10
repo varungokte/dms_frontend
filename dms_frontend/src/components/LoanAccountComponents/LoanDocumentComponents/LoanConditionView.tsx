@@ -3,8 +3,9 @@ import { BodyRowsMapping, HeaderRows } from "../../BasicComponents/Table";
 import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import DeleteConfirmation from "./../../BasicComponents/DeleteConfirmation";
 import edit_icon from "./../../static/edit_icon.svg";
+import { FieldValues } from "DataTypes";
 
-function LoanConditionView(props:{conData:any, label:string, fieldList:any, fieldValues:any, setFieldValues:Function, uploadField:any, fileList:any, setFileList:Function, editConditionFunction:Function, deleteConditionFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
+function LoanConditionView(props:{conData:FieldValues[], label:string, fieldList:any, fieldValues:FieldValues, setFieldValues:Function, uploadField:any, fileList:any, setFileList:Function, editConditionFunction:Function, deleteConditionFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
   return(
     <Table className="border rounded-2xl">
       <HeaderRows headingRows={["Condition Name", "Priority", "Phyical Location", "Execution Location", "Start Date","End Date", "Action"]} />
