@@ -206,7 +206,7 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
 function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
   
-  const statusList = [<></>,<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
+  //const statusList = [<></>,<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
   //const [filePossibilities] = useState(["","application/pdf"])
   const [error, setError] = useState(<></>)
   const [renderedFileList, setRenderedFileList] = useState(<></>);
