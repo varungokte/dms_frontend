@@ -1,19 +1,32 @@
 import { useEffect, useState, createElement, FormEventHandler } from "react";
-import PermissionSetter from "../BasicComponents/PermissionSetter";
+//import PermissionSetter from "../BasicComponents/PermissionSetter";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 import moment from "moment";
 import { Autocomplete, TextField as MUITextField } from "@mui/material";
 
-function FieldLabel (props:{index:number|string, id:string, name:string, required:boolean}){
+function FieldLabel (props:{index:number|string, id:string, name:string, required:boolean, disabled:boolean}){
   return(
-    <label key={props.index+props.id+"1"} htmlFor={props.id} className={`font-light text-lg ${props.name==""?"mx-5":""}`}>{props.name} {props.required?<span className="text-red-600">*</span>:""}</label>
+    <label 
+      key={props.index+props.id+"1"} htmlFor={props.id} 
+      className={`font-light text-lg ${props.disabled?"text-gray-700":""} ${props.name==""?"mx-5":""}`}
+    >
+      {props.name} {props.required?<span className="text-red-600">*</span>:""}
+    </label>
   )
 }
 
-function TextField (props:{index:number|string, id:string, name: string, type: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
+function TextField (props:{index:number|string, id:string, name: string, type: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, errorMessage?:string, repeatFields?:boolean, formIndex?:number }) {
+  const [message, setMessage] = useState(<></>);
+
+  useEffect(()=>{
+    if (props.errorMessage)
+      setMessage(<p className="mx-2 mt-1 text-red-600 text-sm">{props.errorMessage}.</p>);
+  },[props.errorMessage]);
+  
   return(
     <div key={props.index} className="mb-5 mx-2">
-      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
-      <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} 
+      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
+      <input key={props.index+props.id+"t_2"} autoComplete="new-password" id={props.id} 
         type={props.type} disabled={props.disabled} required={props.required}
         className={`border rounded-if w-full p-4  ${props.name==""?"mt-7":""} placeholder:text-slate-800`}
         value={props.repeatFields
@@ -22,41 +35,80 @@ function TextField (props:{index:number|string, id:string, name: string, type: s
         }
         
         onChange={props.repeatFields
-          ?(e)=>{props.setPrefillValues((curr:any)=>{curr[props.formIndex||0][props.id]=e.target.value; return [...curr];})}
+          ?(e)=>{
+            props.setPrefillValues((curr:any)=>{
+              curr[props.formIndex||0][props.id]=e.target.value; 
+              return [...curr];})}
           :(e)=>{props.setPrefillValues((curr:any)=>{curr[props.id]=e.target.value; return {...curr};})}
         }
       />
+      {message}
     </div>
   )
 };
 
 function NumberField (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
+  const [message, setMessage] = useState(<></>)
   return(
     <div key={props.index} className="mb-5 mx-2">
-      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
-      <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} type="number"
-        placeholder="0"
-        min={0}
+      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
+      <input key={props.index+props.id+"t_2"} autoComplete="new-password" id={props.id} type="text"
+        min={0.000001}
         disabled={props.disabled} required={props.required}
-        className={`border rounded-if w-full h-full p-4  ${props.name==""?"mt-7":""}`}
+        className={`border rounded-if w-full p-4  ${props.name==""?"mt-7":""}`}
         value={props.repeatFields
           ?props.prefillValues[props.formIndex||0][props.id]||""
-          :props.prefillValues[props.id]|| ""
+          :props.prefillValues[props.id]!==undefined?props.prefillValues[props.id]:""
         }
         onChange={props.repeatFields && props.formIndex!=null
-          ?(e)=>{props.setPrefillValues((curr:any)=>{curr[props.formIndex||0][props.id]=e.target.value; return [...curr];})}
-          :(e)=>{
+          ?(e)=>{
+            const val = e.target.value;
+            if (isNaN(Number(val)))
+              return;
             props.setPrefillValues((curr:any)=>{
-              if (props.id=="HA" && curr["SA"] && Number(e.target.value)>Number(curr["SA"]))
-                return {...curr}
-              curr[props.id]=e.target.value; 
-              if ((props.id=="SA" || props.id=="HA") && (curr["HA"] && curr["SA"]))
-                curr["DA"] = Number(curr["SA"])-Number(curr["HA"]);
+              curr[props.formIndex||0][props.id]=e.target.value; 
+              return [...curr];
+            })
+          }
+          :(e)=>{
+            const val = e.target.value;
+            let downsell_amount:number|"NO";
+            if (isNaN(Number(val)))
+              return;
+              if (props.id=="SA"){
+                if (!props.prefillValues["HA"])
+                  downsell_amount = Number(val);
+                else{
+                  const num = Number(val)-Number(props.prefillValues["HA"]);
+                  if (num<0)
+                    setMessage(<p className="text-red-600 text-sm">This cannot be less than Hold Amount.</p>)
+                  else{
+                    setMessage(<></>);
+                    downsell_amount=num;
+                  }
+                }
+              }
+            else if (props.id=="HA"){
+              if (props.prefillValues["SA"]){
+                const num = Number(props.prefillValues["SA"])-Number(val);
+                if (num<0)
+                  setMessage(<p className="text-red-600 text-sm">This cannot be greater than Sanctioned Amount.</p>)
+                else{
+                  setMessage(<></>);
+                  downsell_amount=num;
+                }
+              }
+            }
+            props.setPrefillValues((curr:any)=>{
+              curr[props.id]=val; 
+              if (downsell_amount!=="NO")
+                curr["DA"]=downsell_amount;
               return {...curr};
             })
           }
         }
       />
+      {message}
     </div>
   )
 };
@@ -65,18 +117,22 @@ function SelectField (props:{index:number|string, id:string, name: string, optio
   try{
     return(
       <div key={props.index} className="mb-5 mx-2">
-        <FieldLabel key={props.index+"s_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
+        <FieldLabel key={props.index+"s_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
         <br/>
         <select key={props.index+props.id+"s_2"} id={props.id} 
           className="bg-white border rounded-if w-full h-10/12 p-4"
           required={props.required} disabled={props.disabled}
           value={props.repeatFields
-            ?Number(props.prefillValues[props.formIndex||0][props.id])||-1
-            :Number(props.prefillValues[props.id])|| -1
+            ?Number(props.prefillValues[props.formIndex||0][props.id])||""
+            :Number(props.prefillValues[props.id])|| ""
           }
           
           onChange={props.repeatFields && props.formIndex!=null
-            ?(e)=>{props.setPrefillValues((curr:any)=>{console.log("OLD CURR",curr); curr[props.formIndex||0][props.id]=e.target.value; console.log("NEW CURR",curr); return [...curr];})}
+            ?(e)=>{
+              props.setPrefillValues((curr:any)=>{
+                curr[props.formIndex||0][props.id]=e.target.value;
+                return [...curr];
+              })}
             :(e)=>{
               const num = Number(e.target.value)
               props.setPrefillValues((curr:any)=>{curr[props.id]=num; return {...curr}})
@@ -93,7 +149,7 @@ function SelectField (props:{index:number|string, id:string, name: string, optio
             }
           }
         >
-          <option key={props.index+"_0"} value={-1} >Select {props.name}</option>
+          <option key={props.index+"_0"} value={""} disabled>Select {props.name}</option>
           {props.options.map((option:any,optionIndex:any)=>{
             return <option key={props.index+"_"+optionIndex} value={optionIndex+1}>{option}</option>
           })}
@@ -106,15 +162,22 @@ function SelectField (props:{index:number|string, id:string, name: string, optio
   }
 };
 
+const getValidMinDate = (id:string, prefillValues:any ):string => {
+  let date = moment(new Date()).format("yyyy-MM-DD");
+  if (id!=="SD")
+    date = prefillValues["SD"]
+  return date;
+}
 
 function DateField (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
   return(
     <div key={props.index} className="mb-5 mx-2">
-      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
-      <input key={props.index+props.id+"t_2"} name="otp" autoComplete="garbage" id={props.id} type="date" 
+      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
+      <input key={props.index+props.id+"t_2"} id={props.id} type="date" 
         disabled={props.disabled} required={props.required}
-        className={`border rounded-if w-full h-full p-4  ${props.name==""?"mt-7":""}`}
+        className={`border rounded-if w-full p-4 text-black ${props.name==""?"mt-7":""}`}
         value={props.prefillValues[props.id]?moment(props.prefillValues[props.id]).format("yyyy-MM-DD"):""}
+        min={getValidMinDate(props.id, props.prefillValues)}
         onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{props.setPrefillValues((curr:any)=>{curr[props.formIndex||0][props.id]=e.target.value; return [...curr];})}
           :(e)=>{props.setPrefillValues((curr:any)=>{curr[props.id]=e.target.value; return {...curr};})}
@@ -127,7 +190,7 @@ function DateField (props:{index:number|string, id:string, name: string, require
 function TextAreaField (props:{index:number|string, id: string, name:string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function}) {
   return (
     <div key={props.index}>
-      <FieldLabel key={props.index+"ta_1"} index={props.index} id={props.id} name={props.name} required={props.required} />
+      <FieldLabel key={props.index+"ta_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
       <textarea id={props.id} className={`border rounded-if w-full h-full p-4`}
         value={props.prefillValues[props.id]}
         onChange={(e)=>{props.setPrefillValues((curr:any)=>{curr[props.id]=e.target.value; return {...curr};})}}
@@ -136,29 +199,31 @@ function TextAreaField (props:{index:number|string, id: string, name:string, req
   )
 };
 
-function RoleField (props:{index:number|string, id: string, name:string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function}){
+function RoleField (props:{index:number, id: string, name:string, roleList:any, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function}){
 
   const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
   const [currentRole, setCurrentRole] = useState(-1);
 
   useEffect(()=>{
-    setAllRolesPermissionsList({
-      "Maker":{
-        "Loan Account": ["access","add","edit"],
-        "Product": ["access", "view", "delete"],
-        "Transaction Documents": ["access", "delete","add","edit"],
-        "Compliance Documents": ["edit"],
-        "Covenants": ["access", "view", "delete","add","edit"],
-      },
-      "Checker":{
-        "Loan Account": ["access", "view", "delete","add","edit"],
-        "Product": ["access", "view", "delete","add","edit"],
-        "Transaction Documents": ["access", "view", "delete","add","edit"],
-        "Compliance Documents": ["access", "view", "delete","add","edit"],
-        "Covenants": ["access", "view", "delete","add","edit"],
-      }
+    if (props.prefillValues["R"] && props.prefillValues["R"]!=currentRole)
+      setCurrentRole(props.prefillValues["R"])
+  },[props.prefillValues])
+
+  useEffect(()=>{
+    if (props.roleList==undefined)
+      return;
+    const obj:any={}
+    for (let i=0; i<props.roleList.length; i++)
+      obj[props.roleList[i]["N"]]=props.roleList[i]["P"];
+    setAllRolesPermissionsList(obj);
+  },[props.roleList])
+
+  useEffect(()=>{
+    props.setPrefillValues((curr:any)=>{
+      curr["UP"]=allRolesPermissionsList[Object.keys(allRolesPermissionsList)[currentRole-1]];
+      return {...curr};
     })
-  },[]);
+  },[allRolesPermissionsList,currentRole])
 
   return (
     <div>
@@ -166,51 +231,125 @@ function RoleField (props:{index:number|string, id: string, name:string, require
       {currentRole==-1
         ?<></>
         :<PermissionsField index={props.index} id={"P"} name={"Permission"} 
-          permissionPreset={allRolesPermissionsList[Object.keys(allRolesPermissionsList)[currentRole-1]]} 
+          permissionPreset={props.prefillValues["UP"]} 
           required={props.required} disabled={props.disabled} 
-          prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
+          setPermissionSet={props.setPrefillValues} 
         />
       }
     </div>
   )
 };
 
-function PermissionsField (props:{index:number|string, id: string, name:string, permissionPreset:any, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function}){
-  const [permissionSet, setPermissionSet] = useState<any>([]);
-  
-  useEffect(()=>{
-    setPermissionSet(props.permissionPreset);
-  },[props.permissionPreset]);
+function PermissionsField (props:{index:number, id: string, name:string, permissionPreset:any, required:boolean, disabled:boolean, setPermissionSet:Function, multiple?:boolean}){
+  const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
+
+
 
   useEffect(()=>{
-    props.setPrefillValues(((curr:any)=>{
-      curr["UP"] = permissionSet;
-      return {...curr};
-    }))
-  },[permissionSet]);
+    if (props.multiple && props.permissionPreset.length==0)
+      props.setPermissionSet((curr:any)=>{
+        curr["UP"]=[{ "Loan Account":[], "Product": [], "Transaction Documents": [], "Compliance Documents": [], "Covenants": [] }];
+        return {...curr};
+      }
+    );
+    else if (props.permissionPreset && Object.keys(props.permissionPreset).length==0)
+      props.setPermissionSet( (curr:any)=>{
+        curr["UP"]={ "Loan Account":[], "Product": [], "Transaction Documents": [], "Compliance Documents": [], "Covenants": [] };
+        //console.log("NEW CURR",curr)
+        return {...curr};
+      }
+    );
+  },[props.permissionPreset])
+  
+  const togglePermission = (permissions: string[], action: string, value:boolean, section: string) => {
+    if (value)
+      permissions.push(action);
+    else
+     permissions = permissions.filter(name=> name!==action);
+
+    if (props.multiple)
+      props.setPermissionSet((curr:any)=>{
+        curr[props.index]["UP"][section] = [...permissions];
+        return [...curr];
+      })
+    
+    else
+      props.setPermissionSet((curr:any)=>{
+        curr["UP"][section] = [...permissions];
+        return {...curr};
+      })
+  }
 
   return (
     <div key={props.index}>
-      <FieldLabel index={props.index} id={props.id} name={props.name} required={props.required} />
-      <PermissionSetter setter={setPermissionSet} permissionSet={permissionSet} />
+      <div className="mx-2"><FieldLabel index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} /></div>
+      <Table className="rounded-xl bg-white">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Modules</TableHead>
+            <TableHead>Access</TableHead>
+            <TableHead>View</TableHead>
+            <TableHead>Delete</TableHead>
+            <TableHead>Add</TableHead>
+            <TableHead>Edit</TableHead>
+          </TableRow>
+        </TableHeader>
+        
+        <TableBody>
+          {props.permissionPreset
+            ?Object.keys(props.permissionPreset).map((section,index)=>{
+              return (
+                <TableRow key={index}>
+                  <TableCell key={index+"s"}>{section}</TableCell>
+                  {permissionTypes.map(action=>{
+                    return (
+                      <TableCell key={index+action}>
+                        <input 
+                          type="checkbox"
+                          checked={props.permissionPreset[section].includes(action)}
+                          onChange={(e)=>{
+                            togglePermission(props.permissionPreset[section],action,e.target.checked,section);
+                          }}
+                        />
+                      </TableCell>
+                    )
+                  })}
+                </TableRow>
+              )
+            })
+            :<></>
+          }
+        </TableBody>
+
+      </Table>
     </div>
   )
 };
 
-function ComboboxField (props:{index:number|string, id: string, name:string, suggestions:any, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, multiple?:boolean}){
+function ComboboxField (props:{index:number|string, id: string, name:string, suggestions:any, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, multiple?:boolean, singleValue?:boolean}){
   const [value, setValue] = useState("");
 	const [results, setResults] = useState<any>([]);
+
   useEffect(()=>{
-    console.log("result",results)
     props.setPrefillValues((curr:any)=>{
       curr[props.id]=results; 
       return {...curr};
     })
-  },[results])
+  },[results]);
+
+  useEffect(()=>{
+    if (props.prefillValues && props.prefillValues["RM"]){
+      console.log("Combobox suggestions",props.suggestions);
+      for (let i=0; i<props.suggestions.length; i++)
+        if (props.suggestions[i].label==props.prefillValues["RM"])
+          setValue(props.suggestions[i].label);
+    }
+  },[props.prefillValues]);
+
 
   return (
     <div key={props.index}>
-      <FieldLabel index={props.index} id={props.id} name={""} required={false} />
+      <FieldLabel index={props.index} id={props.id} name={""} required={false} disabled={props.disabled} />
       <Autocomplete key={props.index} id={props.id} disablePortal
         multiple={props.multiple}
         disabled={props.disabled}
@@ -251,7 +390,7 @@ const MultiTextField = (props:{index:number|string, id:string, name: string, req
 const CheckboxField = (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) => {
   return (
     <div className="flex flex-row">
-      <input type="checkbox" className="mr-3" onChange={()=>{props.setPrefillValues((curr:any)=>{curr[props.id]=true; return {...curr}})}} />
+      <input type="checkbox" className="mr-3" checked={(props.prefillValues && props.prefillValues[props.id]==true)||false} onChange={()=>{props.setPrefillValues((curr:any)=>{curr[props.id]=true; return {...curr}})}} />
       <p>{props.name}</p>
     </div>
   )
@@ -308,7 +447,7 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
         <button className="mt-10 h-[50px] w-1/12 rounded-xl text-white text-lg bg-custom-1" type="button"
           onClick={()=>{
             setCurrentForm(curr=> {return curr+1});
-            props.setFieldValues((curr:any)=>{ console.log(curr); curr=[...curr,{}]; return curr})
+            props.setFieldValues((curr:any)=>{ curr=[...curr,{}]; return curr})
             setRepeatForm((curr:any)=>{return [...curr,{key:"f"+currentForm+1, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm+1, repeatFields:true }]}); 
           }}
         >+</button>
@@ -319,19 +458,22 @@ function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValue
 }
 
 function RenderForm(props:{grid:any, fieldValues:any, setter:Function, formIndex:number, repeatFields:boolean}) {
-  useEffect(()=>{
-    console.log("render form field Valies",props.fieldValues)
-  },[props.fieldValues])
   return props.grid.map((item:any,index:number)=>{
-    return item.type=="select"
-      ?<span className="mx-5">
-        <SelectField id={item.id} key={index} index={index} name={item.name} options={item.options} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
-      </span>
-      :<span className="mx-5">
-        <TextField id={item.id} key={index} index={index} name={item.name} disabled={false}  prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} type={item.type} repeatFields={props.repeatFields} formIndex={props.formIndex} />
-      </span> 
+    if (item.type=="select")
+      return <SelectField id={item.id} key={index} index={index} name={item.name} options={item.options} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+    else if (item.type=="number")
+      return <NumberField id={item.id} key={index} index={index} name={item.name} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+    else if (item.type=="date")
+      return <DateField id={item.id} key={index} index={index} name={item.name} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+    else
+      return <TextField id={item.id} key={index} index={index} name={item.name} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} type={item.type} repeatFields={props.repeatFields} formIndex={props.formIndex} /> 
   })
 }
 
 
-export { TextField, NumberField, SelectField, DateField, TextAreaField, RoleField, PermissionsField, ComboboxField, MultiTextField, CheckboxField, FormRepeatableGrid };
+export { 
+  TextField, NumberField, DateField, SelectField, TextAreaField, 
+  RoleField, PermissionsField, ComboboxField, 
+  MultiTextField, CheckboxField, 
+  FormRepeatableGrid 
+};

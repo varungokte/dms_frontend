@@ -7,10 +7,9 @@ import VerificationPage from "./components/AuthPages/VerificationPage";
 function PrivateRoutes(){
   const [token, setToken] = useState<any>(null);  
   const {getDecryptedToken} = useGlobalContext();
-  console.log("visited private routes")
   useEffect(()=>{
     getDecryptedToken().then((resToken:any)=>{
-      console.log("private routes token", resToken)
+     // console.log("private routes token", resToken)
       /* if (JSON.stringify(token)===JSON.stringify(resToken) && Object.keys(resToken).length>0)
         return;
        */if (resToken)
@@ -32,7 +31,7 @@ function PrivateRoutes(){
 
 function EmailVerification(props:any){
   useEffect(()=>{
-    console.log("email verification props",props)
+    //console.log("email verification props",props)
   },[])
   
   if (!props.token)

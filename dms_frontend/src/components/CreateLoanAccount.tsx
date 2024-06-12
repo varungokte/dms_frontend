@@ -15,6 +15,7 @@ import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
 import { useLocation } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+import { FieldValues } from "DataTypes";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
@@ -23,41 +24,26 @@ function CreateLoanAccount() {
 
   useTitle(`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`)
   
-  const [actionType] = useState(state.linkSource);
+  const [actionType] = useState<"CREATE"|"EDIT">(state.linkSource);
 
   const [loanId, setLoanId] = useState(state.linkSource=="CREATE"?"":state.loanId);
   const [AID, setAID] = useState(state.linkSource=="CREATE"?"":state.AID);
-  const [preexisting, setPreexisting] = useState<any>();
   const [currentSection, setCurrentSection] = useState(state.linkSource=="CREATE"?0:1);
-  const [okToFrolic, setOkToFrolic] = useState(state.linkSource=="CREATE"?false:true);
+
+  const [preexistingData, setPreexistingData] = useState<FieldValues>();
+  
+  const [okToFrolic, setOkToFrolic] = useState(state.linkSource=="CREATE"?false:true); //When false, user cannot go to other pages
+  const [unsavedWarning, setUnsavedWarning] = useState(false); //when true, user will get a pop-up warning
+  
   const [showSecurityDetails, setShowSecurityDetails] = useState(true);
-  const [loadingData, setLoadingData] = useState(state.linkSource=="CREATE"?true:false);
-  const [okToChange, setOkToChange] = useState(true);
-
-  useEffect(()=>{
-    if (actionType=="EDIT"){
-      getLoanFields(loanId).then(res=>{
-        if (res["ST"] && res["ST"]==2)
-          setShowSecurityDetails(false);
-        setPreexisting(res);
-        setLoadingData(true);
-      })
-    }
-  },[]);
-
-  const goToNextSection = () => {
-    const sectionCount = formSections.length-1;
-    setCurrentSection((curr:any)=>{
-      if (curr===sectionCount) return sectionCount 
-      else return curr+1
-    });
-  };
+  const [dataHasLoaded, setDataHasLoaded] = useState(state.linkSource=="CREATE"?true:false);
 
   const [formSections] = useState([
     { name: "Create Agreement ID", component: GenerateLoanID },
     { name: "Basic Details", component: BasicDetails },
     { name: "Security Details", component: SecurityDetails, show: showSecurityDetails },
     { name: "Bank Details", component: BankDetails },
+    { name: "Ratings", component: Ratings },
     { name: "Contact Details", component: ContactDetails },
     { name: "Relationship Mapping", component: RelationshipMapping },
     { name: "Transaction Documents", component: LoanDocuments },
@@ -65,8 +51,38 @@ function CreateLoanAccount() {
     { name: "Covenants", component: LoanDocuments },
     { name: "Condition Precedent", component: LoanDocuments },
     { name: "Condition Subsequent", component: LoanDocuments },
-    { name: "Ratings", component: Ratings },
-  ])
+  ]);
+
+  const getOldData = async () => {
+    const res = await getLoanFields(loanId);
+    console.log("preexisting data",res);
+    if (res["ST"] && res["ST"]==2)
+      setShowSecurityDetails(false);
+    if (res["CN"])
+      setPreexistingData(res);
+    setDataHasLoaded(true);
+  }
+
+  useEffect(()=>{
+    if (actionType=="EDIT")
+      getOldData();
+  },[]);
+  
+  /* useEffect(()=>{
+    if (actionType=="CREATE" && currentSection>0 && currentSection<5)
+      getOldData();
+  },[currentSection]) */
+
+
+  const goToNextSection = async () => {
+    if (currentSection>0 && currentSection<5)
+      await getOldData();
+    const sectionCount = formSections.length-1;
+    setCurrentSection((curr)=>{
+      if (curr===sectionCount) return sectionCount 
+      else return curr+1
+    });
+  };
 	
   return(
     <div style={{width:"relative"}}>
@@ -79,16 +95,16 @@ function CreateLoanAccount() {
             <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap' }}>
 
             <TooltipProvider>
-              {formSections.map((section:any, index:number)=>{
+              {formSections.map((section, index:number)=>{
                 return(
                   <Tooltip key={index}>
                       <TooltipTrigger key={index} disabled={!okToFrolic || index==0}
                         className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
                         onClick={()=>{
-                          okToChange
-                            ?setCurrentSection(index)
-                            :confirm("WARNING:\nYou have unsaved data which will be lost.\nTo save your data, close this dialog and click the Save & Next button")
-                              ?setCurrentSection(index):""
+                          unsavedWarning
+                            ?(confirm("WARNING:\nYou have unsaved data which will be lost.\nTo save your data, close this dialog and click the Save & Next button")
+                              ?setCurrentSection(index):"")
+                            :setCurrentSection(index)                      
                         }}
                       >
                         <div className="flex flex-row">
@@ -111,7 +127,7 @@ function CreateLoanAccount() {
         </div>
 
         <div className="mx-10">
-          {loadingData?
+          {dataHasLoaded?
             React.createElement (formSections[currentSection].component, 
             {
               key:currentSection,
@@ -123,12 +139,12 @@ function CreateLoanAccount() {
               currentSection: currentSection,
               setCurrentSection: setCurrentSection,
               goToNextSection: goToNextSection,
-              setOkToChange: setOkToChange,
+              setUnsavedWarning: setUnsavedWarning,
               label: formSections[currentSection].name,
               setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:()=>{},
               showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:false,
               setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
-              preexistingValues: actionType=="EDIT"?preexisting:"",
+              preexistingValues: preexistingData||{},
             }
           ):<LoadingMessage sectionName="details" />} 
         </div>

@@ -12,13 +12,14 @@ import edit_icon from "./static/edit_icon.svg";
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+import { FormFieldDetails } from "DataTypes";
 
 function UserManagement(){
   const [userData, setUserData]= useState<any>();
   
   const [fieldValues, setFieldValues] = useState<any>({});
 
-  const [fieldList] = useState<any>([
+  const [fieldList] = useState<FormFieldDetails>([
     { category: "grid", row: 2, fields: [
       { id: "N", name: "Name", type: "text", required:true },
       { id: "E", name: "Email", type: "email", immutable: true, required:true },
@@ -47,7 +48,6 @@ function UserManagement(){
   useEffect(()=>{
     if (added)
       getUsers().then((res)=>{
-        console.log(res)
         if (res.status==200){
           setUserData(res.obj);
           setAdded(false);
@@ -60,7 +60,6 @@ function UserManagement(){
   },[added])
 
   const createUser = async (userValues:any) => {
-    console.log("creating user", userValues);
 
     const data:any={};
     for (let i=0; i<fieldList.length; i++){
@@ -101,10 +100,10 @@ function UserManagement(){
   }
 
   const editUser = async (userValues:any) => {
-    console.log("reached edit user");
     if (selectedUser==-1)
       return;
-
+  
+   console.log("reached edit user");
     const arr = userData[selectedUser];
     const id = userData[selectedUser]["_id"];
 
@@ -116,16 +115,16 @@ function UserManagement(){
 
     const res = await changeUserInfo(userValues);
 
-    if (res==200)
+    if (res==200){
       setAdded(true);
+      setFieldValues({});
+    }
 
     return res;
   }
 
   useEffect(()=>{
-    console.log("new user status",userStatus);
-    editUser({"S":userStatus}).then(res=>{
-      console.log ("changes made? ", res);
+    editUser({"S":userStatus}).then(()=>{
     }).catch(err=>{console.log(err)})
     ;
   },[userStatus]);
@@ -152,7 +151,7 @@ function UserManagement(){
           <FormDialog key={-10} index={-10} edit={false} type="user"
             triggerText="+ Add User" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}} suggestions="RM"
+            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}} suggestions="RM" getRoles={true}
           />
         </div>
       </div>
@@ -163,7 +162,7 @@ function UserManagement(){
             :<Table className="bg-white border-2 rounded-xl">
               <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
               <BodyRowsMapping
-                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "objName", "zone","text", "userStatus", "action"]}
+                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "zone","text", "userStatus", "action"]}
                 searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
                 setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
                 action = {userData.map((_:any, index:number)=>{
@@ -172,7 +171,7 @@ function UserManagement(){
                       <FormDialog key={index} index={index} type="user" edit={true}
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                         formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
-                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]}
+                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]} suggestions="RM" getRoles={true}
                       />
                       {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */}
                     </div>

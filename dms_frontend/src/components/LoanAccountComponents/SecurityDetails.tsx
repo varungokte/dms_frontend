@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import { TextField, FormRepeatableGrid } from "../FormComponents/FormFields";
+import { FormRepeatableGrid, NumberField, DateField } from "../FormComponents/FormFields";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
 
-function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}){
+function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
 
@@ -58,7 +58,6 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
   }
   
   useEffect(()=>{
-    console.log(props.preexistingValues)
     if (!props.showSecurityDetails)
       setDisableFields(true)
 
@@ -93,16 +92,14 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
 
   useEffect(()=>{
     let okToChange = areAllFieldsEmpty();
-    if (props.actionType=="EDIT" && props.preexistingValues)
+    if (props.actionType=="EDIT" && Object.keys(props.preexistingValues).length!=0)
       okToChange = okToChange && compareFieldsToPreexisting();
-    props.setOkToChange(okToChange);
+    props.setUnsavedWarning(!okToChange);
   },[fieldValuesFixed,fieldValuesRepeatable]);
 
   const submitForm = (e:any) => {
     e.preventDefault();
     let data:any={};
-
-    console.log("security details field values", fieldValuesRepeatable);
 
     if (Object.keys(fieldValuesFixed).length!=0 || fieldValuesRepeatable.length!=0){
       data["AID"]= props.AID;
@@ -131,10 +128,10 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-2">
           {fieldList.map((field,index)=>{
-            if (field.type!="repeatable" && !disableFields)
-              return <span className="mx-2">
-                <TextField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} type={field.type} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
-              </span>
+            if (field.type=="date" && !disableFields)
+              return <DateField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+            else if (field.type=="number" && !disableFields)
+              return <NumberField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
           })}
           </div>
 

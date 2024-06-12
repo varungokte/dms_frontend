@@ -1,33 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../ui/table";
 
 function PermissionSetter(props:{ setter:Function, permissionSet:any}){
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
-  /* const [permissionList, setPermissionList] = useState<any>({
-    "Loan Account": [],
-    "Product": [],
-    "Transaction Documents": [],
-    "Compliance Documents": [],
-    "Covenants": [],
-  });
-
   useEffect(()=>{
-    if (props.permissionSet)
-      setPermissionList(props.permissionSet);
-    else
-      setPermissionList({
-        "Loan Account": [],
-        "Product": [],
-        "Transaction Documents": [],
-        "Compliance Documents": [],
-        "Covenants": [],
-      })
-  },[props.permissionSet]) */
-
-  /* useEffect(()=>{
-    console.log("CURRENT PERMISSIONS LIST", permissionList)
-  },[permissionList]) */
+    console.log("permission setter",props);
+  },[])
 
   const togglePermission = (permissions: string[], action: string, value:boolean, section: string) => {
     if (value)

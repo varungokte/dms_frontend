@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FieldValues, FormFieldDetails } from "../../../DataTypes";
+import { FieldValues, FormDialogDocumentSections, FormDialogDocumentTypes, FormFieldDetails } from "../../../DataTypes";
 
 import FormDialogDocuments from "../FormComponents/FormDialogDocuments";
 import LoanDocumentView from "./LoanDocumentComponents/LoanDocumentView";
@@ -15,12 +15,12 @@ import { Toaster } from "../ui/toaster";
 import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../BasicComponents/Constants";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
-function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
+function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [docData, setDocData] = useState<FieldValues[]>();
 
   type SectionDetails = {
-    sectionName: "TD" | "CD" | "C" | "CP" | "CS" | "Unknown",
-    type:"doc"|"cov"|"con",
+    sectionName: FormDialogDocumentSections,
+    type:FormDialogDocumentTypes,
     fieldList:FormFieldDetails
   }
 
@@ -87,8 +87,9 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     
     else if (props.label=="Condition Subsequent")
       return { sectionName: "CS", type:"con",fieldList: conditionsFieldList(EnumIteratorValues(ConditionSubsequentTypes)) }
+    
     else 
-      return { sectionName: "Unknown", type:"con", fieldList: [] }
+      return { sectionName: "undefined", type:"undefined", fieldList: [] }
   }
   
   const [sectionDetails] = useState(setSection());

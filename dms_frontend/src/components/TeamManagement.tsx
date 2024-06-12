@@ -4,7 +4,7 @@ import { Table } from "./ui/table";
 
 import useGlobalContext from "./../../GlobalContext";
 import FormDialog from "./FormComponents/FormDialog";
-import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
+//import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import edit_icon from "./static/edit_icon.svg";
 import Search from "./BasicComponents/Search";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
@@ -63,8 +63,8 @@ function TeamManagement(){
     teamStatus;
     if (added){
       getTeamsList().then(res=>{
-        if (res.status==200 && res.obj.length!=0)
-         setTeamList(res.obj.list);
+        if (res.status==200 && res.obj.length!=0){console.log(res.obj.list)
+         setTeamList(res.obj.list);}
         else
           setTeamList([])
       }).catch(()=>{
@@ -95,7 +95,8 @@ function TeamManagement(){
         title: "Success!",
         description: "The team has been created",
         className:"bg-white"
-      })
+      });
+      setFieldValues({});
     };
 
     return res;
@@ -103,7 +104,7 @@ function TeamManagement(){
 
   const editTeam = () => {}
 
-  const deleteTeam = () => {}
+  //const deleteTeam = () => {}
 
   return(
     <div>
@@ -131,7 +132,7 @@ function TeamManagement(){
                 headingClassNames={[""]}
               />
               <BodyRowsMapping 
-                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "objName", "countTeam","date", "teamStatus", "action"]}
+                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "text", "countTeam","date", "teamStatus", "action"]}
                 searchRows={[]} filterRows={[]}
                 setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
                 action={teamList.map((_:any, index:number)=>{
@@ -139,10 +140,10 @@ function TeamManagement(){
                     <div className="flex flex-row">
                       <FormDialog key={index} index={index} edit={true} type="team"
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                        formTitle="Edit User" formSubmit={editTeam} submitButton="Edit User" formSize="medium"
+                        formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
                         form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={teamList[index]}
                       />
-                      <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} />
+                      {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
                     </div>
                   )
                 })}

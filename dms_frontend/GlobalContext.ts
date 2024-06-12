@@ -2,11 +2,12 @@ import axios from 'axios';
 import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { useEffect } from 'react';
+import { UserSuggestionTypes } from 'DataTypes';
 
-//const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
+const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
+//const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
+
 const encryption_key = "JAIBAJRANGBALI";
-
-const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
 
 //HELPERS
 const useTitle = (title:string) => {
@@ -62,7 +63,7 @@ const getDecryptedToken = async () => {
 }
 
 //SUGGESTIONS
-const getUserSuggestions = async (type:"AU"|"RM"|"TL") => {
+const getUserSuggestions = async (type:UserSuggestionTypes) => {
 	try {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/suggestion`, {
@@ -70,7 +71,6 @@ const getUserSuggestions = async (type:"AU"|"RM"|"TL") => {
 			params: {type: type}
 		});
 		const decryptedObject = await handleDecryption(response.data);
-		console.log("decrypted object", decryptedObject)
 		if (response.status==200)
 			return {status:200, obj:decryptedObject}
 		else
@@ -87,14 +87,16 @@ const getUserSuggestions = async (type:"AU"|"RM"|"TL") => {
 //AUTH
 const RegisterAdmin = async (data:object) => {
 	try {
-		console.log(data);
 		const req_body = await handleEncryption(data);
 		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
-		console.log(response);
-		return response;
+		//console.log("register response",response);
+		return response.status;
 	} 
-	catch (error) {
-		throw error;
+	catch (error:any) {
+		if (error.response)
+			return error.response.status;
+		else
+			return 0;
 	}
 }	
 
@@ -104,14 +106,10 @@ const LoginUser = async (data: object) => {
 	//Unauthorized 401 -> Incorrect Username
 	try {
 		const req_body = await handleEncryption(data);
-		console.log("req_body", req_body);
 		const response = await axios.post(`${Base_Url}/login`, {data:req_body}, {
 			headers:{ "Content-type": "application/json" }
 		});
-		console.log("response", response)
-		console.log(response.status)
 		if (response.status == 200){
-			console.log("login token",response.data);
 			localStorage.setItem("Beacon-DMS-token",response["data"]);
 			return 200;
 		}	
@@ -119,7 +117,6 @@ const LoginUser = async (data: object) => {
 			return response.status;
 	} 
 	catch (error:any) {
-		console.log ("login error",error)
 		if (!error.response)
 			return 0;
 		else
@@ -135,14 +132,13 @@ const sendOTP = async () => {
 		const response = await axios.get(`${Base_Url}/sendOTP`, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
-		if (response.status==200)
-			return 200;
-		if (response.status==503)
-			return 503;
 		return response.status;
-	}
-	catch(error){
-		throw error;
+	} 
+	catch (error:any) {
+		if (!error.response)
+			return 0;
+		else
+			return error.response.status;
 	}
 }
 
@@ -155,7 +151,6 @@ const verifyOTP = async (otp:any) => {
 		const response = await axios.post(`${Base_Url}/verifyOTP`,{data: enc_otp},{
 			headers:{	"Authorization": `Bearer ${token}` }
 		});
-		console.log(response)
 
 		if (response.status==200){
 			return {status:200, data:response["data"]}
@@ -216,7 +211,6 @@ const editUser = async (data:object) => {
 const getAllUsers = async () => {
 	try {
 		const token = await getEncryptedToken();
-		console.log("token",token)
 		const response = await axios.get(`${Base_Url}/listUser`, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
@@ -238,7 +232,7 @@ const getSingleUser = async (id:string) => {
 			params:{"_id":id}
 		});
 		const decryptedObject = await handleDecryption(response["data"]);
-		console.log("single user", decryptedObject);
+		//console.log("Single user information", decryptedObject);
 		return {status:response.status, obj:decryptedObject||{}};
 	}
 	catch(error:any) {
@@ -290,9 +284,7 @@ const getLoanFields = async (loanId:string) => {
 const createLoan = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
-		console.log("REG Data",data)
 		const enc_data = await handleEncryption(data);
-		console.log("ECN Data",enc_data)
 		const response = await axios.post(`${Base_Url}/createLoan`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
@@ -328,14 +320,11 @@ const createAID = async (data:object) =>{
 const addContact = async (data:object, actionType:string) => {
 	try {
 		const token = getEncryptedToken();
-		console.log("OBJECT",data)
 		const enc_data = await handleEncryption(data);
-		console.log("ACTION", actionType);
 		const response = await axios.post(`${Base_Url}/createContact`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "type": actionType },
 		});
-		console.log("RESPONSE ",response)
 		return response.status;
 	}
 	catch(error:any) {
@@ -414,7 +403,7 @@ const addRole = async (data:object) => {
 		if (!error.response)
 			return;
 		else
-			return error.response;
+			return error.response.status;
 	}
 }
 
@@ -424,17 +413,15 @@ const getRolesList = async () => {
 		const response = await axios.get(`${Base_Url}/listRole`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
-		const decryptedObject = handleDecryption(response.data);
-		if (response.status==200)
-			return decryptedObject; 
-		else
-		return null;
+		const decryptedObject = await handleDecryption(response.data);
+		
+		return {status:response.status, data:decryptedObject||null};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0, data:null};
 		else
-			return error.response;
+			return {status:error.response.status, data:null};
 	}
 }
 
@@ -475,17 +462,18 @@ const addTeam = async (data:any) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
 			return error.response.status;
 	}
 }
 
-const getSingleTeam = async () => {
+const getSingleTeam = async (teamId:string) => {
 	try {
 		const token = await getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/getTeam`, {
 			headers:{ "Authorization": `Bearer ${token}` },
+			params:{_id:teamId}
 		});
 		const decryptedObject = await handleDecryption(response.data);
 
@@ -509,9 +497,7 @@ const addDocument =  async (data:any) => {
 		const response = await axios.post(`${Base_Url}/addDocsDetails`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}`}});
 
-		console.log("Server response, ",response);
 		const decryptedObject = await handleDecryption(response.data);
-		console.log("decrypted object", decryptedObject)
 		return {status:response.status, id:decryptedObject["_id"]||""};
 	}
 
@@ -532,9 +518,7 @@ const editDocument =  async (data:any) => {
 		const response = await axios.post(`${Base_Url}/addDocsDetails`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}`}});
 
-		console.log("Server response, ",response);
 		const decryptedObject = await handleDecryption(response.data);
-		console.log("decrypted object", decryptedObject)
 		return {status:response.status, id:decryptedObject["_id"]||""};
 	}
 
@@ -549,13 +533,11 @@ const editDocument =  async (data:any) => {
 const uploadFile = async (data:any,loc:string,docId:string) => {
 	try {
 		const token = getEncryptedToken();
-		console.log("DOCID",docId)
 		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 			params: { "LOC":loc, "_id":docId }
 		});
 
-		console.log("Server response, ",response);
 		return response.status;
 	}
 
@@ -570,7 +552,6 @@ const uploadFile = async (data:any,loc:string,docId:string) => {
 const getDocumentsList = async (loanId:string, sectionName:string) =>  {
 	try {
 		const token = getEncryptedToken();
-		console.log("SENDING", loanId, sectionName)
 		const response = await axios.get(`${Base_Url}/listDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: {"_loanId": loanId, SN:sectionName }

@@ -10,6 +10,7 @@ import Search from "./BasicComponents/Search";
 import ProgressBar from "./BasicComponents/ProgressBar";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+import { FormDialogDocumentSections, FormDialogDocumentTypes } from "DataTypes";
 
 type DocumentDetails= {
   _id:string,
@@ -20,8 +21,8 @@ type DocumentDetails= {
 }
 
 type SectionDetails = {
-  sectionName: "TD" | "CD" | "C" | "CP" | "CS" | "Unknown",
-  sectionType: "doc" | "cov" | "con"
+  sectionName: FormDialogDocumentSections,
+  sectionType: FormDialogDocumentTypes
 }
 
 function DocumentList(props:{label:string}) {	
@@ -43,7 +44,7 @@ function DocumentList(props:{label:string}) {
     else if (props.label=="Condition Subsequent")
       return { sectionName: "CS", sectionType:"con" }
     else 
-      return { sectionName: "Unknown", sectionType:"con" }
+      return { sectionName: "undefined", sectionType:"undefined" }
   }
 
   const [sectionDetails] = useState(setSection());

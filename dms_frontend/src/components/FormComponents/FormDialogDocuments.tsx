@@ -9,8 +9,9 @@ import { Upload } from "lucide-react";
 import { EnumIteratorValues, FileTypes } from "../BasicComponents/Constants";
 import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
+import { FormDialogDocumentTypes } from "DataTypes";
 
-function FormDialogDocuments(props:{index:number, type:"doc"|"cov"|"con", triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any }){
+function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any }){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [fileList, setFileList] = useState<any>([]);
@@ -215,7 +216,7 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
       const arr  = [...curr];
       if (acceptedFiles && acceptedFiles.length>0)
         for (let i=0; i<acceptedFiles.length; i++){
-          arr.push([acceptedFiles[i],0]);
+          arr.push(acceptedFiles[i]);
           setError(<></>);
         }
       return arr;
@@ -225,11 +226,12 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
   useEffect(()=>{
     if (props.fileList)
       setRenderedFileList (props.fileList.map((item:any,index:number)=>{
+        console.log("FILE INFO",item);
         return (
           <div key={index} className="border p-3 flex flex-row">
             <div key={index} className="flex-auto">
               <p>{item.filename?item.filename:item.name}</p>
-              {statusList[item[1]]}
+              {/* {statusList[item[1]]} */}
             </div>
             <button type="button" onClick={()=>obliterateFile(item.filename?item.filename:item.name)}>x</button>
           </div>
@@ -286,7 +288,7 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
       <br/>
       <div className="flex flex-row">
         <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{EnumIteratorValues(FileTypes).map(ft=>" "+ft).toString()}</p>
-        {props.edit?<button className="text-custom-1" onClick={()=>getUploadedFiles()}>Get Uploaded Files</button>:<></>}
+        {/* {props.edit?<button className="text-custom-1" onClick={()=>getUploadedFiles()}>Get Uploaded Files</button>:<></>} */}
       </div>
       <br/>
       {error}

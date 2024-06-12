@@ -13,7 +13,7 @@ import LoadingMessage from "../BasicComponents/LoadingMessage";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 //import Search from "../BasicComponents/Search";
 
-function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
+function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({
     "A":-1, "T":-1,
     "DT":null, "O":-1,

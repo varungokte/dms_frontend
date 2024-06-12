@@ -19,7 +19,7 @@ import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
 
 
-function ContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
+function ContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [contacts, setContacts] = useState<any>();
 
   const [fieldValues, setFieldValues]= useState<any>({});

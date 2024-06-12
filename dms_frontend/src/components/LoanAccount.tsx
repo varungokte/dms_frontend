@@ -28,8 +28,7 @@ function LoanAccount() {
       setIds(idarr);
     })
     
-  },[])
-
+  },[]);
 
   //const [searchString, setSearchString] = useState("");
   

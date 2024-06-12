@@ -8,38 +8,29 @@ import './styling.css';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 
 import Dashboard from './components/Dashboard';
+import LoanAccount from './components/LoanAccount';
 import CreateLoanAccount from './components/CreateLoanAccount';
 import Products from './components/Products';
 //import TeamMembers from './components/UnusedComponents/TeamMembers';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
 import RoleManagement from './components/RoleManagement';
+import TeamManagement from './components/TeamManagement';
 //import Zones from './components/Zones';
 //import Default from './components/DefaultCases';
 //import CriticalCases from './components/CriticalCases';
 //import Reports from './components/Reports';
 //import Reminders from './components/Reminders';
+import { Toaster } from './components/ui/toaster';
 
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
-import DashboardIcon from './components/static/PanelIcons/DashboardIcon';
-import LoanIcon from './components/static/PanelIcons/LoanIcon';
-import ProductIcon from './components/static/PanelIcons/ProductIcon';
-import TransIcon from './components/static/PanelIcons/TransIcon';
-import CompIcon from './components/static/PanelIcons/CompIcon';
-import CovenantIcon from './components/static/PanelIcons/CovenantIcon';
-import ConditionsIcon from './components/static/PanelIcons/ConditionsIcon';
-import MembersIcon from './components/static/PanelIcons/MembersIcon';
-import ManagementIcon from './components/static/PanelIcons/ManagementIcon';
-import TeamManagement from './components/TeamManagement';
-import LoanAccount from './components/LoanAccount';
-//import ZoneIcon from './components/static/PanelIcons/ZoneIcon';
-//import ReminderIcon from './components/static/PanelIcons/ReminderIcon';
-//import DefaultIcon from './components/static/PanelIcons/DefaultIcon';
-//import CriticalIcon from './components/static/PanelIcons/CriticalIcon';
-//import ReportsIcon from './components/static/PanelIcons/ReportsIcon';
-//import Masters from './components/Masters';
-//import DocumentViewer from './components/BasicComponents/DocumentViewer';
+
+import {DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, /* ZoneIcon, ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */} from "./../src/components/static/PanelIcons"
+
+/* import Masters from './components/Masters';
+import DocumentViewer from './components/BasicComponents/DocumentViewer'; */
+
 
 export const MenuRouter = () => {
 	const [currLink, setCurrLink] = useState("");
@@ -126,7 +117,7 @@ export const MenuRouter = () => {
 		{ name: "Condition Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Condition Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
-		{ name: "Role Management", path:"/roles", component: RoleManagement },
+		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
 		//{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
@@ -137,6 +128,7 @@ export const MenuRouter = () => {
 	
 	return (
 		<div className='relative'>
+			<Toaster/>
 			<div style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1" >
 				<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
 				<div className='mx-8 my-5'>

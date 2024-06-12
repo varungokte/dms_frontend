@@ -4,7 +4,7 @@ import useGlobalContext from "./../../../GlobalContext";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { BankAccountType, EnumIteratorValues } from "../BasicComponents/Constants";
 
-function BankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setOkToChange: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,}) {
+function BankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const {createLoan} = useGlobalContext();
 
   const [fieldList] = useState([
@@ -38,7 +38,7 @@ function BankDetails(props:{key:number,actionType: string, loanId: string, setLo
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
       for (let j=0; j<fieldValues.length; j++){
-        if (fieldValues[j][field.id] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
+        if (fieldValues[j][field.id] &&  props.preexistingValues["BD"] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
           no_changes=false;
       }
     }
@@ -61,24 +61,23 @@ function BankDetails(props:{key:number,actionType: string, loanId: string, setLo
       setFieldValues(arr);
 
       setValuesExist(true);
-      props.setOkToChange(true);
+      props.setUnsavedWarning(true);
     }
     else 
       setFieldValues([{}])
   },[]);
 
   useEffect(()=>{
-    if (props.actionType=="EDIT" && props.preexistingValues)
-      props.setOkToChange(compareFieldsToPreexisting());
+    if (props.actionType=="EDIT" && Object.keys(props.preexistingValues).length!=0)
+      props.setUnsavedWarning(!compareFieldsToPreexisting());
     else
-      props.setOkToChange(areAllFieldsEmpty());
+      props.setUnsavedWarning(!areAllFieldsEmpty());
   },[fieldValues]);
   
   const submitForm = (e:any) =>{
     e.preventDefault();
 
     let data:any={};
-    console.log("bank details field values", fieldValues);
 
     if (data.length!=0){
       data["AID"] = props.AID;
@@ -87,7 +86,6 @@ function BankDetails(props:{key:number,actionType: string, loanId: string, setLo
       console.log("SUBMITTED NOW",data);
 
       createLoan(data).then(res=> {
-        console.log("RES", res);
         if (res==200)
           props.goToNextSection();
         else

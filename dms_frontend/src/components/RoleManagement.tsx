@@ -1,64 +1,96 @@
-import { useState } from "react";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible"
-import PermissionSetter from "./BasicComponents/PermissionSetter";
+import { useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
+
+import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible";
+import FormDialog from "./FormComponents/FormDialog";
+import LoadingMessage from "./BasicComponents/LoadingMessage";
+import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+
+import { FieldValues, FormFieldDetails } from "DataTypes";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import FormDialog from "./FormComponents/FormDialog";
-function RoleManagement(){
-  const [roleList] = useState<any>([
-    { N: "MAKER", P:{
-      "Loan Account":["access", "edit"]}
-    },
-    { N: "CHECKER", P:{
-      "Loan Account": ["access", "edit"],
-      "Product": ["view", "access"],
-      "Transaction Documents": ["access", "edit"],
-      "Compliance Documents": ["delete", "access"],
-      "Covenants": [ "edit"],
-    }}
-  ]);
+import { PermissionsField } from "./FormComponents/FormFields";
+import { useToast } from "./ui/use-toast";
 
-  const [fieldList] = useState([
+function RoleManagement(){
+  const [roleList, setRoleList] = useState<any[]>();
+
+  const [fieldList] = useState<FormFieldDetails>([
     { category: "single", id: "N", name:"Role Name", type: "text" },
-    { category: "single", id: "P", name: "Permissions", type: "permissions"}
+    { category: "single", id: "P", name: "Permissions", type: "permissions", newRole:true }
   ]);
 
   const [fieldValues, setFieldValues] = useState<any>({});
-  const [newRole, setNewRole] = useState<any>();
-  newRole;
+  //const [newRole, setNewRole] = useState<any>();
   const [open, setOpen] = useState<boolean[]>([]);
+  const [added, setAdded] = useState(true);
 
-	const {useTitle} = useGlobalContext();
+	const {useTitle, addRole, getRolesList} = useGlobalContext();
 
 	useTitle("Role Management");
 
- /*  useEffect(()=>{
-    getRolesList().then(res=>{
-      if (res==null)
-        return;
-      setRoleList(res);
-      console.log(res);
-    }).catch(err=>{
-      console.log(err);
-    })
-  },[]);
- */
-  const createRole = (e:any) =>{
-    e.preventDefault();
+  const {toast} = useToast();
   
-    console.log("CREATINGG")
-    console.log(fieldValues)
+  useEffect(()=>{
+    if (added){
+      listRole();
+      setAdded(false);
+    }
+  },[added]);
 
-    /* addRole(data).then(res=>{
-      console.log(res);
-    }) */
-    
+  useEffect(()=>{
+    console.log("roleList values", roleList);
+  },[roleList])
+
+  const listRole = async () => {
+    const res = await getRolesList();
+    if (res.status==200){
+      const arr = await res.data.map((obj:FieldValues)=>{
+        const permissionObj = JSON.parse(obj["P"]?.toString()||"");
+        obj["P"] = permissionObj;
+        return obj;
+      });
+      setRoleList(arr);
+    }
+    else
+      setRoleList([]);
   }
 
-  const editRoles = (e:any) =>{
-    e.preventDefault();
-    console.log(roleList)
+  const createRole = async (userData:FieldValues) => {
+    const data:FieldValues = {}
+    data["N"] = userData["N"];
+    data["P"] = JSON.stringify(userData["UP"]);
+    
+    console.log("SUBMITTED",data)
+
+    const res = await addRole(data);
+
+    if (res==200)
+      setAdded(true);
+    return res
+  }
+
+  const editRoles = async (roleIndex:number) =>{
+    const roleData = {...roleList?.[roleIndex]};
+    roleData["P"] = JSON.stringify(roleData["P"]);
+    console.log("SUBMITTING",roleData);
+
+    const res = await addRole(roleData);
+
+    if (res==200){
+      setAdded(true);
+      toast({
+        description:"Success!",
+        duration:5000,
+        className:"bg-white"
+      })
+    }
+    else
+      toast({
+        description:"Something went wrong",
+        duration:5000,
+        className:"bg-white"
+    })
   }
 
   return (
@@ -66,36 +98,45 @@ function RoleManagement(){
 			<p className="text-3xl font-bold m-7">Role Management</p>
       <br/>
       <div className="flex flex-row">
-        {/* <div className="flex-auto">
-          <Search label="Search Role" setter={setSearchString} />
-        </div> */}
+        <div className="flex-auto">
+          {/* <Search label="Search Role" setter={setSearchString} /> */}
+        </div>
         <div>
-          <FormDialog index={-1} type="role"
-            triggerText="Create New Role" triggerClassName={CreateButtonStyling}
-            formTitle="Create a New Role" formSize="small"
-            formSubmit={createRole} submitButton="Create Role" setter={setFieldValues}
-            form={fieldList} fieldValues={fieldValues} currentFields={{}}
-          />
+        <FormDialog key={-10} index={-10} edit={false} type="user"
+          triggerText="+ Add Role" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
+          formTitle="Add Role" formSubmit={createRole} submitButton="Add Role"
+          form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}}
+        />
         </div>
       </div>
-      {roleList.map((role:any,index:number)=>{
-        return(
-        <Collapsible key={index} className="mx-7 my-3">
-          <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...open]; arr[index]=!open[index]; setOpen(arr)}}>
-            <div className="flex flex-row">
-              <div>{role.N}</div>
-              <div>{open[index]?<ChevronDown className="mt-[1px]"/>:<ChevronRight className="mt-[2px]"/>}</div>
+      {roleList==undefined
+        ?<LoadingMessage sectionName="data" />
+        :roleList.length==0
+          ?<EmptyPageMessage sectionName="roles" />
+          :<div>
+            <p className="mx-7 text-2xl font-bold">Defined User Roles</p>
+            <div>
+              {roleList.map((singleRole:any,index:number)=>{
+                console.log("SINGLE ROLE",singleRole)
+                return(
+                  <Collapsible key={index} className="mx-7 my-3">
+                    <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...open]; arr[index]=!open[index]; setOpen(arr)}}>
+                      <div className="flex flex-row">
+                        <div>{singleRole.N}</div>
+                        <div>{open[index]?<ChevronDown className="mt-[1px]"/>:<ChevronRight className="mt-[2px]"/>}</div>
+                      </div>
+                    </CollapsibleTrigger>
+                    <CollapsibleContent>
+                      <PermissionsField key={index} index={index} id="P" name="" permissionPreset={singleRole.P} required={false} disabled={false} setPermissionSet={setRoleList} multiple />
+                      <button className={`rounded-xl p-2 text-white text-lg align-middle bg-custom-1 my-3`} onClick={()=>editRoles(index)}>Save Changes for {singleRole.N}</button>
+                    </CollapsibleContent>
+                  </Collapsible>
+                )
+              })}
             </div>
-          </CollapsibleTrigger>
-          <CollapsibleContent>
-            <PermissionSetter setter={setNewRole} permissionSet={role.P} />
-          </CollapsibleContent>
-        </Collapsible>
-        )
-      })}
-
-      <div><button className={`${CreateButtonStyling}`} onClick={editRoles}>Save</button></div>
-      
+            
+          </div>     
+      }
     </div>
   )
 }
