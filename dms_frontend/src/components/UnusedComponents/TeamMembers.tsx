@@ -46,7 +46,7 @@ function TeamMembers() {
 				</div>
 				
 				<div className='flex-auto'>
-					<Filter setter={setSearchString} listsAreSame={true} labelList={Object.keys(members)} setPlaceholder={false} />
+					<Filter setter={setSearchString} valueList={Object.keys(members)} setPlaceholder={false} />
 				</div>
 
 				<div className="">

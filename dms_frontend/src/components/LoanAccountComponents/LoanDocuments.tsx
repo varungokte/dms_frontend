@@ -191,9 +191,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
           {sectionDetails.type=="doc"
             ?<></>
             :sectionDetails.type=="cov"
-              ?<Filter setter={setPriority} listsAreSame={false} 
-                labelList={CovenantTypeList}// valueList={EnumIteratorKeys(CovenantType).map(val=>{return Number(val)+1})}
-              />
+              ?<Filter setter={setPriority} valueList={CovenantTypeList}/>
               :<></>
           }
         </div>
