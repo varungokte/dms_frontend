@@ -15,8 +15,6 @@ function Dashboard() {
 				<div><button onClick={showToken}>click</button></div>
 			</div>
 			<br/>
-			<div>
-			</div>
 		</div>
 		
 	)
