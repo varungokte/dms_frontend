@@ -17,7 +17,7 @@ function GenerateLoanID(props:any){
       if (res.status==422)
         setErrorMessage(<p className="text-red-600">This Agreement ID has been taken. Please enter another one.</p>)
       else if (res.status!==200)
-        setErrorMessage(<p className="text-yellow-600">Please try again later.</p>)
+        setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
       else{
         props.setAID(res.obj.AID);
         props.setLoanId(res.obj._loanId)
@@ -68,7 +68,7 @@ function GenerateLoanID(props:any){
         <hr className="w-7/12 m-auto" />
         <br/>
         <div className="text-center">
-          <button className="text-white bg-green-600 rounded-xl h-12 w-36 my-1" onClick={systemGeneratedId}>Generate Random ID</button>
+          <button className="text-white bg-green-600 rounded-xl h-12 p-2 my-1" onClick={systemGeneratedId}>Generate Random ID</button>
         </div>
         {errorMessage}
       </div>

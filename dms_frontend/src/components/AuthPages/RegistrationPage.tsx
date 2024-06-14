@@ -8,7 +8,7 @@ export const RegistrationPage = () => {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [maximumUsers, /* setMaximumUsers */] = useState(1);
-	const [zone, /* setZone */] = useState(1);
+	const [zone, /* setZone */] = useState("West");
 	const [reportingManager,/* setReportingManager */] = useState("ABC");
 	const [isManager, /* setIsManager */]  = useState(true);
 	const [message, setMessage] = useState(<></>);

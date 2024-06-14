@@ -6,7 +6,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "../ui/toaster";
 
-import { ContactType, EnumIteratorKeys, EnumIteratorValues } from "../BasicComponents/Constants";
+import { ContactTypeList, EmailRecipientList } from "../../../Constants";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import Filter from "../BasicComponents/Filter";
 import FormDialog from "../FormComponents/FormDialog";
@@ -26,14 +26,14 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
 
   const [fieldList] = useState<any>([
     { category: "grid", row:3, sectionName:"", fields: [
-      { id: "CT", type: "select", name: "Contact Type", options: EnumIteratorValues(ContactType), required:true },
-      { id: "CE", type:"email", name: "Email Address", required:true, immutable:true }, 
-      { id: "RT", type:"select", name: "Email Recipient Type", options: ["To", "Cc","Bcc"] },
+      { id: "CT", type: "select", name: "Contact Type", options: ContactTypeList, required:true },
       { id: "CN", type:"text", name: "Company Name", required:true },
-      { id: "D", type:"text", name: "Designation", required:true },
       { id: "PN", type:"text", name: "Contact Person Name",required:true },
+      { id: "D", type:"text", name: "Designation", required:true },
       { id: "MN", type:"text", name: "Mobile Number" },
       { id: "LN", type:"text", name: "Landline Number" },
+      { id: "CE", type:"email", name: "Email Address", required:true, immutable:true }, 
+      { id: "RT", type:"select", name: "Email Recipient Type", options:EmailRecipientList },
     ]}, 
     { category: "grid", row: 2, sectionName:"Billing Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "BA", type:"text", name: "Bulding/Street/Locality Name" },
@@ -71,12 +71,12 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       getContacts(loanId).then(res=>{
         const obj:any={};
         res.map((contact:any)=>{
-          if (Number(contact.CT)==0)
+          if (contact.CT=="-")
             return;
-          if (obj[Number(contact.CT)])
-            obj[Number(contact.CT)].push(contact);  
+          if (obj[contact.CT])
+            obj[contact.CT].push(contact);  
           else
-            obj[Number(contact.CT)] = [contact];
+            obj[contact.CT] = [contact];
         })
         setContacts(obj);
         setAdded(false);
@@ -117,7 +117,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
       }
 
       return res;
-    }    
+    }
   }
 
   const editContact = () =>{
@@ -160,7 +160,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
         </div>
 
         <div className="flex-auto">
-          <Filter setter={setRole} listsAreSame={false} labelList={EnumIteratorValues(ContactType)} valueList={EnumIteratorKeys(ContactType)}/>
+          <Filter setter={setRole} valueList={ContactTypeList}/>
         </div>
       
         <div className="mr-3">
@@ -256,7 +256,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
                   <CardContent className="text-left">
                     <p className="font-medium">{person.PN || "person_name"}</p>
                     <p className="font-light">{person.CE || "email"}</p>
-                    <p className="font-light">{ContactType[role]}</p>     
+                    <p className="font-light">{role}</p>     
                     <br/>
                   </CardContent>
                 </Card>

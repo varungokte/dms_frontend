@@ -170,7 +170,7 @@ function SingleDealDocuments(props:{loanId:string, sectionDetails:SectionDetails
           />
           <BodyRowsMapping list={docData} 
             columns={["N", "C", "PL","EL","P", "SD","ED","S"]} 
-            dataType={["text","transaction","text","text","priority","date","date","docStatus","action"]}
+            dataType={["text","text","text","text","priority","date","date","docStatus","action"]}
             cellClassName={["text-center","text-center","text-center","text-center","text-center","text-center","text-center","text-center"]}
             searchRows={[]} filterRows={[]}
             action={

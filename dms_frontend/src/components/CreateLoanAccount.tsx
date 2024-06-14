@@ -33,7 +33,9 @@ function CreateLoanAccount() {
   const [preexistingData, setPreexistingData] = useState<FieldValues>();
   
   const [okToFrolic, setOkToFrolic] = useState(state.linkSource=="CREATE"?false:true); //When false, user cannot go to other pages
-  const [unsavedWarning, setUnsavedWarning] = useState(false); //when true, user will get a pop-up warning
+  const [unsavedWarning, setUnsavedWarning] = useState(false); //when true, user will get a pop-up warning beacuse changes have been made
+  const [changesHaveBeenMade, setChangesHaveBeenMade] = useState(false);
+  const [enableDocumentSections, setEnableDocumentSections] = useState(false);
   
   const [showSecurityDetails, setShowSecurityDetails] = useState(true);
   const [dataHasLoaded, setDataHasLoaded] = useState(state.linkSource=="CREATE"?true:false);
@@ -45,7 +47,7 @@ function CreateLoanAccount() {
     { name: "Bank Details", component: BankDetails },
     { name: "Ratings", component: Ratings },
     { name: "Contact Details", component: ContactDetails },
-    { name: "Relationship Mapping", component: RelationshipMapping },
+    { name: "Select Team", component: RelationshipMapping },
     { name: "Transaction Documents", component: LoanDocuments },
     { name: "Compliance Documents", component: LoanDocuments },
     { name: "Covenants", component: LoanDocuments },
@@ -55,7 +57,7 @@ function CreateLoanAccount() {
 
   const getOldData = async () => {
     const res = await getLoanFields(loanId);
-    console.log("preexisting data",res);
+    //console.log("preexisting data",res);
     if (res["ST"] && res["ST"]==2)
       setShowSecurityDetails(false);
     if (res["CN"])
@@ -73,10 +75,15 @@ function CreateLoanAccount() {
       getOldData();
   },[currentSection]) */
 
+  useEffect(()=>{
+    if (currentSection>0 && currentSection<5 && changesHaveBeenMade){
+      getOldData().then(()=>{
+        setChangesHaveBeenMade(false);
+      });
+    }
+  },[changesHaveBeenMade])
 
   const goToNextSection = async () => {
-    if (currentSection>0 && currentSection<5)
-      await getOldData();
     const sectionCount = formSections.length-1;
     setCurrentSection((curr)=>{
       if (curr===sectionCount) return sectionCount 
@@ -98,7 +105,7 @@ function CreateLoanAccount() {
               {formSections.map((section, index:number)=>{
                 return(
                   <Tooltip key={index}>
-                      <TooltipTrigger key={index} disabled={!okToFrolic || index==0}
+                      <TooltipTrigger key={index} disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
                         className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
                         onClick={()=>{
                           unsavedWarning
@@ -114,10 +121,16 @@ function CreateLoanAccount() {
                         </div>
                       </TooltipTrigger>
                     {!okToFrolic && currentSection==1 && index>1
-                    ?<TooltipContent className="bg-white">
-                      <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
-                    </TooltipContent>
-                    :<></>}
+                      ?<TooltipContent className="bg-white">
+                        <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
+                      </TooltipContent>
+                      
+                      :!enableDocumentSections && index>=7
+                        ?<TooltipContent className="bg-white">
+                          <p className="">Please <span className="font-bold">select a team</span> to move to this page</p>
+                        </TooltipContent>
+                        :<></>
+                    }
                   </Tooltip>
                 )
               })}
@@ -140,6 +153,8 @@ function CreateLoanAccount() {
               setCurrentSection: setCurrentSection,
               goToNextSection: goToNextSection,
               setUnsavedWarning: setUnsavedWarning,
+              setChangesHaveBeenMade:setChangesHaveBeenMade,
+              setEnableDocumentSections:setEnableDocumentSections,
               label: formSections[currentSection].name,
               setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:()=>{},
               showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:false,

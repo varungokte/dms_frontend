@@ -10,7 +10,7 @@ function LoanDocumentView(props:{docData:any, label:string, fieldList:any, field
       <HeaderRows 
         headingRows={["Document Name", "Document Category", "Physical Location", "Execution Location", "Priority", "Start Date", "End Date", "Action"]} 
       />
-      <BodyRowsMapping list={props.docData} columns={["N", "C", "PL","EL","P", "SD","ED"]} dataType={["text","transaction","text","text","priority","date","date","action"]}
+      <BodyRowsMapping list={props.docData} columns={["N", "C", "PL","EL","P", "SD","ED"]} dataType={["text","text","text","text","priority","date","date","action"]}
         searchRows={[]} filterRows={[]}
         action = {props.docData.map((item:any, index:number)=>{
           item;

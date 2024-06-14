@@ -1,17 +1,14 @@
 import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
-//import {socket} from "./socket";
 import useGlobalContext from './../GlobalContext';
 import './styling.css';
-
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
+//import {socket} from "./socket";
 
 import Dashboard from './components/Dashboard';
 import LoanAccount from './components/LoanAccount';
 import CreateLoanAccount from './components/CreateLoanAccount';
 import Products from './components/Products';
-//import TeamMembers from './components/UnusedComponents/TeamMembers';
 import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
 import RoleManagement from './components/RoleManagement';
@@ -21,15 +18,14 @@ import TeamManagement from './components/TeamManagement';
 //import CriticalCases from './components/CriticalCases';
 //import Reports from './components/Reports';
 //import Reminders from './components/Reminders';
+//import Masters from './components/Masters';
+
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
 
+import {DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, /* ZoneIcon, ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */} from "./../src/components/static/PanelIcons"
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
-
-import {DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, /* ZoneIcon, ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */} from "./../src/components/static/PanelIcons"
-
-/* import Masters from './components/Masters';
-import DocumentViewer from './components/BasicComponents/DocumentViewer'; */
 
 
 export const MenuRouter = () => {
@@ -90,7 +86,7 @@ export const MenuRouter = () => {
 			<DropdownMenu>
 				<DropdownMenuTrigger className='mb-3 mx-6'>
 					<div className="flex flex-row">
-						<div><ProfileIcon name={res["N"]} size="small" showStatus={true/* socketIsConnected */}/></div>
+						<div><ProfileIcon name={res["N"]||"User"} size="small" showStatus={true/* socketIsConnected */}/></div>
 						<div className="text-left mx-3">
 							<p>{res["N"]}</p>
 							<p className="font-light">No Role</p>
@@ -110,6 +106,7 @@ export const MenuRouter = () => {
 		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
 		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
 		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
+		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
 		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
 		{ name: "Transaction Documents", path:"/transaction", component: DocumentList, icon: TransIcon },
 		{ name: "Compliance Documents", path:"/compliance", component: DocumentList, icon: CompIcon },
@@ -117,7 +114,6 @@ export const MenuRouter = () => {
 		{ name: "Condition Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Condition Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
-		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
 		//{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },

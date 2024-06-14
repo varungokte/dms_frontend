@@ -52,7 +52,7 @@ function LoanAccount() {
               />
               <BodyRowsMapping 
                 list={accountList} columns={["AID", "CN", "GN", "Z", "SA"]}
-                dataType={["index","text","text","text","zone","text", "action"]} 
+                dataType={["index","text","text","text","text","text", "action"]} 
                 cellClassName={["font-medium", "text-custom-1","","","","",""]} 
                 searchRows={[]} filterRows={[]}
                 action = {accountList.map((item:any, index:number)=>{

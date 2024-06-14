@@ -6,10 +6,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import {useDropzone} from "react-dropzone";
 import { Upload } from "lucide-react";
-import { EnumIteratorValues, FileTypes } from "../BasicComponents/Constants";
+
 import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
 import { FormDialogDocumentTypes } from "DataTypes";
+import { FileTypeList } from "../../../Constants";
 
 function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any }){
   const [open, setOpen] = useState(false);
@@ -287,7 +288,7 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
       </div>
       <br/>
       <div className="flex flex-row">
-        <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{EnumIteratorValues(FileTypes).map(ft=>" "+ft).toString()}</p>
+        <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{FileTypeList.map(ft=>" "+ft).toString()}</p>
         {/* {props.edit?<button className="text-custom-1" onClick={()=>getUploadedFiles()}>Get Uploaded Files</button>:<></>} */}
       </div>
       <br/>

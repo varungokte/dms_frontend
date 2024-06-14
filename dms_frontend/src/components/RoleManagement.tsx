@@ -59,7 +59,7 @@ function RoleManagement(){
   const createRole = async (userData:FieldValues) => {
     const data:FieldValues = {}
     data["N"] = userData["N"];
-    data["P"] = JSON.stringify(userData["UP"]);
+    data["P"] = JSON.stringify(userData["P"]);
     
     console.log("SUBMITTED",data)
 
@@ -117,7 +117,6 @@ function RoleManagement(){
             <p className="mx-7 text-2xl font-bold">Defined User Roles</p>
             <div>
               {roleList.map((singleRole:any,index:number)=>{
-                console.log("SINGLE ROLE",singleRole)
                 return(
                   <Collapsible key={index} className="mx-7 my-3">
                     <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...open]; arr[index]=!open[index]; setOpen(arr)}}>

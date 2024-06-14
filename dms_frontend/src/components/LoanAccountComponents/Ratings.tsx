@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { EnumIteratorValues, RatingAgencies, RatingOutlook, RatingTypes } from "../BasicComponents/Constants";
+import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "../../../Constants";
 import { FieldValues, FormFieldDetails } from "DataTypes";
 
 import { Table } from "@/components/ui/table"
@@ -15,19 +15,19 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({
-    "A":-1, "T":-1,
-    "DT":null, "O":-1,
+    "A":"", "T":"",
+    "DT":null, "O":"",
     "L":"", "R":"",
   });
 
   const [fieldList] = useState<FormFieldDetails>([
     { category: "grid", row:2, sectionName:"", fields: [
-      { id: "A", type: "select", name: "Rating Agency", options: EnumIteratorValues(RatingAgencies), required:true },
-      { id: "T", type: "select", name: "Rating Type", options: EnumIteratorValues(RatingTypes), required:true },
+      { id: "A", type: "select", name: "Rating Agency", options: RatingAgencyList, required:true },
+      { id: "T", type: "select", name: "Rating Type", options: RatingTypeList, required:true },
       { id: "DT", type: "date", name: "Date", required:true },
-      { id: "O", type: "select", name: "Outlook", options: EnumIteratorValues(RatingOutlook), required:true },
+      { id: "O", type: "select", name: "Outlook", options: RatingOutlookList, required:true },
       { id: "L", type: "text", name: "Link", required:true },
-      { id: "R", type: "text", name: "Rating", required:true },
+      { id: "V", type: "text", name: "Rating Value", required:true },
     ]}
   ]);
 
@@ -40,6 +40,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
   useEffect(()=>{
     if (added){
       getRatingsList(props.loanId).then((res)=>{
+        console.log(res.arr)
         if (res.status==200)
           setRatingsList(res.arr);
         else
@@ -52,7 +53,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
     }
   },[added])
 
-  const createRating = (userValues:any) =>{
+  const createRating = async (userValues:any) =>{
     const data:FieldValues = {};
 
     for (let i=0; i<fieldList.length; i++){
@@ -67,19 +68,17 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
       }
     }
 
-    if (Object.keys(data).length!=0){
-      console.log("DATA", data)
-      data["AID"]= props.AID;
-      data["_loanId"]= props.loanId;
+    data["AID"]= props.AID;
+    data["_loanId"]= props.loanId;
+    console.log("SUBMITTED ratings NOW", data);
 
-      addRating(data).then(res=>{
-        console.log("RESPONSE",res);
-        setFieldValues({});
-        setAdded(true);
-      }).catch(err=>{
-        console.log(err);
-      })
+    const res  = await addRating(data);
+    if (res==200){
+      setFieldValues({});
+      setAdded(true);
     }
+    
+    return res;
   }
 
   return(
@@ -102,10 +101,12 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
           ?ratingsList.length==0
             ?<EmptyPageMessage sectionName="ratings" />
             :<Table className="border">
-              <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating"]} />
+              <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]}
+                headingClassNames={["text-center","text-center","text-center","text-center","text-center","text-center"]}
+              />
 
-              <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","R",]} dataType={["ratingAgency", "ratingType", "date", "ratingOutlook", "text", "text"]}
-                searchRows={[]} filterRows={[]} cellClassName={["","","","","text-blue-500",""]} 
+              <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","V",]} dataType={["text", "text", "date", "text", "text", "text"]}
+                searchRows={[]} filterRows={[]} cellClassName={["text-center","text-center","text-center","text-center","text-center text-blue-500","text-center"]} 
               />
           </Table>
           :<LoadingMessage sectionName="ratings" />

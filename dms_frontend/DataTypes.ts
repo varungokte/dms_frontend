@@ -1,16 +1,8 @@
 type FieldValues = {
-  [key:string]: any
+  [key:string]: any | any[]
 };
 
-type TableDataTypes = (
-  "index" | "text" | "date" | 
-  "priority" | "frequency" |
-  "docStatus" | "userStatus" | "teamStatus" | 
-  "role" | "zone" | 
-  "ratingAgency" | "ratingType" | "ratingOutlook"| 
-  "transaction" | "file" | 
-  "objName" | "action" | "countTeam"
-)[];
+type TableDataTypes = ( "index" | "text" | "date" | "priority" | "frequency" | "docStatus" | "userStatus" | "teamStatus" | "objName" | "action" | "countTeam" )[];
 
 type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox"
 

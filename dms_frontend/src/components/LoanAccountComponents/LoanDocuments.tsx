@@ -12,7 +12,8 @@ import Filter from "../BasicComponents/Filter";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { Toaster } from "../ui/toaster";
-import { PriorityValues, EnumIteratorValues, TransactionDocumentTypes, ComplianceDocumentTypes, CovenantDocumentTypes, ConditionPrecedentTypes, ConditionSubsequentTypes, CovenantType, FrequencyType, EnumIteratorKeys } from "../BasicComponents/Constants";
+import { CovenantTypeList, CovenantCategoryList, FrequencyList, TransactionCategoryList, ComplianceCategoryList, ConditionPrecedentCategoryList, ConditionSubsequentCategoryList } from "../../../Constants";
+import { PriorityList } from "../../../StatusLists";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
@@ -30,7 +31,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         { category:"single", id:"N", name:"Document Name", type:"text", required:true },
         { category:"grid", row:2, fields:[
           { id:"C", name:"Document Category", type:"select", options:documentOptions, required:false, immutable:true },
-          { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true },
+          { id:"P", name:"Priority", type:"select", options:Object.keys(PriorityList), required:true },
           { id:"SD", name:"Start Date", type:"date", required:true },
           { id:"ED", name:"End Date", type:"date", required:true },
           { id:"PL", name:"Physical Location", type:"text" },
@@ -43,11 +44,11 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
       return [
         { category:"grid", row:2, fields:[
           { id:"N", name:"Covenant Name", type:"text", required:true },
-          { id:"T", name:"Covenant Type", type:"select", options:EnumIteratorValues(CovenantType), required:true },
-          { id:"C", name:"Category Type", type:"select", options:EnumIteratorValues(CovenantDocumentTypes), required:true},
-          { id:"P", name:"Priority", type:"select", options:EnumIteratorValues(PriorityValues), required:true},
+          { id:"T", name:"Covenant Type", type:"select", options:CovenantTypeList, required:true },
+          { id:"C", name:"Category Type", type:"select", options:CovenantCategoryList, required:true},
+          { id:"P", name:"Priority", type:"select", options:Object.keys(PriorityList), required:true},
         ]},
-        { category:"single", id:"F", name:"Frequency", type:"select", options:EnumIteratorValues(FrequencyType) },
+        { category:"single", id:"F", name:"Frequency", type:"select", options:FrequencyList },
         { category:"grid", row:2, fields:[  
           { id:"SD", name:"Start Date", type:"date", required:true },
           { id:"ED", name:"End Date", type:"date", required:true },
@@ -63,7 +64,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         { category:"single", id:"N", name:"Condition Name", type:"text" },
         { category:"grid", row:2, fields:[
           { id:"C", name:"Condition Category", type:"select", options:documentOptions },
-          { id:"P", name: "Priority", type:"select", options:EnumIteratorValues(PriorityValues)},
+          { id:"P", name: "Priority", type:"select", options:Object.keys(PriorityList)},
           { id:"SD", name:"Start Date", type:"date", required:true },
           { id:"ED", name:"End Date", type:"date", required:true },
           { id:"PL", name:"Physical Location", type:"text" },
@@ -74,19 +75,19 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     }
 
     if (props.label=="Transaction Documents")
-      return { sectionName: "TD", type:"doc", fieldList: documentFieldList(EnumIteratorValues(TransactionDocumentTypes)) }
+      return { sectionName: "TD", type:"doc", fieldList: documentFieldList(TransactionCategoryList) }
     
     else if (props.label=="Compliance Documents")
-      return { sectionName: "CD", type:"doc", fieldList: documentFieldList(EnumIteratorValues(ComplianceDocumentTypes)) }
+      return { sectionName: "CD", type:"doc", fieldList: documentFieldList(ComplianceCategoryList) }
     
     else if (props.label=="Covenants")
       return { sectionName: "C", type:"cov", fieldList: covenantFieldList() }
     
     else if (props.label=="Condition Precedent")
-      return { sectionName: "CP", type:"con", fieldList: conditionsFieldList(EnumIteratorValues(ConditionPrecedentTypes)) }
+      return { sectionName: "CP", type:"con", fieldList: conditionsFieldList(ConditionPrecedentCategoryList) }
     
     else if (props.label=="Condition Subsequent")
-      return { sectionName: "CS", type:"con",fieldList: conditionsFieldList(EnumIteratorValues(ConditionSubsequentTypes)) }
+      return { sectionName: "CS", type:"con",fieldList: conditionsFieldList(ConditionSubsequentCategoryList) }
     
     else 
       return { sectionName: "undefined", type:"undefined", fieldList: [] }
@@ -96,7 +97,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
   const [added, setAdded] = useState(true);
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   const [fileList, setFileList] = useState<any>([]);
-  const [priority, setPriority] = useState(1);
+  const [priority, setPriority] = useState(CovenantTypeList[1]);
   
   const [uploadField] = useState(
     { id: "Docs", name:"Document Upload", fileList: fileList }
@@ -191,7 +192,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
             ?<></>
             :sectionDetails.type=="cov"
               ?<Filter setter={setPriority} listsAreSame={false} 
-                labelList={EnumIteratorValues(CovenantType)} valueList={EnumIteratorKeys(CovenantType).map(val=>{return Number(val)+1})}
+                labelList={CovenantTypeList}// valueList={EnumIteratorKeys(CovenantType).map(val=>{return Number(val)+1})}
               />
               :<></>
           }

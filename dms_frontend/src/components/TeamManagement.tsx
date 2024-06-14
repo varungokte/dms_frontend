@@ -58,8 +58,8 @@ function TeamManagement(){
   const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
-    searchString;
     selectedTeam;
+    searchString;
     teamStatus;
     if (added){
       getTeamsList().then(res=>{
@@ -72,19 +72,24 @@ function TeamManagement(){
       })
       setAdded(false);
     }
-  },[added])
+  },[added]);
 
-  const createTeam = async (userValues:any) => {
+  const teamMembersToArr = (userValues:any) =>{
     const data:any={};
     data["N"] = userValues["N"];
-    data["L"] = userValues["L"];
+    data["L"] = userValues["L"].values?userValues["L"].values["E"]:userValues["L"];
     const sections = ["TD","CD","C","CP","CS"];
     sections.map(name=>{
       data[name]={
-        M:userValues[`${name}M`].map((obj:any)=>obj),
-        C:userValues[`${name}M`].map((obj:any)=>obj)
+        M:userValues[`${name}M`].map((obj:any)=>obj.values?obj.values["E"]:obj),
+        C:userValues[`${name}C`].map((obj:any)=>obj.values?obj.values["E"]:obj)
       }
     });
+    return data;
+  }
+
+  const createTeam = async (userValues:any) => {
+    const data = teamMembersToArr(userValues);
     console.log("SUBMITTED",data);
 
     const res = await addTeam(data);
@@ -102,7 +107,12 @@ function TeamManagement(){
     return res;
   }
 
-  const editTeam = () => {}
+  const editTeam = (userValues:any) => {
+    console.log("raw data",userValues);
+    const data = teamMembersToArr(userValues);
+    console.log("SUBMITTED", data)
+    return 200;
+  }
 
   //const deleteTeam = () => {}
 
@@ -127,10 +137,7 @@ function TeamManagement(){
           ?teamList.length==0
             ?<EmptyPageMessage sectionName="teams"/>
             :<Table className="bg-white rounded-xl">
-              <HeaderRows
-                headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}
-                headingClassNames={[""]}
-              />
+              <HeaderRows headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}  />
               <BodyRowsMapping 
                 list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "text", "countTeam","date", "teamStatus", "action"]}
                 searchRows={[]} filterRows={[]}
@@ -138,10 +145,11 @@ function TeamManagement(){
                 action={teamList.map((_:any, index:number)=>{
                   return(
                     <div className="flex flex-row">
-                      <FormDialog key={index} index={index} edit={true} type="team"
+                      <FormDialog key={index} index={index} edit type="team"
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                         formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
                         form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={teamList[index]}
+                        suggestions="RM"
                       />
                       {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
                     </div>

@@ -22,16 +22,8 @@ function Zones() {
 	useTitle("Zones");
 	
 	const [currentZone, setCurrentZone] = useState("");
-
-	//An object where the 
-	//key: zone name
-	//value: array where [percent_complete, money(in crores of INR), total_number_of_facilities] NOTE all of these are of Number type
-
-	//Currency array: [currency(INR,USD,etc.), amount(crore,billion,etc.)]
 	const [currency] = useState(["INR", "Cr."])
 
-	//An array of arrays for details of a specific zone: [deal_1, deal_2, deal_3] where each deal is an array 
-	//Single deal details: [deal_id, deal_name, monitoring_manager, start_date]
 	const [zoneDetails] = useState([
 		{ AID:1, CN:"Loan Company" },
 		{ AID:2,	CN:"Construction Company" }

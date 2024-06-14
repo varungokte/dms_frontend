@@ -3,7 +3,7 @@ import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { EnumIteratorValues, ZoneList } from "./BasicComponents/Constants";
+import { ZoneList } from "../../Constants";
 import FormDialog from "./FormComponents/FormDialog";
 import Search from "./BasicComponents/Search";
 
@@ -24,7 +24,7 @@ function UserManagement(){
       { id: "N", name: "Name", type: "text", required:true },
       { id: "E", name: "Email", type: "email", immutable: true, required:true },
       { id: "P", name: "Password", type: "password", required:true },
-      { id: "Z", name: "Zone", type: "select", options: EnumIteratorValues(ZoneList), required:true },
+      { id: "Z", name: "Zone", type: "select", options: ZoneList, required:true },
     ]},
     { category:"single", id: "RM", name: "Reporting Manager", type:"combobox", required:true },
     { category:"single", id: "M", name: "User is a Manager", type:"checkbox", required:false },
@@ -73,16 +73,10 @@ function UserManagement(){
         }
       }
     }
-    /* if (userValues["RM"]){
-      if (userValues["RM"]["values"]["E"]=="root"){
-        userValues["RM"]={};
-        userValues["RM"]["root"]="root";
-      }
-      else {
-        const obj = userValues["RM"]["values"];
-        userValues["RM"]={...obj}
-      }
-    } */
+    if (userValues["RM"]){
+      const email = userValues["RM"]["values"]["E"];
+      userValues["RM"]=email;
+    }
     
     console.log ("SUBMITTING DATA", userValues)
     
@@ -103,12 +97,8 @@ function UserManagement(){
     if (selectedUser==-1)
       return;
   
-   console.log("reached edit user");
-    const arr = userData[selectedUser];
+    console.log("reached edit user");
     const id = userData[selectedUser]["_id"];
-
-    console.log("THE SELECTED USER",arr, selectedUser,id)
-    
     userValues["_id"] = id;
 
     console.log("SUBMITTING", userValues);
@@ -158,20 +148,20 @@ function UserManagement(){
       <div className="m-7">
         {userData
           ?userData.length==0
-            ?<EmptyPageMessage sectionName="users" emotion={true} />
-            :<Table className="bg-white border-2 rounded-xl">
+            ?<EmptyPageMessage sectionName="users" emotion />
+            :<Table className="bg-white border-2 ro ded-xl">
               <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
               <BodyRowsMapping
-                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "zone","text", "userStatus", "action"]}
+                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "text","text", "userStatus", "action"]}
                 searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
                 setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
                 action = {userData.map((_:any, index:number)=>{
                   return(
                     <div className="flex flex-row">
-                      <FormDialog key={index} index={index} type="user" edit={true}
+                      <FormDialog key={index} index={index} type="user" edit
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                         formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
-                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]} suggestions="RM" getRoles={true}
+                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]} suggestions="RM" getRoles
                       />
                       {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */}
                     </div>

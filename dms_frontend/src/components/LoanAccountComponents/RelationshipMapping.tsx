@@ -6,7 +6,7 @@ import useGlobalContext from "./../../../GlobalContext";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
 
-function RelationshipMapping(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}){
+function RelationshipMapping(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setEnableDocumentSections:Function}){
   const [teamsList, setTeamList] = useState<any>();
 
   const { getTeamsList, selectTeam } = useGlobalContext();
@@ -34,7 +34,10 @@ function RelationshipMapping(props:{key:number,actionType: string, loanId: strin
     console.log("data",data)
     selectTeam(data).then(res=>{
       console.log("res",res);
-      props.goToNextSection();
+      if (res==200){
+        props.goToNextSection();
+        props.setEnableDocumentSections(true);
+      }
     }).catch(err=>{
       console.log("err",err);
     })

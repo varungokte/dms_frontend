@@ -2,16 +2,17 @@ import { useEffect, useState } from "react";
 import { FormRepeatableGrid, NumberField, DateField } from "../FormComponents/FormFields";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "./../../../GlobalContext";
+import { LoanSecurityTypeList } from "../../../Constants";
 
-function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}){
+function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setChangesHaveBeenMade:Function}){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
 
   const [fieldList] = useState([
-    { id:"S", name:"Share Percentage(%)", type:"number", required:false },
+    { id:"SP", name:"Share Percentage(%)", type:"number", required:false },
     { id:"DV", name:"Date of Valuation", type:"date",required:false },
     { id:"STV", name:"", type:"repeatable", fields:[
-      { id:"T", name:"Security Type", type:"select", options:[1,2],required:false },
+      { id:"T", name:"Security Type", type:"select", options:LoanSecurityTypeList,required:false },
       { id:"V", name:"Security Value", type:"number",required:false },
     ]}
   ]);
@@ -39,22 +40,23 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
     return all_fields_empty;
   }
 
+
   const compareFieldsToPreexisting = () => {
-    let no_changes = true;
+    let changes_have_been_made = false;
     for (let i=0; i<fieldList.length; i++){
       const id = fieldList[i].id;
       if (fieldValuesFixed[id] && props.preexistingValues[id]!=fieldValuesFixed[id])
-        no_changes= false;
+        changes_have_been_made= true;
       if (id=="STV"){
         for (let j=0; j<fieldValuesRepeatable.length; j++){
-          if (fieldValuesRepeatable[j]["T"] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues[id])
-          no_changes = false;
-          if (fieldValuesRepeatable[j]["V"] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues[id])
-          no_changes = false;
+          if (fieldValuesRepeatable[j]["T"] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues["STV"][j]["T"])
+            changes_have_been_made= true;
+          if (fieldValuesRepeatable[j]["V"] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues["STV"][j]["V"])
+            changes_have_been_made= true;
         }
       }
     }
-    return no_changes;
+    return changes_have_been_made;
   }
   
   useEffect(()=>{
@@ -63,8 +65,8 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
 
     const obj:any={};
 
-    if (props.preexistingValues["S"])
-      obj["S"] = props.preexistingValues["S"];
+    if (props.preexistingValues["SP"])
+      obj["SP"] = props.preexistingValues["SP"];
     
     if (props.preexistingValues["DV"])
       obj["DV"] = props.preexistingValues["DV"];
@@ -92,8 +94,8 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
 
   useEffect(()=>{
     let okToChange = areAllFieldsEmpty();
-    if (props.actionType=="EDIT" && Object.keys(props.preexistingValues).length!=0)
-      okToChange = okToChange && compareFieldsToPreexisting();
+    if (Object.keys(props.preexistingValues).length!=0)
+      okToChange = okToChange || !compareFieldsToPreexisting();
     props.setUnsavedWarning(!okToChange);
   },[fieldValuesFixed,fieldValuesRepeatable]);
 
@@ -104,14 +106,16 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
     if (Object.keys(fieldValuesFixed).length!=0 || fieldValuesRepeatable.length!=0){
       data["AID"]= props.AID;
       data["_loanId"]= props.loanId;
-      data["S"] = fieldValuesFixed["S"];
+      data["SP"] = fieldValuesFixed["SP"];
+      data["DV"] = fieldValuesFixed["DV"];
       data["STV"] = fieldValuesRepeatable;
 
-      console.log("SUBMITTED NOW",data);
       createLoan(data).then(res=> {
         console.log("RES", res);
-        if (res==200)
+        if (res==200){
           props.goToNextSection();
+          props.setChangesHaveBeenMade(true);
+        }
         else
           console.log("ERROR")
       }

@@ -3,16 +3,17 @@ import { BodyRowsMapping, HeaderRows } from "../../BasicComponents/Table";
 import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import DeleteConfirmation from "./../../BasicComponents/DeleteConfirmation";
 import edit_icon from "./../../static/edit_icon.svg";
+import { CovenantTypeList } from "./../../../../Constants";
 
-function LoanCovenantView(props:{priority:number,covData:any,label:string, fieldList:any, fieldValues:any, setFieldValues:Function, uploadField:any, fileList:any, setFileList:Function, editCovenantFunction:Function, deleteCovenantFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
+function LoanCovenantView(props:{priority:string,covData:any,label:string, fieldList:any, fieldValues:any, setFieldValues:Function, uploadField:any, fileList:any, setFileList:Function, editCovenantFunction:Function, deleteCovenantFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
   return (
-    props.priority==1
+    props.priority==CovenantTypeList[1]
       ?<Table className="border rounded-2xl">
         <HeaderRows headingRows={["Covenant Name","Frequency", "Physical Location", "Execution Location", "Start Date","End Date", "Priority", "Action"]} />
         <BodyRowsMapping
-          list={props.covData.filter((document:any)=>document["T"]==1)} columns={["N", "F","PL","EL", "SD", "ED","P"]} dataType={["text", "frequency", "text", "text", "text", "text", "priority", "action"]}
+          list={props.covData.filter((document:any)=>document["T"]==CovenantTypeList[1])} columns={["N", "F","PL","EL", "SD", "ED","P"]} dataType={["text", "frequency", "text", "text", "text", "text", "priority", "action"]}
           searchRows={[]} filterRows={[]}
-          action = {props.covData.filter((document:any)=>document["T"]==1).map((item:any, index:number)=>{
+          action = {props.covData.filter((document:any)=>document["T"]==CovenantTypeList[1]).map((item:any, index:number)=>{
             item;
             return(
               <div className="flex flex-row">
@@ -31,9 +32,9 @@ function LoanCovenantView(props:{priority:number,covData:any,label:string, field
       </Table>
       :<Table>
         <HeaderRows headingRows={["Covenant Name", "Physical Location", "Execution Location", "Start Date","End Date", "Priority", "Action"]} />
-        <BodyRowsMapping list={props.covData.filter((document:any)=>document["T"]==2)} columns={["N","PL","EL", "SD", "ED","P"]} dataType={["text", "text", "text", "date", "date", "priority", "action"]}
+        <BodyRowsMapping list={props.covData.filter((document:any)=>document["T"]==CovenantTypeList[2])} columns={["N","PL","EL", "SD", "ED","P"]} dataType={["text", "text", "text", "date", "date", "priority", "action"]}
           searchRows={[]} filterRows={[]}
-          action = {props.covData.filter((document:any)=>document["T"]==2).map((item:any, index:number)=>{
+          action = {props.covData.filter((document:any)=>document["T"]==CovenantTypeList[2]).map((item:any, index:number)=>{
             item;
             return(
               <div className="flex flex-row">

@@ -2,11 +2,10 @@ import { Dialog, DialogContent, DialogTrigger, } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import pdf_icon from "./../static/pdf_icon.svg";
 import xlsx_icon from "./../static/xlsx_icon.svg";
-
-import { FileStatusStyling, FileStatusValue } from "../BasicComponents/Constants";
 import { Plus } from "lucide-react";
 import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
 import { DialogTitle } from "@radix-ui/react-dialog";
+import { FileStatusList } from "../../../StatusLists";
 
 function FormDialogFiles(props:{triggerText:any}){
   const [files,setFiles] = useState<any>([]);
@@ -127,7 +126,7 @@ function FormDialogFiles(props:{triggerText:any}){
                     <p className="text-base font-light">{file.name}</p>
                     <p className="text-xs text-gray-500">{file.size} KB</p>
                   </div>
-                  <span className={`${FileStatusStyling[file.status]} mx-5`}> <span className="inline-block align-middle">{FileStatusValue[file.status]}</span></span>
+                  <span className={`${FileStatusList[file.status]} mx-5`}> <span className="inline-block align-middle">{file.status}</span></span>
                   <span className="inline-block align-middle"><DeleteConfirmation thing="file" deleteFunction={deleteFile} currIndex={index}/></span>
                 </div>
                 <hr/>
