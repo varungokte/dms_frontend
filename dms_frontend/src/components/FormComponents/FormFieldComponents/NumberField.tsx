@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import FieldLabel from "./FieldLabel";
 import { FieldValues } from "DataTypes";
-import { error } from "console";
 
 const number_to_words = (num:number, setMessage:Function, index:number|string):void => {
   const wordsClassName = "mx-2 text-amber-800 text-sm";
@@ -162,7 +161,7 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
             if (amountFields.includes(props.id))
               number_to_words(val?Number(val):-1,setWordsMessage,props.index);
             
-            const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage)
+            const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage);
           
             props.setPrefillValues((curr:any)=>{
               curr[props.id]=val; 
