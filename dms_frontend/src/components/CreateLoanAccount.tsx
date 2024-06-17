@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 
 import ContactDetails from "./LoanAccountComponents/ContactDetails";
@@ -16,19 +16,25 @@ import { useLocation } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import { FieldValues } from "DataTypes";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
 
   const {getLoanFields, useTitle} = useGlobalContext();
 
-  useTitle(`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`)
+  const navRef = useRef<any>(null);
+  const sectionRef = useRef<any>([]);
+
+  useTitle(`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`);
   
   const [actionType] = useState<"CREATE"|"EDIT">(state.linkSource);
 
   const [loanId, setLoanId] = useState(state.linkSource=="CREATE"?"":state.loanId);
   const [AID, setAID] = useState(state.linkSource=="CREATE"?"":state.AID);
   const [currentSection, setCurrentSection] = useState(state.linkSource=="CREATE"?0:1);
+  const [navbarLastSections, setNavbarLastSections] = useState([0]);//The last section to be displayed on the navbar
+  const [jumpNumber, setJumpNumber] = useState(0);
 
   const [preexistingData, setPreexistingData] = useState<FieldValues>();
   
@@ -90,7 +96,47 @@ function CreateLoanAccount() {
       else return curr+1
     });
   };
-	
+
+  const navigateForward = () => {
+    if (navbarLastSections && navbarLastSections[jumpNumber+1]){
+      sectionRef.current[navbarLastSections[jumpNumber+1]].scrollIntoView({inline:"start"});
+      setJumpNumber(curr=>curr+1)
+    }
+    console.log("get bounding client rect", sectionRef.current[4].getBoundingClientRect());
+  }
+
+  const backwardNavigation = () => {
+    if (navbarLastSections && navbarLastSections[jumpNumber-1]!=undefined){
+      sectionRef.current[navbarLastSections[jumpNumber-1]].scrollIntoView({inline:"start"});
+      setJumpNumber(curr=>curr-1)
+    }
+  }
+
+  const calculateSectionBreaks = () =>{
+    console.log(navRef.current.clientWidth)
+    let total_width=0;
+    const breaks:number[]=[];
+      for (let i=0; i<formSections.length; i++){
+        total_width+=sectionRef.current[i].offsetWidth+24;
+        if (total_width>=navRef.current.clientWidth){
+          breaks.push(i);
+          total_width=0;
+        }
+      }
+      setNavbarLastSections(curr=>curr.concat(breaks));
+    console.log(breaks);
+  }
+
+  useEffect(()=>{
+    console.log(navbarLastSections);
+    console.log("get bounding client rect", sectionRef.current[9].getBoundingClientRect());
+  },[navbarLastSections])
+
+  useEffect(()=>{
+    calculateSectionBreaks();
+
+  },[])
+  
   return(
     <div style={{width:"relative"}}>
 			<p className="text-3xl font-bold mx-7 my-2 page-heading">{(actionType.charAt(0).toUpperCase()+actionType.toLowerCase().slice(1))} Loan Account</p>
@@ -98,14 +144,14 @@ function CreateLoanAccount() {
       <br/>
       <div className="bg-white mx-7 p-2 rounded-xl">
         <div className="flex flex-row" style={{position:"relative"}}>
-          {/* <button><ChevronLeft className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={previousSection} /></button> */}
-            <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap' }}>
-
-            <TooltipProvider>
-              {formSections.map((section, index:number)=>{
-                return(
-                  <Tooltip key={index}>
-                      <TooltipTrigger key={index} disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
+          <button><ChevronLeft className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={backwardNavigation}/></button>
+            <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap', scrollbarWidth:"none" }} className="" ref={navRef}>
+              <TooltipProvider>
+                {formSections.map((section, index:number)=>{
+                  return(
+                    <Tooltip key={index}>
+                      <TooltipTrigger key={index} ref={el=>sectionRef.current[index]=el} 
+                        disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
                         className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
                         onClick={()=>{
                           unsavedWarning
@@ -120,23 +166,23 @@ function CreateLoanAccount() {
                           <div className="m-auto">{section.name}</div>
                         </div>
                       </TooltipTrigger>
-                    {!okToFrolic && currentSection==1 && index>1
-                      ?<TooltipContent className="bg-white">
-                        <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
-                      </TooltipContent>
-                      
-                      :!enableDocumentSections && index>=7
+                      {!okToFrolic && currentSection==1 && index>1
                         ?<TooltipContent className="bg-white">
-                          <p className="">Please <span className="font-bold">select a team</span> to move to this page</p>
+                          <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
                         </TooltipContent>
-                        :<></>
-                    }
-                  </Tooltip>
-                )
-              })}
+                        
+                        :!enableDocumentSections && currentSection!=0 && index>=7
+                          ?<TooltipContent className="bg-white">
+                            <p className="">Please <span className="font-bold">select a team</span> to move to this page</p>
+                          </TooltipContent>
+                          :<></>
+                      }
+                    </Tooltip>
+                  )
+                })}
               </TooltipProvider>
             </div>
-          {/* <button><ChevronRight className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={nextSection}/></button> */}
+          <button><ChevronRight className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={navigateForward}/></button>
         </div>
 
         <div className="mx-10">

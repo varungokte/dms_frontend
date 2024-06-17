@@ -29,7 +29,6 @@ import ProfileIcon from './components/BasicComponents/ProfileIcon';
 
 
 export const MenuRouter = () => {
-	const [currLink, setCurrLink] = useState("");
 	const [hover,setHover] = useState(-1);
 	const navigate = useNavigate();
 	const {getDecryptedToken} = useGlobalContext();
@@ -130,22 +129,15 @@ export const MenuRouter = () => {
 				<div className='mx-8 my-5'>
 					{componentList.map((item:any,index:number)=>{
 						return (
-							<NavLink to={item.path} key={index}
-								onClick={()=>setCurrLink(item.path)}
-								onMouseEnter={()=>setHover(index)} 
-								onMouseLeave={()=>setHover(-1)}
-								className={({ isActive, }) => {
-									if (isActive)
-										setCurrLink(item.path);
-									return "bg-red-800";
-								}}
-							>
-								<div className={`p-3 text-sm pageLink py-3 my-3 rounded-xl ${(currLink===item.path)?"bg-white text-custom-1":"text-white"}`}>
-									<div className='flex flex-row'>
-										{item.icon?createElement(item.icon, {fill: (currLink===item.path || hover===index)?"rgba(80, 65, 188, 1)":"white"}):""}
-										<div className="mx-5">{item.name}</div>
+							<NavLink to={item.path} key={index}	onMouseEnter={()=>setHover(index)} onMouseLeave={()=>setHover(-1)}>
+								{({ isActive }) => (
+									<div className={`p-3 text-sm pageLink py-3 my-3 rounded-xl ${isActive?"bg-white text-custom-1":"text-white"}`}>
+										<div className='flex flex-row'>
+											{item.icon?createElement(item.icon, {fill: (isActive || hover===index)?"rgba(80, 65, 188, 1)":"white"}):""}
+											<div className="mx-5">{item.name}</div>
+										</div>
 									</div>
-								</div>
+								)}
 							</NavLink>
 						)
 					})}

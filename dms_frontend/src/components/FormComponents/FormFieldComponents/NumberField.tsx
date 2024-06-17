@@ -1,8 +1,8 @@
-import {  useState } from "react";
+import {  useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
 import { FieldValues } from "DataTypes";
 
-const number_to_words = (num:number, setMessage:Function, index:number|string):void => {
+const numberToWords = (num:number, setMessage:Function, index:number|string):void => {
   const wordsClassName = "mx-2 text-amber-800 text-sm";
   
   const words_1to19 = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];
@@ -11,11 +11,11 @@ const number_to_words = (num:number, setMessage:Function, index:number|string):v
 
   const two_digit_number = (num:number,div:number) => {
     if (num<20)
-      return (div==0?" and ":"" )+words_1to19[num]
+      return (div==1?" and ":"" )+words_1to19[num]
     else{
-      const tens_place = words_20to100[Math.floor((num)/10)]
+      const tens_place = words_20to100[Math.floor((num)/10)];
       const units_place = words_1to19[Math.floor((num)%10)];
-      return tens_place+" "+(div==0?"and ":"" )+units_place;
+      return tens_place+" "+units_place;
     }
   }
 
@@ -46,11 +46,25 @@ const number_to_words = (num:number, setMessage:Function, index:number|string):v
         curr_len+=2;
       }
     }
-    let res="";
+    console.log("ARR",arr)
     if (!words_bigger.includes(arr[0]))
-      arr[0] = " and "+arr[0]
+      arr[0] = " "+arr[0]
+    console.log("ARR",arr)
+    let res="";
     for (let i=arr.length-1; i>=0; i--)
       res+=" "+arr[i];
+    console.log("curr res",res)
+      res=res.trim();
+      while(res.substring(0,3)==="and" || res.substring(0,3)==="And"){
+        if (res.substring(0,3)==="and"||res.substring(0,3)==="And")
+          res = res.substring(3);
+        res=res.trim();
+      }
+      while (res.substring(res.length-4)===" and"){
+        if (res.substring(res.length-4)===" and")
+          res = res.substring(0,res.length-3);
+        res=res.trim();
+      }
     return res;
   }
 
@@ -79,18 +93,11 @@ const number_to_words = (num:number, setMessage:Function, index:number|string):v
     res=seven_digit_number(num,div,curr_len);
   else{
     const res1 = seven_digit_number(num%Math.pow(10,7),3,curr_len);
-    const res2 = seven_digit_number(num/Math.pow(10,7),div-3,curr_len);
+    const res2 = seven_digit_number(Math.floor(num/Math.pow(10,7)),div-3,curr_len);
     res+=res2+" Crore"+ res1
   }
-  res=res.trim();
-  if (res.substring(0,3)==="and")
-    res = res.substring(3);
-  if (res.substring(res.length-4)===" and")
-    res = res.substring(0,res.length-3);
-  res=res.trim();
 
   res = res.charAt(0).toUpperCase()+res.toLowerCase().slice(1);
-  console.log(res)
   setMessage(<p key={index} className={wordsClassName}>{res}</p>);
 }
 
@@ -127,7 +134,21 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [wordsMessage, setWordsMessage] = useState(<></>);
 
+  const [numberFormatter] = useState(new Intl.NumberFormat("en-IN"));
+
   const [amountFields] = useState(["SA", "HA", "DA", "OA"]);
+
+  useEffect(()=>{
+    if (props.id=="SA")
+    if (amountFields.includes(props.id)){
+      let num = props.prefillValues[props.id];
+      if (!num)
+        num=-1
+      else if (num=="00")
+        num=0;
+      numberToWords(Number(num),setWordsMessage,props.index);
+    }
+  },[props])
   
   return(
     <div key={props.index} className="mb-5 mx-2">
@@ -141,7 +162,7 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
         className={`border rounded-if w-full p-4 ${props.name==""?"mt-7":""}`}
         value={props.repeatFields
           ?props.prefillValues[props.formIndex||0][props.id]||""
-          :props.prefillValues[props.id]!==undefined?props.prefillValues[props.id]:""
+          :props.prefillValues[props.id]!==undefined?numberFormatter.format(Number(props.prefillValues[props.id]))||"":""
         }
         onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{
@@ -154,13 +175,14 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
             })
           }
           :(e)=>{
-            const val = e.target.value;
+            const val_w_commas = e.target.value;
+            let val="";
+            for (let i=0; i<val_w_commas.length; i++)
+              if (!isNaN(Number(val_w_commas[i])))
+                val+=val_w_commas[i];
+
             if (isNaN(Number(val)))
               return;
-            
-            if (amountFields.includes(props.id))
-              number_to_words(val?Number(val):-1,setWordsMessage,props.index);
-            
             const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage);
           
             props.setPrefillValues((curr:any)=>{
