@@ -7,7 +7,7 @@ function PermissionsField (props:{index:number, id: string, name:string, permiss
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
   useEffect(()=>{
-    console.log("permission field props",props)
+    //console.log("permission field props",props)
   },[props])
 
   useEffect(()=>{

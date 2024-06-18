@@ -55,7 +55,7 @@ function FileViewer(props:{AID:string, loanId:string, docId:string, sectionName:
       data["R"]=remark;
     console.log("SUBMITTING DATA",data);
     const res = await editDocument(data);
-    console.log("RESPONSE",res)
+    //console.log("RESPONSE",res)
     if (res.status==200){
       if (status==DocumentStatusList[3])
         setVerified(true);

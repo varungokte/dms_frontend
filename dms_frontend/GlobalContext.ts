@@ -4,8 +4,8 @@ import CryptoJS from "crypto-js";
 import { useEffect } from 'react';
 import { UserSuggestionTypes } from 'DataTypes';
 
-//const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
-const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
+const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
+//const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
 
 const encryption_key = "JAIBAJRANGBALI";
 
@@ -533,7 +533,7 @@ const editDocument =  async (data:any) => {
 const uploadFile = async (data:any,loc:string,docId:string) => {
 	try {
 		const token = getEncryptedToken();
-		console.log("DATA",data)
+		//console.log("DATA",data)
 		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 			params: { "LOC":loc, "_id":docId }

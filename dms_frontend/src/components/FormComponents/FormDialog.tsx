@@ -74,7 +74,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
       
       //console.log("RECENTLY ASSIGEND DATA",data);
       if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1)){
-        console.log("ERROR",key,value,Object.keys(data))
+        //console.log("ERROR",key,value,Object.keys(data))
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }
@@ -89,19 +89,19 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
   const submitFunction = async () => {
     let okToSubmit = validateRequiredFields();
     let submittedData:any = false;
-    console.log("VALIDATED",okToSubmit);
+    //console.log("VALIDATED",okToSubmit);
     if (typeof okToSubmit!="boolean"){
       submittedData=okToSubmit;
       okToSubmit=true;
     }
     if(okToSubmit){
-      console.log("prefillValues",prefillValues)
+      //console.log("prefillValues",prefillValues)
       let res;
       if (props.edit && props.type=="user")
         res = await props.formSubmit(submittedData==false?prefillValues:submittedData,props.index);
       else
         res = await props.formSubmit(submittedData==false?prefillValues:submittedData);
-      console.log ("reponse?",res)
+      //console.log ("reponse?",res)
       if (res==200)
         setOpen(false);
       else if (res==422)

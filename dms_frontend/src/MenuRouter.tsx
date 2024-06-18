@@ -1,4 +1,4 @@
-import { Routes, Route, NavLink, Navigate } from 'react-router-dom';
+import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
 import { useNavigate } from "react-router-dom";
 import useGlobalContext from './../GlobalContext';
@@ -155,9 +155,9 @@ export const MenuRouter = () => {
 					{componentList.map((item,index)=>{
 						return <Route key={index} path={item.path} element={createElement(item.component, { key:index, label: item.name })} />
 					})}
-					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
+					{/* <Route key={"V"} path='/verify' element={<Navigate to="/"/>}/> */}
 				</Routes>
 			</div>
 		</div>

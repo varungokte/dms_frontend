@@ -1,7 +1,10 @@
+import { useEffect } from "react";
 import FieldLabel from "./FieldLabel";
 
 function SelectField (props:{index:number|string, id:string, name: string, options: string[], required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, sectionType?:string, setFileType?:Function, setCovType?:Function, setRole?:Function, setZone?:Function}){
   try{
+    useEffect(()=>{
+    },[props])
     return(
       <div key={props.index} className="mb-5 mx-2">
         <FieldLabel key={props.index+"s_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />

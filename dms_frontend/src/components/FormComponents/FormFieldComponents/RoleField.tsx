@@ -23,19 +23,16 @@ function RoleField (props:{index:number, id: string, name:string, roleList:any, 
 
   useEffect(()=>{
     props.setPrefillValues((curr:any)=>{
-      console.log("OLD curr",curr);
-      console.log("allRolePermissionList",allRolesPermissionsList);
-      console.log(Object.keys(allRolesPermissionsList),currentRole);
-      console.log("single permission",allRolesPermissionsList[currentRole])
       curr["UP"]=allRolesPermissionsList[currentRole];
-      console.log("NEW curr",curr);
       return {...curr};
     })
   },[allRolesPermissionsList,currentRole])
 
+  useEffect(()=>{
+  },[allRolesPermissionsList])
   return (
     <div>
-      <SelectField index={props.index} id={"R"} name={"Role"} options={Object.keys(allRolesPermissionsList)} required={props.required} disabled={props.disabled} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} setRole={setCurrentRole} />
+      <SelectField index={props.index} id={"R"} name={"Role"} options={["-"].concat(Object.keys(allRolesPermissionsList))} required={props.required} disabled={props.disabled} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} setRole={setCurrentRole} />
       {currentRole==""
         ?<></>
         :<PermissionsField index={props.index} id={"UP"} name={"Permission"} 

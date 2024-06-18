@@ -10,6 +10,7 @@ function PrivateRoutes(){
   const {getDecryptedToken} = useGlobalContext();
   useEffect(()=>{
     getDecryptedToken().then((resToken:any)=>{
+      //console.log(resToken)
      // console.log("private routes token", resToken)
       /* if (JSON.stringify(token)===JSON.stringify(resToken) && Object.keys(resToken).length>0)
         return;

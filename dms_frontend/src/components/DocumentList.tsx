@@ -140,7 +140,7 @@ function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:Se
 
   useEffect(()=>{
     getDocumentsList(props.loanId, props.sectionDetails.sectionName).then(res=>{
-      console.log("document list",res)
+      //console.log("document list",res)
       setDocData(res.obj)
     })
   },[]);

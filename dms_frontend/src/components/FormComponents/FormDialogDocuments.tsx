@@ -71,7 +71,7 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
       setErrorMessage(<></>);
       if (res["id"]!="")
         setDocId(res["id"]);
-      console.log("res.id",res["id"],res)
+      //console.log("res.id",res["id"],res)
       return true;
     }
     else if (res.status==422){
@@ -85,17 +85,18 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
   }
 
   const submitDetails = async () => {
-    console.log("Reached submit");
-    console.log("docId",docId);
+    //console.log("Reached submit");
+    //console.log("docId",docId);
     let res=200;
-    console.log("A",fileList)
-    if (fileList && fileList.length>0){console.log("ENTERED FILELIST")
+    //console.log("A",fileList)
+    if (fileList && fileList.length>0){
       res = await props.fileSubmit(fileList,docId);}
     if (res==200)
       setOpen(false);
     else{
       setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
-      console.log("You've got a problem, si ",res);}
+      //console.log("You've got a problem, si ",res);
+    }
   }
 
   useEffect(()=>{
@@ -229,7 +230,7 @@ function FileField (props:{index:number, id:string, name:string, fileType:number
   useEffect(()=>{
     if (props.fileList)
       setRenderedFileList (props.fileList.map((item:any,index:number)=>{
-        console.log("FILE INFO",item);
+        //console.log("FILE INFO",item);
         return (
           <div key={index} className="border p-3 flex flex-row">
             <div key={index} className="flex-auto">
