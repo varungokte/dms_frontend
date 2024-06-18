@@ -94,7 +94,6 @@ function UserManagement(){
   }
 
   const editUser = async (userValues:any, index?:number) => {
-    console.log("USERVALUES",userValues,selectedUser)
     if (selectedUser==-1 && !index)
       return;
   
