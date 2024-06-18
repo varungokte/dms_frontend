@@ -21,7 +21,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 function CreateLoanAccount() {
   const {state} = useLocation();
 
-  const {getLoanFields, useTitle} = useGlobalContext();
+  const {getLoanFields, getTeamsList, useTitle} = useGlobalContext();
 
   const navRef = useRef<any>(null);
   const sectionRef = useRef<any>([]);
@@ -45,6 +45,9 @@ function CreateLoanAccount() {
   
   const [showSecurityDetails, setShowSecurityDetails] = useState(true);
   const [dataHasLoaded, setDataHasLoaded] = useState(state.linkSource=="CREATE"?true:false);
+
+  const [assignedTeam,setAssignedTeam] = useState<string>();
+  const [teamList,setTeamList] = useState<any>();
 
   const [formSections] = useState([
     { name: "Create Agreement ID", component: GenerateLoanID },
@@ -71,9 +74,23 @@ function CreateLoanAccount() {
     setDataHasLoaded(true);
   }
 
+  const getAssignedTeam = async() => {
+    if (loanId){
+      const res = await getTeamsList(loanId);
+      if (res.status==200 && res.obj.currentTeam){
+        setEnableDocumentSections(true);
+        setAssignedTeam(res.obj.currentTeam._teamId);
+        setTeamList(res.obj.list);
+      }
+      else
+        setEnableDocumentSections(false);
+    }
+  }
+
   useEffect(()=>{
     if (actionType=="EDIT")
       getOldData();
+    getAssignedTeam();
   },[]);
   
   /* useEffect(()=>{
@@ -102,7 +119,7 @@ function CreateLoanAccount() {
       sectionRef.current[navbarLastSections[jumpNumber+1]].scrollIntoView({inline:"start"});
       setJumpNumber(curr=>curr+1)
     }
-    console.log("get bounding client rect", sectionRef.current[4].getBoundingClientRect());
+    //console.log("get bounding client rect", sectionRef.current[4].getBoundingClientRect());
   }
 
   const backwardNavigation = () => {
@@ -113,7 +130,7 @@ function CreateLoanAccount() {
   }
 
   const calculateSectionBreaks = () =>{
-    console.log(navRef.current.clientWidth)
+    //console.log(navRef.current.clientWidth)
     let total_width=0;
     const breaks:number[]=[];
       for (let i=0; i<formSections.length; i++){
@@ -123,13 +140,12 @@ function CreateLoanAccount() {
           total_width=0;
         }
       }
-      setNavbarLastSections(curr=>curr.concat(breaks));
-    console.log(breaks);
+    setNavbarLastSections(curr=>curr.concat(breaks));
   }
 
   useEffect(()=>{
-    console.log(navbarLastSections);
-    console.log("get bounding client rect", sectionRef.current[9].getBoundingClientRect());
+    //console.log(navbarLastSections);
+    //console.log("get bounding client rect", sectionRef.current[9].getBoundingClientRect());
   },[navbarLastSections])
 
   useEffect(()=>{
@@ -206,6 +222,8 @@ function CreateLoanAccount() {
               showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:false,
               setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
               preexistingValues: preexistingData||{},
+              assignedTeam:assignedTeam||"",
+              teamList:teamList,
             }
           ):<LoadingMessage sectionName="details" />} 
         </div>

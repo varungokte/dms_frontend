@@ -35,6 +35,7 @@ type FormLabelFieldDetails = {
 
 type FormFieldDetails = (FormSingleFieldDetails | FormGridFieldDetails | FormLabelFieldDetails)[];
 
+
 type FormDialogTypes = "team"|"user"|"role"|"cont"|"rate";
 
 type FormDialogDocumentTypes = "doc"|"cov"|"con"|"undefined";

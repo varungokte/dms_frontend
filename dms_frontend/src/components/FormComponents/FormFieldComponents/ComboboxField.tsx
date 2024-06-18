@@ -11,12 +11,15 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
 
   useEffect(()=>{
     if (props.prefillValue && props.suggestions.length!=0){
-      for (let i=0 ; i<props.suggestions.length; i++)
-        if (props.suggestions[i].values["E"]==props.prefillValue)
-          if (props.multiple)
-            setDefaultValue([props.suggestions[i]])
-          else
-            setDefaultValue(props.suggestions[i])
+      let values=[];
+      for (let i=0 ; i<props.suggestions.length; i++){
+        if (props.multiple && props.prefillValue.includes(props.suggestions[i].values["E"]))
+          values.push(props.suggestions[i])
+        else if (props.suggestions[i].values["E"]==props.prefillValue)
+          setDefaultValue(props.suggestions[i])
+      }
+      if (props.multiple && values.length!=0)
+        setDefaultValue(values)
     }
   },[props.prefillValue,props.suggestions])
 
@@ -41,7 +44,7 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
       <Autocomplete key={props.index+defaultValue} id={props.id} disablePortal
         multiple={props.multiple}
         disabled={props.disabled}
-        
+        limitTags={1}
         //value={(props.edit && !props.multiple)?(defaultValue||null):(defaultValue||undefined)}
         
         defaultValue={props.multiple

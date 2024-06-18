@@ -13,7 +13,6 @@ function GenerateLoanID(props:any){
     e.preventDefault();
     console.log("USER GENERATED ID", agreementId);
     createAID({"AID":agreementId}).then(res=>{
-      console.log("REPOSNE", res);
       if (res.status==422)
         setErrorMessage(<p className="text-red-600">This Agreement ID has been taken. Please enter another one.</p>)
       else if (res.status!==200)
@@ -73,8 +72,8 @@ function GenerateLoanID(props:any){
         {errorMessage}
       </div>
       <br/>
-      <button onClick={()=>{props.setOkToFrolic(true);
-        props.setCurrentSection(1);}}>Skip</button>
+      {/* <button onClick={()=>{props.setOkToFrolic(true);
+        props.setCurrentSection(1);}}>Skip</button> */}
     </div>
   )
 }

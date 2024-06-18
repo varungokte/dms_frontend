@@ -13,7 +13,7 @@ function Dashboard() {
 			<div className="text-center my-4 font-bold text-5xl text-custom-1">DASHBOARD</div>
 			<br/>
 			<div>
-				<button onClick={showToken}>click</button>
+				<button className="mx-5" onClick={showToken}>Get token</button>
 			</div>
 			<br/>
 		</div>

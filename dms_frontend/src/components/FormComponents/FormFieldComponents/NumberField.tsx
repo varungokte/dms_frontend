@@ -46,14 +46,11 @@ const numberToWords = (num:number, setMessage:Function, index:number|string):voi
         curr_len+=2;
       }
     }
-    console.log("ARR",arr)
     if (!words_bigger.includes(arr[0]))
       arr[0] = " "+arr[0]
-    console.log("ARR",arr)
     let res="";
     for (let i=arr.length-1; i>=0; i--)
       res+=" "+arr[i];
-    console.log("curr res",res)
       res=res.trim();
       while(res.substring(0,3)==="and" || res.substring(0,3)==="And"){
         if (res.substring(0,3)==="and"||res.substring(0,3)==="And")

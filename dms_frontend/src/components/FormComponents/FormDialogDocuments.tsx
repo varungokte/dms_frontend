@@ -9,10 +9,11 @@ import { Upload } from "lucide-react";
 
 import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
-import { FormDialogDocumentTypes } from "DataTypes";
+import { FormDialogDocumentSections, FormDialogDocumentTypes } from "DataTypes";
 import { FileTypeList } from "../../../Constants";
+//import useGlobalContext from "./../../../GlobalContext";
 
-function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any }){
+function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, AID?:string, sectionName?:FormDialogDocumentSections, triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any}){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<any>({});
   const [fileList, setFileList] = useState<any>([]);
@@ -87,8 +88,9 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
     console.log("Reached submit");
     console.log("docId",docId);
     let res=200;
-    if (fileList && fileList.length>0)
-      res = await props.fileSubmit(fileList,docId);
+    console.log("A",fileList)
+    if (fileList && fileList.length>0){console.log("ENTERED FILELIST")
+      res = await props.fileSubmit(fileList,docId);}
     if (res==200)
       setOpen(false);
     else{

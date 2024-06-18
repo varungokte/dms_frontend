@@ -35,7 +35,7 @@ const uploadFile = async (userFiles:any,AID:string, sectionName:string, docId:st
   return res;
 }
 
-const showList = async (loanId:string,sectionName:string,) => {
+const showDocumentList = async (loanId:string,sectionName:string,) => {
   const { getDocumentsList } = useGlobalContext();
 
   const res = await getDocumentsList(loanId,sectionName);
@@ -62,4 +62,4 @@ const deleteDocument = async (AID:string,docId:string, sectionName:string, fileN
 }
  */
 
-export { addDocument, editDocument, deleteDocument, uploadFile, showList };
+export { addDocument, editDocument, deleteDocument, uploadFile, showDocumentList };

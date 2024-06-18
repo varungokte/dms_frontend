@@ -60,7 +60,7 @@ export const LoginPage = () => {
         <form onSubmit={handleRegister}>
           <label htmlFor="email" className="font-light">Email Address</label>
           <br/>
-          <input id="email" type="email" style={{height:"50px", width:"100%", borderRadius:"12px", paddingLeft:"3%"}} onChange={(e)=>setEmail(e.target.value)}/>
+          <input id="email" type="text" style={{height:"50px", width:"100%", borderRadius:"12px", paddingLeft:"3%"}} onChange={(e)=>setEmail(e.target.value)}/>
           <br/>
           <br/>
           

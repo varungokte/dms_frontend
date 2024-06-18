@@ -8,7 +8,7 @@ import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 import { useToast } from "@/components/ui/use-toast"
 import { FieldDataTypes, FieldValues } from "DataTypes";
 
-function BasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:FieldValues,setChangesHaveBeenMade:Function, setEnableDocumentSections:Function}) {
+function BasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:FieldValues,setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,assignedTeam:string, teamList:any}) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   
   const [fieldList] = useState<{id:string, name:string, type:FieldDataTypes, required:boolean, options?:string[]}[]>([

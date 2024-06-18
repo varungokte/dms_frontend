@@ -157,7 +157,6 @@ export const MenuRouter = () => {
 					})}
 					<Route key={"V"} path='/verify' element={<Navigate to="/"/>}/>
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
-					{/* <Route key={"T"} path="/teams/:id" element={<TeamMembers/>} /> */}
 					<Route key={"N"} path="/*" element={<>Not Found</>} />
 				</Routes>
 			</div>

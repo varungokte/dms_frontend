@@ -515,7 +515,7 @@ const editDocument =  async (data:any) => {
 
 		const enc_data = await handleEncryption(data);
 
-		const response = await axios.post(`${Base_Url}/addDocsDetails`, {data:enc_data}, {
+		const response = await axios.post(`${Base_Url}/editDocsDetails`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}`}});
 
 		const decryptedObject = await handleDecryption(response.data);
@@ -533,6 +533,7 @@ const editDocument =  async (data:any) => {
 const uploadFile = async (data:any,loc:string,docId:string) => {
 	try {
 		const token = getEncryptedToken();
+		console.log("DATA",data)
 		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 			params: { "LOC":loc, "_id":docId }
@@ -571,7 +572,7 @@ const getDocumentsList = async (loanId:string, sectionName:string) =>  {
 	}
 };
 
-const getFileList = async (AID:string,section_name:string, document_category:string) => {
+/* const getFileList = async (AID:string,section_name:string, document_category:string) => {
 	try {
 		const token = getEncryptedToken();
 
@@ -591,14 +592,14 @@ const getFileList = async (AID:string,section_name:string, document_category:str
 		else
 			return {status: error.status, obj:null};
 	}
-}
+} */
 
-const fetchDocument = async (AID:string,section_name:string, document_category:string,file_name:string) => {
+const fetchDocument = async (AID:string,section_name:string, file_name:string) => {
 	try {
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/viewDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/${section_name}/${document_category}/${file_name}` },
+			params: { LOC: `${AID}/${section_name}/${file_name}` },
 			responseType: 'blob',
 		});
 
@@ -610,9 +611,9 @@ const fetchDocument = async (AID:string,section_name:string, document_category:s
 	} 
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return{status:0, url:""};
 		else
-			return error.response;
+			return {status:error.response.status, url:""}
 	}
 };
 
@@ -725,7 +726,7 @@ const useGlobalContext = () => {
 		addRole, getRolesList,
 		getUserSuggestions,
 		getTeamsList, addTeam, getSingleTeam,
-		addDocument, uploadFile, getDocumentsList, editDocument, getFileList, deleteDocument, fetchDocument,
+		addDocument, uploadFile, getDocumentsList, editDocument, /* getFileList, */ deleteDocument, fetchDocument,
 		selectTeam,
 		addToMasters,getDealList,
 	}

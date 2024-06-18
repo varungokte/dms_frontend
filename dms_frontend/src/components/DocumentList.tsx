@@ -5,19 +5,22 @@ import { Table } from "@/components/ui/table"
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import TableCollapsible from "./BasicComponents/TableCollapsible";
 
-import {UploadButton, ViewFilesButton} from "./BasicComponents/UploadButton";
+import UploadFileButton from "./BasicComponents/UploadFileButton";
+import ViewFileButton from "./BasicComponents/ViewFileButton";
 import Search from "./BasicComponents/Search";
 import ProgressBar from "./BasicComponents/ProgressBar";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import { FormDialogDocumentSections, FormDialogDocumentTypes } from "DataTypes";
+import { DocumentStatusList } from "./../../Constants";
+import moment from "moment";
 
 type DocumentDetails= {
   _id:string,
   AID:string, 
   CN:string, 
   SD:Date|string,
-  details: {S:number}[]
+  details: {S:string}[]
 }
 
 type SectionDetails = {
@@ -59,7 +62,6 @@ function DocumentList(props:{label:string}) {
   useEffect(()=>{
     if (added)
       getDealList(sectionDetails.sectionName).then((res)=>{
-        console.log("response",res)
         setDealData(res.obj);
         setAdded(false);
       })
@@ -97,7 +99,7 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:SectionDe
     const totalDocs = props.deal.details.length;
     let verifiedDocs = 0;
     for (let i=0; i<totalDocs; i++){
-      if (props.deal.details[i]["S"]==3)
+      if (props.deal.details[i]["S"]=="Verified")
         verifiedDocs++;
     }
     setProgressValue(verifiedDocs/totalDocs*100);
@@ -108,7 +110,7 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:SectionDe
       topRow={[
         [props.deal.AID, "w-[20%] font-medium text-base"],
         [props.deal.CN, "w-[20%] font-medium text-base"], 
-        [props.deal.SD, "w-[30%] font-medium text-base"],
+        [moment(props.deal.SD).format("DD-MM-yyyy"), "w-[30%] font-medium text-base"],
         ["Document Upload", "w-[26.70%] font-medium text-base text-justify"],
       ]}
       bottomRow={[
@@ -118,7 +120,7 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:SectionDe
         [<ProgressBar value={progressValue} />, "content-center"],
       ]}
       content={/* props.sectionDetails.sectionType=="doc"
-        ? */<SingleDealDocuments loanId={props.deal["_id"]} sectionDetails={props.sectionDetails}  />
+        ? */<SingleDealDocuments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails}  />
         /* :(props.sectionDetails.sectionType=="cov"
           ?<SingleDealDocuments loanId={props.deal["_id"]} />
           :<SingleDealDocuments loanId={props.deal["_id"]} />
@@ -129,7 +131,7 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:SectionDe
   )
 }
 
-function SingleDealDocuments(props:{loanId:string, sectionDetails:SectionDetails}){
+function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:SectionDetails}){
   const [docData, setDocData] = useState<any>([]);
   
   const {getDocumentsList} = useGlobalContext();
@@ -145,21 +147,6 @@ function SingleDealDocuments(props:{loanId:string, sectionDetails:SectionDetails
 
   return(
     <div className="p-5 mx-3 my-2 ">
-      {/* <div className="float-right">
-        <div className="text-base">
-          Priority:{`  `}
-          <select className="p-3 rounded-xl"
-            value={priority} 
-            onChange={(e:any)=>setPriority(e.target.value)}
-          >
-            {EnumIteratorKeys(PriorityValues).map((val,index)=>{
-              return <option key={index} value={val}>{PriorityValues[Number(val)]}</option>
-            })}
-          </select>
-        </div>
-        <br/> 
-      </div> 
-      <br/>  */}
       <br/>
       {docData.length==0
         ?<EmptyPageMessage sectionName="documents" />
@@ -175,10 +162,10 @@ function SingleDealDocuments(props:{loanId:string, sectionDetails:SectionDetails
             searchRows={[]} filterRows={[]}
             action={
               docData.map((doc: any)=>{
-                if (doc["S"]==1)
-                  return <UploadButton />
+                if (doc["S"]==DocumentStatusList[1])
+                  return <UploadFileButton />
                 else
-                  return <ViewFilesButton />
+                  return <ViewFileButton AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionName={props.sectionDetails.sectionName} fileName={doc.FD[0].filename} />
               })
             }
           />

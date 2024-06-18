@@ -107,11 +107,25 @@ function TeamManagement(){
     return res;
   }
 
-  const editTeam = (userValues:any) => {
+  const editTeam = async (userValues:any) => {
     console.log("raw data",userValues);
     const data = teamMembersToArr(userValues);
-    console.log("SUBMITTED", data)
-    return 200;
+    data["_id"] = userValues["_id"];
+    console.log("SUBMITTED", data);
+
+    const res = await addTeam(data);
+
+    if (res==200){
+      setAdded(true);
+      toast({
+        title: "Success!",
+        description: "The team has been created",
+        className:"bg-white"
+      });
+      setFieldValues({});
+    };
+
+    return res;
   }
 
   //const deleteTeam = () => {}

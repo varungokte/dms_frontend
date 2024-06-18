@@ -158,9 +158,11 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
     const { uploadFile } = useGlobalContext();
 
     const formData = new FormData();
+
+    console.log("userFiles",userFiles);
     
     for (let i=0; i<userFiles.length; i++)
-      formData.append("file", userFiles[i][0]);
+      formData.append("file", userFiles[i]);
     
     const res = await uploadFile(formData, `${props.AID}/${sectionDetails.sectionName}`,docId);
     
@@ -210,7 +212,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
         {docData
           ?docData.length==0?<EmptyPageMessage sectionName="documents" />
           :sectionDetails.type=="doc"
-            ?<LoanDocumentView docData={docData} label={props.label} 
+            ?<LoanDocumentView docData={docData} label={props.label} AID={props.AID} sectionName={sectionDetails.sectionName}
               fieldList={sectionDetails.fieldList} uploadField={uploadField} fieldValues={fieldValues} setFieldValues={setFieldValues} fileList={fileList} setFileList={setFileList}
               editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
             />

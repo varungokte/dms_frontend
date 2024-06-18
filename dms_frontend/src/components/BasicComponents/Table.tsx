@@ -1,11 +1,17 @@
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { DocumentStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../StatusLists";
+import { DocumentStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
 
 import chevron_down from "./../static/chevron-down.svg";
 import moment from "moment";
 import { ReactElement } from "react";
 import { TableDataTypes } from "DataTypes";
+
+const PriorityStyling = ["-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100"];
+const UserStatusStyling = ["-", "text-yellow-600 bg-yellow-100", "text-green-600 bg-green-100", "text-red-600 bg-red-100"];
+const TeamStatusStyling = ["-", "text-green-600 bg-green-100", "text-red-600 bg-red-100"];
+const DocumentStatusStyling = ["-", "text-yellow-500", "text-blue-500", "text-green-600", "text-red-600"];
+//const FileStatusStyling = ["-", "text-yellow-500", "text-green-600"];
 
 function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   return(
@@ -51,7 +57,8 @@ function BodyRowsMapping(props:{list:any, columns:string[], cellClassName?:strin
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:string[], cellClassName?:string[], singleRow:any, action?:any, setEntityStatus?:Function,setSelectedEntity?:Function}){
+function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:string[], cellClassName?:string[], singleRow:any, action?:any, setEntityStatus?:Function,setSelectedEntity?:Function}){ 
+  
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType:any, index:number)=>{
@@ -92,6 +99,7 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:stri
 const handleIndex = (index:number, cellClassName:string, uniqueIndex:string) =>{
   return <TableCell key={uniqueIndex}  className={cellClassName}>{index}</TableCell>
 }
+
 const handleText = (item:string, cellClassName:string, uniqueIndex:string) => {
   return <TableCell key={uniqueIndex} className={cellClassName}>{item}</TableCell>
 }
@@ -103,7 +111,7 @@ const handleDate = (item:string, cellClassName:string, uniqueIndex:string) => {
 const handlePriority = (priority:string, cellClassName:string, uniqueIndex:string) => {
   return(
     <TableCell key={uniqueIndex}>
-      <div className={`${PriorityList[priority]} text-center ${cellClassName}`} style={{borderRadius:"2.7px"}}>
+      <div className={`${PriorityStyling[PriorityList.indexOf(priority)]} text-center ${cellClassName}`} style={{borderRadius:"2.7px"}}>
         {priority}
       </div>
     </TableCell>
@@ -112,28 +120,27 @@ const handlePriority = (priority:string, cellClassName:string, uniqueIndex:strin
 
 const handleDocStatus = (status:string, cellClassName:string, uniqueIndex:string) => {
   return(
-    <TableCell key={uniqueIndex} className={`${DocumentStatusList[status]} ${cellClassName}`}>
+    <TableCell key={uniqueIndex} className={`${DocumentStatusStyling[DocumentStatusList.indexOf(status)]} ${cellClassName}`}>
       {status}
     </TableCell>
   )
 }
 
 const handleUserStatus = (status:string, cellClassName:string, uniqueIndex:string, selectedUser:number, setSelectedUser:Function, setUserStatus:Function) => {
-  const statusList = Object.keys(UserStatusList);
 
   return (
     <TableCell key={uniqueIndex} className={cellClassName}>
       <DropdownMenu>
-      <DropdownMenuTrigger className={`${UserStatusList[isNaN(Number(status))?status.charAt(0).toUpperCase()+status.toLowerCase().slice(1):status]} w-28 h-10 text-center rounded-xl `}>
+      <DropdownMenuTrigger className={`${UserStatusStyling[UserStatusList.indexOf(status)]} w-28 h-10 text-center rounded-xl `}>
         <div className="flex flex-row w-full" >
-          <p className=" m-auto">{isNaN(Number(status))?status.charAt(0).toUpperCase()+status.toLowerCase().slice(1):status}</p>
+          <p className=" m-auto">{status}</p>
           <img className="mr-2" src={chevron_down} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(statusList[1])}} className={`${UserStatusList[statusList[1]]} bg-white`}>{statusList[1]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(statusList[2])}} className={`${UserStatusList[statusList[2]]} bg-white`}>{statusList[2]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(statusList[3])}} className={`${UserStatusList[statusList[3]]} bg-white`}>{statusList[3]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(UserStatusList[1])}} className={`${UserStatusList[1]} bg-white`}>{UserStatusList[1]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(UserStatusList[2])}} className={`${UserStatusList[2]} bg-white`}>{UserStatusList[2]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(UserStatusList[3])}} className={`${UserStatusList[3]} bg-white`}>{UserStatusList[3]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>
@@ -141,19 +148,19 @@ const handleUserStatus = (status:string, cellClassName:string, uniqueIndex:strin
 }
 
 const handleTeamStatus = (status:string, cellClassName:string, uniqueIndex:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function) => {
-  const statusList = Object.keys(TeamStatusList);
+  
   return (
     <TableCell key={uniqueIndex} className={cellClassName}>
       <DropdownMenu>
-      <DropdownMenuTrigger className={`${TeamStatusList[isNaN(Number(status))?status.charAt(0).toUpperCase()+status.toLowerCase().slice(1):status]} w-28 h-10 text-center rounded-xl `}>
+      <DropdownMenuTrigger className={`${TeamStatusStyling[TeamStatusList.indexOf(status)]} w-28 h-10 text-center rounded-xl `}>
         <div className="flex flex-row w-full" >
-          <p className=" m-auto">{isNaN(Number(status))?status.charAt(0).toUpperCase()+status.toLowerCase().slice(1):status }</p>
+          <p className=" m-auto">{status}</p>
           <img className="mr-2" src={chevron_down} />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(statusList[1])}} className={`${TeamStatusList[statusList[1]]} bg-white`}>{statusList[1]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(statusList[2])}} className={`${TeamStatusList[statusList[2]]} bg-white`}>{statusList[2]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[1])}} className={`${TeamStatusList[1]} bg-white`}>{TeamStatusList[1]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[2])}} className={`${TeamStatusList[2]} bg-white`}>{TeamStatusList[2]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>

@@ -1,14 +1,10 @@
 import upload_icon from "./../static/upload_icon.svg";
-import view_icon from "./../static/view_files_icon.svg";
 import { useEffect, useState } from "react";
-import FormDialogFiles from "../FormComponents/FormDialogFiles";
 
-function UploadButton(){
+function UploadFileButton(){
   const [files, setFiles] = useState<any>([]);
 
   useEffect(()=>{
-    console.log("file list", files);
-    //send file
   },[files]);
 
   return(
@@ -35,19 +31,4 @@ function UploadButton(){
   )
 };
 
-function ViewFilesButton(){
-  return(
-    <div>
-      <FormDialogFiles
-        triggerText={
-          <div className="flex flex-row rounded-xl py-3 px-3 w-28 m-auto ml-7 inline-block align-middle" style={{backgroundColor:"rgba(255, 245, 204, 1)"}}>
-            <img className="m-auto" src={view_icon} />
-            <span className="m-auto" style={{color:"rgba(255, 178, 0, 1)"}}>View</span>
-          </div>
-        }
-      />
-    </div>
-  )
-};
-
-export {UploadButton, ViewFilesButton};
+export default UploadFileButton;

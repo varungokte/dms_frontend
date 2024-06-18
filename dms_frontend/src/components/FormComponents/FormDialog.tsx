@@ -20,10 +20,10 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
   };  
 
   const teamMembersRenamingWhileSubmitting = () => {
-    console.log("BROKEN TEAM MEMBERS",prefillValues)
-    const data:any={}
+    const data:any={};
+    data["_id"]=prefillValues["_id"];
     data["N"]=prefillValues["N"];
-    data["L"]=prefillValues["L"]
+    data["L"]=prefillValues["L"];
     const sections = ["TD","CD","C","CP","CS"];
     for (let i=0; i<sections.length; i++){
       const section = sections[i];
@@ -68,6 +68,9 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
         value=true;
       }
       data = (props.type=="team" && props.edit)?teamMembersRenamingWhileSubmitting():{...prefillValues};
+
+      if (key=="P" && props.edit)
+        continue;
       
       //console.log("RECENTLY ASSIGEND DATA",data);
       if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1)){
@@ -75,7 +78,8 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }
-    };
+    }
+
     setErrorMessage(<></>);
     if (props.type=="team" && props.edit)
       return data;
@@ -85,12 +89,18 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
   const submitFunction = async () => {
     let okToSubmit = validateRequiredFields();
     let submittedData:any = false;
+    console.log("VALIDATED",okToSubmit);
     if (typeof okToSubmit!="boolean"){
       submittedData=okToSubmit;
       okToSubmit=true;
     }
     if(okToSubmit){
-      const res = await props.formSubmit(submittedData==false?prefillValues:submittedData);
+      console.log("prefillValues",prefillValues)
+      let res;
+      if (props.edit && props.type=="user")
+        res = await props.formSubmit(submittedData==false?prefillValues:submittedData,props.index);
+      else
+        res = await props.formSubmit(submittedData==false?prefillValues:submittedData);
       console.log ("reponse?",res)
       if (res==200)
         setOpen(false);
@@ -191,16 +201,19 @@ function RenderForm(props:{ setter:Function, edit:boolean, formType:FormDialogTy
 
   const getTeamData = async () => {
     const res = await getSingleTeam(props.currentFields["_id"]);
-    if (res.status==200)
+    if (res.status==200){
+      res.obj["_id"]=props.currentFields["_id"];
       props.setPrefillValues(res.obj);
+    }
     
     else
       props.setPrefillValues([]);
   }
 
   const teamRolesRenaming = () => {
-    const data:any={}
-    data["L"]=props.prefillValues["L"]
+    const data:any={};
+    data["_id"]=props.prefillValues["_id"];
+    data["L"]=props.prefillValues["L"];
     const sections = ["TD","CD","C","CP","CS"];
     for (let i=0; i<sections.length; i++){
       const section = sections[i];

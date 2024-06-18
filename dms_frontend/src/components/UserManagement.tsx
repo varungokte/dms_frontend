@@ -94,12 +94,14 @@ function UserManagement(){
   }
 
   const editUser = async (userValues:any) => {
-    if (selectedUser==-1)
-      return;
+
+    console.log("USERVALUES",userValues,selectedUser)
+    /* if (selectedUser==-1)
+      return; */
   
     console.log("reached edit user");
-    const id = userData[selectedUser]["_id"];
-    userValues["_id"] = id;
+    //const id = userData[selectedUser]["_id"];
+    //userValues["_id"] = id;
 
     console.log("SUBMITTING", userValues);
 

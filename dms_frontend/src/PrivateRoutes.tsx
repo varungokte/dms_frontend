@@ -3,6 +3,7 @@ import useGlobalContext from "../GlobalContext";
 import { MenuRouter } from "./MenuRouter";
 import { useEffect, useState } from "react";
 import VerificationPage from "./components/AuthPages/VerificationPage";
+import { UserStatusList } from "./../Constants";
 
 function PrivateRoutes(){
   const [token, setToken] = useState<any>(null);  
@@ -36,7 +37,7 @@ function EmailVerification(props:any){
   
   if (!props.token)
     return <Navigate to="/login"/>
-  if (props.token["S"]==2){
+  if (props.token["S"]==UserStatusList[2]){
     return <MenuRouter />
   }
   else
