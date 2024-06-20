@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { FieldValues, FormDialogTypes, UserSuggestionTypes, UserSuggestionsList } from "DataTypes";
+import { FieldValues, FormDialogTypes, FormFieldDetails, UserSuggestionTypes, UserSuggestionsList } from "DataTypes";
 
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CheckboxField, ComboboxField, DateField, MultiTextField, NumberField, PermissionsField, RoleField, SelectField, TextAreaField, TextField } from "./FormFields";
@@ -8,9 +8,9 @@ import { CheckboxField, ComboboxField, DateField, MultiTextField, NumberField, P
 import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 
-function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, triggerText:any, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:any, fieldValues:any, setter:Function, currentFields:any, repeatFields?:boolean, suggestions?:UserSuggestionTypes, getRoles?:boolean }){
+function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, triggerText:string|ReactElement, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:FormFieldDetails, currentFields:FieldValues, repeatFields?:boolean, suggestions?:UserSuggestionTypes, getRoles?:boolean }){
   const [open, setOpen] = useState(false);
-  const [prefillValues, setPrefillValues] = useState<any>({});
+  const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
 
   enum FormSizes {
@@ -20,7 +20,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
   };  
 
   const teamMembersRenamingWhileSubmitting = () => {
-    const data:any={};
+    const data:FieldValues={};
     data["_id"]=prefillValues["_id"];
     data["N"]=prefillValues["N"];
     data["L"]=prefillValues["L"];
@@ -101,7 +101,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
         res = await props.formSubmit(submittedData==false?prefillValues:submittedData,props.index);
       else
         res = await props.formSubmit(submittedData==false?prefillValues:submittedData);
-      //console.log ("reponse?",res)
+      
       if (res==200)
         setOpen(false);
       else if (res==422)
@@ -120,7 +120,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
             <hr/>
           </DialogHeader>
             <RequiredFieldsNote />
-            <RenderForm key={"f0"} setter={props.setter} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} fieldValues={props.fieldValues} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestions={props.suggestions} getRoles={props.getRoles} />
+            <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestions={props.suggestions} getRoles={props.getRoles} />
             {errorMessage}
             <br/>
             <div className="flex flex-row">
@@ -137,7 +137,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
   )
 }
 
-function RenderForm(props:{ setter:Function, edit:boolean, formType:FormDialogTypes, currentFields:any, fieldValues:any, form:any, prefillValues:any, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean}){
+function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FormFieldDetails, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean}){
   const [roles, setRoles] = useState<FieldValues[]>();
   const [suggestionsUnformatted, setSuggestionsUnformatted] = useState<any>();
 
@@ -250,11 +250,8 @@ function RenderForm(props:{ setter:Function, edit:boolean, formType:FormDialogTy
   },[suggestionsUnformatted,zone])
 
   useEffect(()=>{
-    if (props.edit)
-      props.setPrefillValues(props.currentFields);
-    else
-      props.setPrefillValues(props.fieldValues);
-  },[props.fieldValues,props.currentFields]);
+    props.setPrefillValues(props.currentFields);
+  },[props.currentFields]);
 
   return (
     props.form.map((field:any,index:number)=>{
@@ -295,7 +292,7 @@ function RenderForm(props:{ setter:Function, edit:boolean, formType:FormDialogTy
         else if (field["type"]=="multitext")
           return <MultiTextField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
+            setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="checkbox")
           return <CheckboxField key={index} index={index} id={field["id"]} name={field["name"]} 

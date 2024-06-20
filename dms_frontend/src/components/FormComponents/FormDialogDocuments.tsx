@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
 import { DateField, SelectField, TextAreaField, TextField } from "./FormFields";
@@ -9,13 +9,13 @@ import { Upload } from "lucide-react";
 
 import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
-import { FormDialogDocumentSections, FormDialogDocumentTypes } from "DataTypes";
+import { FieldValues, FormDialogDocumentTypes, FormFieldDetails } from "DataTypes";
 import { FileTypeList } from "../../../Constants";
 //import useGlobalContext from "./../../../GlobalContext";
 
-function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, AID?:string, sectionName?:FormDialogDocumentSections, triggerText:any, triggerClassName:string, formTitle:string, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, detailForm:any, setter:Function, fieldValues:any,uploadForm:any, fileSetter:Function, fileList:any, edit:boolean, currIndex?:number, currentFields?:any}){
+function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, triggerText:string|ReactElement, triggerClassName:string, titleText:string, currentFields:FieldValues, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, formFields:FormFieldDetails, edit:boolean, currIndex?:number}){
   const [open, setOpen] = useState(false);
-  const [prefillValues, setPrefillValues] = useState<any>({});
+  const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [fileList, setFileList] = useState<any>([]);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [currentTab, setCurrentTab] = useState("details");
@@ -33,13 +33,13 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
       setEnableUpload(true);
     }
     else
-      setPrefillValues(props.fieldValues);
-  },[props.fieldValues,props.currentFields]);
+      setPrefillValues(props.currentFields);
+  },[props.currentFields]);
 
   const validateRequiredFields = async()=>{
     const data:any={};
-    for (let i=0; i<props.detailForm.length; i++){
-      const field = props.detailForm[i];
+    for (let i=0; i<props.formFields.length; i++){
+      const field = props.formFields[i];
       if (field.category=="single")
         data[field.id] = field["required"]?true:false;
 
@@ -108,7 +108,7 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
       <AlertDialogTrigger className={props.triggerClassName}>{props.triggerText}</AlertDialogTrigger>
       <AlertDialogContent className={`bg-white overflow-y-auto max-h-screen min-w-[800px]`}>
         <AlertDialogHeader>
-          <AlertDialogTitle className="text-2xl font-normal">{props.formTitle}</AlertDialogTitle>
+          <AlertDialogTitle className="text-2xl font-normal">{props.titleText}</AlertDialogTitle>
           <hr/>
         </AlertDialogHeader>
         <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
@@ -120,7 +120,7 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
             <Card className="border-0">
               <CardContent className="mt-5"  style={{borderWidth:"0px", borderColor:"white"}}>
                 <form onSubmit={(e)=>{props.detailSubmit(e);}}>
-                  {props.detailForm.map((field:any,index:number)=>{
+                  {props.formFields.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
                       if (field["id"]=="F" && covType!==1)
                         return null;
@@ -191,7 +191,7 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
           <TabsContent value="upload">
             <Card className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
               <CardContent className="border-0">
-                <FileField key={100} index={100} id={props.uploadForm["id"]} name={props.uploadForm["name"]} fileType={fileType} required={props.uploadForm["required"]?true:false} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} />
+                <FileField key={100} index={100} fileType={fileType} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -207,7 +207,7 @@ function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, 
   )
 };
 
-function FileField (props:{index:number, id:string, name:string, fileType:number, required:boolean, fileList:any, validateRequiredFields:Function, fileSetter:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function }) {
+function FileField (props:{index:number, fileType:number, fileList:any, fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
   
   //const statusList = [<></>,<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]

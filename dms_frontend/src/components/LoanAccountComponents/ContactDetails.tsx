@@ -22,8 +22,6 @@ import LoadingMessage from "../BasicComponents/LoadingMessage";
 function ContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [contacts, setContacts] = useState<any>();
 
-  const [fieldValues, setFieldValues]= useState<any>({});
-
   const [fieldList] = useState<any>([
     { category: "grid", row:3, sectionName:"", fields: [
       { id: "CT", type: "select", name: "Contact Type", options: ContactTypeList, required:true },
@@ -120,7 +118,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
     }
   }
 
-  const editContact = () =>{
+  const editContact = (userValues:any) =>{
     const data:any = {};
 
     console.log("inside edit, oldValues", oldValues)
@@ -128,14 +126,14 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
       if (field.category=="single"){
-        if (fieldValues[field.id]!==null && fieldValues[field.id]!==oldValues[field.id])
-          data[field.id] = fieldValues[field.id];
+        if (userValues[field.id]!==null && userValues[field.id]!==oldValues[field.id])
+          data[field.id] = userValues[field.id];
       }
       else if (field.category=="grid"){
         for (let j=0; j<field.fields.length; j++){
           const gridField = field.fields[j];
-          if (fieldValues[gridField.id]!=null && fieldValues[gridField.id]!==oldValues[gridField.id])
-            data[gridField.id] = fieldValues[gridField.id];
+          if (userValues[gridField.id]!=null && userValues[gridField.id]!==oldValues[gridField.id])
+            data[gridField.id] = userValues[gridField.id];
         }
       }
     }
@@ -167,7 +165,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
           <FormDialog key={-5} index={-5} edit={false} type="cont"
             triggerText={<div className="flex flex-row"><Plus className="mt-1"/> <p className="">Add Contact</p></div>} triggerClassName={CreateButtonStyling} formSize="large"
             formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={fieldValues}
+            form={fieldList} currentFields={{}}
           />
         </div>
       </div>
@@ -190,7 +188,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
                           <FormDialog key={index} index={index} edit={true} type="cont"
                             triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
                             formTitle="Edit Contact" formSubmit={editContact} submitButton="Edit Contact"
-                            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={person}
+                            form={fieldList} currentFields={person}
                           />
                           <div className="ml-2">
                           <Dialog>

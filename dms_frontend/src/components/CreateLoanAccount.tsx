@@ -4,7 +4,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/com
 import ContactDetails from "./LoanAccountComponents/ContactDetails";
 import Ratings from "./LoanAccountComponents/Ratings";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
-import RelationshipMapping from "./LoanAccountComponents/RelationshipMapping";
+import SelectTeam from "./LoanAccountComponents/SelectTeam";
 import BasicDetails from "./LoanAccountComponents/BasicDetails";
 import SecurityDetails from "./LoanAccountComponents/SecurityDetails";
 import BankDetails from "./LoanAccountComponents/BankDetails";
@@ -56,7 +56,7 @@ function CreateLoanAccount() {
     { name: "Bank Details", component: BankDetails },
     { name: "Ratings", component: Ratings },
     { name: "Contact Details", component: ContactDetails },
-    { name: "Select Team", component: RelationshipMapping },
+    { name: "Select Team", component: SelectTeam },
     { name: "Transaction Documents", component: LoanDocuments },
     { name: "Compliance Documents", component: LoanDocuments },
     { name: "Covenants", component: LoanDocuments },

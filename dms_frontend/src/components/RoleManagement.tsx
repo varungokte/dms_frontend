@@ -20,8 +20,6 @@ function RoleManagement(){
     { category: "single", id: "P", name: "Permissions", type: "permissions", newRole:true }
   ]);
 
-  const [fieldValues, setFieldValues] = useState<any>({});
-  //const [newRole, setNewRole] = useState<any>();
   const [open, setOpen] = useState<boolean[]>([]);
   const [added, setAdded] = useState(true);
 
@@ -105,7 +103,7 @@ function RoleManagement(){
         <FormDialog key={-10} index={-10} edit={false} type="user"
           triggerText="+ Add Role" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
           formTitle="Add Role" formSubmit={createRole} submitButton="Add Role"
-          form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}}
+          form={fieldList} currentFields={{}}
         />
         </div>
       </div>

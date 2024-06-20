@@ -44,8 +44,7 @@ function TeamManagement(){
       { id: "CSC", name:"Checker", type:"combobox", multiple:true, required:true},
     ]}
   ]);
-  const [fieldValues, setFieldValues] = useState<any>({});
-  
+
   const [added, setAdded] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState("");
   const [teamStatus, setTeamStatus] = useState(-1);
@@ -101,7 +100,6 @@ function TeamManagement(){
         description: "The team has been created",
         className:"bg-white"
       });
-      setFieldValues({});
     };
 
     return res;
@@ -122,7 +120,6 @@ function TeamManagement(){
         description: "The team has been created",
         className:"bg-white"
       });
-      setFieldValues({});
     };
 
     return res;
@@ -141,7 +138,7 @@ function TeamManagement(){
           <FormDialog key={-1} index={-1} type="team"
             triggerText="Add Team" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add Team" formSubmit={createTeam} submitButton="Add"
-            form={fieldList} fieldValues={fieldValues} setter={setFieldValues} currentFields={{}}
+            form={fieldList} currentFields={{}}
             suggestions="RM"
           />
         </div>
@@ -162,7 +159,7 @@ function TeamManagement(){
                       <FormDialog key={index} index={index} edit type="team"
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                         formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
-                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={teamList[index]}
+                        form={fieldList} currentFields={teamList[index]}
                         suggestions="RM"
                       />
                       {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}

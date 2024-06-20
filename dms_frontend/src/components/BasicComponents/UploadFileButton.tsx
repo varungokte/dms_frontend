@@ -19,10 +19,8 @@ function UploadFileButton(){
           (e)=>setFiles((curr:any)=>{
             const arr  = [...curr];
             if (e.target.files && e.target.files.length>0)
-              for (let i=0; i<e.target.files.length; i++){
+              for (let i=0; i<e.target.files.length; i++)
                 arr.push(e.target.files[i]);
-              }
-              console.log("new curr", arr);
             return arr;
           })
         }

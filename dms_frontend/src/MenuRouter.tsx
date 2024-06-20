@@ -13,12 +13,12 @@ import DocumentList from './components/DocumentList';
 import UserManagement from './components/UserManagement';
 import RoleManagement from './components/RoleManagement';
 import TeamManagement from './components/TeamManagement';
+import Masters from './components/Masters';
 //import Zones from './components/Zones';
 //import Default from './components/DefaultCases';
 //import CriticalCases from './components/CriticalCases';
 //import Reports from './components/Reports';
 //import Reminders from './components/Reminders';
-//import Masters from './components/Masters';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
@@ -113,12 +113,12 @@ export const MenuRouter = () => {
 		{ name: "Condition Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Condition Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
+		{ name: "Masters", path:"/masters", component: Masters, },
 		//{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
 		//{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
-		//{ name: "Masters", path:"/masters", component: Masters, },
 	]);
 	
 	return (

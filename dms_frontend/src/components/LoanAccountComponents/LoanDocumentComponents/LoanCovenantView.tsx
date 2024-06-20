@@ -4,8 +4,9 @@ import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import DeleteConfirmation from "./../../BasicComponents/DeleteConfirmation";
 import edit_icon from "./../../static/edit_icon.svg";
 import { CovenantTypeList } from "./../../../../Constants";
+import { FormFieldDetails } from "DataTypes";
 
-function LoanCovenantView(props:{priority:string,covData:any,label:string, fieldList:any, fieldValues:any, setFieldValues:Function, uploadField:any, fileList:any, setFileList:Function, editCovenantFunction:Function, deleteCovenantFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
+function LoanCovenantView(props:{priority:string,covData:any,label:string, fieldList:FormFieldDetails, editCovenantFunction:Function, deleteCovenantFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
   return (
     props.priority==CovenantTypeList[1]
       ?<Table className="border rounded-2xl">
@@ -18,11 +19,9 @@ function LoanCovenantView(props:{priority:string,covData:any,label:string, field
             return(
               <div className="flex flex-row">
                 <FormDialogDocuments key={index} index={index} edit={true} type="cov"
-                  triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" formTitle={props.label}
+                  triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" titleText={props.label}
                   detailSubmit={props.editCovenantFunction} fileSubmit={props.addFileFunction} deleteFile={props.deleteFileFunction} getFiles={props.getFileListFunction}
-                  detailForm={props.fieldList} setter={props.setFieldValues} fieldValues={props.fieldValues}
-                  uploadForm={props.uploadField} fileSetter={props.setFileList} fileList={props.fileList}
-                  currentFields={props.covData[index]}
+                  formFields={props.fieldList} currentFields={props.covData[index]}
                 />
                 <DeleteConfirmation thing="covenant" deleteFunction={props.deleteCovenantFunction} currIndex={index}/>
               </div>
@@ -39,11 +38,9 @@ function LoanCovenantView(props:{priority:string,covData:any,label:string, field
             return(
               <div className="flex flex-row">
                 <FormDialogDocuments key={index} index={index} edit={true} type="cov"
-                  triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" formTitle={props.label}
+                  triggerText={<img src={edit_icon} className="mr-5"/>} triggerClassName="" titleText={props.label}
                   detailSubmit={props.editCovenantFunction} fileSubmit={props.addFileFunction} deleteFile={props.deleteFileFunction} getFiles={props.getFileListFunction}
-                  detailForm={props.fieldList} setter={props.setFieldValues} fieldValues={props.fieldValues}
-                  uploadForm={props.uploadField} fileSetter={props.setFileList} fileList={props.fileList}
-                  currentFields={props.covData[index]}
+                  formFields={props.fieldList} currentFields={props.covData[index]}
                 />
                 <DeleteConfirmation thing="covenant" deleteFunction={props.deleteCovenantFunction} currIndex={index}/>
               </div>

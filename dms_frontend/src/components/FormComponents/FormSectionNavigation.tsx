@@ -8,7 +8,8 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
     props.setCurrentSection((curr:any)=>{
       if (curr===1)  
         return 0;
-      else return curr-1
+      else 
+        return curr-1;
     });
   };
 
@@ -17,6 +18,7 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
       <div className="flex-auto">
         <button className="text-red-600 border border-red-600 rounded-xl h-12 w-36 mx-3" onClick={()=>navigate("/loan")}>Cancel</button>
       </div>
+
       <div>
         {props.currentSection==1
           ?<></>

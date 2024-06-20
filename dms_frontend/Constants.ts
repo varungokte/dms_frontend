@@ -6,14 +6,14 @@ const FileTypeList:string[] = ["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"]
 const UserRoleList:string[] = ["-","Maker", "Checker", "Admin", "Superadmin"];
 const IndustryList:string[] = ["-", "Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others"];
 const LoanTypeList:string[] = ["-", "Long Term", "Short Term"];
-const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant"];
+const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant","Other"];
 
 //Statuses
-const PriorityList:string[] =["-", "Low", "Medium", "High"];
-const UserStatusList:string[] = ["-", "Unverified", "Active", "Inactive"];
-const TeamStatusList:string[] = ["-", "Active", "Inactive"];
-const DocumentStatusList:string[] = ["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"];
-const FileStatusList:string[] = ["-", "Pending",  "Verified"]
+const PriorityList =["-", "Low", "Medium", "High"] as const;
+const UserStatusList = ["-", "Unverified", "Active", "Inactive"] as const;
+const TeamStatusList = ["-", "Active", "Inactive"] as const;
+const DocumentStatusList = ["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const;
+const FileStatusList = ["-", "Pending",  "Verified"] as const;
 
 //Loan Details
 const LoanSecuredList:string[] = ["-","Secured","Unsecured"];

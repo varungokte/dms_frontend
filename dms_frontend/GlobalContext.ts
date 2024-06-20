@@ -5,7 +5,8 @@ import { useEffect } from 'react';
 import { UserSuggestionTypes } from 'DataTypes';
 
 //const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
-const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
+//const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
+const Base_Url = "http://139.5.190.208/api/v1/allAPI";
 
 const encryption_key = "JAIBAJRANGBALI";
 
@@ -636,7 +637,6 @@ const deleteDocument = async (AID:string, docId:string, section_name:string, fil
 	}
 }
 
-
 const getDealList = async (sectionName:string) =>  {
 	try {
 		const token = getEncryptedToken();
@@ -649,13 +649,13 @@ const getDealList = async (sectionName:string) =>  {
 		if (response.status==200)
 			return {status: response.status, obj:decryptedObject}; 
 		else
-			return {status: 0, obj:null};
+			return {status: response.status, obj:null};
 	}
 	catch(error:any) {
 		if (!error.response)
 			return {status: 0, obj:null};
 		else
-			return {status: error.status, obj:null};;
+			return {status: error.response.status, obj:null};;
 	}
 };
 
@@ -678,13 +678,12 @@ const selectTeam = async (data:any) => {
 }
 
 //MASTERS
-//addMST
 
 const addToMasters = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addTeam`, {data: enc_data}, {
+		const response = await axios.post(`${Base_Url}/updateMst`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -697,8 +696,25 @@ const addToMasters = async (data:any) => {
 	}
 }
 
+const getMastersList = async () =>  {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listMst`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		const decryptedObject = await handleDecryption(response.data);
+		
+		return {status: response.status, obj:decryptedObject||null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else
+			return {status: error.reponse.status, obj:null};;
+	}
+};
 
-//addMember, getTeam
+//updateMst, listMst,
 
 /* const decrypt = async (data:object) => {
 	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
@@ -728,7 +744,8 @@ const useGlobalContext = () => {
 		getTeamsList, addTeam, getSingleTeam,
 		addDocument, uploadFile, getDocumentsList, editDocument, /* getFileList, */ deleteDocument, fetchDocument,
 		selectTeam,
-		addToMasters,getDealList,
+		addToMasters,getMastersList,
+		getDealList,
 	}
 }
 

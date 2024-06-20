@@ -5,7 +5,7 @@ import xlsx_icon from "./../static/xlsx_icon.svg";
 import { Plus } from "lucide-react";
 import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
 import { DialogTitle } from "@radix-ui/react-dialog";
-import { FileStatusList } from "../../../StatusLists";
+import { FileStatusList } from "../../../Constants";
 
 function FormDialogFiles(props:{triggerText:any}){
   const [files,setFiles] = useState<any>([]);
@@ -121,7 +121,7 @@ function FormDialogFiles(props:{triggerText:any}){
                       style={{width:"17px", height:"17px"}} 
                     />
                   </span>
-                  <span className="inline-block align-middlem mx-2"><img src={file.name.search(".pdf")!=-1?pdf_icon:xlsx_icon} style={{width:"36px", verticalAlign:"middle"}} /></span>
+                  <span className="inline-block align-middle mx-2"><img src={file.name.search(".pdf")!=-1?pdf_icon:xlsx_icon} style={{width:"36px", verticalAlign:"middle"}} /></span>
                   <div className="flex-auto">
                     <p className="text-base font-light">{file.name}</p>
                     <p className="text-xs text-gray-500">{file.size} KB</p>

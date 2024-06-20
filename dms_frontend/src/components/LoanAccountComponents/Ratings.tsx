@@ -14,11 +14,6 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 //import Search from "../BasicComponents/Search";
 
 function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
-  const [fieldValues, setFieldValues] = useState<FieldValues>({
-    "A":"", "T":"",
-    "DT":null, "O":"",
-    "L":"", "R":"",
-  });
 
   const [fieldList] = useState<FormFieldDetails>([
     { category: "grid", row:2, sectionName:"", fields: [
@@ -74,7 +69,6 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
 
     const res  = await addRating(data);
     if (res==200){
-      setFieldValues({});
       setAdded(true);
     }
     
@@ -91,7 +85,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
           <FormDialog index={-1} type="rate"
             triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
             formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
-            form={fieldList} fieldValues={fieldValues} setter={setFieldValues} currentFields={{}}
+            form={fieldList} currentFields={{}}
           />
         </div>
       </div>
@@ -101,9 +95,7 @@ function Ratings(props:{key:number,actionType: string, loanId: string, setLoanId
           ?ratingsList.length==0
             ?<EmptyPageMessage sectionName="ratings" />
             :<Table className="border">
-              <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]}
-                headingClassNames={["text-center","text-center","text-center","text-center","text-center","text-center"]}
-              />
+              <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]} headingClassNames={["text-center","text-center","text-center","text-center","text-center","text-center"]} />
 
               <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","V",]} dataType={["text", "text", "date", "text", "text", "text"]}
                 searchRows={[]} filterRows={[]} cellClassName={["text-center","text-center","text-center","text-center","text-center text-blue-500","text-center"]} 

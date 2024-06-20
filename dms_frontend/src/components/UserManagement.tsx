@@ -17,8 +17,6 @@ import { FormFieldDetails } from "DataTypes";
 function UserManagement(){
   const [userData, setUserData]= useState<any>();
   
-  const [fieldValues, setFieldValues] = useState<any>({});
-
   const [fieldList] = useState<FormFieldDetails>([
     { category: "grid", row: 2, fields: [
       { id: "N", name: "Name", type: "text", required:true },
@@ -108,7 +106,6 @@ function UserManagement(){
 
     if (res==200){
       setAdded(true);
-      setFieldValues({});
     }
 
     return res;
@@ -142,7 +139,7 @@ function UserManagement(){
           <FormDialog key={-10} index={-10} edit={false} type="user"
             triggerText="+ Add User" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
-            form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={{}} suggestions="RM" getRoles={true}
+            form={fieldList} currentFields={{}} suggestions="RM" getRoles={true}
           />
         </div>
       </div>
@@ -162,7 +159,7 @@ function UserManagement(){
                       <FormDialog key={index} index={index} type="user" edit
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                         formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
-                        form={fieldList} setter={setFieldValues} fieldValues={fieldValues} currentFields={userData[index]} suggestions="RM" getRoles
+                        form={fieldList} currentFields={userData[index]} suggestions="RM" getRoles
                       />
                       {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */}
                     </div>

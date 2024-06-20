@@ -1,4 +1,4 @@
-import { FieldValues } from "DataTypes"
+/* import { FieldValues } from "DataTypes"
 
 const PriorityList:FieldValues ={
   "-":"-",
@@ -34,4 +34,4 @@ const FileStatusList:FieldValues = {
   "Verified":"text-green-600"
 }
 
-export {PriorityList, UserStatusList, TeamStatusList, DocumentStatusList, FileStatusList,}
+export {PriorityList, UserStatusList, TeamStatusList, DocumentStatusList, FileStatusList,} */

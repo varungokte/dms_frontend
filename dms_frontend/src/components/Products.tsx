@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
 //import Search from "./BasicComponents/Search";
 
 import useGlobalContext from "./../../GlobalContext";
@@ -32,20 +32,20 @@ function Products(){
 
 			<div className="flex flex-row relative m-10">
 				<div className="mr-9">
-				<Table className="rounded-2xl bg-white">
-					<TableHeader>
-						<TableRow>
-							<TableHead className="text-xl">Product Name</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody className="border-none">
-						{Object.keys(products).map((product, index)=>{
-							return (
-								<TableRow className="border-none">
-									<TableCell className={`text-lg	tableCell ${selected===index?"text-blue-600 bg-slate-200":""}`} onClick={()=>{setSelected(index)}}>{product}</TableCell>
-								</TableRow>
-						)})}
-					</TableBody>
+					<Table className="rounded-2xl bg-white">
+						<TableHeader>
+							<TableRow>
+								<TableHead className="text-xl">Product Name</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody className="border-none">
+							{Object.keys(products).map((product, index)=>{
+								return (
+									<TableRow className="border-none">
+										<TableCell className={`text-lg	tableCell ${selected===index?"text-blue-600 bg-slate-200":""}`} onClick={()=>{setSelected(index)}}>{product}</TableCell>
+									</TableRow>
+							)})}
+						</TableBody>
 					</Table>
 				</div>
 
