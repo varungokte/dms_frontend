@@ -4,6 +4,6 @@
       "destination": "/index.html"
   }],
   "github":{
-    "enabled":true
+    "enabled":false
   }
 }
