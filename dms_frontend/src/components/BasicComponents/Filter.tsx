@@ -1,15 +1,27 @@
-//FILTER SHOWS VALUE-1
+import { MenuItem, OutlinedInput, Select } from "@mui/material";
 
-function Filter(props:{setter:Function, placeholderValue?:any[], setPlaceholder?:boolean, valueList:any[] }){
+function Filter(props:{value:string[]|string, setValue:Function, options:string[], placeholderValue?:string, multiple?:boolean}){
   return(
-    <select className="bg-white border-2 p-1 h-[50px] rounded-xl" onChange={(e:any)=>{console.log(e.target.value); props.setter(e.target.value)}}>
-      {props.setPlaceholder && props.placeholderValue!=undefined?<option value={props.placeholderValue[0]}>{props.placeholderValue[1]}</option>:""}
-      
-      {props.valueList.map((item:any,index:number)=>{
-        if (index!-=0)
-        return <option key={index} value={props.valueList[index]}>{item}</option>
+    <Select
+      multiple={props.multiple}
+      displayEmpty
+      value={props.value}
+      onChange={(e)=>props.setValue(e.target.value)}
+      input={<OutlinedInput sx={{borderRadius:"10px", height:"50px"}}/>}
+      renderValue={(selected) => {
+        if (typeof selected==="string")
+          return selected;
+        if (props.placeholderValue && selected.length==0) 
+          return <em>Select {props.placeholderValue}</em>;
+        return selected.join(', ');
+      }}
+      inputProps={{ 'aria-label': 'Without label' }}
+    >
+      {props.options.map(option => {
+        if (option!="-")
+          return <MenuItem key={option} value={option}>{option}</MenuItem>
       })}
-      </select>
+    </Select>
   )
 }
 

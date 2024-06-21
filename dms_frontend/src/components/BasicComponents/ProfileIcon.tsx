@@ -68,8 +68,3 @@ function ProfileIcon(props:{size:"large"|"small", name:string, showStatus?:boole
 }
 
 export default ProfileIcon;
-
-/* props:
-  size= "large" or "small"
-  name="Harvey Dent"
-*/

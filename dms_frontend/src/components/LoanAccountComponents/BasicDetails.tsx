@@ -1,12 +1,13 @@
 import { FormEvent, useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { TextField, SelectField, NumberField, DateField } from "../FormComponents/FormFields";
 import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
+import { FieldDataTypes, FieldValues } from "DataTypes";
+
+import { TextField, SelectField, NumberField, DateField } from "../FormComponents/FormFields";
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import moment from "moment";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 import { useToast } from "@/components/ui/use-toast"
-import { FieldDataTypes, FieldValues } from "DataTypes";
 
 function BasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:FieldValues,setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,assignedTeam:string, teamList:any}) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});

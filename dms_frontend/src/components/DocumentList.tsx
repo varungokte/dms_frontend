@@ -121,13 +121,7 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:SectionDe
         ["Sanction Date", "font-light"],
         [<ProgressBar value={progressValue} />, "content-center"],
       ]}
-      content={/* props.sectionDetails.sectionType=="doc"
-        ? */<SingleDealDocuments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} setAdded={props.setAdded} />
-        /* :(props.sectionDetails.sectionType=="cov"
-          ?<SingleDealDocuments loanId={props.deal["_id"]} />
-          :<SingleDealDocuments loanId={props.deal["_id"]} />
-        ) */
-      }
+      content={<SingleDealDocuments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} setAdded={props.setAdded} />}
       searchString={props.searchString}
     />
   )
@@ -184,20 +178,4 @@ function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:Se
   )
 }
 
-/* function SingleDealCovenants(props:{loanId:string}){
-
-  return (
-    <div>Cov</div>
-  )
-}
-
-function SingleDealConditions(props:{loanId:string}){
-  useEffect(()=>{
-  },[]);
-  
-  return (
-    <div></div>
-  )
-}
- */
 export default DocumentList;

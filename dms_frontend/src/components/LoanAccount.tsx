@@ -21,11 +21,17 @@ function LoanAccount() {
   useEffect(()=>{
     getLoanList().then(res=>{
       const idarr:any=[];
-      res.map((deal:any)=>{
-        idarr.push(deal._id);
-      });
-      setAccountList(res);
-      setIds(idarr);
+      if (res.status==200){
+        res.arr.map((deal:any)=>{
+          idarr.push(deal._id);
+        });
+        setAccountList(res.arr);
+        setIds(idarr);
+      }
+      else
+        setAccountList([]);
+    }).catch(()=>{
+      setAccountList([]);
     })
     
   },[]);
@@ -51,10 +57,8 @@ function LoanAccount() {
                 headingClassNames={["w-[100px]"]}
               />
               <BodyRowsMapping 
-                list={accountList} columns={["AID", "CN", "GN", "Z", "SA"]}
-                dataType={["index","text","text","text","text","text", "action"]} 
-                cellClassName={["font-medium", "text-custom-1","","","","",""]} 
-                searchRows={[]} filterRows={[]}
+                list={accountList} columns={["AID", "CN", "GN", "Z", "SA"]} dataType={["index","text","text","text","text","text", "action"]} 
+                cellClassName={["font-medium", "text-custom-1","","","","",""]} searchRows={[]} filterRows={[]}
                 action = {accountList.map((item:any, index:number)=>{
                   return(
                     <div className="flex flex-row">

@@ -3,8 +3,9 @@ import TextField from "./TextField";
 import SelectField from "./SelectField";
 import DateField from "./DateField";
 import NumberField from "./NumberField";
+import { FieldValues } from "DataTypes";
 
-function FormRepeatableGrid(props:{fieldList:any, fieldValues:any, setFieldValues:Function, submitForm:FormEventHandler, fieldsInRow:number, preexistingValues?:boolean}) {
+function FormRepeatableGrid(props:{fieldList:FieldValues[], fieldValues:FieldValues, setFieldValues:Function, submitForm:FormEventHandler, fieldsInRow:number, preexistingValues?:boolean}) {
   const [currentForm, setCurrentForm] = useState(0);
   const [repeatForm, setRepeatForm] = useState<any>([]);
   const [renderRepeatForm, setRenderRepeatForm] = useState<any>([]);

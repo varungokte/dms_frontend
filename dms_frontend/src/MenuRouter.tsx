@@ -14,7 +14,7 @@ import UserManagement from './components/UserManagement';
 import RoleManagement from './components/RoleManagement';
 import TeamManagement from './components/TeamManagement';
 import Masters from './components/Masters';
-//import Zones from './components/Zones';
+import Zones from './components/Zones';
 //import Default from './components/DefaultCases';
 //import CriticalCases from './components/CriticalCases';
 //import Reports from './components/Reports';
@@ -23,9 +23,10 @@ import Masters from './components/Masters';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
 
-import {DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, /* ZoneIcon, ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */} from "./../src/components/static/PanelIcons"
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, /*  ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */ } from "./../src/components/static/PanelIcons"
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
+import PageNotFound from './components/BasicComponents/PageNotFound';
 
 
 export const MenuRouter = () => {
@@ -113,8 +114,8 @@ export const MenuRouter = () => {
 		{ name: "Condition Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Condition Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
 		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
-		{ name: "Masters", path:"/masters", component: Masters, },
-		//{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
+		{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
+		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
@@ -125,7 +126,9 @@ export const MenuRouter = () => {
 		<div className='relative'>
 			<Toaster/>
 			<div style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1" >
-				<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
+				<NavLink to={"/"} key={-1}	onMouseEnter={()=>setHover(-1)} onMouseLeave={()=>setHover(-1)}>
+					<img src={beacon_logo} width={"250px"} className='m-auto p-3'/>
+				</NavLink>
 				<div className='mx-8 my-5'>
 					{componentList.map((item:any,index:number)=>{
 						return (
@@ -144,7 +147,7 @@ export const MenuRouter = () => {
 				</div>
 			</div>
 			
-			<div style={ {marginLeft:"280px",} }>
+			<div style={{marginLeft:"280px",}}>
 				<div className='relative h-20 w-100 bg-white'>
 					<div className=' absolute inset-y-5 right-0 w-50'>
 						{userInfo}
@@ -156,8 +159,7 @@ export const MenuRouter = () => {
 						return <Route key={index} path={item.path} element={createElement(item.component, { key:index, label: item.name })} />
 					})}
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
-					<Route key={"N"} path="/*" element={<>Not Found</>} />
-					{/* <Route key={"V"} path='/verify' element={<Navigate to="/"/>}/> */}
+					<Route key={"N"} path="/*" element={<PageNotFound/>} />
 				</Routes>
 			</div>
 		</div>

@@ -40,7 +40,7 @@ function Masters(){
   useEffect(()=>{
     if (added){
       getMastersList().then(res=>{
-        console.log("RESPONSE",res)
+        //console.log("RESPONSE",res)
         if (res.status==200){
           const obj:any={};
           const idArr:string[]=[];
@@ -71,7 +71,7 @@ function Masters(){
   
   const createMaster = async (userValues:FieldValues) =>{
     const res = await addToMasters(userValues);
-    console.log("SUBMIT DATA",userValues);
+    //console.log("SUBMIT DATA",userValues);
     if (res==200)
       setAdded(true);
     return res;
@@ -87,7 +87,7 @@ function Masters(){
     
     const userValues = {N:newValues.N, V:newValues.V, _id:idList[selected]}
 
-    console.log("userValues",userValues)
+    //console.log("userValues",userValues)
     
     const res = await addToMasters(userValues);
 

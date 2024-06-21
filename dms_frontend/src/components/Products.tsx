@@ -1,79 +1,53 @@
-import { useState } from "react";
-
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-//import Search from "./BasicComponents/Search";
-
+import { useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
+import { FieldValues } from "./../../DataTypes";
+import { LoanProductList } from "./../../Constants";
+
+import Filter from "./BasicComponents/Filter";
+import { Table } from "./ui/table";
+import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import LoadingMessage from "./BasicComponents/LoadingMessage";
+import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 
 function Products(){
+	const [loanList, setLoanList] = useState<FieldValues[]>();
+	const [products, setProducts] = useState<string[]>([]);
 
-	//An object where each key is the name of a product, and its corresponding value is an array of sub-products
-	const [products] = useState({
-		"Capital Flex Advantage":["P1", "P2", "P3"],
-		"Work Cash Solutions":["Work Cash Express Loan", "Work Cash FlexiCredit", "Work Cash Business Boost", "Work Cash Express Loan", "Work Cash FlexiCredit", "Work Cash Business Boost"],
-		"Biz Boost Express": ["Product 1", "Product 2", "Product 3"],
-		"Flexi Capital Max": ["Product Names", "Go Here", "You get the idea"],
-		"Swift Capital Elite": ["Test Product 1", "Test Product 2"]
-	});
+	const {useTitle, getLoanList} = useGlobalContext();
 
-	const [selected, setSelected] = useState(0);
-	//const [searchString, setSearchString] = useState("");
+	useTitle("Products");
 
-	const {useTitle} = useGlobalContext();
-
-	useTitle("Products")
+	useEffect(()=>{
+		setLoanList(undefined);
+		getLoanList("P",products.length==0?[]:products).then(res=>{
+			console.log("response",res)
+			if (res.status==200)
+				setLoanList(res.arr);
+			else
+				setLoanList([])
+		})
+	},[products]);
 	
 	return(
-		<div>
+		<div className="m-5">
 			<p className="text-3xl font-bold m-7">Products</p>
-			{/* <div className=''>
-				<Search setter={setSearchString} label="Search"/>
-			</div> */}
-
-			<div className="flex flex-row relative m-10">
-				<div className="mr-9">
-					<Table className="rounded-2xl bg-white">
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-xl">Product Name</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody className="border-none">
-							{Object.keys(products).map((product, index)=>{
-								return (
-									<TableRow className="border-none">
-										<TableCell className={`text-lg	tableCell ${selected===index?"text-blue-600 bg-slate-200":""}`} onClick={()=>{setSelected(index)}}>{product}</TableCell>
-									</TableRow>
-							)})}
-						</TableBody>
-					</Table>
-				</div>
-
-				<div className="grow mr-10">
-					<Table className="flex-none rounded-2xl bg-white">
-						<TableHeader>
-							<TableRow>
-								<TableHead className="text-xl">
-									{//@ts-ignore
-									Object.keys(products)[selected]}
-								</TableHead>
-							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{//@ts-ignore
-							products[Object.keys(products)[selected]].map((product)=>{
-								return (
-								<TableRow className="border-none">
-									<TableCell className="text-lg	">{product}</TableCell>
-								</TableRow>
-								)
-							})}
-						</TableBody>
-					</Table>
-				</div>
+			<div className="flex flex-row mx-7">
+				<div className="flex-auto"><Filter value={products} setValue={setProducts} options={LoanProductList} placeholderValue="Products" multiple /> </div>
 			</div>
-	</div>
-	
+
+			<div className="bg-white mx-7 my-5">
+				{loanList
+					?loanList.length==0
+						?<span><br/><EmptyPageMessage sectionName="loans" /></span>
+						:<Table>
+							<HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount"]} headingClassNames={["w-[100px]","text-center","text-center","text-center","text-center","text-center"]} />
+							<BodyRowsMapping list={loanList} columns={["AID", "CN", "GN", "Z", "SA"]}  dataType={["index","text","text","text","text","text"]}  cellClassName={["font-medium text-center", "text-center text-custom-1","text-center","text-center","text-center","text-center"]} />
+						</Table>
+					:<span><br /> <LoadingMessage sectionName="data" /></span>
+				}
+				<br />
+			</div>
+		</div>
 	)
 }
 

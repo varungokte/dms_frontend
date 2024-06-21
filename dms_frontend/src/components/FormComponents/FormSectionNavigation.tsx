@@ -22,12 +22,27 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
       <div>
         {props.currentSection==1
           ?<></>
-          :<button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle	" onClick={previousSection}><div className="flex flex-row place-content-center"><ChevronLeft/><div>Previous</div></div></button>
+          :<button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle	" onClick={previousSection}>
+            <div className="flex flex-row place-content-center">
+              <ChevronLeft/>
+              <div>Previous</div>
+            </div>
+          </button>
         }
         
         {props.isForm
-          ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1 p-3" type="submit"><div className="flex flex-row place-content-center"><div>Save & Next</div><ChevronRight/></div></button>
-          :<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1" onClick={()=>props.goToNextSection()}><div className="flex flex-row place-content-center"><div>Save & Next</div><ChevronRight/></div></button>
+          ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1 p-3" type="submit">
+            <div className="flex flex-row place-content-center">
+              <div>Save & Next</div>
+              <ChevronRight/>
+            </div>
+          </button>
+          :<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1" onClick={()=>props.goToNextSection()}>
+            <div className="flex flex-row place-content-center">
+              <div>Save & Next</div>
+              <ChevronRight/>
+            </div>
+          </button>
         }
       </div>
   </div>

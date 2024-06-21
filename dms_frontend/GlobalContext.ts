@@ -5,8 +5,8 @@ import { useEffect } from 'react';
 import { UserSuggestionTypes } from 'DataTypes';
 
 //const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
+const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
 //const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
-const Base_Url = "http://139.5.190.208/api/v1/allAPI";
 
 const encryption_key = "JAIBAJRANGBALI";
 
@@ -245,20 +245,22 @@ const getSingleUser = async (id:string) => {
 }
 
 //LOAN ACCOUNT
-const getLoanList = async () => {
+const getLoanList = async (filterType?:"Z"|"P", filterCategory?:string|string[]) => {
 	try {
 		const token = getEncryptedToken();
+		console.log("VALUES",filterType,filterCategory)
 		const response = await axios.get(`${Base_Url}/listLoan`, {
 			headers:{ "Authorization": `Bearer ${token}` },
+			params:{T:filterType, V:filterCategory }
 		});
-		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject;
+		const decryptedObject = await handleDecryption(response.data);
+		return {status:response.status, arr:decryptedObject||null};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0, arr:null};
 		else
-			return error.response;
+			return {status:error.response.status, arr:null};
 	}
 };
 

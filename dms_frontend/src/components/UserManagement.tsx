@@ -126,7 +126,7 @@ function UserManagement(){
 			<p className="text-3xl font-bold m-7">User Management</p>
       <div className="flex flex-row">
         <div className='m-auto flex-auto'>
-          <Search setter={setSearchString} label="Search Users"/>
+          <Search setter={setSearchString} label="Search Users" className="mx-7"/>
         </div>
 
         <div className="flex-auto">
@@ -137,7 +137,7 @@ function UserManagement(){
 
         <div className="">
           <FormDialog key={-10} index={-10} edit={false} type="user"
-            triggerText="+ Add User" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
+            triggerText="+ Add User" triggerClassName={`${CreateButtonStyling} mx-7`} formSize="medium"
             formTitle="Add User" formSubmit={createUser} submitButton="Add User"
             form={fieldList} currentFields={{}} suggestions="RM" getRoles={true}
           />

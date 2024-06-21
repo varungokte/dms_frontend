@@ -104,7 +104,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
           {sectionDetails.type=="doc"
             ?<></>
             :sectionDetails.type=="cov"
-              ?<Filter setter={setPriority} valueList={CovenantTypeList}/>
+              ?<Filter value={priority} setValue={setPriority} options={CovenantTypeList}/>
               :<></>
           }
         </div>

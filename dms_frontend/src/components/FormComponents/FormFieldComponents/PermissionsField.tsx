@@ -7,10 +7,6 @@ function PermissionsField (props:{index:number, id: string, name:string, permiss
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
   useEffect(()=>{
-    //console.log("permission field props",props)
-  },[props])
-
-  useEffect(()=>{
     if (props.multiple && props.permissionPreset.length==0)
       props.setPermissionSet((curr:any)=>{
         curr[props.id]=[{ "Loan Account":[], "Product": [], "Transaction Documents": [], "Compliance Documents": [], "Covenants": [] }];

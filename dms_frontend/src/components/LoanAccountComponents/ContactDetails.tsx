@@ -57,7 +57,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
   const [AID]= useState(props.AID);
 
   const [searchString, setSearchString] = useState("");
-  const [role, setRole] = useState(1);
+  const [role, setRole] = useState(ContactTypeList[1]);
   const [added, setAdded] = useState(true);
   const [oldValues, /* setOldValues */] = useState<any>({});
 
@@ -154,11 +154,11 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
     <div className="mt-8">
       <div className="flex flex-row">
         <div className=''>
-          <Search setter={setSearchString} label="Search" />
+          <Search setter={setSearchString} label="Search" className="mx-5" />
         </div>
 
         <div className="flex-auto">
-          <Filter setter={setRole} valueList={ContactTypeList}/>
+          <Filter value={role} setValue={setRole} options={ContactTypeList}/>
         </div>
       
         <div className="mr-3">
@@ -167,7 +167,7 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
             formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
             form={fieldList} currentFields={{}}
           />
-        </div>
+        </div>  
       </div>
       <Toaster/>
       <div className="flex flex-row flex-wrap">

@@ -133,10 +133,10 @@ function TeamManagement(){
       <br/>
       <Toaster/>
       <div className="flex flex-row">
-        <div className="flex-auto"><Search label={"Search by Team Name"} setter={setSearchString} /></div>
+        <div className="flex-auto"><Search label={"Search by Team Name"} setter={setSearchString} className=" mx-7" /></div>
         <div>
           <FormDialog key={-1} index={-1} type="team"
-            triggerText="Add Team" triggerClassName={CreateButtonStyling} formSize="medium"
+            triggerText="Add Team" triggerClassName={`${CreateButtonStyling} mx-7`} formSize="medium"
             formTitle="Add Team" formSubmit={createTeam} submitButton="Add"
             form={fieldList} currentFields={{}}
             suggestions="RM"

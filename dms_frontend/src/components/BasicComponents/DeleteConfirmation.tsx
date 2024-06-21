@@ -2,21 +2,23 @@ import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogDescript
 import { useState } from "react";
 import delete_icon from "./../static/delete_icon.svg";
 
-function DeleteConfirmation(props:{triggerText?:any, thing:string, deleteFunction:Function, currIndex:number}){
+function DeleteConfirmation(props:{thing:string, deleteFunction:Function, currIndex:number}){
   const [open, setOpen] = useState(false);
 
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger>
-        {props.triggerText
-          ?<span className="inline-block align-middle"><div style={{backgroundColor:"rgba(200, 25, 25, 1)"}} className="mx-3  text-white w-[100px] rounded-[8px] flex flex-row"><img src={delete_icon}/><span className="m-1">Delete</span></div></span>
-          :<img src={delete_icon}/>
-        }
+        <span className="inline-block align-middle">
+          <div style={{backgroundColor:"rgba(200, 25, 25, 1)"}} className="mx-3  text-white w-[100px] rounded-[8px] flex flex-row">
+            <img src={delete_icon}/>
+            <span className="m-1">Delete</span>
+          </div>
+        </span>
       </AlertDialogTrigger>
       <AlertDialogContent className="bg-white rounded-2xl">
         <AlertDialogHeader>
-          <AlertDialogTitle className="m-auto">Delete {props.thing}{props.triggerText?"s":""}</AlertDialogTitle>
-          <AlertDialogDescription className="m-auto">Are you sure you want to delete {props.triggerText?"these":"this"} {props.thing}{props.triggerText?"s":""} permanently?</AlertDialogDescription>
+          <AlertDialogTitle className="m-auto">Delete {props.thing}</AlertDialogTitle>
+          <AlertDialogDescription className="m-auto">Are you sure you want to delete this {props.thing} permanently?</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter className="m-auto">
           <AlertDialogCancel className="border-light rounded-lg font-normal hover:bg-slate-100">Cancel</AlertDialogCancel>

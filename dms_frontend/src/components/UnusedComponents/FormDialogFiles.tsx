@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTrigger, } from "@/components/ui/dialog";
+/* import { Dialog, DialogContent, DialogTrigger, } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import pdf_icon from "./../static/pdf_icon.svg";
 import xlsx_icon from "./../static/xlsx_icon.svg";
@@ -84,7 +84,7 @@ function FormDialogFiles(props:{triggerText:any}){
             <span className="flex-auto"><p className="mt-1 inline-block align-middle mx-2 text-base hover:cursor-default" onClick={()=>selectAll()}>Select all documents</p></span>
             <div>
               {showDeleteAll
-                ?<DeleteConfirmation thing="file" triggerText="Delete" deleteFunction={deleteFile} currIndex={0} />
+                ?<DeleteConfirmation thing="file" deleteFunction={deleteFile} currIndex={0} />
                 :<></>
               }
             </div>
@@ -139,4 +139,4 @@ function FormDialogFiles(props:{triggerText:any}){
   )
 }
 
-export default FormDialogFiles;
+export default FormDialogFiles; */

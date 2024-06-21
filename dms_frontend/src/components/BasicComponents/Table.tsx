@@ -26,12 +26,12 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows:any, filterRows:any, dataType:TableDataTypes, action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function}){
+function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataType:TableDataTypes, action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function}){
   return(
     <TableBody>
       {props.list.map((singleRow,index)=>{
         let searchValid = true;
-        if (props.searchRows.length>0){
+        if (props.searchRows && props.searchRows.length>0){
           searchValid = false;
           const regEx = new RegExp(props.searchRows[0], "i");
           for (let i=1; i<props.searchRows.length; i++)
@@ -40,19 +40,18 @@ function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassN
         }
 
         let filterValid = true;
-        if (props.filterRows.length>0){
+        if (props.filterRows && props.filterRows.length>0){
           filterValid = false;
           const filter = props.filterRows[0];
-          for (let i=1; i<props.filterRows.length; i++){
+          for (let i=1; i<props.filterRows.length; i++)
             if ((singleRow[props.filterRows[i]])==Number(filter))
               filterValid = true;
-          }
         }
 
         if (searchValid && filterValid)
           return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} />
         else
-          return ""
+          return <></>
       })}
     </TableBody>
   )
@@ -63,11 +62,8 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:stri
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType, index)=>{
-        let cellClassName="";
         const uniqueIndex = props.rowIndex+"_"+index;
-        
-        if (props.cellClassName && props.cellClassName[index])
-          cellClassName = props.cellClassName[index];
+        const cellClassName=(props.cellClassName && props.cellClassName[index])?props.cellClassName[index]:"";
       
         if (dataType=="index")
           return handleIndex(props.rowIndex+1, cellClassName, uniqueIndex);
@@ -79,6 +75,7 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:stri
           return handleCountTeam(props.singleRow, cellClassName, uniqueIndex);
     
         const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
+        
         if (dataType=="date")
           return handleDate(item, cellClassName,uniqueIndex);
         else if (dataType=="priority")
