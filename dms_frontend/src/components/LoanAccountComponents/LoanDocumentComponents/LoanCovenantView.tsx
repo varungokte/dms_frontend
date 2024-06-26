@@ -12,7 +12,7 @@ function LoanCovenantView(props:{priority:string,covData:any,label:string, field
       ?<Table className="border rounded-2xl">
         <HeaderRows headingRows={["Covenant Name","Frequency", "Physical Location", "Execution Location", "Start Date","End Date", "Priority", "Action"]} />
         <BodyRowsMapping
-          list={props.covData.filter((document:any)=>document["T"]==CovenantTypeList[1])} columns={["N", "F","PL","EL", "SD", "ED","P"]} dataType={["text", "frequency", "text", "text", "text", "text", "priority", "action"]}
+          list={props.covData.filter((document:any)=>document["T"]==CovenantTypeList[1])} columns={["N", "F","PL","EL", "SD", "ED","P"]} dataType={["text", "frequency", "text", "text", "date", "date", "priority", "action"]}
           searchRows={[]} filterRows={[]}
           action = {props.covData.filter((document:any)=>document["T"]==CovenantTypeList[1]).map((item:any, index:number)=>{
             item;

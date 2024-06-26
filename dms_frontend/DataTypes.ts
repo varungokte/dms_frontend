@@ -1,14 +1,12 @@
 import { DocumentStatusList, FileStatusList, PriorityList, TeamStatusList, UserStatusList } from "Constants";
 
-type FieldValues = {
-  [key:string]: any | any[]
-};
+type FieldValues = {[key:string]: any | any[]};
 
 //Data Types for table
-type TableDataTypes = ( "index" | "text" | "date" | "priority" | "frequency" | "docStatus" | "userStatus" | "teamStatus" | "objName" | "action" | "countTeam" )[];
+type TableDataTypes = ( "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field")[];
 
 //Form Field data types
-type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox"
+type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break"
 
 //Form Fields
 type FormFieldsCommon = {
@@ -17,70 +15,59 @@ type FormFieldsCommon = {
   type: FieldDataTypes,
   required?: boolean,
   immutable?: boolean,
-  options?:string[] | readonly string[],
-  multiple?:boolean,
-  newRole?:boolean
+  options?:string[] | readonly string[], //for select
+  multiple?:boolean, //for combobox 
+  newRole?:boolean //for permissions/role
 };
 
-type FormSingleFieldDetails = {category:"single"} & FormFieldsCommon;
+type SingleFieldAttributes = {category:"single"} & FormFieldsCommon;
 
-type FormGridFieldDetails = {
+type GridFieldAttributes = {
   category:"grid",
   row:number,
   sectionName?:string,
-  sectionClassName?:string
+  sectionClassName?:string,
+  customWidth?:string,
   fields: FormFieldsCommon[]
 };
 
-type FormLabelFieldDetails = {
+type LabelFieldAttributes = {
   category:"label", 
   name: string,
   sectionClassName:string,
 };
 
-type FormFieldDetails = (FormSingleFieldDetails | FormGridFieldDetails | FormLabelFieldDetails)[];
+type FieldAttributesList = (SingleFieldAttributes | GridFieldAttributes | LabelFieldAttributes)[];
 
 //The sections which call Form Dialog component 
 type FormDialogTypes = "team"|"user"|"role"|"cont"|"rate"|"mast";
 
-//Types of Documents
-type FormDialogDocumentTypes = "doc"|"cov"|"con"|"undefined";
-
 //Document Sections
-type FormDialogDocumentSections = "TD"|"CD"|"C"|"CP"|"CS"|"undefined";
-
+type DocumentSectionTypes = "doc"|"cov"|"con"|"pay"|"undefined";
+type DocumentSectionNames = "TD"|"CD"|"C"|"CP"|"CS"|"PD";
+type DocumentSectionDetails = {
+  sectionName: DocumentSectionNames,
+  sectionType: DocumentSectionTypes
+}
 
 type UserSuggestionTypes = "AU"|"TL"|"RM";
-
 type UserSuggestionsList = {
   label:string,
   values: FieldValues
 }[];
 
 type UserStatus = typeof UserStatusList[number];
-
 type DocumentStatus = typeof DocumentStatusList[number];
-
 type FileStatus = typeof FileStatusList[number];
-
 type TeamStatus = typeof TeamStatusList[number];
-
 type Priority = typeof PriorityList[number];
 
-
 export {
-  type FormFieldDetails,
-  type TableDataTypes,
-  type FieldDataTypes,
   type FieldValues,
+  type TableDataTypes, type FieldDataTypes,
+  type SingleFieldAttributes, type GridFieldAttributes, type LabelFieldAttributes, type FieldAttributesList,
   type FormDialogTypes, 
-  type FormDialogDocumentSections,
-  type FormDialogDocumentTypes,
-  type UserSuggestionTypes,
-  type UserSuggestionsList,
-  type UserStatus,
-  type DocumentStatus,
-  type FileStatus,
-  type TeamStatus,
-  type Priority,
+  type DocumentSectionTypes, type DocumentSectionNames, type DocumentSectionDetails,
+  type UserSuggestionTypes, type UserSuggestionsList,
+  type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority,
 }

@@ -1,32 +1,34 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
-
-import ContactDetails from "./LoanAccountComponents/ContactDetails";
-import Ratings from "./LoanAccountComponents/Ratings";
-import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
-import SelectTeam from "./LoanAccountComponents/SelectTeam";
-import BasicDetails from "./LoanAccountComponents/BasicDetails";
-import SecurityDetails from "./LoanAccountComponents/SecurityDetails";
-import BankDetails from "./LoanAccountComponents/BankDetails";
-
-//import { ChevronLeft, ChevronRight } from "lucide-react";
-
-import GenerateLoanID from "./LoanAccountComponents/GenerateLoanID";
-import { useLocation } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
+import { useLocation } from "react-router-dom";
+
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+
+import LoanIDAssignment from "./LoanAccountComponents/LoanIDAssignment";
+import LoanBasicDetails from "./LoanAccountComponents/LoanBasicDetails";
+import LoanSecurityDetails from "./LoanAccountComponents/LoanSecurityDetails";
+import LoanBankDetails from "./LoanAccountComponents/LoanBankDetails";
+import LoanRatings from "./LoanAccountComponents/LoanRatings";
+import LoanPaymentSchedule from "./LoanAccountComponents/LoanPaymentSchedule";
+import LoanContactDetails from "./LoanAccountComponents/LoanContactDetails";
+import LoanTeamSelection from "./LoanAccountComponents/LoanTeamSelection";
+import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
+
 import { FieldValues } from "DataTypes";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 function CreateLoanAccount() {
+  useEffect(()=>{
+		document.title=`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`+" | Beacon DMS"
+	},[]);
+
   const {state} = useLocation();
 
-  const {getLoanFields, getTeamsList, useTitle} = useGlobalContext();
+  const {getLoanFields, getTeamsList} = useGlobalContext();
 
   const navRef = useRef<any>(null);
   const sectionRef = useRef<any>([]);
-
-  useTitle(`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`);
   
   const [actionType] = useState<"CREATE"|"EDIT">(state.linkSource);
 
@@ -50,13 +52,14 @@ function CreateLoanAccount() {
   const [teamList,setTeamList] = useState<any>();
 
   const [formSections] = useState([
-    { name: "Create Agreement ID", component: GenerateLoanID },
-    { name: "Basic Details", component: BasicDetails },
-    { name: "Security Details", component: SecurityDetails, show: showSecurityDetails },
-    { name: "Bank Details", component: BankDetails },
-    { name: "Ratings", component: Ratings },
-    { name: "Contact Details", component: ContactDetails },
-    { name: "Select Team", component: SelectTeam },
+    { name: "Create Agreement ID", component: LoanIDAssignment },
+    { name: "Basic Details", component: LoanBasicDetails },
+    { name: "Security Details", component: LoanSecurityDetails, show: showSecurityDetails },
+    { name: "Bank Details", component: LoanBankDetails },
+    { name: "Ratings", component: LoanRatings },
+    { name: "Contact Details", component: LoanContactDetails },
+    { name: "Select Team", component: LoanTeamSelection },
+    { name: "Payment Schedule", component: LoanPaymentSchedule },
     { name: "Transaction Documents", component: LoanDocuments },
     { name: "Compliance Documents", component: LoanDocuments },
     { name: "Covenants", component: LoanDocuments },
@@ -202,32 +205,37 @@ function CreateLoanAccount() {
         </div>
 
         <div className="mx-10">
-          {dataHasLoaded?
-            React.createElement (formSections[currentSection].component, 
-            {
-              key:currentSection,
-              actionType: actionType,
-              loanId: loanId,
-              setLoanId: setLoanId,
-              AID: AID,
-              setAID: setAID,
-              currentSection: currentSection,
-              setCurrentSection: setCurrentSection,
-              goToNextSection: goToNextSection,
-              setUnsavedWarning: setUnsavedWarning,
-              setChangesHaveBeenMade:setChangesHaveBeenMade,
-              setEnableDocumentSections:setEnableDocumentSections,
-              label: formSections[currentSection].name,
-              setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:()=>{},
-              showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:false,
-              setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
-              preexistingValues: preexistingData||{},
-              assignedTeam:assignedTeam||"",
-              teamList:teamList,
-            }
-          ):<LoadingMessage sectionName="details" />} 
+          {dataHasLoaded
+            ?React.createElement (formSections[currentSection].component, 
+              {
+                key:currentSection,
+                actionType: actionType,
+                loanId: loanId,
+                setLoanId: setLoanId,
+                AID: AID,
+                setAID: setAID,
+                currentSection: currentSection,
+                setCurrentSection: setCurrentSection,
+                goToNextSection: goToNextSection,
+                setUnsavedWarning: setUnsavedWarning,
+                setChangesHaveBeenMade:setChangesHaveBeenMade,
+                setEnableDocumentSections:setEnableDocumentSections,
+                label: formSections[currentSection].name,
+                setShowSecurityDetails: (formSections[currentSection].name=="Basic Details")?setShowSecurityDetails:()=>{},
+                showSecurityDetails: (formSections[currentSection].name=="Security Details")?showSecurityDetails:false,
+                setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
+                preexistingValues: preexistingData||{},
+                assignedTeam:assignedTeam||"",
+                teamList:teamList,
+              }
+            )
+            :<LoadingMessage sectionName="details" />
+          } 
         </div>
-      </div> 
+      </div>
+      <button onClick={()=>{
+        setOkToFrolic(true);
+        setCurrentSection(2);}}>Skip</button> 
     </div>
   )
 }

@@ -1,24 +1,10 @@
-import { Routes, Route, NavLink } from 'react-router-dom';
 import { useEffect, useState, createElement } from 'react';
-import { useNavigate } from "react-router-dom";
-import useGlobalContext from './../GlobalContext';
+import { Routes, Route, NavLink, useNavigate } from 'react-router-dom';
 import './styling.css';
-//import {socket} from "./socket";
-
-import Dashboard from './components/Dashboard';
-import LoanAccount from './components/LoanAccount';
-import CreateLoanAccount from './components/CreateLoanAccount';
-import Products from './components/Products';
-import DocumentList from './components/DocumentList';
-import UserManagement from './components/UserManagement';
-import RoleManagement from './components/RoleManagement';
-import TeamManagement from './components/TeamManagement';
-import Masters from './components/Masters';
-import Zones from './components/Zones';
-//import Default from './components/DefaultCases';
-//import CriticalCases from './components/CriticalCases';
-//import Reports from './components/Reports';
-//import Reminders from './components/Reminders';
+import {socket} from "./socket";
+import useGlobalContext from './../GlobalContext';
+import { MastersMapping } from './../Constants';
+import { FieldValues } from './../DataTypes';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
@@ -28,25 +14,68 @@ import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
 import PageNotFound from './components/BasicComponents/PageNotFound';
 
+import Dashboard from './components/Dashboard';
+import LoanAccount from './components/LoanAccount';
+import CreateLoanAccount from './components/CreateLoanAccount';
+import Products from './components/Products';
+import DealsList from './components/DealsList';
+import UserManagement from './components/UserManagement';
+import RoleManagement from './components/RoleManagement';
+import TeamManagement from './components/TeamManagement';
+import Masters from './components/Masters';
+import Zones from './components/Zones';
 
 export const MenuRouter = () => {
 	const [hover,setHover] = useState(-1);
 	const navigate = useNavigate();
-	const {getDecryptedToken} = useGlobalContext();
+	const {getDecryptedToken, getMastersList} = useGlobalContext();
 
-/* 
 	const [socketIsConnected, setSocketIsConnected] = useState( socket.connected);
+  const [masterLists, setMasterLists] = useState<FieldValues>();
+  const [mastersIdList, setMastersIdList] = useState<string[]>();
+	const [changeInMasters,setChangeInMasters] = useState(true);
+  
+	useEffect(()=>{
+    if (changeInMasters){
+      getMastersList().then(res=>{
+        if (res.status==200){
+          const obj:any={};
+          const idArr:string[]=[];
+          res.obj.map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
+          setMasterLists(obj);
+          setMastersIdList(idArr);
+          setChangeInMasters(false);
+        }
+        else
+				setMasterLists({});
+      }).catch(()=>{
+        setMasterLists({})
+      })
+  }
+  },[changeInMasters]);
+
+	useEffect(()=>{
+		if (!masterLists)
+			return;
+		for (let i=0; i<Object.keys(masterLists).length; i++){
+			const cat = Object.keys(masterLists)[i];
+			const vals = masterLists[cat];
+			if ((Object.keys(MastersMapping).includes(cat))){
+				while (MastersMapping[cat].length>1)
+					MastersMapping[cat].pop()
+				MastersMapping[cat].push(...vals);
+			}
+		}
+	},[masterLists]);
 
 	const onConnect = () => {
 		try{
 			setSocketIsConnected(()=>{const a = true; return a});
 			socket.emit("sendMessage", {message:"Connection established"})
-			console.log("CONNECTED")
+			//console.log("CONNECTED");
 			socket.emit("subscribe", "BusinessChannel");
 		}
-		catch(err){
-
-		}
+		catch(err){}
 	}
 
 	const onDisconnect = () => {
@@ -61,11 +90,11 @@ export const MenuRouter = () => {
 			console.log("socketfailed")
 		} )
 		socket.on("disconnect", onDisconnect);
-		socket.on("messageReceived", (data:any)=>{
-			console.log("RECIEVE",data)
+		socket.on("messageReceived", ()=>{
+			//console.log("RECIEVE",data)
 		})
 	},[])
- */
+
 	const logoutUser = () => {
 		localStorage.removeItem("Beacon-DMS-token");
 		navigate("/login");
@@ -83,39 +112,41 @@ export const MenuRouter = () => {
 		getUserInfo().then(res=>{
 			if (res)
 			setUserInfo(
-			<DropdownMenu>
-				<DropdownMenuTrigger className='mb-3 mx-6'>
-					<div className="flex flex-row">
-						<div><ProfileIcon name={res["N"]||"User"} size="small" showStatus={true/* socketIsConnected */}/></div>
-						<div className="text-left mx-3">
-							<p>{res["N"]}</p>
-							<p className="font-light">No Role</p>
+				<DropdownMenu>
+					<DropdownMenuTrigger className='mb-3 mx-6'>
+						<div className="flex flex-row">
+							<div><ProfileIcon name={res["N"]||"User"} size="small" showStatus={socketIsConnected}/></div>
+							<div className="text-left mx-3">
+								<p>{res["N"]}</p>
+								<p className="font-light">No Role</p>
+							</div>
 						</div>
-					</div>
-					</DropdownMenuTrigger>
-				<DropdownMenuContent className='bg-white'>
-					<DropdownMenuItem>Profile</DropdownMenuItem>
-					<DropdownMenuSeparator />
-					<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
-				</DropdownMenuContent>
-			</DropdownMenu>);
+						</DropdownMenuTrigger>
+					<DropdownMenuContent className='bg-white'>
+						<DropdownMenuItem>Profile</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			);
 		})
-	},[/* socketIsConnected */]);
+	},[socketIsConnected]);
 	
 	const [componentList] = useState([
 		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
+		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
 		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
 		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
-		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
 		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
-		{ name: "Transaction Documents", path:"/transaction", component: DocumentList, icon: TransIcon },
-		{ name: "Compliance Documents", path:"/compliance", component: DocumentList, icon: CompIcon },
-		{ name: "Covenants", path:"/covenants", component: DocumentList, icon: CovenantIcon },
-		{ name: "Condition Precedent", path:"/precedent", component: DocumentList, icon: ConditionsIcon },
-		{ name: "Condition Subsequent", path:"/subsequent", component: DocumentList, icon: ConditionsIcon },
+		{ name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },
+		{ name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },
+		{ name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },
+		{ name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },
+		{ name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },
 		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
 		{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
 		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
+		{ name: "Payment Schedule", path:"/schedule", component: DealsList}
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
@@ -156,7 +187,13 @@ export const MenuRouter = () => {
 				<hr />
 				<Routes>
 					{componentList.map((item,index)=>{
-						return <Route key={index} path={item.path} element={createElement(item.component, { key:index, label: item.name })} />
+						const componentProps:any = { key:index, label: item.name}
+						if (item.component==Masters){
+							componentProps["masterLists"] = masterLists;
+							componentProps["idList"] = mastersIdList;
+							componentProps["callMasterLists"] = setChangeInMasters
+						}
+						return <Route key={index} path={item.path} element={createElement(item.component, componentProps)} />
 					})}
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
 					<Route key={"N"} path="/*" element={<PageNotFound/>} />

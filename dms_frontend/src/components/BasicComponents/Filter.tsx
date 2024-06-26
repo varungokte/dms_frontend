@@ -7,7 +7,7 @@ function Filter(props:{value:string[]|string, setValue:Function, options:string[
       displayEmpty
       value={props.value}
       onChange={(e)=>props.setValue(e.target.value)}
-      input={<OutlinedInput sx={{borderRadius:"10px", height:"50px"}}/>}
+      input={<OutlinedInput sx={{backgroundColor:"white", borderRadius:"10px", height:"50px"}}/>}
       renderValue={(selected) => {
         if (typeof selected==="string")
           return selected;

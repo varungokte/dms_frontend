@@ -1,7 +1,8 @@
 import { Autocomplete, TextField as MUITextField } from "@mui/material";
+import { FieldValues } from "DataTypes";
 import { useEffect, useState } from "react";
 
-const MultiTextField = (props:{index:number, id:string, name: string, required:boolean, disabled:boolean, setPrefillValues:Function}) => {
+const MultiTextField = (props:{index:number, id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:FieldValues, setPrefillValues:Function}) => {
   const [results,setResults] = useState<string[]>([]);
 
   useEffect(()=>{
@@ -10,6 +11,7 @@ const MultiTextField = (props:{index:number, id:string, name: string, required:b
       return {...curr};
     })
   },[results])
+
   
   return (
     <Autocomplete 

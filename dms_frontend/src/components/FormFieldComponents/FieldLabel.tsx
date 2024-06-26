@@ -1,4 +1,4 @@
-function FieldLabel (props:{index:number|string, id:string, name:string, required:boolean, disabled:boolean}){
+function FieldLabel (props:{index:number|string, id:string, name:string, required?:boolean, disabled?:boolean}){
   return(
     <label 
       key={props.index+props.id+"1"} htmlFor={props.id} 

@@ -3,9 +3,9 @@ import { BodyRowsMapping, HeaderRows } from "../../BasicComponents/Table";
 import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import DeleteConfirmation from "./../../BasicComponents/DeleteConfirmation";
 import edit_icon from "./../../static/edit_icon.svg";
-import { FormFieldDetails } from "DataTypes";
+import { FieldAttributesList } from "./../../../../DataTypes";
 
-function LoanDocumentView(props:{docData:any, label:string, fieldList:FormFieldDetails, editDocumentFunction:Function, deleteDocumentFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function }){
+function LoanDocumentView(props:{docData:any, label:string, fieldList:FieldAttributesList, editDocumentFunction:Function, deleteDocumentFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function }){
   return (
     <Table className="border rounded-3xl" style={{borderRadius:"md"}}>
       <HeaderRows 

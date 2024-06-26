@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
 
-function TextField (props:{index:number|string, id:string, name: string, type: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, errorMessage?:string, repeatFields?:boolean, formIndex?:number }) {
+function TextField (props:{index:number|string, id:string, name: string, type: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, errorMessage?:string, repeatFields?:boolean, formIndex?:number }) {
   const [message, setMessage] = useState(<></>);
 
   useEffect(()=>{

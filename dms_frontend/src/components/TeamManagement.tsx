@@ -12,12 +12,16 @@ import { useToast } from "./ui/use-toast";
 import { Toaster } from "./ui/toaster";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
-import { FormFieldDetails } from "../../DataTypes";
+import { FieldAttributesList } from "../../DataTypes";
 
-function TeamManagement(){
+function TeamManagement(props:{label:string}){
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+
   const [teamList,setTeamList] = useState<any>();
 
-  const [fieldList] = useState<FormFieldDetails>([
+  const [fieldList] = useState<FieldAttributesList>([
     { category:"grid", row:2, fields:[
       { id:"N", name:"Team Name", type:"text", required:true },
       { id:"L", name:"Team Lead", type:"combobox", multiple:false, required:true },
@@ -42,6 +46,10 @@ function TeamManagement(){
     { category:"grid", row:2, sectionName:"Condition Subsequent", sectionClassName:"text-xl font-medium my-2", fields:[
       { id: "CSM", name:"Maker", type:"combobox", multiple:true, required:true},
       { id: "CSC", name:"Checker", type:"combobox", multiple:true, required:true},
+    ]},
+    { category:"grid", row:2, sectionName:"Payment Schedule", sectionClassName:"text-xl font-medium my-2", fields:[
+      { id: "PDM", name:"Maker", type:"combobox", multiple:true, required:true},
+      { id: "PDC", name:"Checker", type:"combobox", multiple:true, required:true},
     ]}
   ]);
 
@@ -49,10 +57,8 @@ function TeamManagement(){
   const [selectedTeam, setSelectedTeam] = useState("");
   const [teamStatus, setTeamStatus] = useState(-1);
   
-  const {useTitle, addTeam, getTeamsList} = useGlobalContext();
+  const { addTeam, getTeamsList} = useGlobalContext();
   const { toast } = useToast();
-
-  useTitle("Team Management");
 
   const [searchString, setSearchString] = useState("");
 
@@ -74,11 +80,13 @@ function TeamManagement(){
   },[added]);
 
   const teamMembersToArr = (userValues:any) =>{
+    console.log("raw data",userValues)
     const data:any={};
     data["N"] = userValues["N"];
     data["L"] = userValues["L"].values?userValues["L"].values["E"]:userValues["L"];
-    const sections = ["TD","CD","C","CP","CS"];
-    sections.map(name=>{
+    const sections = ["TD","CD","C","CP","CS","PD"];
+    sections.map((name)=>{
+      console.log(name,data)
       data[name]={
         M:userValues[`${name}M`].map((obj:any)=>obj.values?obj.values["E"]:obj),
         C:userValues[`${name}C`].map((obj:any)=>obj.values?obj.values["E"]:obj)
@@ -117,7 +125,7 @@ function TeamManagement(){
       setAdded(true);
       toast({
         title: "Success!",
-        description: "The team has been created",
+        description: "Team members added",
         className:"bg-white"
       });
     };
@@ -129,7 +137,7 @@ function TeamManagement(){
 
   return(
     <div>
-			<p className="text-3xl font-bold m-7">Team Management</p>
+			<p className="text-3xl font-bold m-7">{props.label}</p>
       <br/>
       <Toaster/>
       <div className="flex flex-row">
@@ -150,7 +158,7 @@ function TeamManagement(){
             :<Table className="bg-white rounded-xl">
               <HeaderRows headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}  />
               <BodyRowsMapping 
-                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "text", "countTeam","date", "teamStatus", "action"]}
+                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "text", "count-team","date", "team-status", "action"]}
                 searchRows={[]} filterRows={[]}
                 setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
                 action={teamList.map((_:any, index:number)=>{

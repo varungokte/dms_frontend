@@ -9,13 +9,15 @@ import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 
-function Zones(){
+function Zones(props:{label:string}){
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+
 	const [loanList, setLoanList] = useState<FieldValues[]>();
 	const [zones, setZones] = useState<string[]>([]);
 
-	const {useTitle, getLoanList} = useGlobalContext();
-
-	useTitle("Zones");
+	const {getLoanList} = useGlobalContext();
 
 	useEffect(()=>{
 		setLoanList(undefined);
@@ -30,7 +32,7 @@ function Zones(){
 	
 	return(
 		<div className="m-5">
-			<p className="text-3xl font-bold m-7">Zones</p>
+			<p className="text-3xl font-bold m-7">{props.label}</p>
 			<div className="flex flex-row mx-7">
 				<div className="flex-auto"><Filter value={zones} setValue={setZones} options={ZoneList} placeholderValue="Zones" multiple /> </div>
 			</div>
@@ -43,7 +45,7 @@ function Zones(){
 							<HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount"]} headingClassNames={["w-[100px]","text-center","text-center","text-center","text-center","text-center"]} />
 							<BodyRowsMapping list={loanList} columns={["AID", "CN", "GN", "Z", "SA"]}  dataType={["index","text","text","text","text","text"]}  cellClassName={["font-medium text-center", "text-center text-custom-1","text-center","text-center","text-center","text-center"]} />
 						</Table>
-					:<span><br /> <LoadingMessage sectionName="data" /></span>
+					:<LoadingMessage sectionName="data" />
 				}
 				<br />
 			</div>

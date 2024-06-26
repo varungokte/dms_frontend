@@ -1,4 +1,4 @@
-const CheckboxField = (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) => {
+const CheckboxField = (props:{index:number|string, id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function }) => {
   return (
     <div className="flex flex-row">
       <input type="checkbox" className="mr-3" 

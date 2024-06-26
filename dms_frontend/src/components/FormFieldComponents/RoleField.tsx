@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import SelectField from "./SelectField";
 import PermissionsField from "./PermissionsField";
+import { FieldValues } from "DataTypes";
 
-function RoleField (props:{index:number, id: string, name:string, roleList:any, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function}){
+function RoleField (props:{index:number, id: string, name:string, roleList:FieldValues[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function}){
 
   const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
   const [currentRole, setCurrentRole] = useState("");

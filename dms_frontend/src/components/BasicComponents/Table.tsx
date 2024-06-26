@@ -1,12 +1,13 @@
+import { ReactElement } from "react";
+import moment from "moment";
+import { DocumentStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../Constants";
+import { DocumentStatus, FieldValues, Priority, TableDataTypes, TeamStatus, UserStatus } from "DataTypes";
 
 import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { DocumentStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../Constants";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
+import NumberField from "../FormFieldComponents/NumberField";
 
 import chevron_down from "./../static/chevron-down.svg";
-import moment from "moment";
-import { ReactElement } from "react";
-import { DocumentStatus, FieldValues, Priority, TableDataTypes, TeamStatus, UserStatus } from "DataTypes";
 
 const PriorityStyling = ["-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100"];
 const UserStatusStyling = ["-", "text-yellow-600 bg-yellow-100", "text-green-600 bg-green-100", "text-red-600 bg-red-100"];
@@ -26,7 +27,7 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataType:TableDataTypes, action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function}){
+function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataType:TableDataTypes, action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function}){
   return(
     <TableBody>
       {props.list.map((singleRow,index)=>{
@@ -49,7 +50,7 @@ function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassN
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} />
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} />
         else
           return <></>
       })}
@@ -57,8 +58,7 @@ function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassN
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function}){ 
-  
+function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function}){ 
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType, index)=>{
@@ -71,7 +71,7 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:stri
         else if (dataType=="action" && props.action)
           return handleAction(props.action[props.rowIndex], cellClassName, uniqueIndex)
 
-        else if (dataType=="countTeam")
+        else if (dataType=="count-team")
           return handleCountTeam(props.singleRow, cellClassName, uniqueIndex);
     
         const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
@@ -80,14 +80,16 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes, columns:stri
           return handleDate(item, cellClassName,uniqueIndex);
         else if (dataType=="priority")
           return handlePriority(item, cellClassName, uniqueIndex);
-        else if (dataType=="docStatus")
+        else if (dataType=="doc-status")
           return handleDocStatus(item, cellClassName, uniqueIndex);
-        else if (dataType=="userStatus")
+        else if (dataType=="user-status")
           return handleUserStatus(item, cellClassName, uniqueIndex, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
-        else if (dataType=="teamStatus")
+        else if (dataType=="team-status")
           return handleTeamStatus(item, cellClassName, uniqueIndex, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
-        else if (dataType=="objName")
+        else if (dataType=="obj-name")
           return handleObjName(item, cellClassName, uniqueIndex);
+        else if (dataType=="text-field")
+          return handleTextField(item,cellClassName,uniqueIndex, props.rowIndex, props.columns[props.dataType[0]=="index"?index-1:index], props.setValues||(()=>{}));
         else
           return handleText(item, cellClassName, uniqueIndex);
       })}
@@ -158,6 +160,7 @@ const handleTeamStatus = (status:TeamStatus, cellClassName:string, uniqueIndex:s
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
+      
         <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[1])}} className={`${TeamStatusList[1]} bg-white`}>{TeamStatusList[1]}</DropdownMenuItem>
         <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[2])}} className={`${TeamStatusList[2]} bg-white`}>{TeamStatusList[2]}</DropdownMenuItem>
       </DropdownMenuContent>
@@ -181,6 +184,15 @@ const handleCountTeam = (obj:any, cellClassName:string, uniqueIndex:string) => {
     count+=obj[name]["M"].length+obj[name]["C"].length
   });
   return <TableCell key={uniqueIndex} className={cellClassName}>{count}</TableCell>
+}
+
+const handleTextField = (prefillValue:any, cellClassName:string, uniqueIndex:string, tableIndex:number, columnId:string, setPrefillValue:Function) => {
+  return <TableCell key={uniqueIndex} className="p-2">
+    <NumberField key={uniqueIndex} index={tableIndex} id={columnId} name="" className={cellClassName}
+      prefillValues={{[tableIndex]:{[columnId]:prefillValue}}} setPrefillValues={setPrefillValue} 
+      repeatFields formIndex={tableIndex} enableDecimal
+    />
+  </TableCell>
 }
 
 export { HeaderRows, BodyRowsMapping };

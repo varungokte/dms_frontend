@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
-import { FormRepeatableGrid, NumberField, DateField } from "../FormComponents/FormFields";
-import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import useGlobalContext from "./../../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 import { LoanSecurityTypeList } from "../../../Constants";
 
-function SecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setChangesHaveBeenMade:Function}){
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
+import DateField from "../FormFieldComponents/DateField";
+import NumberField from "../FormFieldComponents/NumberField";
+import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
+
+function LoanSecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setChangesHaveBeenMade:Function}){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
 
@@ -40,7 +43,6 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
     return all_fields_empty;
   }
 
-
   const compareFieldsToPreexisting = () => {
     let changes_have_been_made = false;
     for (let i=0; i<fieldList.length; i++){
@@ -49,9 +51,9 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
         changes_have_been_made= true;
       if (id=="STV"){
         for (let j=0; j<fieldValuesRepeatable.length; j++){
-          if (fieldValuesRepeatable[j]["T"] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues["STV"][j]["T"])
+          if (fieldValuesRepeatable[j]["T"] && props.preexistingValues["STV"] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues["STV"][j]["T"])
             changes_have_been_made= true;
-          if (fieldValuesRepeatable[j]["V"] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues["STV"][j]["V"])
+          if (fieldValuesRepeatable[j]["V"] && props.preexistingValues["STV"] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues["STV"][j]["V"])
             changes_have_been_made= true;
         }
       }
@@ -93,6 +95,7 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
   },[]);
 
   useEffect(()=>{
+    console.log("changed field values",fieldValuesRepeatable)
     let okToChange = areAllFieldsEmpty();
     if (Object.keys(props.preexistingValues).length!=0)
       okToChange = okToChange || !compareFieldsToPreexisting();
@@ -150,4 +153,4 @@ function SecurityDetails(props:{key:number,actionType: string, loanId: string, s
   )
 }
 
-export default SecurityDetails;
+export default LoanSecurityDetails;

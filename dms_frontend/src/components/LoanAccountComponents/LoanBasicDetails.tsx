@@ -1,18 +1,22 @@
 import { FormEvent, useEffect, useState } from "react";
-import useGlobalContext from "./../../../GlobalContext";
-import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
-import { FieldDataTypes, FieldValues } from "DataTypes";
-
-import { TextField, SelectField, NumberField, DateField } from "../FormComponents/FormFields";
-import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
+import useGlobalContext from "../../../GlobalContext";
 import moment from "moment";
+import { FieldValues, GridFieldAttributes } from "DataTypes";
+import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
+
+import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 import { useToast } from "@/components/ui/use-toast"
+import SelectField from "../FormFieldComponents/SelectField";
+import NumberField from "../FormFieldComponents/NumberField";
+import DateField from "../FormFieldComponents/DateField";
+import TextField from "../FormFieldComponents/TextField";
 
-function BasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:FieldValues,setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,assignedTeam:string, teamList:any}) {
+function LoanBasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:FieldValues,setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,assignedTeam:string, teamList:any}) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   
-  const [fieldList] = useState<{id:string, name:string, type:FieldDataTypes, required:boolean, options?:string[]}[]>([
+  const [fieldList] = useState<GridFieldAttributes>(
+    {category:"grid",row:4, fields:[
     { id:"CN", name:"Company Name", type:"text", required: true },
     { id:"GN", name:"Group Name", type:"text", required: false },
     { id:"I", name:"Industry", type:"select", options:IndustryList, required: true },
@@ -24,7 +28,7 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
     { id:"PN", name:"PAN Number", type:"text", required: false },
     { id:"GST", name:"GST Number", type:"text", required: false },
     { id:"CIN", name:"CIN Number", type:"text", required: false },
-    { id:"break", name:"break", type:"text", required:false },
+    { id:"break", name:"break", type:"break", required:false },
     { id:"SD", name:"Sanction Date", type:"date", required: true },
     { id:"DD", name:"Downsell Date", type:"date", required: false },
     { id:"CD", name:"Loan Closure Date", type:"date", required: false },
@@ -37,7 +41,8 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
     { id:"F", name:"DSRA Form", type:"select", options:DSRAFormList, required: false },
     { id:"S", name:"DSRA Created or Not", type:"select", options:YesOrNoList, required: false },
     { id:"V", name:"DSRA Amount", type:"number", required: false },
-  ]);
+    ]}
+  );
 
   const [validationErrors, setValidationErrors] = useState<{[key:string]:string}>({});
 
@@ -74,12 +79,12 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
 
   const compareFieldsToPreexisting = () => {
     let no_changes = true;
-    for (let i=0; i<fieldList.length; i++){
-      const id = fieldList[i].id;
+    for (let i=0; i<fieldList["fields"].length; i++){
+      const id = fieldList["fields"][i].id;
       if (id=="break")
         break;
       let isDateField = false;
-      fieldList.map(obj=>{if (obj.id==id && obj.type=="date") isDateField=true;})
+      fieldList["fields"].map(obj=>{if (obj.id==id && obj.type=="date") isDateField=true;})
       if (fieldValues[id] && (props.preexistingValues[id]!=fieldValues[id] || (isDateField && fieldValues[id]==moment(props.preexistingValues[id]).format("yyyy-MM-DD"))))
         no_changes= false;
     }
@@ -100,7 +105,7 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
           dsra[field] = fieldValues[field];
       }
       let isDateField = false;
-      fieldList.map(obj=>{if (obj.id==field && obj.type=="date") isDateField=true;})
+      fieldList["fields"].map(obj=>{if (obj.id==field && obj.type=="date") isDateField=true;})
       if (fieldValues[field]==null || fieldValues[field]=="" || (Object.keys(props.preexistingValues).length!=0 && (fieldValues[field]==props.preexistingValues[field] || (isDateField && fieldValues[field]==moment(props.preexistingValues[field]).format("yyyy-MM-DD")))))
         return;
       data[field] = fieldValues[field];
@@ -168,7 +173,7 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
       <br/>
       <form onSubmit={submitForm}>
         <div className="grid grid-cols-4">
-          {fieldList.map((field,index)=>{
+          {fieldList["fields"].map((field,index)=>{
             let errorMessage="";
             if (field.id in validationErrors)
               errorMessage=validationErrors[field.id]
@@ -181,7 +186,7 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
               disabled=true;
             
             if (field.type=="select")
-              return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required} disabled={disabled} />
+              return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required||false} disabled={disabled} />
             else if (field.type=="number")
               return <NumberField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else if (field.type=="date")
@@ -199,4 +204,4 @@ function BasicDetails(props:{key:number,actionType: string, loanId: string, setL
 }
 
 
-export default BasicDetails;
+export default LoanBasicDetails;

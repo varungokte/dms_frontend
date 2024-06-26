@@ -1,14 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Table } from "@/components/ui/table"
 import { Ellipsis } from "lucide-react";
 import Search from "./BasicComponents/Search";
 import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import useGlobalContext from "../../GlobalContext";
+//import useGlobalContext from "../../GlobalContext";
 
 
-function Default() {
-  //An array of default cases
-  //Each default case is an array where: [Deal Name, Default Type, Date]
+function Default(props:{label:string}) {
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+  
   const [defaultData] = useState([
     {AID:"001",N:"Mortgage", T:"Payment", D:"01/01/01"},
     {AID:"002",N:"Home Loan", T:"Covenant", D:"02/02/02"},
@@ -16,11 +18,7 @@ function Default() {
   ]);
 
   const [searchString, setSearchString] = useState("");
-
-	const {useTitle} = useGlobalContext();
-
-	useTitle("Default Cases");
-
+  
   return(
     <div>
 			<p className="text-3xl font-bold m-7">Default Cases</p>

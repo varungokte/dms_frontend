@@ -16,7 +16,7 @@ const getValidMaxDate = (id:string, prefillValues:FieldValues):string => {
   return date;
 }
 
-function DateField (props:{index:number|string, id:string, name: string, required:boolean, disabled:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
+function DateField (props:{index:number|string, id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
   return(
     <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />

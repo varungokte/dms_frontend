@@ -7,14 +7,7 @@ function DeleteConfirmation(props:{thing:string, deleteFunction:Function, currIn
 
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger>
-        <span className="inline-block align-middle">
-          <div style={{backgroundColor:"rgba(200, 25, 25, 1)"}} className="mx-3  text-white w-[100px] rounded-[8px] flex flex-row">
-            <img src={delete_icon}/>
-            <span className="m-1">Delete</span>
-          </div>
-        </span>
-      </AlertDialogTrigger>
+      <AlertDialogTrigger><img src={delete_icon}/></AlertDialogTrigger>
       <AlertDialogContent className="bg-white rounded-2xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="m-auto">Delete {props.thing}</AlertDialogTitle>

@@ -1,25 +1,27 @@
 import { useEffect, useState } from 'react';
 import useGlobalContext from "./../../GlobalContext";
-import { FieldValues, FormFieldDetails } from 'DataTypes';
+import { FieldValues, FieldAttributesList } from 'DataTypes';
+import { MastersMapping } from './../../Constants';
 
+import { HeaderRows } from './BasicComponents/Table';
 import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table";
 import FormDialog from './FormComponents/FormDialog';
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
-import { HeaderRows } from './BasicComponents/Table';
 
-import AddIcon from '@mui/icons-material/Add';
 import { CreateButtonStyling } from './BasicComponents/PurpleButtonStyling';
+import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-function Masters(){
-  const [mastersData, setMastersData] = useState<{[key:string]:string[]}>();
-  const [idList, setIdList] = useState<string[]>();
-
-  const [fieldList] = useState<FormFieldDetails>([
-    { category: "single", id:"N", name: "Category Name", type:"text", required:true },
-    { category: "single", id:"V", name: "Values", type:"multitext", required:true},
+function Masters(props:{label:string, masterLists: FieldValues, idList:string[], callMasterLists:Function}){
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+  
+  const [fieldList, setFieldList] = useState<FieldAttributesList>([
+    { category: "single", id:"N", name: "Category Name", type:"select", options:Object.keys(MastersMapping), required:true },
+    { category: "single", id:"V", name: "Values (Enter values separated by commas)", type:"textarea", required:true},
   ]);
 
   const [selected, setSelected] = useState(0);
@@ -35,26 +37,22 @@ function Masters(){
   })
   const [information, setInformation] =useState<"duplicate"|"empty"|"ok"|"success"|"error">("ok");
 
-  const {addToMasters, getMastersList} = useGlobalContext();
+  const {addToMasters} = useGlobalContext();
+
+  useEffect(()=>{
+    if (props.masterLists)
+      setFieldList(curr=>{
+        if (curr[0].category=="single")
+          curr[0].options = Object.keys(MastersMapping).filter(option=>!Object.keys(props.masterLists).includes(option))
+      return [...curr];
+      })
+  },[props.masterLists])
 
   useEffect(()=>{
     if (added){
-      getMastersList().then(res=>{
-        //console.log("RESPONSE",res)
-        if (res.status==200){
-          const obj:any={};
-          const idArr:string[]=[];
-          res.obj.map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
-          setMastersData(obj);
-          setIdList(idArr);
-          setAdded(false);
-        }
-        else
-          setMastersData({});
-      }).catch(()=>{
-        setMastersData({})
-      })
-  }
+      props.callMasterLists(true);
+      setAdded(false);
+    }
   },[added]);
 
   const changeSection = (index:number) => {
@@ -62,16 +60,31 @@ function Masters(){
   }
 
   useEffect(()=>{
-    if (!mastersData)
+    if (!props.masterLists)
       return;
-    const key = Object.keys(mastersData)[selected];
-    const value = mastersData[key];
+    const key = Object.keys(props.masterLists)[selected];
+    const value = props.masterLists[key];
     setNewValues({N:key, V:value});
-  },[selected,mastersData])
-  
+  },[selected,props.masterLists]);
+
+  const cleanUpInput = (str:string):string[] =>{
+    let val=str.trim();
+
+    val=val.replaceAll("\n","");
+    val=val.replaceAll("\"","");
+    val=val.replaceAll(", ",",");
+    val=val.replaceAll(" ,",",");
+    
+    if (val.charAt(val.length-1)==",")
+      val=val.slice(0,val.length-1);
+    const arr = val.split(",");
+    return [...(new Set(arr))];
+  }
+
   const createMaster = async (userValues:FieldValues) =>{
-    const res = await addToMasters(userValues);
-    //console.log("SUBMIT DATA",userValues);
+    userValues["V"]= cleanUpInput(userValues["V"]);
+    console.log(" ", userValues);
+    const res = 200// await addToMasters(userValues);
     if (res==200)
       setAdded(true);
     return res;
@@ -82,10 +95,10 @@ function Masters(){
       setInformation("empty")
       return;
     } 
-    if (!newValues || !idList || information=="duplicate")
+    if (!newValues || !props.idList || information=="duplicate")
       return;
     
-    const userValues = {N:newValues.N, V:newValues.V, _id:idList[selected]}
+    const userValues = {N:newValues.N, V:newValues.V, _id:props.idList[selected]}
 
     //console.log("userValues",userValues)
     
@@ -136,7 +149,7 @@ function Masters(){
   
   return(
     <div>
-      <p className="text-3xl font-bold m-7">Masters</p>
+      <p className="text-3xl font-bold m-7">{props.label}</p>
     
       <div className="flex flex-row">
         <div className="flex-auto"></div>
@@ -146,14 +159,14 @@ function Masters(){
           form={fieldList} currentFields={{}}
         />
       </div>
-      {mastersData
-        ?Object.keys(mastersData).length!=0
+      {props.masterLists
+        ?Object.keys(props.masterLists).length!=0
           ?<div className="flex flex-row relative m-10">
             <div className="mr-9 w-[25%]">
               <Table className="rounded-2xl bg-white">
                 <HeaderRows headingRows={["Category"]} headingClassNames={["text-2xl"]} />
                 <TableBody className="border-none">
-                  {Object.keys(mastersData).map((category, index)=>{
+                  {Object.keys(props.masterLists).map((category, index)=>{
                     return (
                       <TableRow key={index} className="border-none">
                         <TableCell className={`text-xl tableCell ${selected===index?"text-blue-600 bg-slate-200":""}`} onClick={()=>{changeSection(index)}}>
@@ -169,7 +182,7 @@ function Masters(){
     
             <div className="mr-28 w-[50%]">
               <Table className="rounded-2xl bg-white">
-                <HeaderRows headingRows={[Object.keys(mastersData)[selected]]} headingClassNames={["text-2xl"]} />
+                <HeaderRows headingRows={[Object.keys(props.masterLists)[selected]]} headingClassNames={["text-2xl"]} />
                 <TableBody>
                   {newValues?.V.map((data:any,index:number)=>{
                     if (data==="-")

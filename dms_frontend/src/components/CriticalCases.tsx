@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 /* import 'react-date-range/dist/styles.css';
 import 'react-date-range/dist/theme/default.css'; */
 
@@ -6,20 +6,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "
 import { Ellipsis } from "lucide-react";
 
 import Search from "./BasicComponents/Search";
-import useGlobalContext from "./../../GlobalContext";
+//import useGlobalContext from "./../../GlobalContext";
 
-function CriticalCases() {
-  //An array of critical cases
-  //Each critical case is an array where: [Document Name, Document Type, Date, Priority(will always be HIGH)]
+function CriticalCases(props:{label:string}) {
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+  
   const [defaultData] = useState([
     ["Lender's Agent Agreeement", "PDF", "01/01/01"],
     ["Lender's Agent Agreeement", "PNG", "02/02/02"],
     ["Power Purchase Agreement", "PDF", "03/03/03"]
   ]);
-
-  const {useTitle} = useGlobalContext();
-
-  useTitle("Critical Cases")
 
   const [searchString, setSearchString] = useState("");
   return(

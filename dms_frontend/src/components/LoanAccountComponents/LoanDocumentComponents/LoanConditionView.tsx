@@ -3,14 +3,14 @@ import { BodyRowsMapping, HeaderRows } from "../../BasicComponents/Table";
 import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import DeleteConfirmation from "./../../BasicComponents/DeleteConfirmation";
 import edit_icon from "./../../static/edit_icon.svg";
-import { FieldValues, FormFieldDetails } from "DataTypes";
+import { FieldValues, FieldAttributesList } from "DataTypes";
 
-function LoanConditionView(props:{conData:FieldValues[], label:string, fieldList:FormFieldDetails, editConditionFunction:Function, deleteConditionFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
+function LoanConditionView(props:{conData:FieldValues[], label:string, fieldList:FieldAttributesList, editConditionFunction:Function, deleteConditionFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function}){
   return(
     <Table className="border rounded-2xl">
       <HeaderRows headingRows={["Condition Name", "Priority", "Phyical Location", "Execution Location", "Start Date","End Date", "Action"]} />
       <BodyRowsMapping
-        list={props.conData} columns={["N","P","PL","EL", "SD", "ED"]} dataType={["text","priority", "text","text", "text", "text", "action"]}
+        list={props.conData} columns={["N","P","PL","EL", "SD", "ED"]} dataType={["text","priority", "text","text", "date", "date", "action"]}
         searchRows={[]} filterRows={[]}
         action = {props.conData.map((item:any, index:number)=>{
           item;

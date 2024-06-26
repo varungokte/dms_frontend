@@ -12,12 +12,16 @@ import edit_icon from "./static/edit_icon.svg";
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
-import { FormFieldDetails } from "DataTypes";
+import { FieldAttributesList } from "DataTypes";
 
-function UserManagement(){
+function UserManagement(props:{label:string}){
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+
   const [userData, setUserData]= useState<any>();
   
-  const [fieldList] = useState<FormFieldDetails>([
+  const [fieldList] = useState<FieldAttributesList>([
     { category: "grid", row: 2, fields: [
       { id: "N", name: "Name", type: "text", required:true },
       { id: "E", name: "Email", type: "email", immutable: true, required:true },
@@ -39,10 +43,6 @@ function UserManagement(){
   const changeUserInfo = useGlobalContext().editUser;
   const getUsers = useGlobalContext().getAllUsers;
 
-  const {useTitle} = useGlobalContext();
-
-  useTitle("User Management");
-
   useEffect(()=>{
     if (added)
       getUsers().then((res)=>{
@@ -53,7 +53,7 @@ function UserManagement(){
         else
           setUserData([]);
       }).catch(()=> {
-        setUserData([])
+        setUserData([]);
       })
   },[added])
 
@@ -86,7 +86,7 @@ function UserManagement(){
     const res = await newUser(userValues);
 
     if (res==200)
-      setAdded(true);
+      setAdded(true); 
     
     return res;
   }
@@ -123,7 +123,7 @@ function UserManagement(){
 
   return(
     <div>
-			<p className="text-3xl font-bold m-7">User Management</p>
+			<p className="text-3xl font-bold m-7">{props.label}</p>
       <div className="flex flex-row">
         <div className='m-auto flex-auto'>
           <Search setter={setSearchString} label="Search Users" className="mx-7"/>
@@ -150,7 +150,7 @@ function UserManagement(){
             :<Table className="bg-white border-2 ro ded-xl">
               <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
               <BodyRowsMapping
-                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "text","text", "userStatus", "action"]}
+                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "text","text", "user-status", "action"]}
                 searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
                 setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
                 action = {userData.map((_:any, index:number)=>{

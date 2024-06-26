@@ -1,14 +1,23 @@
 import { ReactElement, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { FieldValues, FormDialogTypes, FormFieldDetails, UserSuggestionTypes, UserSuggestionsList } from "DataTypes";
+import { FieldAttributesList, FieldValues, FormDialogTypes, UserSuggestionTypes, UserSuggestionsList } from "DataTypes";
 
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { CheckboxField, ComboboxField, DateField, MultiTextField, NumberField, PermissionsField, RoleField, SelectField, TextAreaField, TextField } from "./FormFields";
-
-import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
+import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
-function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, triggerText:string|ReactElement, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:FormFieldDetails, currentFields:FieldValues, repeatFields?:boolean, suggestions?:UserSuggestionTypes, getRoles?:boolean }){
+import CheckboxField from "../FormFieldComponents/CheckboxField";
+import ComboboxField from "../FormFieldComponents/ComboboxField";
+import DateField from "../FormFieldComponents/DateField";
+import MultiTextField from "../FormFieldComponents/MultiTextField";
+import NumberField from "../FormFieldComponents/NumberField";
+import PermissionsField from "../FormFieldComponents/PermissionsField";
+import RoleField from "../FormFieldComponents/RoleField";
+import SelectField from "../FormFieldComponents/SelectField";
+import TextAreaField from "../FormFieldComponents/TextAreaField";
+import TextField from "../FormFieldComponents/TextField";
+
+function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, triggerText:string|ReactElement, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:FieldAttributesList, currentFields:FieldValues, repeatFields?:boolean, suggestions?:UserSuggestionTypes, getRoles?:boolean }){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
@@ -24,7 +33,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
     data["_id"]=prefillValues["_id"];
     data["N"]=prefillValues["N"];
     data["L"]=prefillValues["L"];
-    const sections = ["TD","CD","C","CP","CS"];
+    const sections = ["TD","CD","C","CP","CS","PD"];
     for (let i=0; i<sections.length; i++){
       const section = sections[i];
       const obj = prefillValues[section];
@@ -74,7 +83,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
       
       //console.log("RECENTLY ASSIGEND DATA",data);
       if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1)){
-        //console.log("ERROR",key,value,Object.keys(data))
+        console.log("ERROR",key,value,Object.keys(data),data)
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }
@@ -106,8 +115,11 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
         setOpen(false);
       else if (res==422)
         setErrorMessage(<p className="text-red-600">Already exists.</p>);
-      else
+      else{
         setErrorMessage(<p className="text-yellow-600">Something went wrong.</p>);
+        console.log("PREFILL VALUES",prefillValues)
+        prefillValues["UP"] = JSON.parse(prefillValues["UP"])
+      }
     }
   }
   return (
@@ -137,7 +149,7 @@ function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, tr
   )
 }
 
-function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FormFieldDetails, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean}){
+function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean}){
   const [roles, setRoles] = useState<FieldValues[]>();
   const [suggestionsUnformatted, setSuggestionsUnformatted] = useState<any>();
 
@@ -214,7 +226,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     const data:any={};
     data["_id"]=props.prefillValues["_id"];
     data["L"]=props.prefillValues["L"];
-    const sections = ["TD","CD","C","CP","CS"];
+    const sections = ["TD","CD","C","CP","CS","PD"];
     for (let i=0; i<sections.length; i++){
       const section = sections[i];
       const obj = props.prefillValues[section];
@@ -265,7 +277,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
             prefillValue={props.formType=="user"?props.prefillValues[field["id"]]:teamMembers[field["id"]]} setPrefillValues={props.setPrefillValues} multiple={field["multiple"]} suggestions={suggestionsList}
           />
         else if (field["type"]=="role")
-          return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} roleList={roles}
+          return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} roleList={roles||[]}
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
             prefillValues={{...props.prefillValues}} setPrefillValues={props.setPrefillValues} 
           />
@@ -292,7 +304,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
         else if (field["type"]=="multitext")
           return <MultiTextField key={index} index={index} id={field["id"]} name={field["name"]} 
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            setPrefillValues={props.setPrefillValues} 
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="checkbox")
           return <CheckboxField key={index} index={index} id={field["id"]} name={field["name"]} 

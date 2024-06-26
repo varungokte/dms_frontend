@@ -18,7 +18,7 @@ function ViewFileButton(props:{AID:string, loanId:string, docId:string, sectionN
         <span className="m-auto" style={{color:"rgba(255, 178, 0, 1)"}}>View</span>
       </button>
       {openDialog
-        ?<Dialog onClose={()=>setOpenDialog(false)} fullScreen open={openDialog}>
+        ?<Dialog open={openDialog} onClose={()=>setOpenDialog(false)} fullScreen>
           <FileViewer {...props} setOpenDialog={setOpenDialog} status={props.status} setAdded={props.setAdded} rejectionReason={props.rejectionReason} />
         </Dialog>
         :<></>

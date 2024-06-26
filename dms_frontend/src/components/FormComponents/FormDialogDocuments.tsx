@@ -1,19 +1,24 @@
 import { ReactElement, useEffect, useState } from "react";
-import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+//import useGlobalContext from "./../../../GlobalContext";
+import { DocumentSectionTypes, FieldAttributesList, FieldValues} from "./../../../DataTypes";
+import { FileTypeList } from "../../../Constants";
+
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
-import { DateField, SelectField, TextAreaField, TextField } from "./FormFields";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import {useDropzone} from "react-dropzone";
 import { Upload } from "lucide-react";
-
 import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
-import { FieldValues, FormDialogDocumentTypes, FormFieldDetails } from "DataTypes";
-import { FileTypeList } from "../../../Constants";
-//import useGlobalContext from "./../../../GlobalContext";
+import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
-function FormDialogDocuments(props:{index:number, type:FormDialogDocumentTypes, triggerText:string|ReactElement, triggerClassName:string, titleText:string, currentFields:FieldValues, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, formFields:FormFieldDetails, edit:boolean, currIndex?:number}){
+
+import SelectField from "../FormFieldComponents/SelectField";
+import TextAreaField from "../FormFieldComponents/TextAreaField";
+import DateField from "../FormFieldComponents/DateField";
+import TextField from "../FormFieldComponents/TextField";
+
+function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, triggerText:string|ReactElement, triggerClassName:string, titleText:string, currentFields:FieldValues, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, formFields:FieldAttributesList, edit:boolean, currIndex?:number}){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [fileList, setFileList] = useState<any>([]);

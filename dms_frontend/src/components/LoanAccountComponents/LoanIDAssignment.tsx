@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useGlobalContext from "./../../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 
-function GenerateLoanID(props:any){
+function LoanIDAssignment(props:any){
   const navigate = useNavigate();
   const {createAID} = useGlobalContext();
 
@@ -72,10 +72,8 @@ function GenerateLoanID(props:any){
         {errorMessage}
       </div>
       <br/>
-      {/* <button onClick={()=>{props.setOkToFrolic(true);
-        props.setCurrentSection(1);}}>Skip</button> */}
     </div>
   )
 }
 
-export default GenerateLoanID;
+export default LoanIDAssignment;

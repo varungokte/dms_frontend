@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Autocomplete, TextField as MUITextField } from "@mui/material";
 import FieldLabel from "./FieldLabel";
 
-function ComboboxField (props:{index:number|string, id: string, name:string, suggestions:any, required:boolean, disabled:boolean, prefillValue:any, setPrefillValues:Function, multiple?:boolean, edit?:boolean}){
+function ComboboxField (props:{index:number|string, id: string, name:string, suggestions:any, required?:boolean, disabled?:boolean, prefillValue:any, setPrefillValues:Function, multiple?:boolean, edit?:boolean}){
   const [value, setValue] = useState("");
 	const [results, setResults] = useState<any>([]);
   const [defaultValue,setDefaultValue] = useState<any>();
@@ -40,7 +40,7 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
 
   return (
     <div key={props.index}>
-      <FieldLabel index={props.index} id={props.id} name={""} required={false} disabled={props.disabled} />
+      <FieldLabel index={props.index} id={props.id} name={""} required={false} disabled={props.disabled || false} />
       <Autocomplete key={props.index+defaultValue} id={props.id} disablePortal
         multiple={props.multiple}
         disabled={props.disabled}

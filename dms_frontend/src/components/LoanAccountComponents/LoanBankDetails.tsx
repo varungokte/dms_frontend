@@ -1,29 +1,33 @@
-import { FormRepeatableGrid } from "../FormComponents/FormFields";
+
 import { useEffect, useState } from "react";
-import useGlobalContext from "./../../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { BankAccountTypeList } from "../../../Constants";
+import { GridFieldAttributes } from "DataTypes";
+import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 
-function BankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,setChangesHaveBeenMade:Function}) {
+function LoanBankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,setChangesHaveBeenMade:Function}) {
   const {createLoan} = useGlobalContext();
 
-  const [fieldList] = useState([
-    { id:"AN", name:"Account Name", type:"text", required:false },
-    { id:"BAN", name:"Account Number", type:"text",required:false },
-    { id:"AT", name:"Account Type", type:"select", options:BankAccountTypeList,required:false },
-    { id:"IFSC", name:"IFSC", type:"text",required:false },
-    { id:"BN", name:"Bank Name", type:"text",required:false},
-    { id:"LB", name:"Branch Name", type:"text",required:false },
-    { id:"BA", name:"Branch Address", type:"text",required:false },
-  ]);
+  const [fieldList] = useState<GridFieldAttributes>({
+    category:"grid", row:4, fields:[
+      { id:"AN", name:"Account Name", type:"text", required:false },
+      { id:"BAN", name:"Account Number", type:"text",required:false },
+      { id:"AT", name:"Account Type", type:"select", options:BankAccountTypeList,required:false },
+      { id:"IFSC", name:"IFSC", type:"text",required:false },
+      { id:"BN", name:"Bank Name", type:"text",required:false},
+      { id:"LB", name:"Branch Name", type:"text",required:false },
+      { id:"BA", name:"Branch Address", type:"text",required:false },
+    ]
+  });
   
   const [fieldValues, setFieldValues] = useState<any>([{}]);
   const [valuesExist, setValuesExist] = useState(false);
 
   const areAllFieldsEmpty = () => {
     let all_fields_empty=true;
-    for (let i=0; i<fieldList.length; i++){
-      const field = fieldList[i];
+    for (let i=0; i<fieldList["fields"].length; i++){
+      const field = fieldList["fields"][i];
       for (let j=0; j<fieldValues.length; j++){
         const singleAccount=fieldValues[j];
         if (singleAccount[field.id] && singleAccount[field.id]!="" && singleAccount[field.id]!=-1)
@@ -35,8 +39,8 @@ function BankDetails(props:{key:number,actionType: string, loanId: string, setLo
   
   const compareFieldsToPreexisting = () => {
     let changes_have_been_made=false;
-    for (let i=0; i<fieldList.length; i++){
-      const field = fieldList[i];
+    for (let i=0; i<fieldList["fields"].length; i++){
+      const field = fieldList["fields"][i];
       for (let j=0; j<fieldValues.length; j++)
         if (fieldValues[j][field.id] &&  props.preexistingValues["BD"] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
         changes_have_been_made=true;
@@ -104,10 +108,10 @@ function BankDetails(props:{key:number,actionType: string, loanId: string, setLo
     <div className="">
       <br/>
       <form onSubmit={submitForm}>
-        <FormRepeatableGrid fieldList={fieldList} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={valuesExist} />
+        <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={valuesExist} />
         <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
       </form>
     </div>
   )
 }
-export default BankDetails;
+export default LoanBankDetails;

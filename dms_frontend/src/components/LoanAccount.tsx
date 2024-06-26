@@ -10,14 +10,16 @@ import edit_icon from "./static/edit_icon.svg";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 
-function LoanAccount() {
+function LoanAccount(props:{label:string}) {
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+
   const [accountList, setAccountList] = useState<any>();
   const [ids, setIds] = useState([]);
 
-  const {getLoanList, useTitle} = useGlobalContext();
+  const {getLoanList} = useGlobalContext();
 
-  useTitle("Loan Account");
-  
   useEffect(()=>{
     getLoanList().then(res=>{
       const idarr:any=[];

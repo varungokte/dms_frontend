@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "./../../../GlobalContext";
+import useGlobalContext from "../../../GlobalContext";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
@@ -17,12 +17,13 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
+import { FieldAttributesList } from "./../../../DataTypes";
 
 
-function ContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
+function LoanContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [contacts, setContacts] = useState<any>();
 
-  const [fieldList] = useState<any>([
+  const [fieldList] = useState<FieldAttributesList>([
     { category: "grid", row:3, sectionName:"", fields: [
       { id: "CT", type: "select", name: "Contact Type", options: ContactTypeList, required:true },
       { id: "CN", type:"text", name: "Company Name", required:true },
@@ -269,4 +270,4 @@ function ContactDetails(props:{key:number,actionType: string, loanId: string, se
   )
 }
 
-export default ContactDetails;
+export default LoanContactDetails;

@@ -1,4 +1,4 @@
-import useGlobalContext from "./../../../../GlobalContext";
+/* import useGlobalContext from "../../../GlobalContext";
 
 const addDocument = async(userValues:any,loanId:string, sectionName:string) => {
   const { addDocument } = useGlobalContext();
@@ -55,11 +55,11 @@ const deleteDocument = async (AID:string,docId:string, sectionName:string, fileN
   return res;
 }
 
-/* const getFiles = async (AID:string, ) => {
+const getFiles = async (AID:string, ) => {
   const {getFileList}  = useGlobalContext();
 
   const res = getFileList(AID,sectionName,"")
 }
- */
 
-export { addDocument, editDocument, deleteDocument, uploadFile, showDocumentList };
+
+export { addDocument, editDocument, deleteDocument, uploadFile, showDocumentList }; */

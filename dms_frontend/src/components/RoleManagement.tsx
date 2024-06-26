@@ -6,16 +6,20 @@ import FormDialog from "./FormComponents/FormDialog";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 
-import { FieldValues, FormFieldDetails } from "DataTypes";
+import { FieldValues, FieldAttributesList } from "DataTypes";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { PermissionsField } from "./FormComponents/FormFields";
+import PermissionsField from "./FormFieldComponents/PermissionsField";
 import { useToast } from "./ui/use-toast";
 
-function RoleManagement(){
+function RoleManagement(props:{label:string}){
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+
   const [roleList, setRoleList] = useState<any[]>();
 
-  const [fieldList] = useState<FormFieldDetails>([
+  const [fieldList] = useState<FieldAttributesList>([
     { category: "single", id: "N", name:"Role Name", type: "text" },
     { category: "single", id: "P", name: "Permissions", type: "permissions", newRole:true }
   ]);
@@ -23,9 +27,7 @@ function RoleManagement(){
   const [open, setOpen] = useState<boolean[]>([]);
   const [added, setAdded] = useState(true);
 
-	const {useTitle, addRole, getRolesList} = useGlobalContext();
-
-	useTitle("Role Management");
+	const { addRole, getRolesList} = useGlobalContext();
 
   const {toast} = useToast();
   
@@ -93,7 +95,7 @@ function RoleManagement(){
 
   return (
     <div>
-			<p className="text-3xl font-bold m-7">Role Management</p>
+			<p className="text-3xl font-bold m-7">{props.label}</p>
       <br/>
       <div className="flex flex-row">
         <div className="flex-auto">

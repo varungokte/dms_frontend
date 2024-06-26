@@ -1,21 +1,15 @@
 import axios from 'axios';
 import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
-import { useEffect } from 'react';
-import { UserSuggestionTypes } from 'DataTypes';
+import { FieldValues, UserSuggestionTypes } from 'DataTypes';
 
-//const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
-const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
+const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
+//const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
 //const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
 
 const encryption_key = "JAIBAJRANGBALI";
 
 //HELPERS
-const useTitle = (title:string) => {
-	useEffect(()=>{
-		document.title=title+" | Beacon DMS"
-	},[title])
-}
 
 const handleEncryption = async (data:object) => {
 	try{
@@ -248,7 +242,6 @@ const getSingleUser = async (id:string) => {
 const getLoanList = async (filterType?:"Z"|"P", filterCategory?:string|string[]) => {
 	try {
 		const token = getEncryptedToken();
-		console.log("VALUES",filterType,filterCategory)
 		const response = await axios.get(`${Base_Url}/listLoan`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:{T:filterType, V:filterCategory }
@@ -458,7 +451,7 @@ const addTeam = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addTeam`, {data: enc_data}, {
+		const response = await axios.post(`${Base_Url}/updateTeam`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -533,13 +526,22 @@ const editDocument =  async (data:any) => {
 	}
 };
 
-const uploadFile = async (data:any,loc:string,docId:string) => {
+const uploadFile = async (data:any,loc:string, docId:string|number, loanId?:string, isPayment?:boolean) => {
 	try {
 		const token = getEncryptedToken();
+		
+		const query:FieldValues = { "LOC":loc};
+		
+		if (isPayment) query["POS"]=docId;
+
+		if (loanId)
+			query["_id"]=loanId;
+		else
+			query["_id"]=docId;
 		//console.log("DATA",data)
 		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
-			params: { "LOC":loc, "_id":docId }
+			params: query
 		});
 
 		return response.status;
@@ -547,9 +549,9 @@ const uploadFile = async (data:any,loc:string,docId:string) => {
 
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
-			return error.response;
+			return error.response.status;
 	}
 };
 
@@ -680,7 +682,6 @@ const selectTeam = async (data:any) => {
 }
 
 //MASTERS
-
 const addToMasters = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
@@ -716,8 +717,6 @@ const getMastersList = async () =>  {
 	}
 };
 
-//updateMst, listMst,
-
 /* const decrypt = async (data:object) => {
 	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
 	console.log("ENCRYPTED TEXTZ", encryptedText);
@@ -730,9 +729,44 @@ const getMastersList = async () =>  {
 }
 */
 
+const addPaymentSchedule = async (data:any) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${Base_Url}/addPaymentDetails`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return;
+		else
+			return error.response.status;
+	}
+}
+
+const getPaymentSchedule = async (loanId:string) =>  {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.get(`${Base_Url}/listPaymentDetails`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params:{_loanId:loanId}
+		});
+		const decryptedObject = await handleDecryption(response.data);
+		
+		return {status: response.status, obj:decryptedObject||null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else
+			return {status: error.reponse.status, obj:null};;
+	}
+};
+
 const useGlobalContext = () => {
 	return {
-		useTitle,
 		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
 		RegisterAdmin, LoginUser,
 		sendOTP, verifyOTP,
@@ -748,6 +782,7 @@ const useGlobalContext = () => {
 		selectTeam,
 		addToMasters,getMastersList,
 		getDealList,
+		addPaymentSchedule, getPaymentSchedule,
 	}
 }
 

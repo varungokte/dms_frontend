@@ -14,7 +14,7 @@ import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { Toaster } from "../ui/toaster";
 import { CovenantTypeList } from "../../../Constants";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import setSection from "./LoanDocumentComponents/SectionDetails";
+import setSection from "./LoanDocumentComponents/LoanDocSectionDetails";
 
 function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
   const [docData, setDocData] = useState<FieldValues[]>();
