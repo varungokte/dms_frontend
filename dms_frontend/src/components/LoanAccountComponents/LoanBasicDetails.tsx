@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import moment from "moment";
 import { FieldValues, GridFieldAttributes, LoanCommonProps } from "DataTypes";
-import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
+import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanTypeList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
 
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
@@ -22,7 +22,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
     { id:"I", name:"Industry", type:"select", options:IndustryList, required: true },
     { id:"Z", name:"Zone", type:"select", options:ZoneList, required: true },
     { id:"P", name:"Loan Product", type:"select", options:LoanProductList, required: false },
-    { id:"T", name:"Loan Type", type:"select", options:LoanProductList, required: true },
+    { id:"T", name:"Loan Type", type:"select", options:LoanTypeList, required: true },
     { id:"ST", name:"Secured", type:"select", options:LoanSecuredList, required: true }, 
     { id:"PS", name:"Project Status", type:"select", options:ProjectStatusList, required: true },
     { id:"PN", name:"PAN Number", type:"text", required: false },
@@ -33,14 +33,14 @@ function LoanBasicDetails(props:LoanCommonProps) {
     { id:"DD", name:"Downsell Date", type:"date", required: false },
     { id:"CD", name:"Loan Closure Date", type:"date", required: false },
     { id:"RED", name:"Repayment End Date", type:"date", required: false },
-    { id:"SA", name:"Sanction Amount", type:"number", required: true },
-    { id:"HA", name:"Hold Amount", type:"number", required: true },
-    { id:"DA", name:"Downsell Amount", type:"number", required: false },
-    { id:"OA", name:"Outstanding Amount", type:"number", required: false },
+    { id:"SA", name:"Sanction Amount", type:"number", numtype:"curr", required: true },
+    { id:"HA", name:"Hold Amount", type:"number", numtype:"curr", required: true },
+    { id:"DA", name:"Downsell Amount", type:"number", numtype:"curr", required: false },
+    { id:"OA", name:"Outstanding Amount", type:"number", numtype:"curr", required: false },
     { id:"A", name:"DSRA Applicability", type:"select", options:YesOrNoList, required: false },
     { id:"F", name:"DSRA Form", type:"select", options:DSRAFormList, required: false },
     { id:"S", name:"DSRA Created or Not", type:"select", options:YesOrNoList, required: false },
-    { id:"V", name:"DSRA Amount", type:"number", required: false },
+    { id:"V", name:"DSRA Amount", type:"number", numtype:"curr", required: false },
     ]}
   );
 
@@ -188,7 +188,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
             if (field.type=="select")
               return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required||false} disabled={disabled} />
             else if (field.type=="number")
-              return <NumberField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
+              return <NumberField key={field.id} index={field.id} id={field.id} name={field.name||""} type={field.numtype} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else if (field.type=="date")
               return <DateField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else

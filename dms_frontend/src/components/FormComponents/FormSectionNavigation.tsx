@@ -33,7 +33,7 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
         {props.isForm
           ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1 p-3" type="submit">
             <div className="flex flex-row place-content-center">
-              <div>Save & Next</div>
+              <div>Next</div>
               <ChevronRight/>
             </div>
           </button>

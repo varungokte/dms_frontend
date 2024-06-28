@@ -30,7 +30,11 @@ function LoanRatings(props:LoanCommonProps) {
 
   const [ratingsList, setRatingsList] = useState<FieldValues[]>();
   const [added, setAdded] = useState(true);
- // const [searchString, setSearchString] = useState("");
+  // const [searchString, setSearchString] = useState("");
+
+  useEffect(()=>{
+    props.setUnsavedWarning(false);
+  },[])
 
   useEffect(()=>{
     if (added){

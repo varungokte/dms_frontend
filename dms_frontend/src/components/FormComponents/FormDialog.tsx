@@ -149,7 +149,7 @@ function FormDialog(props:FormDialogProps){
             <hr/>
           </DialogHeader>
             <RequiredFieldsNote />
-            <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestions={props.suggestions} getRoles={props.getRoles} />
+            <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestions={props.suggestions} getRoles={props.getRoles} formSubmit={props.formSubmit} />
             {errorMessage}
             <br/>
             <div className="flex flex-row">
@@ -166,7 +166,7 @@ function FormDialog(props:FormDialogProps){
   )
 }
 
-function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean}){
+function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
   const [roles, setRoles] = useState<FieldValues[]>();
   const [suggestionsUnformatted, setSuggestionsUnformatted] = useState<any>();
 
@@ -174,8 +174,24 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   const [zone, setZone] = useState(-1);
 
   const [teamMembers, setTeamMembers] = useState<FieldValues>({});
-  
+  const [teamLead, setTeamLead] = useState<string>();
+
   const {getUserSuggestions, getSingleUser, getRolesList, getSingleTeam} = useGlobalContext();
+
+  useEffect(()=>{
+    if (props.formType=="team" && props.prefillValues && props.prefillValues["L"])
+      setTeamLead(props.prefillValues["L"].values["E"])
+  },[props])
+
+  useEffect(()=>{
+    console.log("props",props.prefillValues)
+    if (props.formType=="team"&&props.formSubmit&& props.prefillValues["L"]){
+      getUserSuggestions("TL",props.prefillValues["L"].values["E"]).then(res=>{
+        console.log("suggestions TL",res)
+      })
+    }
+  },[teamLead])
+  
 
   const listRoles = async () => {
     const res = await getRolesList();
@@ -191,8 +207,9 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     setRoles([]);
   };
 
-  const listSuggestions = async () => {
-    const res = await getUserSuggestions(props.suggestions||"AU");
+  const listSuggestions = async (suggestionType?:UserSuggestionTypes) => {
+    const res = await getUserSuggestions(suggestionType?suggestionType:props.suggestions||"RM");
+    console.log("sugg",props.suggestions, res.obj)
     if (res.status==200)
       setSuggestionsUnformatted(res.obj);
     else
@@ -314,7 +331,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
         else if (field["type"]=="number")
-          return <NumberField key={index} index={index} id={field["id"]} name={field["name"]} 
+          return <NumberField key={index} index={index} id={field["id"]} name={field["name"]} type={field["numtype"]}
             required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />

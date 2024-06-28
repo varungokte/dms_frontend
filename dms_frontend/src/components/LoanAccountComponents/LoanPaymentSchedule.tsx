@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import moment from "moment";
 import { FrequencyList, HolidayConventionList, InterestTypeList } from "./../../../Constants";
 import { FieldValues, GridFieldAttributes, LoanCommonProps } from "./../../../DataTypes";
@@ -17,7 +17,7 @@ import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 function LoanPaymentSchedule(props:LoanCommonProps){
   const [fieldList] = useState<GridFieldAttributes>(
     {category:"grid", row:2, fields:[
-      {id:"P", name:"Principal", type:"number", required:true},
+      {id:"P", name:"Principal", type:"number", numtype:"curr", required:true},
       {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true},
       {id:"SD", name:"Start Date", type:"date", required:true},
       {id:"ED", name:"End Date", type:"date", required:true},
@@ -32,7 +32,13 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [installmentError, setInstallmentError] = useState(<></>);
 
-  const {addPaymentSchedule} = useGlobalContext();
+  const {addPaymentSchedule, getPaymentSchedule} = useGlobalContext();
+
+  useEffect(()=>{
+    getPaymentSchedule(props.loanId).then(res=>{
+      console.log("response",res)
+    })
+  },)
 
   const validateFields = () => {
     for (let i=0; i<fieldList.fields.length; i++){
@@ -139,7 +145,7 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="number")
-            return <NumberField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
+            return <NumberField key={index} index={index} id={field.id} name={field.name} type={field.numtype} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
           else if (field.type=="date")
             return <DateField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
           else if (field.type=="select")
@@ -148,7 +154,7 @@ function LoanPaymentSchedule(props:LoanCommonProps){
             return <RadioGroupField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
         })}
         {fieldValues["T"]==InterestTypeList[1]
-          ?<NumberField key={5} index={5} id="I" name="Interest Rate" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
+          ?<NumberField key={5} index={5} id="I" name="Interest Rate" type="rate" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
           :<div></div>
         }
         {fieldValues["T"]

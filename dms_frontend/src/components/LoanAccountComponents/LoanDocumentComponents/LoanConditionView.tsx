@@ -18,7 +18,7 @@ function LoanConditionView(props:{conData:FieldValues[], label:string, fieldList
               <FormDialogDocuments key={index} index={index} edit={true} type="con" 
                 triggerText={<img src={edit_icon} /* className="mr-5" *//>} triggerClassName={""} titleText={props.label}  
                 detailSubmit={props.editConditionFunction} fileSubmit={props.addFileFunction} deleteFile={props.deleteFileFunction} getFiles={props.getFileListFunction}
-                formFields={props.fieldList} currentFields={props.conData[index]}
+                formFields={props.fieldList} currentFields={props.conData[index]} currIndex={index}
               />
               {/* <DeleteConfirmation thing="covenant" deleteFunction={props.deleteConditionFunction} currIndex={index}/> */}
             </div>

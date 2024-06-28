@@ -127,10 +127,18 @@ const validateDownsellAmount = (value:number, id:string, prefillValues:FieldValu
   return downsell_amount;
 }
 
-function NumberField (props:{index:number|string, id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number, enableDecimal?:boolean }) {
+function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number, enableDecimal?:boolean }) {
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
-  const [numberFormatter] = useState(new Intl.NumberFormat("en-IN"));
+
+  const numberFormatter = (num:number) => {
+    if (props.type=="curr")
+      return new Intl.NumberFormat("en-IN").format(num);
+    /* else if (props.type=="rate")
+      return new Intl.NumberFormat("en-IN",{style:"percent"}).format(num/100); */
+    else
+      return num;
+  } 
 
   const [amountFields] = useState(["SA", "HA", "DA", "OA","P",]);
   useEffect(()=>{
@@ -158,8 +166,8 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
         disabled={props.disabled} required={props.required}
 
         value={props.repeatFields
-          ?props.prefillValues[props.formIndex||0][props.id]?numberFormatter.format(Number(props.prefillValues[props.formIndex||0][props.id])):""
-          :props.prefillValues[props.id]!==undefined?numberFormatter.format(Number(props.prefillValues[props.id])):""
+          ?props.prefillValues[props.formIndex||0][props.id]?numberFormatter(Number(props.prefillValues[props.formIndex||0][props.id])):""
+          :props.prefillValues[props.id]!==undefined?numberFormatter(Number(props.prefillValues[props.id])):""
         }
 
         onChange={props.repeatFields && props.formIndex!=null
@@ -169,6 +177,7 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
             for (let i=0; i<val_w_commas.length; i++)
               if (!isNaN(Number(val_w_commas[i])))
                 val+=val_w_commas[i];
+
             if (isNaN(Number(val)))
               return;
 
@@ -179,11 +188,17 @@ function NumberField (props:{index:number|string, id:string, name: string, requi
           }
           :(e)=>{
             const val_w_commas = e.target.value;
+            console.log("e.target.value",e.target.value)
             let val="";
-            for (let i=0; i<val_w_commas.length; i++)
-              if (!isNaN(Number(val_w_commas[i])))
+            for (let i=0; i<val_w_commas.length; i++){
+              //if (props.type=="rate")
+              if (val_w_commas[i]!=".")
+                val+=".";
+              else if (!isNaN(Number(val_w_commas[i])))
                 val+=val_w_commas[i];
-            
+            }
+
+            console.log("value",val, isNaN(Number(val)))
             
             if (isNaN(Number(val)))
               return;

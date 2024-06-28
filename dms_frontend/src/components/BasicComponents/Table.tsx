@@ -160,9 +160,8 @@ const handleTeamStatus = (status:TeamStatus, cellClassName:string, uniqueIndex:s
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="bg-white">
-      
-        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[1])}} className={`${TeamStatusList[1]} bg-white`}>{TeamStatusList[1]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[2])}} className={`${TeamStatusList[2]} bg-white`}>{TeamStatusList[2]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[1])}} className={`${TeamStatusStyling[1]} bg-white`}>{TeamStatusList[1]}</DropdownMenuItem>
+        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[2])}} className={`${TeamStatusStyling[2]} bg-white`}>{TeamStatusList[2]}</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   </TableCell>

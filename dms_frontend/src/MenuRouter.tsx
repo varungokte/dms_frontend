@@ -42,6 +42,7 @@ export const MenuRouter = () => {
           const idArr:string[]=[];
           res.obj.map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
           setMasterLists(obj);
+					//console.log("MASTERS",obj);
           setMastersIdList(idArr);
           setChangeInMasters(false);
         }

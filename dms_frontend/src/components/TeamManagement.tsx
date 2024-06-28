@@ -95,12 +95,16 @@ function TeamManagement(props:{label:string}){
     return data;
   }
 
-  const createTeam = async (userValues:any) => {
-    const data = teamMembersToArr(userValues);
+  const createTeam = async (userValues:any, getSugg?:boolean) => {
+    let data:any = {} 
+    if (!getSugg)
+      data = teamMembersToArr(userValues);
+    else
+      data = userValues;
     console.log("SUBMITTED",data);
 
     const res = await addTeam(data);
-
+    console.log("response",res)
     if (res==200){
       setAdded(true);
       toast({
@@ -114,6 +118,7 @@ function TeamManagement(props:{label:string}){
   }
 
   const editTeam = async (userValues:any) => {
+      
     console.log("raw data",userValues);
     const data = teamMembersToArr(userValues);
     data["_id"] = userValues["_id"];
@@ -132,6 +137,12 @@ function TeamManagement(props:{label:string}){
 
     return res;
   }
+
+  useEffect(()=>{
+    editTeam({"S":teamStatus}).then(()=>{
+    }).catch(err=>{console.log(err)})
+    ;
+  },[teamStatus]);
 
   //const deleteTeam = () => {}
 
@@ -159,7 +170,6 @@ function TeamManagement(props:{label:string}){
               <HeaderRows headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}  />
               <BodyRowsMapping 
                 list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "text", "count-team","date", "team-status", "action"]}
-                searchRows={[]} filterRows={[]}
                 setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
                 action={teamList.map((_:any, index:number)=>{
                   return(

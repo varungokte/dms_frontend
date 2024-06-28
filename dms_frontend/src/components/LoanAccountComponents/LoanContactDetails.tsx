@@ -1,31 +1,31 @@
-import { useEffect, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { FieldAttributesList, LoanCommonProps } from "./../../../DataTypes";
+import { FieldAttributesList, FieldValues, LoanCommonProps } from "./../../../DataTypes";
+import { ContactTypeList, EmailRecipientList } from "../../../Constants";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "../ui/toaster";
 
-import { ContactTypeList, EmailRecipientList } from "../../../Constants";
-import ProfileIcon from "../BasicComponents/ProfileIcon";
 import Filter from "../BasicComponents/Filter";
 import FormDialog from "../FormComponents/FormDialog";
 import Search from "../BasicComponents/Search";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
 
+import ProfileIcon from "../BasicComponents/ProfileIcon";
+import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
 
 function LoanContactDetails(props:LoanCommonProps) {
-  const [contacts, setContacts] = useState<any>();
+  const allContacts = "All Contacts";
 
+  const [contacts, setContacts] = useState<{[key:string]:FieldValues}>();
   const [fieldList] = useState<FieldAttributesList>([
     { category: "grid", row:3, sectionName:"", fields: [
-      { id: "CT", type: "select", name: "Contact Type", options: ContactTypeList, required:true },
+      { id: "CT", type: "select", name: "Contact Type", options: ContactTypeList, required:true, immutable:true },
       { id: "CN", type:"text", name: "Company Name", required:true },
       { id: "PN", type:"text", name: "Contact Person Name",required:true },
       { id: "D", type:"text", name: "Designation", required:true },
@@ -43,6 +43,7 @@ function LoanContactDetails(props:LoanCommonProps) {
       { id: "BS", type:"text", name: "State" },
       { id: "BC", type:"text", name: "City" },
     ]}, 
+    { category:"single", id:"add-same", name:"Billing and Registered Addresses are the same", type:"checkbox"},
     { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "RA", type:"text", name: "Bulding/Street/Locality Name" },
       { id: "RP", type:"number", name: "Pincode" },
@@ -54,23 +55,19 @@ function LoanContactDetails(props:LoanCommonProps) {
     ]},
   ]);
 
-  const [loanId]= useState(props.loanId);
-  const [AID]= useState(props.AID);
-
   const [searchString, setSearchString] = useState("");
-  const [role, setRole] = useState(ContactTypeList[1]);
+  const [role, setRole] = useState(allContacts);
   const [added, setAdded] = useState(true);
-  const [oldValues, /* setOldValues */] = useState<any>({});
 
   const {addContact, getContacts} = useGlobalContext();
   const { toast } = useToast();
 
   useEffect(()=>{
     if (added)
-      getContacts(loanId).then(res=>{
-        if (res.status!=200){
+      getContacts(props.loanId).then(res=>{
+        if (res.status!=200)
           setContacts({});
-        }
+        console.log("contacts reponse",res)
         const obj:any={};
         res.data.map((contact:any)=>{
           if (contact.CT=="-")
@@ -104,8 +101,8 @@ function LoanContactDetails(props:LoanCommonProps) {
       }
     }
     if (Object.keys(data).length!=0){
-      data["AID"]=AID;
-      data["_loanId"]= loanId;
+      data["AID"]=props.AID;
+      data["_loanId"]= props.loanId;
 
       const res = await addContact(data,"");
       
@@ -122,10 +119,12 @@ function LoanContactDetails(props:LoanCommonProps) {
     }
   }
 
-  const editContact = (userValues:any) =>{
-    const data:any = {};
+  const editContact = async (userValues:any) =>{
+    const data=userValues;
 
-    console.log("inside edit, oldValues", oldValues)
+    console.log("inside edit, oldValues", userValues);
+
+    /* const oldValues ={}// contacts[]
 
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
@@ -140,18 +139,22 @@ function LoanContactDetails(props:LoanCommonProps) {
             data[gridField.id] = userValues[gridField.id];
         }
       }
+    } */
+    console.log("data",data)
+    if (Object.keys(data).length==0)
+      return 200;
+
+    data["AID"]=props.AID;
+    data["_loanId"]=props.loanId;
+    data["_contactId"]=userValues._id
+
+    console.log("submitted data", data)
+    const res = await addContact(data,"EDIT");
+    if (res==200){
+      setAdded(true);
     }
     
-    if (Object.keys(data).length!=0){
-      data["AID"]=AID;
-      data["_loanId"]=loanId;
-      data["_contactId"]=oldValues._id
-
-      console.log("submitted data", data)
-      /* addContact(data,"EDIT").then(res=>{
-        console.log("EDITED", res)
-      }) */
-    }
+    return res;
   }
 
   return(
@@ -162,7 +165,7 @@ function LoanContactDetails(props:LoanCommonProps) {
         </div>
 
         <div className="flex-auto">
-          <Filter value={role} setValue={setRole} options={ContactTypeList}/>
+          <Filter value={role} setValue={setRole} options={[allContacts].concat(ContactTypeList)}/>
         </div>
       
         <div className="mr-3">
@@ -176,100 +179,162 @@ function LoanContactDetails(props:LoanCommonProps) {
       <Toaster/>
       <div className="flex flex-row flex-wrap">
         {contacts
-          ?(contacts[role] && contacts[role].length>0)?contacts[role].map((person:any,index:number)=>{
-            const regEx = new RegExp(searchString, "i");
-            if (searchString=="" || (person.PN+"").search(regEx)!==-1)
-              return(
-                <Card key={index} className="m-5 w-72 rounded-xl">
-                  <CardHeader>
-                    <CardTitle>	
-                      <div className="flex flex-row">
-                        <div className="flex-auto">
-                          <ProfileIcon name={person.PN} size="small" />
-                        </div>
-                        <div className="">
-                          <div className="flex flex-row">
-                          <FormDialog key={index} index={index} edit={true} type="cont"
-                            triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
-                            formTitle="Edit Contact" formSubmit={editContact} submitButton="Edit Contact"
-                            form={fieldList} currentFields={person}
-                          />
-                          <div className="ml-2">
-                          <Dialog>
-                            <DialogTrigger><CircleUserIcon/></DialogTrigger>
-                            <DialogContent className="bg-white">
-                              <DialogHeader>
-                                <DialogTitle>
-                                  <div className="flex flex-row">
-                                    <ProfileIcon name={person.PN} size="small" />
-                                    <div className="px-3">
-                                      <p className="my-1 font-normal text-custom-1">{person.PN || "person_name"}</p>
-                                      <p className="font-light text-base">{person.D}</p>
-                                    </div>
-                                  </div>
-                                </DialogTitle>
-                              </DialogHeader>
-                              <DialogDescription>
-                                <div className="grid grid-rows-5 grid-flow-col w-full">
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.PN || "N/A"}</p>
-                                    <p className="font-light">Contact Person Name</p>
-                                  </div>
-  
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.D || "N/A"}</p>
-                                    <p className="font-light">Designation</p>
-                                  </div>
-                                  
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.CE || "N/A"}</p>
-                                    <p className="font-light">Email</p>
-                                  </div>
-  
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.MN || "N/A"}</p>
-                                    <p className="font-light">Mobile Number</p>
-                                  </div>
-  
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.LN || "N/A"}</p>
-                                    <p className="font-light">Landline Number</p>
-                                  </div>
-  
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.RA || "N/A"}</p>
-                                    <p className="font-light">Registered Address</p>
-                                  </div>
-  
-                                  <div className="m-5">
-                                    <p className="font-medium">{person.BA || "N/A"}</p>
-                                    <p className="font-light">Billing Address</p>
-                                  </div>
-                                </div>
-                              </DialogDescription>
-                            </DialogContent>
-                          </Dialog>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-left">
-                    <p className="font-medium">{person.PN || "person_name"}</p>
-                    <p className="font-light">{person.CE || "email"}</p>
-                    <p className="font-light">{role}</p>     
-                    <br/>
-                  </CardContent>
-                </Card>
-              )
-            }):<EmptyPageMessage sectionName="contacts" />
+          ?role==allContacts
+            ?Object.keys(contacts).map((category,categoryIndex)=>{
+              return contacts[category].map((person:FieldValues,index:number)=>{
+                const regEx = new RegExp(searchString, "i");
+                if (searchString=="" || (person.PN+"").search(regEx)!==-1)
+                return <ContactCard key={categoryIndex+"_"+index} index={index} person={person} editFunction={editContact} formFields={fieldList} />
+              })
+            })
+            :(contacts[role] && contacts[role].length>0)
+              ?contacts[role].map((person:any,index:number)=>{
+                const regEx = new RegExp(searchString, "i");
+                if (searchString=="" || (person.PN+"").search(regEx)!==-1)
+                  return <ContactCard key={index} index={index} person={person} editFunction={editContact} formFields={fieldList} />
+                })
+              :<EmptyPageMessage sectionName={role.toLowerCase()+"s"} />
           :<LoadingMessage sectionName="contacts" />
         }
       </div>
       <br/>
       <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
     </div>
+  )
+}
+
+function ContactCard(props:{index:number, person:FieldValues, editFunction:Function, formFields:FieldAttributesList }){
+  const [billingAddress, setBillingAddress] = useState<ReactElement>();
+  const [registeredAddress, setRegisteredAddress] = useState<ReactElement>();
+
+  const constructAddresses = () => {
+    const addressPieces = ["A","C","S","CC","P"];
+
+    const baArr:string[] = [];
+    for (let i=0; i<addressPieces.length; i++){
+      if (props.person[`B${addressPieces[i]}`])
+        baArr.push(props.person[`B${addressPieces[i]}`])
+    }
+    if (baArr.length==0)
+      setBillingAddress(<span>N/A</span>);
+    else
+      setBillingAddress(
+        <div className="">
+          {baArr.map((ele,index)=>{
+            if (index==baArr.length-1)
+              return <span key={index}>{ele}</span>
+            return<span key={index}>{ele}, </span>
+          })}
+        </div>
+      );
+    
+    const raArr:string[] = [];
+    for (let i=0; i<addressPieces.length; i++){
+      if (props.person[`R${addressPieces[i]}`])
+        raArr.push(props.person[`R${addressPieces[i]}`])
+    }
+    if (raArr.length==0)
+      setRegisteredAddress(<span>N/A</span>);
+    else
+      setRegisteredAddress(
+        <div className="">
+          {raArr.map((ele,index)=>{
+            if (index==raArr.length-1)
+              return <span key={index}>{ele}</span>
+            return<span key={index}>{ele}, </span>
+          })}
+        </div>
+      );
+  }
+  
+  useEffect(()=>{
+    constructAddresses();
+  },[props])
+  return (
+    <Card key={props.index+props.person.CT} className="m-5 w-72 rounded-xl">
+      <CardHeader>
+        <CardTitle>	
+          <div className="flex flex-row">
+            <div className="flex-auto">
+              <ProfileIcon name={props.person.PN} size="small" />
+            </div>
+            <div className="">
+              <div className="flex flex-row">
+              <FormDialog key={props.index} index={props.index} edit={true} type="cont"
+                triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
+                formTitle="Edit Contact" formSubmit={props.editFunction} submitButton="Edit Contact"
+                form={props.formFields} currentFields={props.person}
+              />
+              <div className="ml-2">
+              <Dialog>
+                <DialogTrigger><CircleUserIcon/></DialogTrigger>
+                <DialogContent className="bg-white min-w-[700px] min-h-[300px]">
+                  <DialogHeader>
+                    <DialogTitle>
+                      <div className="flex flex-row">
+                        <ProfileIcon name={props.person.PN} size="small" />
+                        <div className="px-3">
+                          <p className="my-1 font-normal text-custom-1">{props.person.PN || "person_name"}</p>
+                          <p className="font-light text-base">{props.person.D}</p>
+                        </div>
+                      </div>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="grid grid-rows-5 grid-flow-col w-full">
+                    <div className="m-5">
+                      <p className="font-medium">{props.person.PN || "N/A"}</p>
+                      <p className="font-light">Contact Person Name</p>
+                    </div>
+
+                    <div className="m-5">
+                      <p className="font-medium">{props.person.D || "N/A"}</p>
+                      <p className="font-light">Designation</p>
+                    </div>
+                    
+                    <div className="m-5">
+                      <p className="font-medium">{props.person.CE || "N/A"}</p>
+                      <p className="font-light">Email</p>
+                    </div>
+
+                    <div className="m-5">
+                      <p className="font-medium">{props.person.MN || "N/A"}</p>
+                      <p className="font-light">Mobile Number</p>
+                    </div>
+
+                    <div className="m-5">
+                      <p className="font-medium">{props.person.LN || "N/A"}</p>
+                      <p className="font-light">Landline Number</p>
+                    </div>
+
+                    <div className="m-5">
+                      <div className="font-medium">
+                        {registeredAddress}
+                      </div>
+                      <p className="font-light">Registered Address</p>
+                    </div>
+
+                    <div className="m-5">
+                      <div className="font-medium">
+                        {billingAddress}
+                      </div>
+                      <p className="font-light">Billing Address</p>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+        </div>
+      </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="text-left">
+        <p className="font-medium">{props.person.PN || "person_name"}</p>
+        <p className="font-light">{props.person.CE || "email"}</p>
+        <p className="font-light">{props.person.CT}</p>     
+        <br/>
+      </CardContent>
+    </Card>
   )
 }
 

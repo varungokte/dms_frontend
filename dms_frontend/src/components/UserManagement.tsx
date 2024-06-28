@@ -35,8 +35,8 @@ function UserManagement(props:{label:string}){
 
   const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
-  const [selectedUser,setSelectedUser] = useState(-1);
   const [added, setAdded] = useState(true);
+  const [selectedUser,setSelectedUser] = useState(-1);
   const [userStatus, setUserStatus] = useState(-1);
 
   const newUser = useGlobalContext().createUser;

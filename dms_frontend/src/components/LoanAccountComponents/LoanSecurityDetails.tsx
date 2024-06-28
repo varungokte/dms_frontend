@@ -13,11 +13,11 @@ function LoanSecurityDetails(props:LoanCommonProps){
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
 
   const [fieldList] = useState([
-    { id:"SP", name:"Share Percentage(%)", type:"number", required:false },
+    { id:"SP", name:"Share Percentage(%)", type:"number", numtype:"rate", required:false },
     { id:"DV", name:"Date of Valuation", type:"date",required:false },
     { id:"STV", name:"", type:"repeatable", fields:[
       { id:"T", name:"Security Type", type:"select", options:LoanSecurityTypeList,required:false },
-      { id:"V", name:"Security Value", type:"number",required:false },
+      { id:"V", name:"Security Value", type:"number",numtype:"curr",required:false },
     ]}
   ]);
   
@@ -96,7 +96,6 @@ function LoanSecurityDetails(props:LoanCommonProps){
   },[]);
 
   useEffect(()=>{
-    console.log("changed field values",fieldValuesRepeatable)
     let okToChange = areAllFieldsEmpty();
     if (Object.keys(props.preexistingValues).length!=0)
       okToChange = okToChange || !compareFieldsToPreexisting();
@@ -115,7 +114,6 @@ function LoanSecurityDetails(props:LoanCommonProps){
       data["STV"] = fieldValuesRepeatable;
 
       createLoan(data).then(res=> {
-        console.log("RES", res);
         if (res==200){
           props.goToNextSection();
           props.setChangesHaveBeenMade(true);
@@ -139,7 +137,7 @@ function LoanSecurityDetails(props:LoanCommonProps){
             if (field.type=="date" && !disableFields)
               return <DateField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
             else if (field.type=="number" && !disableFields)
-              return <NumberField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+              return <NumberField key={index} index={index} id={field.id} name={field.name} type={field.numtype=="rate"||field.numtype=="curr"?field.numtype:"curr"} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
           })}
           </div>
 

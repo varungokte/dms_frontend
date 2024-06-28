@@ -58,12 +58,15 @@ const getDecryptedToken = async () => {
 }
 
 //SUGGESTIONS
-const getUserSuggestions = async (type:UserSuggestionTypes) => {
+const getUserSuggestions = async (type:UserSuggestionTypes, teamLead?:string) => {
 	try {
+		const query:FieldValues = {type:type};
+		if (teamLead)
+			query["RM"]=teamLead;
 		const token = getEncryptedToken();
 		const response = await axios.get(`${Base_Url}/suggestion`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: {type: type}
+			params: query
 		});
 		const decryptedObject = await handleDecryption(response.data);
 		if (response.status==200)

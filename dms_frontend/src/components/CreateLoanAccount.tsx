@@ -70,11 +70,12 @@ function CreateLoanAccount() {
 
   const getOldData = async () => {
     const res = await getLoanFields(loanId);
+    //console.log("preexisting data",res)
     if (res.status==200){
       if (res.obj["ST"] && res.obj["ST"]==LoanSecurityTypeList[2])
         setShowSecurityDetails(false);
       if (res.obj["CN"])
-        setPreexistingData(res);
+        setPreexistingData(res.obj);
       setDataHasLoaded(true);
     }
   }
@@ -251,9 +252,10 @@ function CreateLoanAccount() {
           } 
         </div>
       </div>
-      <button onClick={()=>{
+      {/* <button onClick={()=>{
         setOkToFrolic(true);
-        setCurrentSection(2);}}>Skip</button> 
+        setCurrentSection(2);}}>Skip
+      </button> */} 
     </div>
   )
 }

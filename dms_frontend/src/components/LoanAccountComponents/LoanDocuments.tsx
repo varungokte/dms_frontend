@@ -21,7 +21,7 @@ function LoanDocuments(props:LoanCommonProps) {
   
   const [sectionDetails] = useState(setSection(props.label));
   const [added, setAdded] = useState(true);
-  const [priority, setPriority] = useState(CovenantTypeList[1]);
+  const [covenantType, setCovenantType] = useState(CovenantTypeList[1]);
 
   useEffect(()=>{
     if (added)
@@ -57,15 +57,22 @@ function LoanDocuments(props:LoanCommonProps) {
   
   }
 
-  const editDocument = async (userValues:any,currIndex:number) => {
+  const editDocument = async (userValues:any) => {
     const { editDocument } = useGlobalContext();
-    if (docData)
-      userValues["_id"] = docData[currIndex]["_id"];
-    userValues["SN"] = sectionDetails.sectionName; 
-
-    console.log("user values",userValues)
-  
-   const res = await editDocument(userValues);
+    if (!docData)
+      return;
+    /* console.log("userValues",userValues,currIndex)
+    const newValues = Object.keys(userValues);
+    const oldValues = Object.keys(docData[currIndex]);
+    const data:FieldValues={};
+    for (let i=0; i<oldValues.length; i++){
+      if (oldValues[i] && docData[currIndex][oldValues[i]]==userValues[newValues[i]])
+      continue;
+      data[newValues[i]] = userValues[newValues[i]];
+    } */
+    userValues["SN"] = sectionDetails.sectionName;  
+    
+    const res = await editDocument(userValues);
   
     if (res.status==200)
       setAdded(true);
@@ -108,7 +115,7 @@ function LoanDocuments(props:LoanCommonProps) {
           {sectionDetails.sectionType=="doc"
             ?<></>
             :sectionDetails.sectionType=="cov"
-              ?<Filter value={priority} setValue={setPriority} options={CovenantTypeList}/>
+              ?<Filter value={covenantType} setValue={setCovenantType} options={CovenantTypeList}/>
               :<></>
           }
         </div>
@@ -129,7 +136,7 @@ function LoanDocuments(props:LoanCommonProps) {
               editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
             />
             :sectionDetails.sectionType=="cov"
-              ?<LoanCovenantView covData={docData} label={props.label} priority={priority} fieldList={sectionDetails.fieldList}
+              ?<LoanCovenantView covData={docData} label={props.label} type={covenantType} fieldList={sectionDetails.fieldList}
                 editCovenantFunction={editDocument} deleteCovenantFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
               />
               :<LoanConditionView conData={docData} label={props.label} fieldList={sectionDetails.fieldList}

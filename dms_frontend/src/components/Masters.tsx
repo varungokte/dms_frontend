@@ -84,7 +84,7 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
   const createMaster = async (userValues:FieldValues) =>{
     userValues["V"]= cleanUpInput(userValues["V"]);
     console.log(" ", userValues);
-    const res = 200// await addToMasters(userValues);
+    const res = await addToMasters(userValues);
     if (res==200)
       setAdded(true);
     return res;
@@ -179,43 +179,45 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
             </div>
 
             <div className="mx-20"></div>
-    
-            <div className="mr-28 w-[50%]">
-              <Table className="rounded-2xl bg-white">
-                <HeaderRows headingRows={[Object.keys(props.masterLists)[selected]]} headingClassNames={["text-2xl"]} />
-                <TableBody>
-                  {newValues?.V.map((data:any,index:number)=>{
-                    if (data==="-")
-                      return <></>
-                    return (
-                      <TableRow key={index} className="border-none">
-                        <TableCell>
-                          <div className="flex flex-row">
-                            <input className={`text-xl p-1 rounded-if bg-gray-100 w-full`} value={data} onChange={(e)=>editValue(e.target.value,index)} />
-                            <button className='p-1' onClick={()=>removeValue(index)}>
-                              <RemoveCircleIcon fontSize="medium" className="mx-2" sx={{color:"red"}} />
-                            </button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                  <TableRow>
-                    <TableCell>
-                      <button onClick={createNewEntry}><AddCircleIcon sx={{color:"rgba(80, 65, 188, 1)"}} /></button>
-                      {informationMessages[information]}
-                    </TableCell>
-                  </TableRow>
-                  <TableRow>
-                    <TableCell>
-                      <button className={`w-full h-[40px] rounded-if text-white text-lg bg-custom-1 hover:bg-custom-1`} onClick={editMaster}>
-                        Save Changes
-                      </button>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </div>
+            {newValues
+              ?<div className="mr-28 w-[50%]">
+                <Table className="rounded-2xl bg-white">
+                  <HeaderRows headingRows={[Object.keys(props.masterLists)[selected]]} headingClassNames={["text-2xl"]} />
+                  <TableBody>
+                    {newValues.V.map((data:any,index:number)=>{
+                      if (data==="-")
+                        return <></>
+                      return (
+                        <TableRow key={index} className="border-none">
+                          <TableCell>
+                            <div className="flex flex-row">
+                              <input className={`text-xl p-1 rounded-if bg-gray-100 w-full`} value={data} onChange={(e)=>editValue(e.target.value,index)} />
+                              <button className='p-1' onClick={()=>removeValue(index)}>
+                                <RemoveCircleIcon fontSize="medium" className="mx-2" sx={{color:"red"}} />
+                              </button>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                    <TableRow>
+                      <TableCell>
+                        <button onClick={createNewEntry}><AddCircleIcon sx={{color:"rgba(80, 65, 188, 1)"}} /></button>
+                        {informationMessages[information]}
+                      </TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell>
+                        <button className={`w-full h-[40px] rounded-if text-white text-lg bg-custom-1 hover:bg-custom-1`} onClick={editMaster}>
+                          Save Changes
+                        </button>
+                      </TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+             </div>
+              :<></>
+            }
           </div>
           :<EmptyPageMessage sectionName="masters" emotion/>
         :<LoadingMessage sectionName="data" />

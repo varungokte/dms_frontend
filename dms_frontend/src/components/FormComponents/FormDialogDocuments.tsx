@@ -89,8 +89,8 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
     const valid = validateRequiredFields();
     if (!valid)
       return false;
-    let res = await props.detailSubmit(prefillValues, props.currIndex);
     
+    let res = await props.detailSubmit(prefillValues);
     
     if (res.status==200){
       setEnableUpload(true);
@@ -231,11 +231,6 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
 
 function FileField (props:{index:number, fileType:number, fileList:any, fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone({multiple:false, useFsAccessApi:false});
-
-
-  useEffect(()=>{
-    console.log("fileList",props.fileList);
-  },[props.fileList]);
   
   const [error, setError] = useState(<></>);
   
@@ -244,7 +239,6 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
   },[acceptedFiles]);
 
   const updateFilelist = (deleteFile?:boolean) => {
-    console.log("updating");
     if (deleteFile){
       props.fileSetter([]);
       return;
@@ -264,13 +258,10 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
 
   const obliterateFile = async () => {
     if (!props.receivedFilesFromServer){
-      console.log("pre",acceptedFiles);
       acceptedFiles.pop();
-      console.log("post",acceptedFiles);
       updateFilelist(true);
     }
     else{
-      console.log(props.fileList)
       const res = await props.deleteFile(props.docId,props.fileList[0].filename);
       if (res==200)
         updateFilelist(true);

@@ -15,6 +15,7 @@ type FormFieldsCommon = {
   type: FieldDataTypes,
   required?: boolean,
   immutable?: boolean,
+  numtype?:"rate"|"curr", //for number
   options?:string[] | readonly string[], //for select
   multiple?:boolean, //for combobox 
   newRole?:boolean //for permissions/role

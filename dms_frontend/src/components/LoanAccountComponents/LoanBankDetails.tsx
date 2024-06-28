@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { BankAccountTypeList } from "../../../Constants";
-import { GridFieldAttributes, LoanCommonProps } from "DataTypes";
+import { FieldValues, GridFieldAttributes, LoanCommonProps } from "DataTypes";
 import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 
 function LoanBankDetails(props:LoanCommonProps) {
@@ -44,7 +44,6 @@ function LoanBankDetails(props:LoanCommonProps) {
       for (let j=0; j<fieldValues.length; j++)
         if (fieldValues[j][field.id] &&  props.preexistingValues["BD"] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
         changes_have_been_made=true;
-      
     }
     console.log("changes have been made",changes_have_been_made);
     return changes_have_been_made;
@@ -79,29 +78,26 @@ function LoanBankDetails(props:LoanCommonProps) {
       props.setUnsavedWarning(!areAllFieldsEmpty());
   },[fieldValues]);
   
-  const submitForm = (e:any) =>{
+  const submitForm = async (e:any) =>{
     e.preventDefault();
 
-    let data:any={};
-
-    if (data.length!=0){
-      data["AID"] = props.AID;
-      data["_loanId"] = props.loanId;
-      data["BD"] = fieldValues;
-      console.log("SUBMITTED NOW",data);
-
-      createLoan(data).then(res=> {
-        if (res==200){
-          props.goToNextSection();
-          props.setChangesHaveBeenMade(true);
-        }
-        else
-          console.log("error");
-      }
-      ).catch(err=> console.log(err))
-    }
-    else
+    if (!compareFieldsToPreexisting()){
       props.goToNextSection();
+      return;
+    }
+
+    const data:FieldValues = {}
+    data["AID"] = props.AID;
+    data["_loanId"] = props.loanId;
+    data["BD"] = fieldValues;
+    console.log("SUBMITTED NOW",data);
+
+    const res = await createLoan(data);
+    if (res==200){
+      console.log("response",res)
+      props.goToNextSection();
+      props.setChangesHaveBeenMade(true);
+    }
   }
 
   return (
