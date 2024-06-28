@@ -41,8 +41,8 @@ const covenantFieldList = ():FieldAttributesList => {
     { category:"grid", row:2, fields:[  
       { id:"SD", name:"Start Date", type:"date", required:true },
       { id:"ED", name:"End Date", type:"date", required:true },
-      { id:"EL", name:"Execution Location", type:"text" },
       { id:"PL", name:"Physical Location", type:"text" },
+      { id:"EL", name:"Execution Location", type:"text" },
     ]},
     { category:"single", id:"D", name:"Description", type:"textarea" },
   ];

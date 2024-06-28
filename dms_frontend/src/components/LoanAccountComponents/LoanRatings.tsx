@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "../../../Constants";
-import { FieldValues, FieldAttributesList } from "DataTypes";
+import { FieldValues, FieldAttributesList, LoanCommonProps } from "DataTypes";
 
 import { Table } from "@/components/ui/table"
 import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
@@ -13,7 +13,7 @@ import LoadingMessage from "../BasicComponents/LoadingMessage";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 //import Search from "../BasicComponents/Search";
 
-function LoanRatings(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
+function LoanRatings(props:LoanCommonProps) {
 
   const [fieldList] = useState<FieldAttributesList>([
     { category: "grid", row:2, sectionName:"", fields: [

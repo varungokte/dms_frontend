@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
+import { FieldAttributesList, LoanCommonProps } from "./../../../DataTypes";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
@@ -17,10 +18,9 @@ import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
-import { FieldAttributesList } from "./../../../DataTypes";
 
 
-function LoanContactDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
+function LoanContactDetails(props:LoanCommonProps) {
   const [contacts, setContacts] = useState<any>();
 
   const [fieldList] = useState<FieldAttributesList>([
@@ -68,8 +68,11 @@ function LoanContactDetails(props:{key:number,actionType: string, loanId: string
   useEffect(()=>{
     if (added)
       getContacts(loanId).then(res=>{
+        if (res.status!=200){
+          setContacts({});
+        }
         const obj:any={};
-        res.map((contact:any)=>{
+        res.data.map((contact:any)=>{
           if (contact.CT=="-")
             return;
           if (obj[contact.CT])

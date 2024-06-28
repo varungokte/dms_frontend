@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
 import { useLocation } from "react-router-dom";
+import { LoanSecurityTypeList } from "./../../Constants";
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
@@ -54,7 +55,7 @@ function CreateLoanAccount() {
   const [formSections] = useState([
     { name: "Create Agreement ID", component: LoanIDAssignment },
     { name: "Basic Details", component: LoanBasicDetails },
-    { name: "Security Details", component: LoanSecurityDetails, show: showSecurityDetails },
+    { name: "Security Details", component: LoanSecurityDetails },
     { name: "Bank Details", component: LoanBankDetails },
     { name: "Ratings", component: LoanRatings },
     { name: "Contact Details", component: LoanContactDetails },
@@ -69,18 +70,19 @@ function CreateLoanAccount() {
 
   const getOldData = async () => {
     const res = await getLoanFields(loanId);
-    //console.log("preexisting data",res);
-    if (res["ST"] && res["ST"]==2)
-      setShowSecurityDetails(false);
-    if (res["CN"])
-      setPreexistingData(res);
-    setDataHasLoaded(true);
+    if (res.status==200){
+      if (res.obj["ST"] && res.obj["ST"]==LoanSecurityTypeList[2])
+        setShowSecurityDetails(false);
+      if (res.obj["CN"])
+        setPreexistingData(res);
+      setDataHasLoaded(true);
+    }
   }
 
   const getAssignedTeam = async() => {
     if (loanId){
       const res = await getTeamsList(loanId);
-      if (res.status==200 && res.obj.currentTeam){
+      if (res.status==200 && res.obj && res.obj.currentTeam && Object.keys(res.obj.currentTeam).length!=0){
         setEnableDocumentSections(true);
         setAssignedTeam(res.obj.currentTeam._teamId);
         setTeamList(res.obj.list);
@@ -88,12 +90,15 @@ function CreateLoanAccount() {
       else
         setEnableDocumentSections(false);
     }
+    else
+      setEnableDocumentSections(false);
   }
 
   useEffect(()=>{
-    if (actionType=="EDIT")
+    if (actionType=="EDIT"){
       getOldData();
-    getAssignedTeam();
+      getAssignedTeam();
+    }
   },[]);
   
   /* useEffect(()=>{
@@ -132,17 +137,21 @@ function CreateLoanAccount() {
     }
   }
 
+/*   const bringIntoFocus = (sectionIndex:number) => {
+    if (navbarLastSections.includes(sectionIndex))
+  }
+ */
   const calculateSectionBreaks = () =>{
     //console.log(navRef.current.clientWidth)
     let total_width=0;
     const breaks:number[]=[];
-      for (let i=0; i<formSections.length; i++){
-        total_width+=sectionRef.current[i].offsetWidth+24;
-        if (total_width>=navRef.current.clientWidth){
-          breaks.push(i);
-          total_width=0;
-        }
+    for (let i=0; i<formSections.length; i++){
+      total_width+=sectionRef.current[i].offsetWidth+24;
+      if (total_width>=navRef.current.clientWidth){
+        breaks.push(i);
+        total_width=0;
       }
+    }
     setNavbarLastSections(curr=>curr.concat(breaks));
   }
 
@@ -174,15 +183,24 @@ function CreateLoanAccount() {
                         className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
                         onClick={()=>{
                           unsavedWarning
-                            ?(confirm("WARNING:\nYou have unsaved data which will be lost.\nTo save your data, close this dialog and click the Save & Next button")
+                            ?(confirm("WARNING:\nYour unsaved data will be lost.\nTo save your data, close this dialog and click \"Save & Next\"")
                               ?setCurrentSection(index):"")
                             :setCurrentSection(index)                      
                         }}
                       >
                         <div className="flex flex-row">
-                          <div className={`border rounded-full ${index===0?(currentSection===index?"border-white":"border-slate-300"):currentSection===index?"border-white":"border-black"}`} 
-                            style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}</div>
-                          <div className="m-auto">{section.name}</div>
+                          <div className={
+                            `border rounded-full ${index===0
+                              ?currentSection===index?
+                                "border-white"
+                                :"text-zinc-500 border-zinc-300"
+                              :currentSection===index?
+                                "border-white"
+                                :"text-zinc-700 border-zinc-500"
+                            }`} 
+                            style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}
+                          </div>
+                          <div className={`m-auto ${currentSection==0 && currentSection!==index?"text-zinc-500":""}`}>{section.name}</div>
                         </div>
                       </TooltipTrigger>
                       {!okToFrolic && currentSection==1 && index>1

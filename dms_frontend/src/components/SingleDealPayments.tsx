@@ -52,28 +52,17 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
               action={
                 paymentData.map((inst:any,index:number)=>{
                   if (!inst["S"] || inst["S"]==DocumentStatusList[1])
-                    return <UploadFileButton 
-                      key={index}
-                      index={index}
-                      AID={props.AID} 
-                      sectionName={props.sectionDetails.sectionName} 
-                      docId={index} 
-                      setAdded={setAdded} 
-                      loanId={scheduleId}
-                      isPayment
+                    return <UploadFileButton key={props.AID+index} index={index}
+                      AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={index} _id={scheduleId}
+                      setAdded={setAdded} isPayment
                     />
                   else
-                    return <ViewFileButton 
-                      key={index}
-                      AID={props.AID} 
-                      loanId={inst._loanId} 
-                      docId={inst._id} 
-                      status={inst["S"]} 
-                      sectionName={props.sectionDetails.sectionName} 
-                      rejectionReason={inst["R"]} 
+                    return <ViewFileButton key={props.AID+index} type="pay"
+                      AID={props.AID} _id={scheduleId} sectionName={props.sectionDetails.sectionName} index={index}
+                      setAdded={setAdded} schedule={paymentData}
+                      status={inst["S"]} rejectionReason={inst["R"]} 
                       actualName={(inst.FD && inst.FD[0] && inst.FD[0].originalname)?inst.FD[0].originalname:""} 
                       fileName={(inst.FD && inst.FD[0] && inst.FD[0].filename)?inst.FD[0].filename:""} 
-                      setAdded={setAdded} 
                     />
                 })
               }

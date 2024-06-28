@@ -3,7 +3,7 @@ import { DocumentStatusList, FileStatusList, PriorityList, TeamStatusList, UserS
 type FieldValues = {[key:string]: any | any[]};
 
 //Data Types for table
-type TableDataTypes = ( "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field")[];
+type TableDataTypes = ( "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field");
 
 //Form Field data types
 type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break"
@@ -62,6 +62,27 @@ type FileStatus = typeof FileStatusList[number];
 type TeamStatus = typeof TeamStatusList[number];
 type Priority = typeof PriorityList[number];
 
+type LoanCommonProps = {
+  actionType:string, 
+  label:string, 
+  AID:string, 
+  setAID:Function, 
+  loanId:string, 
+  setLoanId:Function, 
+  currentSection:number, 
+  setCurrentSection:Function, 
+  goToNextSection:Function, 
+  setUnsavedWarning:Function,
+  setShowSecurityDetails:Function,
+  showSecurityDetails:boolean,
+  setOkToFrolic:Function,
+  preexistingValues:FieldValues,
+  setChangesHaveBeenMade:Function,
+  setEnableDocumentSections:Function,
+  assignedTeam:string,
+  teamList:any
+}
+
 export {
   type FieldValues,
   type TableDataTypes, type FieldDataTypes,
@@ -70,4 +91,5 @@ export {
   type DocumentSectionTypes, type DocumentSectionNames, type DocumentSectionDetails,
   type UserSuggestionTypes, type UserSuggestionsList,
   type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority,
+  type LoanCommonProps,
 }

@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import moment from "moment";
 import { FrequencyList, HolidayConventionList, InterestTypeList } from "./../../../Constants";
-import { FieldValues, GridFieldAttributes } from "./../../../DataTypes";
+import { FieldValues, GridFieldAttributes, LoanCommonProps } from "./../../../DataTypes";
 import useGlobalContext from "./../../../GlobalContext";
 
 import {Dialog,DialogTitle,DialogContent} from '@mui/material';
@@ -12,8 +12,9 @@ import DateField from "../FormFieldComponents/DateField";
 import NumberField from "../FormFieldComponents/NumberField";
 import RadioGroupField from "../FormFieldComponents/RadioGroupField";
 import SelectField from "../FormFieldComponents/SelectField";
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 
-function LoanPaymentSchedule(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setChangesHaveBeenMade:Function}){
+function LoanPaymentSchedule(props:LoanCommonProps){
   const [fieldList] = useState<GridFieldAttributes>(
     {category:"grid", row:2, fields:[
       {id:"P", name:"Principal", type:"number", required:true},
@@ -32,10 +33,6 @@ function LoanPaymentSchedule(props:{key:number,actionType: string, loanId: strin
   const [installmentError, setInstallmentError] = useState(<></>);
 
   const {addPaymentSchedule} = useGlobalContext();
-
-  useEffect(()=>{
-    console.log("loan payment schedule",schedule)
-  },[schedule])
 
   const validateFields = () => {
     for (let i=0; i<fieldList.fields.length; i++){
@@ -61,9 +58,8 @@ function LoanPaymentSchedule(props:{key:number,actionType: string, loanId: strin
   }
 
   const validateInstallmentAmounts = () =>{
-    console.log("The schedule",schedule);
     for (let i=0; i<schedule.length; i++){
-      if (schedule[i].I==""){console.log("error",schedule[i])
+      if (schedule[i].I==""){
         setInstallmentError(<p className="text-red-600 mx-3">Please fill all required fields.</p>);
         return;
       }
@@ -185,6 +181,7 @@ function LoanPaymentSchedule(props:{key:number,actionType: string, loanId: strin
       </Dialog>
       {errorMessage}
       <br />
+      <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={false} />
     </div>
   )
 }

@@ -39,7 +39,7 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
           </button>
           :<button className="text-white bg-custom-1 rounded-xl h-12 w-36 mb-9 my-1" onClick={()=>props.goToNextSection()}>
             <div className="flex flex-row place-content-center">
-              <div>Save & Next</div>
+              <div>Next</div>
               <ChevronRight/>
             </div>
           </button>

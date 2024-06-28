@@ -16,26 +16,18 @@ function LoanAccount(props:{label:string}) {
 	},[]);
 
   const [accountList, setAccountList] = useState<any>();
-  const [ids, setIds] = useState([]);
 
   const {getLoanList} = useGlobalContext();
 
   useEffect(()=>{
     getLoanList().then(res=>{
-      const idarr:any=[];
-      if (res.status==200){
-        res.arr.map((deal:any)=>{
-          idarr.push(deal._id);
-        });
+      if (res.status==200)
         setAccountList(res.arr);
-        setIds(idarr);
-      }
       else
         setAccountList([]);
     }).catch(()=>{
       setAccountList([]);
     })
-    
   },[]);
 
   //const [searchString, setSearchString] = useState("");
@@ -61,10 +53,10 @@ function LoanAccount(props:{label:string}) {
               <BodyRowsMapping 
                 list={accountList} columns={["AID", "CN", "GN", "Z", "SA"]} dataType={["index","text","text","text","text","text", "action"]} 
                 cellClassName={["font-medium", "text-custom-1","","","","",""]} searchRows={[]} filterRows={[]}
-                action = {accountList.map((item:any, index:number)=>{
+                action = {accountList.map((item:any)=>{
                   return(
                     <div className="flex flex-row">
-                      <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: ids[index], AID: item.AID}}><img src={edit_icon}/></Link>
+                      <Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: item["_id"], AID: item.AID}}><img src={edit_icon}/></Link>
                     </div>
                   )
                 })}

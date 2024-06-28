@@ -1,19 +1,32 @@
 import { ReactElement, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { Dialog,DialogContent,DialogTitle } from "@mui/material";
-import view_icon from "./../static/view_files_icon.svg";
-import LoadingMessage from "./LoadingMessage";
 import { DocumentRejectionReasonList } from "./../../../Constants";
 import { DocumentStatus, FieldValues } from "./../../../DataTypes";
+
+import { Dialog,DialogContent,DialogTitle } from "@mui/material";
+import LoadingMessage from "./LoadingMessage";
+
+import view_icon from "./../static/view_files_icon.svg";
 import { SubmitButtonStyling } from "./PurpleButtonStyling";
 import CloseIcon from '@mui/icons-material/Close';
 
-function ViewFileButton(props:{AID:string, loanId:string, docId:string, sectionName:string, fileName:string, actualName:string, status:DocumentStatus,rejectionReason?:string,setAdded:Function}){
+type CommonFileViewer = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:Function,sectionName:string };
+
+type DocumentFileViewer = {type:"doc", loanId:string, docId:string, };
+
+type PaymentFileViewer = {type:"pay", _id:string, index:number, schedule:FieldValues[] };
+
+
+function ViewFileButton(props:CommonFileViewer & (DocumentFileViewer|PaymentFileViewer)){
+  
   const [openDialog, setOpenDialog] = useState(false);
 
   return (
     <div>
-      <button  onClick={()=>setOpenDialog(true)} className="flex flex-row rounded-xl py-3 px-3 w-28 m-auto ml-7 inline-block align-middle" style={{backgroundColor:"rgba(255, 245, 204, 1)"}}>
+      <button onClick={()=>setOpenDialog(true)}
+       className="flex flex-row rounded-xl m-auto p-3 w-28 inline-block align-middle" 
+       style={{backgroundColor:"rgba(255, 245, 204, 1)"}}
+      >
         <img className="m-auto" src={view_icon} />
         <span className="m-auto" style={{color:"rgba(255, 178, 0, 1)"}}>View</span>
       </button>
@@ -27,15 +40,18 @@ function ViewFileButton(props:{AID:string, loanId:string, docId:string, sectionN
   )
 };
 
-function FileViewer(props:{AID:string, loanId:string, docId:string, sectionName:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setOpenDialog:Function, setAdded:Function}){      
+function FileViewer(props:CommonFileViewer & (DocumentFileViewer|PaymentFileViewer) & {setOpenDialog:Function}){      
+  //IMPORTANT
+  //docId is only present when !isPayment
   const [showDoc, setShowDoc] = useState<ReactElement>(<LoadingMessage sectionName="file"/>);
-  const {fetchDocument,editDocument}=useGlobalContext();
   const [verified, setVerified] = useState(false);
   const [rejected, setRejected] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [rejectionText, setRejectionText] = useState("");
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [rejectionError, setRejectionError] = useState(<></>);
+
+  const {fetchDocument,editDocument, addPaymentSchedule}=useGlobalContext();
 
   const [openRejectionDialog, setOpenRejectionDialog] = useState(false);
   
@@ -59,20 +75,39 @@ function FileViewer(props:{AID:string, loanId:string, docId:string, sectionName:
   
   const changeStatus = async (status:DocumentStatus) => {
     const data:FieldValues= {};
-    data["_loanId"]=props.loanId;
-    data["_id"]=props.docId;
-    data["SN"]=props.sectionName;
-    data["S"]=status;
-    if (status=="Rejected"){
-      if (rejectionReason=="Other")
-        data["R"]=rejectionText;
-      else
-        data["R"]=rejectionReason;
-    }
 
-    const res = await editDocument(data);
-    
-    if (res.status==200){
+    let res;
+
+    if (props.type=="pay"){
+      data["_id"]=props._id;
+      data["POS"]=props.index;
+
+      props.schedule[props.index]["S"]=status;
+      if (status=="Rejected")
+        props.schedule[props.index]["R"]=rejectionReason=="Other"?rejectionText:rejectionReason;
+      else if (props.schedule[props.index]["R"])
+        delete props.schedule[props.index]["R"];
+      data["GS"] = props.schedule;
+      
+      res = await addPaymentSchedule(data);
+    }
+    else{
+      data["_loanId"]=props.loanId;
+      data["_id"]=props.docId;
+      data["SN"]=props.sectionName;
+      data["S"]=status;
+      
+      if (status=="Rejected")
+        data["R"]=rejectionReason=="Other"?rejectionText:rejectionReason;
+      else if (status=="Verified" && data["R"])
+        delete data["R"];
+     
+      res = (await editDocument(data)).status;
+    } 
+
+    console.log("response",res)
+   
+    if (res==200){
       if (status=="Verified")
         setVerified(true);
       else
@@ -110,7 +145,6 @@ function FileViewer(props:{AID:string, loanId:string, docId:string, sectionName:
                   <input id={index+""} type="checkbox" className="mx-5" 
                     checked={rejectionReason==reason}
                     onChange={(e)=>{
-                      console.log("cheked",e.target.checked);
                       if (e.target.checked)
                         setRejectionReason(reason);
                       else if (rejectionReason==reason)
@@ -132,7 +166,7 @@ function FileViewer(props:{AID:string, loanId:string, docId:string, sectionName:
       {rejected
         ?<></>
         :<button 
-          className={`border-2 mx-5 py-2 px-5 m-auto rounded-if ${verified?"border-lime-700":"border-lime-500"} ${verified?"bg-lime-700":"bg-lime-500"} text-white`}
+          className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-lime-700":"border-lime-500"} ${verified?"bg-lime-700":"bg-lime-500"} text-white`}
           onClick={()=>changeStatus("Verified")}
           disabled={verified}
         >

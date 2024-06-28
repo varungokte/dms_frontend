@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { LoanCommonProps } from "./../../../DataTypes";
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
@@ -6,7 +7,7 @@ import useGlobalContext from "../../../GlobalContext";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
 
-function LoanTeamSelection(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setEnableDocumentSections:Function,assignedTeam:string, teamList:any}){
+function LoanTeamSelection(props:LoanCommonProps){
   const [teamsList, setTeamList] = useState<any>();
 
   const { getTeamsList, selectTeam } = useGlobalContext();

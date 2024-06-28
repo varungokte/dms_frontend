@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { Navigate, useNavigate } from "react-router-dom";
 
 function VerificationComponent(){
-  const {sendOTP, verifyOTP,getDecryptedToken,useTitle, getEncryptedToken} = useGlobalContext();
+  useEffect(()=>{
+		document.title="Verify Email | Beacon DMS"
+	},[]);
+  
+  const {sendOTP, verifyOTP,getDecryptedToken, getEncryptedToken} = useGlobalContext();
 	const navigate = useNavigate();
-
-  useTitle("Verify Email");
 
   const [message, setMessage] = useState(<></>)
   const [otp, setOtp] = useState(0);

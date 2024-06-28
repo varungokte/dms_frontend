@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import useGlobalContext from "./../../GlobalContext";
-import { FieldValues } from "./../../DataTypes";
-import { ZoneList } from "./../../Constants";
+/* import { useEffect, useState } from "react";
+import useGlobalContext from "../../../GlobalContext";
+import { FieldValues } from "../../../DataTypes";
+import { ZoneList } from "../../../Constants";
 
-import Filter from "./BasicComponents/Filter";
-import { Table } from "./ui/table";
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import Filter from "../BasicComponents/Filter";
+import { Table } from "../ui/table";
+import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
+import LoadingMessage from "../BasicComponents/LoadingMessage";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
 function Zones(props:{label:string}){
   useEffect(()=>{
@@ -53,4 +53,4 @@ function Zones(props:{label:string}){
 	)
 }
 
-export default Zones;
+export default Zones; */

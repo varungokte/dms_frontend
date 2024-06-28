@@ -137,7 +137,6 @@ const sendOTP = async () => {
 	}
 }
 
-
 const verifyOTP = async (otp:any) => {
 	//Error 412 -> User already verified
 	try {
@@ -264,14 +263,14 @@ const getLoanFields = async (loanId:string) => {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_loanId": loanId },
 		});
-		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject;
+		const decryptedObject = await handleDecryption(response.data);
+		return {status:response.status, obj:decryptedObject||{}};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0, obj:{}};
 		else
-			return error.response;
+			return {status:error.response.status, obj:{}};
 	}
 }
 
@@ -288,7 +287,7 @@ const createLoan = async (data:object) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
 			return error.response.status
 	}
@@ -325,9 +324,9 @@ const addContact = async (data:object, actionType:string) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
-			return error.response.status
+			return error.response.status;
 	}
 }
 
@@ -338,14 +337,14 @@ const getContacts = async (loanId:string) => {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_loanId": loanId },
 		});
-		const decryptedObject = handleDecryption(response.data);
-		return decryptedObject;
+		const decryptedObject = await handleDecryption(response.data);
+		return {status:response.status,data:decryptedObject||{}};
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return {status:0,data:{}};
 		else
-			return error.response
+			return {status:error.response.status, data:{}}
 	}
 };
 
@@ -361,9 +360,9 @@ const addRating = async (data:object) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
-			return error.response;
+			return error.response.status;
 	}
 }
 
@@ -397,7 +396,7 @@ const addRole = async (data:object) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
 			return error.response.status;
 	}
@@ -635,9 +634,9 @@ const deleteDocument = async (AID:string, docId:string, section_name:string, fil
 
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
-			return error.response;
+			return error.response.status;
 	}
 }
 
@@ -675,7 +674,7 @@ const selectTeam = async (data:any) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
 			return error.response.status;
 	}
@@ -693,7 +692,7 @@ const addToMasters = async (data:any) => {
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
 			return error.response.status;
 	}
@@ -733,14 +732,14 @@ const addPaymentSchedule = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addPaymentDetails`, {data: enc_data}, {
+		const response = await axios.post(`${Base_Url}/updatePaymentDetails`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
 	}
 	catch(error:any) {
 		if (!error.response)
-			return;
+			return 0;
 		else
 			return error.response.status;
 	}

@@ -1,13 +1,13 @@
-import { useEffect, useState } from "react";
-import useGlobalContext from "./../../GlobalContext";
-import { FieldValues } from "./../../DataTypes";
-import { LoanProductList } from "./../../Constants";
+/* import { useEffect, useState } from "react";
+import useGlobalContext from "../../../GlobalContext";
+import { FieldValues } from "../../../DataTypes";
+import { LoanProductList } from "../../../Constants";
 
-import Filter from "./BasicComponents/Filter";
-import { Table } from "./ui/table";
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import Filter from "../BasicComponents/Filter";
+import { Table } from "../ui/table";
+import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
+import LoadingMessage from "../BasicComponents/LoadingMessage";
+import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 
 function Products(props:{label:string}){
   useEffect(()=>{
@@ -53,4 +53,4 @@ function Products(props:{label:string}){
 	)
 }
 
-export default Products;
+export default Products; */

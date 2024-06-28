@@ -17,7 +17,24 @@ import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import TextField from "../FormFieldComponents/TextField";
 
-function FormDialog(props:{index:number, type:FormDialogTypes, edit?:boolean, triggerText:string|ReactElement, triggerClassName?:string, formSize:"small"|"medium"|"large", formTitle:string, formSubmit:Function, submitButton:string, form:FieldAttributesList, currentFields:FieldValues, repeatFields?:boolean, suggestions?:UserSuggestionTypes, getRoles?:boolean }){
+type FormDialogProps = {
+  index:number, 
+  type:FormDialogTypes, 
+  edit?:boolean, 
+  triggerText:string|ReactElement, 
+  triggerClassName?:string, 
+  formSize:"small"|"medium"|"large", 
+  formTitle:string, 
+  formSubmit:Function, 
+  submitButton:string, 
+  form:FieldAttributesList, 
+  currentFields:FieldValues, 
+  repeatFields?:boolean, 
+  suggestions?:UserSuggestionTypes, 
+  getRoles?:boolean 
+}
+
+function FormDialog(props:FormDialogProps){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);

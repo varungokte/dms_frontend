@@ -10,7 +10,6 @@ import ViewFileButton from "./BasicComponents/ViewFileButton";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 
-
 function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:DocumentSectionDetails}){
   const [docData, setDocData] = useState<any>();
   const [added, setAdded] = useState(true);
@@ -51,9 +50,17 @@ function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:Do
               action={
                 docData.map((doc:any,index:number)=>{
                   if (doc["S"]==DocumentStatusList[1])
-                    return <UploadFileButton key={index} index={index} AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={doc._id} setAdded={setAdded} />
+                    return <UploadFileButton key={index} index={index} 
+                    AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={doc._id} 
+                    setAdded={setAdded} 
+                  />
                   else
-                    return <ViewFileButton key={index} AID={props.AID} loanId={doc._loanId} docId={doc._id} status={doc["S"]} sectionName={props.sectionDetails.sectionName} rejectionReason={doc["R"]} actualName={doc.FD[0].originalname||""} fileName={doc.FD[0].filename||""} setAdded={setAdded} />
+                    return <ViewFileButton key={index} type="doc" 
+                    AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionName={props.sectionDetails.sectionName} 
+                    status={doc["S"]} rejectionReason={doc["R"]} 
+                    setAdded={setAdded} 
+                    actualName={doc.FD[0].originalname||""} fileName={doc.FD[0].filename||""}
+                    />
                 })
               }
             />

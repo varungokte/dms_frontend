@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { LoanSecurityTypeList } from "../../../Constants";
+import { LoanCommonProps } from "../../../DataTypes";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import DateField from "../FormFieldComponents/DateField";
 import NumberField from "../FormFieldComponents/NumberField";
 import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 
-function LoanSecurityDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any, setChangesHaveBeenMade:Function}){
+function LoanSecurityDetails(props:LoanCommonProps){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
 

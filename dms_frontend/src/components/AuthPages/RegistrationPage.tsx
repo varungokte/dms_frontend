@@ -1,9 +1,12 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useState, useEffect } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { LinearProgress } from "@mui/material";
 import { Link } from "react-router-dom";
 
 export const RegistrationPage = () => {
+  useEffect(()=>{
+		document.title="Register | Beacon DMS"
+	},[]);
 	const [companyName, setCompanyName] = useState("");
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -26,6 +29,7 @@ export const RegistrationPage = () => {
 			N: companyName,
 			P: password,
 			MU: maximumUsers,
+			R: "Admin",
 			Z: zone,
 			M: isManager,
 			RM: reportingManager,

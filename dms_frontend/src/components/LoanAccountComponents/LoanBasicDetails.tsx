@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import moment from "moment";
-import { FieldValues, GridFieldAttributes } from "DataTypes";
+import { FieldValues, GridFieldAttributes, LoanCommonProps } from "DataTypes";
 import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
 
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
@@ -12,7 +12,7 @@ import NumberField from "../FormFieldComponents/NumberField";
 import DateField from "../FormFieldComponents/DateField";
 import TextField from "../FormFieldComponents/TextField";
 
-function LoanBasicDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:FieldValues,setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,assignedTeam:string, teamList:any}) {
+function LoanBasicDetails(props:LoanCommonProps) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   
   const [fieldList] = useState<GridFieldAttributes>(
@@ -34,7 +34,7 @@ function LoanBasicDetails(props:{key:number,actionType: string, loanId: string, 
     { id:"CD", name:"Loan Closure Date", type:"date", required: false },
     { id:"RED", name:"Repayment End Date", type:"date", required: false },
     { id:"SA", name:"Sanction Amount", type:"number", required: true },
-    { id:"HA", name:"Hold Amount", type:"number", required: false },
+    { id:"HA", name:"Hold Amount", type:"number", required: true },
     { id:"DA", name:"Downsell Amount", type:"number", required: false },
     { id:"OA", name:"Outstanding Amount", type:"number", required: false },
     { id:"A", name:"DSRA Applicability", type:"select", options:YesOrNoList, required: false },

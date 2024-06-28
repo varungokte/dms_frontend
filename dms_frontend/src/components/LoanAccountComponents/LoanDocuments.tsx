@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
-import { FieldValues } from "../../../DataTypes";
+import { FieldValues, LoanCommonProps } from "../../../DataTypes";
 
 import FormDialogDocuments from "../FormComponents/FormDialogDocuments";
 import LoanDocumentView from "./LoanDocumentComponents/LoanDocumentView";
@@ -16,7 +16,7 @@ import { CovenantTypeList } from "../../../Constants";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import setSection from "./LoanDocumentComponents/LoanDocSectionDetails";
 
-function LoanDocuments(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any}) {
+function LoanDocuments(props:LoanCommonProps) {
   const [docData, setDocData] = useState<FieldValues[]>();
   
   const [sectionDetails] = useState(setSection(props.label));
@@ -26,6 +26,7 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
   useEffect(()=>{
     if (added)
       getDocumentsList().then(res=>{
+        console.log("rsponse",res)
         setDocData(res);
         setAdded(false);
       })
@@ -47,21 +48,24 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
 
     userValues["_loanId"] = props.loanId;
     userValues["SN"] = sectionDetails.sectionName;
-
+    console.log("userValues",userValues)
     const res = await addDocument(userValues);
 
     if (res.status==200)
       setAdded(true);
     return res;
+  
   }
 
   const editDocument = async (userValues:any,currIndex:number) => {
-    const { addDocument } = useGlobalContext();
-
-    userValues["_id"] = currIndex;
+    const { editDocument } = useGlobalContext();
+    if (docData)
+      userValues["_id"] = docData[currIndex]["_id"];
     userValues["SN"] = sectionDetails.sectionName; 
+
+    console.log("user values",userValues)
   
-   const res = await addDocument(userValues);
+   const res = await editDocument(userValues);
   
     if (res.status==200)
       setAdded(true);
@@ -101,16 +105,16 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
       <Toaster/>
       <div className="flex flex-row">
         <div className="flex-auto">
-          {sectionDetails.type=="doc"
+          {sectionDetails.sectionType=="doc"
             ?<></>
-            :sectionDetails.type=="cov"
+            :sectionDetails.sectionType=="cov"
               ?<Filter value={priority} setValue={setPriority} options={CovenantTypeList}/>
               :<></>
           }
         </div>
       
         <div className="mr-3">
-          <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.type}
+          <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.sectionType}
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} titleText={props.label} 
             detailSubmit={addDocument} fileSubmit={addFile} deleteFile={deleteFile} getFiles={getFileList}
             formFields={sectionDetails.fieldList}currentFields={{}}
@@ -120,11 +124,11 @@ function LoanDocuments(props:{key:number,actionType: string, loanId: string, set
       <div className="m-5">
         {docData
           ?docData.length==0?<EmptyPageMessage sectionName="documents" />
-          :sectionDetails.type=="doc"
+          :sectionDetails.sectionType=="doc"
             ?<LoanDocumentView docData={docData} label={props.label} fieldList={sectionDetails.fieldList}
               editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
             />
-            :sectionDetails.type=="cov"
+            :sectionDetails.sectionType=="cov"
               ?<LoanCovenantView covData={docData} label={props.label} priority={priority} fieldList={sectionDetails.fieldList}
                 editCovenantFunction={editDocument} deleteCovenantFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
               />

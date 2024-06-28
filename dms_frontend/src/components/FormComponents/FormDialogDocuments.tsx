@@ -1,38 +1,50 @@
 import { ReactElement, useEffect, useState } from "react";
 //import useGlobalContext from "./../../../GlobalContext";
 import { DocumentSectionTypes, FieldAttributesList, FieldValues} from "./../../../DataTypes";
-import { FileTypeList } from "../../../Constants";
+import { CovenantTypeList, FileTypeList } from "../../../Constants";
 
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import {useDropzone} from "react-dropzone";
 import { Upload } from "lucide-react";
-import { toast } from "../ui/use-toast";
 import { LinearProgress } from "@mui/material";
 import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-
 
 import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import DateField from "../FormFieldComponents/DateField";
 import TextField from "../FormFieldComponents/TextField";
+import Close from "@mui/icons-material/Close";
 
-function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, triggerText:string|ReactElement, triggerClassName:string, titleText:string, currentFields:FieldValues, detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, formFields:FieldAttributesList, edit:boolean, currIndex?:number}){
+type FormDialogDocumentsProps = {
+  index:number, type:DocumentSectionTypes, edit:boolean,
+  triggerText:string|ReactElement, triggerClassName:string, titleText:string,
+  currentFields:FieldValues, 
+  detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, 
+  formFields:FieldAttributesList, 
+  currIndex?:number
+}
+
+function FormDialogDocuments(props:FormDialogDocumentsProps){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [fileList, setFileList] = useState<any>([]);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [currentTab, setCurrentTab] = useState("details");
   const [fileType, setFileType] = useState(-1);
-  const [covType, setCovType]= useState(-1);
+  const [covType, setCovType]= useState("");
   const [enableUpload, setEnableUpload] = useState(false);
   const [docId, setDocId] = useState("");
+  const [recievedFilesFromServer, setRecievedFilesFromServer] = useState(false);
 
   useEffect(()=>{
     if (props.edit){
-      if (props.currentFields["FD"])
+      if (props.currentFields["FD"]){
         setFileList(props.currentFields["FD"])
+        setRecievedFilesFromServer(true);
+      }
+
       setDocId(props.currentFields["_id"]||"")
       setPrefillValues(props.currentFields);
       setEnableUpload(true);
@@ -41,13 +53,18 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
       setPrefillValues(props.currentFields);
   },[props.currentFields]);
 
+
+  useEffect(()=>{
+    setCurrentTab("details");
+  },[open])
+
   const validateRequiredFields = async()=>{
     const data:any={};
     for (let i=0; i<props.formFields.length; i++){
       const field = props.formFields[i];
+
       if (field.category=="single")
         data[field.id] = field["required"]?true:false;
-
       else if (field.category=="grid"){
         for (let j=0; j<field.fields.length; j++){
           const gridField = field.fields[j];
@@ -64,19 +81,23 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
         return false;
       }
     }
-    setErrorMessage(<span><LinearProgress /></span>)
-    let res;
-    if (props.edit)
-      res = await props.detailSubmit(prefillValues, props.currIndex);
-    else 
-      res = await props.detailSubmit(prefillValues);
+    setErrorMessage(<span><LinearProgress /></span>);
+    return true;
+  }
+
+  const submitDetails = async () => {
+    const valid = validateRequiredFields();
+    if (!valid)
+      return false;
+    let res = await props.detailSubmit(prefillValues, props.currIndex);
+    
+    
     if (res.status==200){
       setEnableUpload(true);
       setCurrentTab("upload");
       setErrorMessage(<></>);
       if (res["id"]!="")
         setDocId(res["id"]);
-      //console.log("res.id",res["id"],res)
       return true;
     }
     else if (res.status==422){
@@ -89,24 +110,20 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
     }
   }
 
-  const submitDetails = async () => {
-    //console.log("Reached submit");
-    //console.log("docId",docId);
-    let res=200;
-    //console.log("A",fileList)
-    if (fileList && fileList.length>0){
-      res = await props.fileSubmit(fileList,docId);}
-    if (res==200)
+  const submitFile = async () => {
+    if (!fileList || fileList.length==0){
       setOpen(false);
-    else{
-      setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
-      //console.log("You've got a problem, si ",res);
+      return;
     }
+    
+    const res = await props.fileSubmit(fileList,docId);
+    if (res==200){
+      setErrorMessage(<></>);
+      setOpen(false);
+    }
+    else
+      setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
   }
-
-  useEffect(()=>{
-    setCurrentTab("details");
-  },[open])
 
   return(
     <AlertDialog open={open} onOpenChange={setOpen}>
@@ -127,7 +144,7 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
                 <form onSubmit={(e)=>{props.detailSubmit(e);}}>
                   {props.formFields.map((field:any,index:number)=>{
                     if (field["category"]=="single"){
-                      if (field["id"]=="F" && covType!==1)
+                      if (field["id"]=="F" && covType!==CovenantTypeList[1])
                         return null;
                       if (field["type"]=="select")
                         return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} 
@@ -158,7 +175,7 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
                           <div key={index+"grid name"} className="text-2xl font-medium my-2">{field["sectionName"]}</div>
                           <div key={index+"gridz"} className={`grid grid-cols-${field["row"]}`}>
                             {field.fields.map((item:any, itemIndex:number)=>{
-                              if (item["id"]=="F" && covType!==1)
+                              if (item["id"]=="F" && covType!==CovenantTypeList[1])
                                 return null;
                               else if (item["type"]=="select")
                                 return <span key={index+"_"+itemIndex} className="mr-3">
@@ -196,7 +213,7 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
           <TabsContent value="upload">
             <Card className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
               <CardContent className="border-0">
-                <FileField key={100} index={100} fileType={fileType} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} />
+                <FileField key={100} index={100} fileType={fileType} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} receivedFilesFromServer={recievedFilesFromServer} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -205,51 +222,62 @@ function FormDialogDocuments(props:{index:number, type:DocumentSectionTypes, tri
         <br/>
         <AlertDialogFooter className="bottom-0 h-12">
           <AlertDialogCancel className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</AlertDialogCancel>
-          <button className={SubmitButtonStyling} onClick={()=>{currentTab=="details"?validateRequiredFields():submitDetails()}}>{currentTab=="details"?"Next":"Save"}</button>
+          <button className={SubmitButtonStyling} onClick={()=>{currentTab=="details"?submitDetails():submitFile()}}>{currentTab=="details"?"Next":"Save"}</button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>  
   )
 };
 
-function FileField (props:{index:number, fileType:number, fileList:any, fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function }) {
-	const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
-  
-  //const statusList = [<></>,<p className="text-blue-500">Uploading...</p>,<p className="text-green-500">Completed</p>,<p className="text-red-500">Rejected</p>]
-  //const [filePossibilities] = useState(["","application/pdf"])
-  const [error, setError] = useState(<></>)
-  const [renderedFileList, setRenderedFileList] = useState(<></>);
+function FileField (props:{index:number, fileType:number, fileList:any, fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean }) {
+	const {acceptedFiles, getRootProps, getInputProps} = useDropzone({multiple:false, useFsAccessApi:false});
+
 
   useEffect(()=>{
-    props.fileSetter((curr:any)=>{
-      const arr  = [...curr];
-      if (acceptedFiles && acceptedFiles.length>0)
-        for (let i=0; i<acceptedFiles.length; i++){
-          arr.push(acceptedFiles[i]);
-          setError(<></>);
-        }
-      return arr;
-    });
+    console.log("fileList",props.fileList);
+  },[props.fileList]);
+  
+  const [error, setError] = useState(<></>);
+  
+  useEffect(()=>{
+    updateFilelist();
   },[acceptedFiles]);
 
-  useEffect(()=>{
-    if (props.fileList)
-      setRenderedFileList (props.fileList.map((item:any,index:number)=>{
-        //console.log("FILE INFO",item);
-        return (
-          <div key={index} className="border p-3 flex flex-row">
-            <div key={index} className="flex-auto">
-              <p>{item.filename?item.filename:item.name}</p>
-              {/* {statusList[item[1]]} */}
-            </div>
-            <button type="button" onClick={()=>obliterateFile(item.filename?item.filename:item.name)}>x</button>
-          </div>
-        )
-      }))
-  },[props.fileList]);
+  const updateFilelist = (deleteFile?:boolean) => {
+    console.log("updating");
+    if (deleteFile){
+      props.fileSetter([]);
+      return;
+    }
+    
+    props.fileSetter((curr:any)=>{
+      const arr = [];
+      if (acceptedFiles && acceptedFiles.length>0){
+        for (let i=0; i<acceptedFiles.length; i++)
+          arr.push(acceptedFiles[i]);
+        setError(<></>);
+        return arr;
+      }
+      return curr;
+    });
+  }
 
-  const obliterateFile = async (fileName:string) => {
-    const res = await props.deleteFile(props.docId,fileName);
+  const obliterateFile = async () => {
+    if (!props.receivedFilesFromServer){
+      console.log("pre",acceptedFiles);
+      acceptedFiles.pop();
+      console.log("post",acceptedFiles);
+      updateFilelist(true);
+    }
+    else{
+      console.log(props.fileList)
+      const res = await props.deleteFile(props.docId,props.fileList[0].filename);
+      if (res==200)
+        updateFilelist(true);
+      else
+        setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
+    }
+    /* const res = await props.deleteFile(props.docId,fileName);
     if (res==200){
       toast({
         title: "Success!",
@@ -261,37 +289,16 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
     }
     else
       setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>);
-  }
-
-  const getUploadedFiles = () => {
-    /* getFileList(props.docPath[0],props.docPath[1], sectionDocumentLists[props.docPath[1]][Number(props.prefillValues["N"]-1)]).then(res=>{
-      console.log("here are the files",res);
-      if(res.status==200)
-        props.fileSetter(()=>{
-          const arr  = [];
-          if (res.obj["files"] && res.obj["files"].length>0)
-            for (let i=0; i<res.obj["files"].length; i++){
-              console.log("file name",res.obj["files"][i])
-              arr.push([res.obj["files"][i],0]);
-              setError(<></>);
-            }
-          return arr;
-        });
-      else
-        setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
-    }).catch(err=>{
-      setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
-      console.log(err);
-    }) */
+    */  
   }
 
   return (
     <div>
       <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
-        <input {...getInputProps()} />
+        <input {...getInputProps()} multiple={false} />
         <div className="my-2 text-center">
           <span className="inline-block align-middle text-custom-1"><Upload/></span>
-          <p className="text-custom-1">Choose File to Upload</p>
+          <p className="text-custom-1">Choose File to {props.fileList && props.fileList.length!=0?"Replace":"Upload"}</p>
         </div>
       </div>
       <br/>
@@ -303,7 +310,16 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
       {error}
       <br/>
       <div>
-        {renderedFileList}
+        {props.fileList.map((item:any,index:number)=>{
+          return (
+            <div key={index} className="border p-3 flex flex-row">
+              <div key={index} className="flex-auto">
+                <p>{item.originalname?item.originalname:item.name}</p>
+              </div>
+              <button type="button" onClick={()=>obliterateFile()}><Close/></button>
+            </div>
+          )
+        })}
       </div>
     </div>
   )

@@ -1,4 +1,4 @@
-import { FormEvent, useState } from "react"
+import { FormEvent, useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
 import useGlobalContext from "../../../GlobalContext";
 
@@ -7,6 +7,9 @@ import eye from "./../static/eye.svg";
 import eye_slash from "./../static/eye-slash.svg";
 
 export const LoginPage = () => {
+  useEffect(()=>{
+		document.title="Login | Beacon DMS"
+	},[]);
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 
@@ -14,10 +17,7 @@ export const LoginPage = () => {
   const [errorMessage, setErrorMessage] = useState(<></>);
 
 	const navigate = useNavigate();
-	const { LoginUser, useTitle } = useGlobalContext();
-
-  useTitle("Login");
-
+	const { LoginUser } = useGlobalContext();
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
 

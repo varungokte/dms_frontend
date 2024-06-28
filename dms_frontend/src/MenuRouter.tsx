@@ -9,7 +9,7 @@ import { FieldValues } from './../DataTypes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
 
-import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, /*  ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */ } from "./../src/components/static/PanelIcons"
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, /*  ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */ } from "./../src/components/static/PanelIcons"
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
 import PageNotFound from './components/BasicComponents/PageNotFound';
@@ -17,13 +17,12 @@ import PageNotFound from './components/BasicComponents/PageNotFound';
 import Dashboard from './components/Dashboard';
 import LoanAccount from './components/LoanAccount';
 import CreateLoanAccount from './components/CreateLoanAccount';
-import Products from './components/Products';
 import DealsList from './components/DealsList';
 import UserManagement from './components/UserManagement';
 import RoleManagement from './components/RoleManagement';
+import FilterPage from './components/FilterPage';
 import TeamManagement from './components/TeamManagement';
 import Masters from './components/Masters';
-import Zones from './components/Zones';
 
 export const MenuRouter = () => {
 	const [hover,setHover] = useState(-1);
@@ -110,6 +109,7 @@ export const MenuRouter = () => {
 	
 	useEffect(()=>{
 		getUserInfo().then(res=>{
+			//console.log("token",res);
 			if (res)
 			setUserInfo(
 				<DropdownMenu>
@@ -118,7 +118,7 @@ export const MenuRouter = () => {
 							<div><ProfileIcon name={res["N"]||"User"} size="small" showStatus={socketIsConnected}/></div>
 							<div className="text-left mx-3">
 								<p>{res["N"]}</p>
-								<p className="font-light">No Role</p>
+								<p className="font-light">{res["R"]||res["E"]||""}</p>
 							</div>
 						</div>
 						</DropdownMenuTrigger>
@@ -143,10 +143,11 @@ export const MenuRouter = () => {
 		{ name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },
 		{ name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },
 		{ name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },
-		{ name: "Products", path:"/products", component: Products, icon: ProductIcon },
-		{ name: "Zones", path:"/zones", component: Zones, icon: ZoneIcon },
+		{ name: "Payment Schedule", path:"/schedule", component: DealsList, icon: ScheduleIcon},
+		{ name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },
+		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },
 		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
-		{ name: "Payment Schedule", path:"/schedule", component: DealsList}
+
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
@@ -193,6 +194,7 @@ export const MenuRouter = () => {
 							componentProps["idList"] = mastersIdList;
 							componentProps["callMasterLists"] = setChangeInMasters
 						}
+						
 						return <Route key={index} path={item.path} element={createElement(item.component, componentProps)} />
 					})}
 					<Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />

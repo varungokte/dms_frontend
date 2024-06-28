@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { BankAccountTypeList } from "../../../Constants";
-import { GridFieldAttributes } from "DataTypes";
+import { GridFieldAttributes, LoanCommonProps } from "DataTypes";
 import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 
-function LoanBankDetails(props:{key:number,actionType: string, loanId: string, setLoanId: Function, AID: string, setAID: Function, currentSection: number, setCurrentSection: Function, goToNextSection: Function, setUnsavedWarning: Function, label: string, setShowSecurityDetails: Function, showSecurityDetails: boolean, setOkToFrolic: Function, preexistingValues:any,setChangesHaveBeenMade:Function}) {
+function LoanBankDetails(props:LoanCommonProps) {
   const {createLoan} = useGlobalContext();
 
   const [fieldList] = useState<GridFieldAttributes>({
