@@ -16,7 +16,7 @@ export const RegistrationPage = () => {
 	const [isManager, /* setIsManager */]  = useState(true);
 	const [message, setMessage] = useState(<></>);
 
-	const {RegisterAdmin} = useGlobalContext();
+	const {registerAdmin} = useGlobalContext();
 
 	const handleRegister = (e: FormEvent) => {
 		e.preventDefault();
@@ -44,7 +44,7 @@ export const RegistrationPage = () => {
 
 		setMessage(<LinearProgress />)
 
-		RegisterAdmin(data).then((res:any)=>{
+		registerAdmin(data).then((res:any)=>{
 			if (res==200)
 				setMessage(<div className="text-center"> <span className="text-green-600">Admin successfully created.</span> <Link to="/login" className="text-blue-500 underline decoration-solid	">Go to login page.</Link></div>);
 			else if (res==422)

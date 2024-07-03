@@ -59,7 +59,8 @@ function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:Do
                     AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionName={props.sectionDetails.sectionName} 
                     status={doc["S"]} rejectionReason={doc["R"]} 
                     setAdded={setAdded} 
-                    actualName={doc.FD[0].originalname||""} fileName={doc.FD[0].filename||""}
+                    actualName={(doc.FD && doc.FD[0] && doc.FD[0].originalname)?doc.FD[0].originalname:""} 
+                    fileName={(doc.FD && doc.FD[0] && doc.FD[0].filename)?doc.FD[0].filename:""} 
                     />
                 })
               }

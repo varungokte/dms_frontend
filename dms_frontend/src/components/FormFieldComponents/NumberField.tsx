@@ -140,7 +140,7 @@ function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string
       return num;
   } 
 
-  const [amountFields] = useState(["SA", "HA", "DA", "OA","P",]);
+  const [amountFields] = useState(["SA", "HA", "DA", "OA","P","V"]);
   useEffect(()=>{
     if (amountFields.includes(props.id)){
       let num;
@@ -149,11 +149,12 @@ function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string
       else
         num = props.prefillValues[props.id];
       
-      if (!num)
+      if (num==0)
+        num=0
+      else if (!num)
         num=-1
       else if (num=="00")
         num=0;
-
       numberToWords(Number(num),setWordsMessage,props.index);
     }
   },[props])
@@ -188,18 +189,15 @@ function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string
           }
           :(e)=>{
             const val_w_commas = e.target.value;
-            console.log("e.target.value",e.target.value)
             let val="";
             for (let i=0; i<val_w_commas.length; i++){
               //if (props.type=="rate")
-              if (val_w_commas[i]!=".")
+              /* if (val_w_commas[i]!=".")
                 val+=".";
-              else if (!isNaN(Number(val_w_commas[i])))
+              else */ if (!isNaN(Number(val_w_commas[i])))
                 val+=val_w_commas[i];
             }
 
-            console.log("value",val, isNaN(Number(val)))
-            
             if (isNaN(Number(val)))
               return;
             const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage);
@@ -208,7 +206,6 @@ function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string
               curr[props.id]=val; 
               if (downsell_amount!=="NO")
                 curr["DA"]=downsell_amount;
-              console.log("New CURR", curr)
               return {...curr};
             })
           }

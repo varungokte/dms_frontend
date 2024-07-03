@@ -49,7 +49,7 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
   },[props.masterLists])
 
   useEffect(()=>{
-    if (added){
+    if (added && props){
       props.callMasterLists(true);
       setAdded(false);
     }
@@ -83,7 +83,7 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
 
   const createMaster = async (userValues:FieldValues) =>{
     userValues["V"]= cleanUpInput(userValues["V"]);
-    console.log(" ", userValues);
+    //console.log(" ", userValues);
     const res = await addToMasters(userValues);
     if (res==200)
       setAdded(true);

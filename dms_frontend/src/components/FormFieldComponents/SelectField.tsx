@@ -1,6 +1,8 @@
+//import { useEffect } from "react";
 import FieldLabel from "./FieldLabel";
 
 function SelectField (props:{index:number|string, id:string, name: string, options: string[]|readonly string[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, sectionType?:string, setFileType?:Function, setCovType?:Function, setRole?:Function, setZone?:Function}){
+  //useEffect(()=>console.log(props),[props]);
 
   return(
     <div key={props.index} className="mb-5 mx-2">

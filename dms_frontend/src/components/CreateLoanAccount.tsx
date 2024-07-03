@@ -252,10 +252,10 @@ function CreateLoanAccount() {
           } 
         </div>
       </div>
-      {/* <button onClick={()=>{
+      <button onClick={()=>{
         setOkToFrolic(true);
         setCurrentSection(2);}}>Skip
-      </button> */} 
+      </button>
     </div>
   )
 }

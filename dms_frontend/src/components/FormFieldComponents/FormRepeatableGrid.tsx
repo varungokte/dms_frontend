@@ -9,6 +9,8 @@ function FormRepeatableGrid(props:{fieldList:FieldValues[], fieldValues:FieldVal
   const [currentForm, setCurrentForm] = useState(0);
   const [repeatForm, setRepeatForm] = useState<any>([]);
   const [renderRepeatForm, setRenderRepeatForm] = useState<any>([]);
+
+  //useEffect(()=>console.log(props),[props])
   
   useEffect(()=>{
     if (props.preexistingValues){
@@ -47,8 +49,12 @@ function FormRepeatableGrid(props:{fieldList:FieldValues[], fieldValues:FieldVal
         {repeatForm.length>1 
           ?<button className="h-[50px] w-1/12 rounded-xl text-white text-lg bg-red-600 mr-5" type="button"
             onClick={()=>{
-              setCurrentForm(curr=>{return curr-1});
-              setRepeatForm((curr:any)=>{return curr.slice(0,-1);})
+              setCurrentForm(curr=>curr-1);
+              props.setFieldValues((curr:any)=>{
+                curr.pop()
+                return [...curr]
+              })
+              setRepeatForm((curr:any)=>curr.slice(0,-1))
             }}
           >-</button>
           :""

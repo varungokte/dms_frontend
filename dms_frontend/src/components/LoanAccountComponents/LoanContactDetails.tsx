@@ -66,8 +66,8 @@ function LoanContactDetails(props:LoanCommonProps) {
     if (added)
       getContacts(props.loanId).then(res=>{
         if (res.status!=200)
-          setContacts({});
-        console.log("contacts reponse",res)
+          return;
+        //console.log("contacts reponse",res)
         const obj:any={};
         res.data.map((contact:any)=>{
           if (contact.CT=="-")
@@ -122,7 +122,7 @@ function LoanContactDetails(props:LoanCommonProps) {
   const editContact = async (userValues:any) =>{
     const data=userValues;
 
-    console.log("inside edit, oldValues", userValues);
+    //console.log("inside edit, oldValues", userValues);
 
     /* const oldValues ={}// contacts[]
 
@@ -140,7 +140,6 @@ function LoanContactDetails(props:LoanCommonProps) {
         }
       }
     } */
-    console.log("data",data)
     if (Object.keys(data).length==0)
       return 200;
 
@@ -148,7 +147,7 @@ function LoanContactDetails(props:LoanCommonProps) {
     data["_loanId"]=props.loanId;
     data["_contactId"]=userValues._id
 
-    console.log("submitted data", data)
+    //console.log("submitted data", data)
     const res = await addContact(data,"EDIT");
     if (res==200){
       setAdded(true);
@@ -179,7 +178,7 @@ function LoanContactDetails(props:LoanCommonProps) {
       <Toaster/>
       <div className="flex flex-row flex-wrap">
         {contacts
-          ?role==allContacts
+          ?role==allContacts && Object.keys(contacts).length!=0
             ?Object.keys(contacts).map((category,categoryIndex)=>{
               return contacts[category].map((person:FieldValues,index:number)=>{
                 const regEx = new RegExp(searchString, "i");
@@ -193,7 +192,7 @@ function LoanContactDetails(props:LoanCommonProps) {
                 if (searchString=="" || (person.PN+"").search(regEx)!==-1)
                   return <ContactCard key={index} index={index} person={person} editFunction={editContact} formFields={fieldList} />
                 })
-              :<EmptyPageMessage sectionName={role.toLowerCase()+"s"} />
+              :<EmptyPageMessage sectionName={role!=allContacts?role.toLowerCase()+"s":"contacts"} />
           :<LoadingMessage sectionName="contacts" />
         }
       </div>

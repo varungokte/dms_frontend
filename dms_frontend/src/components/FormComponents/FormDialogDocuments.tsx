@@ -1,21 +1,21 @@
 import { ReactElement, useEffect, useState } from "react";
-//import useGlobalContext from "./../../../GlobalContext";
 import { DocumentSectionTypes, FieldAttributesList, FieldValues} from "./../../../DataTypes";
 import { CovenantTypeList, FileTypeList } from "../../../Constants";
 
 import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import {useDropzone} from "react-dropzone";
-import { Upload } from "lucide-react";
-import { LinearProgress } from "@mui/material";
+import { useDropzone } from "react-dropzone";
+import { CircularProgress } from "@mui/material";
 import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+
+import { Upload } from "lucide-react";
+import Close from "@mui/icons-material/Close";
 
 import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import DateField from "../FormFieldComponents/DateField";
 import TextField from "../FormFieldComponents/TextField";
-import Close from "@mui/icons-material/Close";
 
 type FormDialogDocumentsProps = {
   index:number, type:DocumentSectionTypes, edit:boolean,
@@ -23,7 +23,8 @@ type FormDialogDocumentsProps = {
   currentFields:FieldValues, 
   detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, 
   formFields:FieldAttributesList, 
-  currIndex?:number
+  currIndex?:number,
+  setAdded:Function,
 }
 
 function FormDialogDocuments(props:FormDialogDocumentsProps){
@@ -37,28 +38,52 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
   const [enableUpload, setEnableUpload] = useState(false);
   const [docId, setDocId] = useState("");
   const [recievedFilesFromServer, setRecievedFilesFromServer] = useState(false);
+  const [buttonText, setButtonText] = useState(<span>{currentTab=="details"?"Next":"Save"}</span>);
 
   useEffect(()=>{
     if (props.edit){
       if (props.currentFields["FD"]){
-        setFileList(props.currentFields["FD"])
+        setFileList(props.currentFields["FD"]);
         setRecievedFilesFromServer(true);
       }
 
       setDocId(props.currentFields["_id"]||"")
-      setPrefillValues(props.currentFields);
+      setPrefillValues({...props.currentFields});
       setEnableUpload(true);
     }
     else
-      setPrefillValues(props.currentFields);
+      setPrefillValues({...props.currentFields});
   },[props.currentFields]);
 
 
   useEffect(()=>{
     setCurrentTab("details");
-  },[open])
+  },[open]);
+  
+  useEffect(()=>{
+    setButtonText(<span>{currentTab=="details"?"Next":"Save"}</span>);
+  },[currentTab])
+  
+  const checkForChanges = () => {
+    if (currentTab=="upload"){
+      if (props.currentFields["FD"] && prefillValues["FD"] && prefillValues["FD"][0].filename==props.currentFields["FD"][0].filename)
+      return false;
+    return true;
+    }
 
-  const validateRequiredFields = async()=>{
+    if (Object.keys(prefillValues).length==0)
+      return true;
+    
+    for (let i=0;i<Object.keys(prefillValues).length;i++){
+      const key = Object.keys(prefillValues)[i];
+      const value = prefillValues[key];
+      if (value && props.currentFields[key]!=value)
+        return true;
+    }
+    return false;
+  }
+
+  const validateRequiredFields = ()=>{
     const data:any={};
     for (let i=0; i<props.formFields.length; i++){
       const field = props.formFields[i];
@@ -75,23 +100,30 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
 
     for (let i=0;i<Object.keys(data).length;i++){
       const key = Object.keys(data)[i];
-      const value = data[key];
+      const value = data[key];  
       if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1)){
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
         return false;
       }
     }
-    setErrorMessage(<span><LinearProgress /></span>);
     return true;
   }
 
   const submitDetails = async () => {
+    const changesHaveBeenMade = checkForChanges();
+    if (!changesHaveBeenMade){
+      setEnableUpload(true);
+      setCurrentTab("upload");
+      return true;
+    }
+
     const valid = validateRequiredFields();
     if (!valid)
       return false;
     
+    setButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />);
     let res = await props.detailSubmit(prefillValues);
-    
+    setButtonText(<span>Save</span>);
     if (res.status==200){
       setEnableUpload(true);
       setCurrentTab("upload");
@@ -113,12 +145,22 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
   const submitFile = async () => {
     if (!fileList || fileList.length==0){
       setOpen(false);
+      props.setAdded(true);
+      return;
+    }
+
+    const changesHaveBeenMade = checkForChanges();
+    if (!changesHaveBeenMade){
+      setOpen(false);
       return;
     }
     
+    setButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />);
     const res = await props.fileSubmit(fileList,docId);
     if (res==200){
       setErrorMessage(<></>);
+      props.setAdded(true);
+      setButtonText(<span>{currentTab=="details"?"Next":"Save"}</span>);
       setOpen(false);
     }
     else
@@ -135,7 +177,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
         </AlertDialogHeader>
         <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
           <TabsList className="grid w-full grid-cols-2 border-0">
-            <TabsTrigger value="details" className="h-10">Document Details</TabsTrigger>
+            <TabsTrigger value="details" className="h-10 ">Document Details</TabsTrigger>
             <TabsTrigger value="upload" className="h-10" disabled={!enableUpload}>File Upload</TabsTrigger>
           </TabsList>
           <TabsContent value="details" className="h-full border-0" style={{overflowY:"auto"}}>
@@ -222,7 +264,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
         <br/>
         <AlertDialogFooter className="bottom-0 h-12">
           <AlertDialogCancel className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</AlertDialogCancel>
-          <button className={SubmitButtonStyling} onClick={()=>{currentTab=="details"?submitDetails():submitFile()}}>{currentTab=="details"?"Next":"Save"}</button>
+          <button className={SubmitButtonStyling} onClick={()=>{currentTab=="details"?submitDetails():submitFile()}}><p>{buttonText}</p></button>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>  
@@ -267,24 +309,15 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
         updateFilelist(true);
       else
         setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
-    }
-    /* const res = await props.deleteFile(props.docId,fileName);
-    if (res==200){
-      toast({
-        title: "Success!",
-        description: <p className="text-black">Your document has been successfully deleted</p>,
-        className:"bg-white",
-        color:"text-green-500"
-      })
-      getUploadedFiles();
-    }
-    else
-      setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>);
-    */  
+    }  
   }
 
   return (
     <div>
+      {props.fileList && props.fileList.length!=0?
+        <p className="text-orange-500 my-2 text-center">Note: If you upload a file now, it will replace the one you have already uploaded</p>
+        :<></>
+      }
       <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
         <input {...getInputProps()} multiple={false} />
         <div className="my-2 text-center">
@@ -294,18 +327,29 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
       </div>
       <br/>
       <div className="flex flex-row">
-        <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{FileTypeList.map(ft=>" "+ft).toString()}</p>
-        {/* {props.edit?<button className="text-custom-1" onClick={()=>getUploadedFiles()}>Get Uploaded Files</button>:<></>} */}
+        <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{FileTypeList.slice(1).map(ft=>" "+ft).toString()}</p>
       </div>
       <br/>
       {error}
       <br/>
       <div>
         {props.fileList.map((item:any,index:number)=>{
+          const fileName = item.originalname?item.originalname:item.name;
+          const size = item.size;
+          let fileSize ="";
+          if (size<1000)
+            fileSize= size+" bytes";
+          else if (size<1_000_000)
+            fileSize = (size/1000).toFixed(2)+" KB";
+          else if (size<1_000_000_000)
+            fileSize = (size/1_000_000).toFixed(2)+ " MB";
+          else
+            fileSize = (size/1_000_000_000).toFixed(2)+ " GB";
           return (
             <div key={index} className="border p-3 flex flex-row">
               <div key={index} className="flex-auto">
-                <p>{item.originalname?item.originalname:item.name}</p>
+                <p>{fileName}</p>
+                <p className="text-sm">File Size: <span className="">{fileSize}</span></p>
               </div>
               <button type="button" onClick={()=>obliterateFile()}><Close/></button>
             </div>

@@ -11,7 +11,7 @@ function LoanIDAssignment(props:any){
   
   const userSubmittedId = (e:any) => {
     e.preventDefault();
-    console.log("USER GENERATED ID", agreementId);
+    //console.log("USER GENERATED ID", agreementId);
     createAID({"AID":agreementId}).then(res=>{
       if (res.status==422)
         setErrorMessage(<p className="text-red-600">This Agreement ID has been taken. Please enter another one.</p>)

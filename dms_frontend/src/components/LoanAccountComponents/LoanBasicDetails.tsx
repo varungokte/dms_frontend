@@ -45,9 +45,11 @@ function LoanBasicDetails(props:LoanCommonProps) {
   );
 
   const [validationErrors, setValidationErrors] = useState<{[key:string]:string}>({});
+  const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
 
   useEffect(()=>{
     if (Object.keys(props.preexistingValues).length!=0){
+      console.log("preexising values",props.preexistingValues)
       const obj:FieldValues={};
       Object.keys(props.preexistingValues).map(value=>{
         if (value=="SD" || value=="DD" || value=="CD" || value=="RED")
@@ -57,7 +59,12 @@ function LoanBasicDetails(props:LoanCommonProps) {
       });
       const num = (Number(props.preexistingValues["SA"]) - Number(props.preexistingValues["HA"])||0)||0;
       obj["DA"] = num;
-          
+      if (props.preexistingValues["DSRA"] && Object.keys(props.preexistingValues["DSRA"]).length!=0){
+        for (let i=0; i<Object.keys(props.preexistingValues["DSRA"]).length; i++){
+          const key = Object.keys(props.preexistingValues["DSRA"])[i];
+          obj[key] = props.preexistingValues["DSRA"][key]
+        }
+      }
       setFieldValues((curr)=>{
         return {...curr, ...obj}
       });
@@ -75,7 +82,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
   },[fieldValues,props.preexistingValues])
 
   const {createLoan} = useGlobalContext();  
-  const { toast } = useToast()
+  const { toast } = useToast();
 
   const compareFieldsToPreexisting = () => {
     let no_changes = true;
@@ -91,28 +98,31 @@ function LoanBasicDetails(props:LoanCommonProps) {
     return no_changes;
   }
 
-  const submitForm = (e:FormEvent) => {
+  const submitForm = async (e:FormEvent) => {
     e.preventDefault();
     
     const data:FieldValues={};
     const dsra:FieldValues={};
 
     Object.keys(fieldValues).map(field=>{
-      if (field=="A" && fieldValues[field]==2)
+      if (field=="A" && fieldValues[field]==YesOrNoList[2])
         dsra[field] = fieldValues[field]
       else if (field=="A" || field=="F" || field=="S" || field=="V"){
-        if (fieldValues[field]!=null && fieldValues[field]==props.preexistingValues[field])
+        if (fieldValues[field] && fieldValues[field]!=props.preexistingValues[field])
           dsra[field] = fieldValues[field];
       }
-      let isDateField = false;
-      fieldList["fields"].map(obj=>{if (obj.id==field && obj.type=="date") isDateField=true;})
-      if (fieldValues[field]==null || fieldValues[field]=="" || (Object.keys(props.preexistingValues).length!=0 && (fieldValues[field]==props.preexistingValues[field] || (isDateField && fieldValues[field]==moment(props.preexistingValues[field]).format("yyyy-MM-DD")))))
-        return;
-      data[field] = fieldValues[field];
+      else{
+        let isDateField = false;
+        fieldList["fields"].map(obj=>{if (obj.id==field && obj.type=="date") isDateField=true;})
+        if (fieldValues[field]==null || fieldValues[field]=="" || (Object.keys(props.preexistingValues).length!=0 && (fieldValues[field]==props.preexistingValues[field] || (isDateField && fieldValues[field]==moment(props.preexistingValues[field]).format("yyyy-MM-DD")))))
+          return;
+        data[field] = fieldValues[field];
+      }
     })
 
     if (dsra && Object.keys(dsra).length!=0)
-      data["dsra"] = dsra;
+      data["DSRA"] = dsra;
+
 
     const error_list:{[key:string]:string} ={};
     if (data["GST"] && data["GST"].length!=15)
@@ -133,7 +143,6 @@ function LoanBasicDetails(props:LoanCommonProps) {
     }
 
     if (Object.keys(data).length!=0){
-      console.log("SUBMITTED basic details NOW",data);
 
       data["AID"]= props.AID;
       data["_loanId"]= props.loanId;
@@ -143,21 +152,21 @@ function LoanBasicDetails(props:LoanCommonProps) {
       else if (fieldValues["ST"]==LoanSecuredList[1])
         props.setShowSecurityDetails(true);
 
-      createLoan(data).then(res=> {
-        if (res==200){
-          setFieldValues(data);
-          props.goToNextSection();
-          props.setOkToFrolic(true);
-          props.setChangesHaveBeenMade(true);
-        }
-        else
-          toast({
-            title: "Error!",
-            description: "Something went wrong",
-            className:"bg-white"
-          })
-      }   
-      ).catch(err=> console.log(err))
+      setEnableLoadingSign(true);
+      
+      const res = await createLoan(data);
+      if (res==200){
+        setFieldValues(data);
+        props.goToNextSection();
+        props.setOkToFrolic(true);
+        props.setChangesHaveBeenMade(true);
+      }
+      else
+        toast({
+          title: "Error!",
+          description: "Something went wrong",
+          className:"bg-white"
+        })
     }
     else{
       if (fieldValues["ST"]==LoanSecuredList[2])
@@ -196,7 +205,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
           })}
         </div>
         <br/>
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
       </form>
       <br/>
     </div>

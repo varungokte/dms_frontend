@@ -76,7 +76,7 @@ function UserManagement(props:{label:string}){
       userValues["RM"]=email;
     }
     
-    console.log ("SUBMITTING DATA", userValues)
+    //console.log ("SUBMITTING DATA", userValues)
     
     if (userValues["UP"]){
       const obj = userValues["UP"];
@@ -100,7 +100,7 @@ function UserManagement(props:{label:string}){
       userValues["_id"] = id;
     }
 
-    console.log("SUBMITTING", userValues);
+    //console.log("SUBMITTING", userValues);
 
     const res = await changeUserInfo(userValues);
 
@@ -147,7 +147,7 @@ function UserManagement(props:{label:string}){
         {userData
           ?userData.length==0
             ?<EmptyPageMessage sectionName="users" emotion />
-            :<Table className="bg-white border-2 ro ded-xl">
+            :<Table className="bg-white rounded-xl">
               <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
               <BodyRowsMapping
                 list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "text","text", "user-status", "action"]}

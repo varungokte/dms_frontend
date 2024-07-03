@@ -39,7 +39,7 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
       {paymentData
         ?paymentData.length==0
           ?<EmptyPageMessage sectionName="installments" />
-          :<Table>
+          :<Table className="rounded-xl bg-blue-200">
             <HeaderRows 
               headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Action"]}
               headingClassNames={["w-[100px] text-center","text-center","text-center","text-center"]} 
@@ -47,7 +47,7 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
             <BodyRowsMapping list={paymentData} 
               columns={["D","I"]} 
               dataType={["index","date","text","action"]}
-              cellClassName={["text-center","text-center","text-center","text-center"]}
+              cellClassName={["w-[100px] text-center","text-center","text-center","text-center"]} 
               searchRows={[]} filterRows={[]}
               action={
                 paymentData.map((inst:any,index:number)=>{

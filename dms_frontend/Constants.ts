@@ -7,7 +7,7 @@ const FileTypeList:string[] = ["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"]
 const UserRoleList:string[] = ["-"];
 const IndustryList:string[] = ["-"];/* , "Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others" */
 const LoanTypeList:string[] = ["-", "Long Term", "Short Term"];
-const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant","Other"];
+const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant"];
 
 //Statuses
 const PriorityList =["-", "Low", "Medium", "High"] as const;

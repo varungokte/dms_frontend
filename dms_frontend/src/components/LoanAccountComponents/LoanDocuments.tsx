@@ -26,7 +26,7 @@ function LoanDocuments(props:LoanCommonProps) {
   useEffect(()=>{
     if (added)
       getDocumentsList().then(res=>{
-        console.log("rsponse",res)
+        //console.log("rsponse",res)
         setDocData(res);
         setAdded(false);
       })
@@ -48,7 +48,7 @@ function LoanDocuments(props:LoanCommonProps) {
 
     userValues["_loanId"] = props.loanId;
     userValues["SN"] = sectionDetails.sectionName;
-    console.log("userValues",userValues)
+    //console.log("userValues",userValues)
     const res = await addDocument(userValues);
 
     if (res.status==200)
@@ -83,7 +83,7 @@ function LoanDocuments(props:LoanCommonProps) {
     const { uploadFile } = useGlobalContext();
     const formData = new FormData();
 
-    console.log("userFiles",userFiles);
+    //console.log("userFiles",userFiles);
     
     for (let i=0; i<userFiles.length; i++)
       formData.append("file", userFiles[i]);
@@ -96,7 +96,7 @@ function LoanDocuments(props:LoanCommonProps) {
   const deleteFile = async (docId:string,fileName:string) => {
     const { deleteDocument } = useGlobalContext();
 
-    console.log("DELETE",props.AID,docId, fileName,sectionDetails.sectionName)
+    //console.log("DELETE",props.AID,docId, fileName,sectionDetails.sectionName)
 
     const res = await deleteDocument(props.AID, docId, sectionDetails.sectionName, fileName);
     return res;
@@ -124,7 +124,7 @@ function LoanDocuments(props:LoanCommonProps) {
           <FormDialogDocuments key={-5} index={-5} edit={false} type={sectionDetails.sectionType}
             triggerText="+ Add" triggerClassName={`${CreateButtonStyling} w-28`} titleText={props.label} 
             detailSubmit={addDocument} fileSubmit={addFile} deleteFile={deleteFile} getFiles={getFileList}
-            formFields={sectionDetails.fieldList}currentFields={{}}
+            formFields={sectionDetails.fieldList}currentFields={{}} setAdded={setAdded}
           />
         </div>
       </div> 

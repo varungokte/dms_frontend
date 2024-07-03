@@ -3,10 +3,10 @@ import { DocumentStatusList, FileStatusList, PriorityList, TeamStatusList, UserS
 type FieldValues = {[key:string]: any | any[]};
 
 //Data Types for table
-type TableDataTypes = ( "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field");
+type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link";
 
 //Form Field data types
-type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break"
+type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
 
 //Form Fields
 type FormFieldsCommon = {
@@ -46,16 +46,10 @@ type FormDialogTypes = "team"|"user"|"role"|"cont"|"rate"|"mast";
 //Document Sections
 type DocumentSectionTypes = "doc"|"cov"|"con"|"pay"|"undefined";
 type DocumentSectionNames = "TD"|"CD"|"C"|"CP"|"CS"|"PD";
-type DocumentSectionDetails = {
-  sectionName: DocumentSectionNames,
-  sectionType: DocumentSectionTypes
-}
+type DocumentSectionDetails = { sectionName:DocumentSectionNames, sectionType:DocumentSectionTypes }
 
 type UserSuggestionTypes = "AU"|"TL"|"RM";
-type UserSuggestionsList = {
-  label:string,
-  values: FieldValues
-}[];
+type UserSuggestionsList = { label:string, values:FieldValues }[];
 
 type UserStatus = typeof UserStatusList[number];
 type DocumentStatus = typeof DocumentStatusList[number];
@@ -63,25 +57,21 @@ type FileStatus = typeof FileStatusList[number];
 type TeamStatus = typeof TeamStatusList[number];
 type Priority = typeof PriorityList[number];
 
+type CommonFileViewerProps = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:Function,sectionName:string };
+type DocumentFileViewerProps = {type:"doc", loanId:string, docId:string, };
+type PaymentFileViewerProps = {type:"pay", _id:string, index:number, schedule:FieldValues[] };
+
 type LoanCommonProps = {
-  actionType:string, 
-  label:string, 
-  AID:string, 
-  setAID:Function, 
-  loanId:string, 
-  setLoanId:Function, 
-  currentSection:number, 
-  setCurrentSection:Function, 
+  actionType:string, label:string, 
+  AID:string, setAID:Function, 
+  loanId:string, setLoanId:Function, 
+  currentSection:number, setCurrentSection:Function, 
   goToNextSection:Function, 
-  setUnsavedWarning:Function,
-  setShowSecurityDetails:Function,
-  showSecurityDetails:boolean,
-  setOkToFrolic:Function,
+  setOkToFrolic:Function, setUnsavedWarning:Function,
+  showSecurityDetails:boolean, setShowSecurityDetails:Function,
+  setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,
+  assignedTeam:string, teamList:any
   preexistingValues:FieldValues,
-  setChangesHaveBeenMade:Function,
-  setEnableDocumentSections:Function,
-  assignedTeam:string,
-  teamList:any
 }
 
 export {
@@ -92,5 +82,6 @@ export {
   type DocumentSectionTypes, type DocumentSectionNames, type DocumentSectionDetails,
   type UserSuggestionTypes, type UserSuggestionsList,
   type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority,
+  type CommonFileViewerProps, type DocumentFileViewerProps, type PaymentFileViewerProps,
   type LoanCommonProps,
 }

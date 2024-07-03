@@ -39,7 +39,7 @@ function LoanRatings(props:LoanCommonProps) {
   useEffect(()=>{
     if (added){
       getRatingsList(props.loanId).then((res)=>{
-        console.log(res.arr)
+        //console.log(res.arr)
         if (res.status==200)
           setRatingsList(res.arr);
         else
@@ -69,7 +69,7 @@ function LoanRatings(props:LoanCommonProps) {
 
     data["AID"]= props.AID;
     data["_loanId"]= props.loanId;
-    console.log("SUBMITTED ratings NOW", data);
+    //console.log("SUBMITTED ratings NOW", data);
 
     const res  = await addRating(data);
     if (res==200){

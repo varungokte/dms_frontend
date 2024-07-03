@@ -68,7 +68,8 @@ function TeamManagement(props:{label:string}){
     teamStatus;
     if (added){
       getTeamsList().then(res=>{
-        if (res.status==200 && res.obj.length!=0){console.log(res.obj.list)
+        console.log("res",res)
+        if (res.status==200 && res.obj.length!=0){
          setTeamList(res.obj.list);}
         else
           setTeamList([])
@@ -80,13 +81,11 @@ function TeamManagement(props:{label:string}){
   },[added]);
 
   const teamMembersToArr = (userValues:any) =>{
-    console.log("raw data",userValues)
     const data:any={};
     data["N"] = userValues["N"];
     data["L"] = userValues["L"].values?userValues["L"].values["E"]:userValues["L"];
     const sections = ["TD","CD","C","CP","CS","PD"];
     sections.map((name)=>{
-      console.log(name,data)
       data[name]={
         M:userValues[`${name}M`].map((obj:any)=>obj.values?obj.values["E"]:obj),
         C:userValues[`${name}C`].map((obj:any)=>obj.values?obj.values["E"]:obj)
@@ -101,10 +100,10 @@ function TeamManagement(props:{label:string}){
       data = teamMembersToArr(userValues);
     else
       data = userValues;
-    console.log("SUBMITTED",data);
+    //console.log("SUBMITTED",data);
 
     const res = await addTeam(data);
-    console.log("response",res)
+    //console.log("response",res)
     if (res==200){
       setAdded(true);
       toast({
@@ -118,11 +117,9 @@ function TeamManagement(props:{label:string}){
   }
 
   const editTeam = async (userValues:any) => {
-      
-    console.log("raw data",userValues);
     const data = teamMembersToArr(userValues);
     data["_id"] = userValues["_id"];
-    console.log("SUBMITTED", data);
+    //console.log("SUBMITTED", data);
 
     const res = await addTeam(data);
 

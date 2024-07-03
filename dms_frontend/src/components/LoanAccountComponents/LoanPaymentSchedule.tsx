@@ -18,11 +18,11 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   const [fieldList] = useState<GridFieldAttributes>(
     {category:"grid", row:2, fields:[
       {id:"P", name:"Principal", type:"number", numtype:"curr", required:true},
-      {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true},
+      {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true, immutable:true},
       {id:"SD", name:"Start Date", type:"date", required:true},
       {id:"ED", name:"End Date", type:"date", required:true},
-      {id:"H", name:"Holiday Convention", type:"select", options:HolidayConventionList, required:true},
-      {id:"T", name:"Interest Type", type:"radio", options:InterestTypeList, required:true},
+      {id:"H", name:"Holiday Convention", type:"select", options:HolidayConventionList, required:true, immutable:true},
+      {id:"T", name:"Interest Type", type:"radio", options:InterestTypeList, required:true, immutable:true},
     ]},
   );
 
@@ -31,14 +31,20 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   const [dialogOpen, setDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [installmentError, setInstallmentError] = useState(<></>);
+  const [editMode, setEditMode] = useState(false);
 
   const {addPaymentSchedule, getPaymentSchedule} = useGlobalContext();
 
   useEffect(()=>{
     getPaymentSchedule(props.loanId).then(res=>{
-      console.log("response",res)
+      //console.log("response",res);
+      if (res.status==200 && res.obj && Object.keys(res.obj).length!=0){
+        setFieldValues(res.obj);
+        setEditMode(true);
+      }
     })
-  },)
+  },[]);
+
 
   const validateFields = () => {
     for (let i=0; i<fieldList.fields.length; i++){
@@ -145,26 +151,22 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="number")
-            return <NumberField key={index} index={index} id={field.id} name={field.name} type={field.numtype} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
+            return <NumberField key={index} index={index} id={field.id} name={field.name} type={field.numtype} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable}/>
           else if (field.type=="date")
-            return <DateField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
+            return <DateField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
           else if (field.type=="select")
-            return <SelectField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
+            return <SelectField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
           else if (field.type=="radio")
-            return <RadioGroupField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} />
+            return <RadioGroupField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
         })}
-        {fieldValues["T"]==InterestTypeList[1]
+        {fieldValues["T"]!=InterestTypeList[2]
           ?<NumberField key={5} index={5} id="I" name="Interest Rate" type="rate" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
-          :<div></div>
+          :""
         }
-        {fieldValues["T"]
-          ?<div className="my-9">
-            <button className="float-right h-[60px] w-[200px] rounded-xl text-white text-lg bg-custom-1" onClick={validateFields}>
-              {fieldValues["T"]==InterestTypeList[1]?"Generate Schedule":"Enter Interest Rates"} 
-            </button>
-          </div>
-          :<></>
-        }
+        <div className="my-10">
+          <button className={`${fieldValues["T"]!=InterestTypeList[2]?"float-right":"float-left"} h-[45px] w-[180px] rounded-xl text-white text-lg bg-custom-1`} onClick={validateFields}>
+          {fieldValues["T"]!=InterestTypeList[2]?"Generate Schedule":`${editMode?"Edit":"Enter"} Interest Rates`} 
+        </button></div>
       </div>
       <Dialog open={dialogOpen} onClose={()=>setDialogOpen(false)} maxWidth="md" fullWidth>
         {dialogOpen

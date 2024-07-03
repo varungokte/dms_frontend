@@ -46,7 +46,7 @@ function LoanAccount(props:{label:string}) {
         {accountList
           ?accountList.length==0
             ?<EmptyPageMessage sectionName="loan accounts"/>
-            :<Table className="border rounded-xl">
+            :<Table style={{ borderRadius:"30px"}}>
               <HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount", "Action"]}
                 headingClassNames={["w-[100px]"]}
               />

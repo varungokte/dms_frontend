@@ -16,7 +16,7 @@ function LoanTeamSelection(props:LoanCommonProps){
 
   useEffect(()=>{
     getTeamsList(props.loanId).then(res=>{
-      if (res.status==200){ console.log("response",res.obj)
+      if (res.status==200){ //console.log("response",res.obj)
         setSelectedTeam(res.obj.currentTeam._teamId)
         setTeamList(res.obj.list);}
       else
@@ -32,9 +32,9 @@ function LoanTeamSelection(props:LoanCommonProps){
       "_loanId":props.loanId,
       "_teamId": selectedTeam
     }
-    console.log("data",data)
+    //console.log("data",data)
     selectTeam(data).then(res=>{
-      console.log("res",res);
+      //console.log("res",res);
       if (res==200){
         props.goToNextSection();
         props.setEnableDocumentSections(true);
@@ -55,7 +55,6 @@ function LoanTeamSelection(props:LoanCommonProps){
             ?teamsList.length==0
               ?<EmptyPageMessage sectionName="teams" />
               :teamsList.map((team:any,index:number)=>{
-                console.log("team",team)
                 return (
                   <Card key={index} className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2 border-double border-violet-800	":""}`} onClick={()=>setSelectedTeam(team["_id"])}>
                     <CardHeader>

@@ -9,10 +9,10 @@ import { FieldValues } from './../DataTypes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
 
-import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, /*  ReminderIcon, DefaultIcon, CriticalIcon, ReportsIcon */ } from "./../src/components/static/PanelIcons"
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, /*  ReminderIcon,  CriticalIcon, ReportsIcon */ } from "./../src/components/static/PanelIcons"
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
-import PageNotFound from './components/BasicComponents/PageNotFound';
+import PageNotFound from './components/PageNotFound';
 
 import Dashboard from './components/Dashboard';
 import LoanAccount from './components/LoanAccount';
@@ -23,6 +23,7 @@ import RoleManagement from './components/RoleManagement';
 import FilterPage from './components/FilterPage';
 import TeamManagement from './components/TeamManagement';
 import Masters from './components/Masters';
+import DefaultCases from './components/DefaultCases';
 
 export const MenuRouter = () => {
 	const [hover,setHover] = useState(-1);
@@ -148,9 +149,9 @@ export const MenuRouter = () => {
 		{ name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },
 		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },
 		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
+		{ name: "Default Cases", path:"/default", component: DefaultCases, icon: DefaultIcon },
 
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
-		//{ name: "Default Cases", path:"/default", component: Default, icon: DefaultIcon },
 		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
 		//{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
 	]);

@@ -16,34 +16,28 @@ import RoleField from "../FormFieldComponents/RoleField";
 import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import TextField from "../FormFieldComponents/TextField";
+import { CircularProgress } from "@mui/material";
 
 type FormDialogProps = {
-  index:number, 
-  type:FormDialogTypes, 
-  edit?:boolean, 
-  triggerText:string|ReactElement, 
-  triggerClassName?:string, 
-  formSize:"small"|"medium"|"large", 
-  formTitle:string, 
-  formSubmit:Function, 
-  submitButton:string, 
+  index:number, type:FormDialogTypes, edit?:boolean, 
+  triggerText:string|ReactElement, triggerClassName?:string, 
+  formSize:"small"|"medium"|"large", formTitle:string, submitButton:string, formSubmit:Function, 
   form:FieldAttributesList, 
-  currentFields:FieldValues, 
-  repeatFields?:boolean, 
-  suggestions?:UserSuggestionTypes, 
-  getRoles?:boolean 
+  currentFields:FieldValues, repeatFields?:boolean, 
+  suggestions?:UserSuggestionTypes, getRoles?:boolean 
 }
+
+enum FormSizes {
+  small= "min-w-[600px] min-h-[300px]",
+  medium= "min-w-[800px] min-h-[300px]",
+  large= "min-w-[1000px] min-h-[300px]",
+};  
 
 function FormDialog(props:FormDialogProps){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
-
-  enum FormSizes {
-    small= "min-w-[600px] min-h-[300px]",
-    medium= "min-w-[800px] min-h-[300px]",
-    large= "min-w-[1000px] min-h-[300px]",
-  };  
+  const [submitButtonText, setSubmitButtonText] = useState(<span>{props.submitButton}</span>);
 
   const teamMembersRenamingWhileSubmitting = () => {
     const data:FieldValues={};
@@ -100,7 +94,6 @@ function FormDialog(props:FormDialogProps){
       
       //console.log("RECENTLY ASSIGEND DATA",data);
       if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1)){
-        console.log("ERROR",key,value,Object.keys(data),data)
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }
@@ -122,19 +115,19 @@ function FormDialog(props:FormDialogProps){
     }
     if(okToSubmit){
       //console.log("prefillValues",prefillValues)
+      setSubmitButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />);
       let res;
       if (props.edit && props.type=="user")
         res = await props.formSubmit(submittedData==false?prefillValues:submittedData,props.index);
       else
         res = await props.formSubmit(submittedData==false?prefillValues:submittedData);
-      
+      setSubmitButtonText(<span>{props.submitButton}</span>)
       if (res==200)
         setOpen(false);
       else if (res==422)
         setErrorMessage(<p className="text-red-600">Already exists.</p>);
       else{
         setErrorMessage(<p className="text-yellow-600">Something went wrong.</p>);
-        console.log("PREFILL VALUES",prefillValues)
         prefillValues["UP"] = JSON.parse(prefillValues["UP"])
       }
     }
@@ -156,7 +149,7 @@ function FormDialog(props:FormDialogProps){
               <div className="flex-auto"></div>
               <DialogClose className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</DialogClose>
               <button className={`float-right ${SubmitButtonStyling}`} type="button" onClick={()=>submitFunction()} >
-                {props.submitButton}
+                {submitButtonText}
               </button>
             </div>
         </DialogContent>
@@ -184,7 +177,6 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   },[props])
 
   useEffect(()=>{
-    console.log("props",props.prefillValues)
     if (props.formType=="team"&&props.formSubmit&& props.prefillValues["L"]){
       getUserSuggestions("TL",props.prefillValues["L"].values["E"]).then(res=>{
         console.log("suggestions TL",res)
@@ -209,7 +201,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
   const listSuggestions = async (suggestionType?:UserSuggestionTypes) => {
     const res = await getUserSuggestions(suggestionType?suggestionType:props.suggestions||"RM");
-    console.log("sugg",props.suggestions, res.obj)
+    //console.log("sugg",props.suggestions, res.obj)
     if (res.status==200)
       setSuggestionsUnformatted(res.obj);
     else

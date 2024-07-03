@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import moment from "moment";
+import { Link } from "react-router-dom";
 import { DocumentStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../Constants";
 import { DocumentStatus, FieldValues, Priority, TableDataTypes, TeamStatus, UserStatus } from "DataTypes";
 
@@ -27,7 +28,7 @@ function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
   )
 }
 
-function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataType:TableDataTypes[], action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function}){
+function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataType:TableDataTypes[], action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function, documentLinks?:string[]}){
   return(
     <TableBody>
       {props.list.map((singleRow,index)=>{
@@ -50,15 +51,15 @@ function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassN
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} />
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} documentLinks={props.documentLinks}/>
         else
-          return <></>
+          return ""
       })}
     </TableBody>
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function}){ 
+function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function, documentLinks?:string[]}){ 
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
       {props.dataType.map((dataType, index)=>{
@@ -75,6 +76,7 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:st
           return handleCountTeam(props.singleRow, cellClassName, uniqueIndex);
     
         const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
+        const documentLink=(props.documentLinks && props.documentLinks[index])?props.documentLinks[index]:"";
         
         if (dataType=="date")
           return handleDate(item, cellClassName,uniqueIndex);
@@ -90,6 +92,8 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:st
           return handleObjName(item, cellClassName, uniqueIndex);
         else if (dataType=="text-field")
           return handleTextField(item,cellClassName,uniqueIndex, props.rowIndex, props.columns[props.dataType[0]=="index"?index-1:index], props.setValues||(()=>{}));
+        else if (dataType=="doc-link")
+          return handleDocumentLink(item, cellClassName, uniqueIndex, documentLink);
         else
           return handleText(item, cellClassName, uniqueIndex);
       })}
@@ -191,6 +195,12 @@ const handleTextField = (prefillValue:any, cellClassName:string, uniqueIndex:str
       prefillValues={{[tableIndex]:{[columnId]:prefillValue}}} setPrefillValues={setPrefillValue} 
       repeatFields formIndex={tableIndex} enableDecimal
     />
+  </TableCell>
+}
+
+const handleDocumentLink = (item:ReactElement, cellClassName:string, uniqueIndex:string, link:string) => {
+  return <TableCell key={uniqueIndex} className={cellClassName}>
+    <Link to={link}>{item}</Link>
   </TableCell>
 }
 

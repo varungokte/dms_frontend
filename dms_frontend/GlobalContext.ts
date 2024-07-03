@@ -83,7 +83,7 @@ const getUserSuggestions = async (type:UserSuggestionTypes, teamLead?:string) =>
 };
 
 //AUTH
-const RegisterAdmin = async (data:object) => {
+const registerAdmin = async (data:object) => {
 	try {
 		const req_body = await handleEncryption(data);
 		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
@@ -98,7 +98,7 @@ const RegisterAdmin = async (data:object) => {
 	}
 }	
 
-const LoginUser = async (data: object) => {
+const loginUser = async (data: object) => {
 	//Conflict Error 409 -> User inactive; contact admin
 	//Precondition Failed 412 -> Incorrect Password
 	//Unauthorized 401 -> Incorrect Username
@@ -770,7 +770,7 @@ const getPaymentSchedule = async (loanId:string) =>  {
 const useGlobalContext = () => {
 	return {
 		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
-		RegisterAdmin, LoginUser,
+		registerAdmin, loginUser,
 		sendOTP, verifyOTP,
 		createUser, editUser, getAllUsers, getSingleUser,
 		createLoan, createAID,

@@ -11,6 +11,7 @@ import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 function LoanSecurityDetails(props:LoanCommonProps){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
+  const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
 
   const [fieldList] = useState([
     { id:"SP", name:"Share Percentage(%)", type:"number", numtype:"rate", required:false },
@@ -22,6 +23,8 @@ function LoanSecurityDetails(props:LoanCommonProps){
   ]);
   
   const {createLoan} = useGlobalContext();
+
+  //useEffect(()=>console.log("fieldvalues repeatable",fieldValuesRepeatable),[fieldValuesRepeatable])
   
   const [disableFields, setDisableFields] = useState(false);
   const [preexistingValues, setPreexistingValues] = useState(false);
@@ -52,9 +55,9 @@ function LoanSecurityDetails(props:LoanCommonProps){
         changes_have_been_made= true;
       if (id=="STV"){
         for (let j=0; j<fieldValuesRepeatable.length; j++){
-          if (fieldValuesRepeatable[j]["T"] && props.preexistingValues["STV"] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues["STV"][j]["T"])
+          if (fieldValuesRepeatable && fieldValuesRepeatable[j] && fieldValuesRepeatable[j]["T"] && props.preexistingValues["STV"] && props.preexistingValues["STV"][j] && fieldValuesRepeatable[j]["T"]!=props.preexistingValues["STV"][j]["T"])
             changes_have_been_made= true;
-          if (fieldValuesRepeatable[j]["V"] && props.preexistingValues["STV"] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues["STV"][j]["V"])
+          if (fieldValuesRepeatable && fieldValuesRepeatable[j] && fieldValuesRepeatable[j]["V"] && props.preexistingValues["STV"] && props.preexistingValues["STV"][j] && fieldValuesRepeatable[j]["V"]!=props.preexistingValues["STV"][j]["V"])
             changes_have_been_made= true;
         }
       }
@@ -102,7 +105,7 @@ function LoanSecurityDetails(props:LoanCommonProps){
     props.setUnsavedWarning(!okToChange);
   },[fieldValuesFixed,fieldValuesRepeatable]);
 
-  const submitForm = (e:any) => {
+  const submitForm = async(e:any) => {
     e.preventDefault();
     let data:any={};
 
@@ -111,17 +114,20 @@ function LoanSecurityDetails(props:LoanCommonProps){
       data["_loanId"]= props.loanId;
       data["SP"] = fieldValuesFixed["SP"];
       data["DV"] = fieldValuesFixed["DV"];
-      data["STV"] = fieldValuesRepeatable;
+      data["STV"] = [];
+      for (let i=0; i<fieldValuesRepeatable.length; i++)
+        if (Object.keys(fieldValuesRepeatable[i]).length!=0)
+          data["STV"].push(fieldValuesRepeatable[i]);
 
-      createLoan(data).then(res=> {
-        if (res==200){
-          props.goToNextSection();
-          props.setChangesHaveBeenMade(true);
-        }
-        else
-          console.log("ERROR")
+
+      setEnableLoadingSign(true);
+      const res = await createLoan(data)
+      if (res==200){
+        props.goToNextSection();
+        props.setChangesHaveBeenMade(true);
       }
-      ).catch(err=> console.log(err))
+      else
+        console.log("ERROR")
     }
     else
       props.goToNextSection(); 
@@ -145,7 +151,7 @@ function LoanSecurityDetails(props:LoanCommonProps){
             if (field.type=="repeatable" && !disableFields)
               return <FormRepeatableGrid key={index} fieldList={field.fields||[]} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} preexistingValues={preexistingValues} />
           })}
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
       <br/>
       </form>
     </div>

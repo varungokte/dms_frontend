@@ -23,6 +23,7 @@ function LoanBankDetails(props:LoanCommonProps) {
   
   const [fieldValues, setFieldValues] = useState<any>([{}]);
   const [valuesExist, setValuesExist] = useState(false);
+  const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
 
   const areAllFieldsEmpty = () => {
     let all_fields_empty=true;
@@ -45,7 +46,6 @@ function LoanBankDetails(props:LoanCommonProps) {
         if (fieldValues[j][field.id] &&  props.preexistingValues["BD"] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
         changes_have_been_made=true;
     }
-    console.log("changes have been made",changes_have_been_made);
     return changes_have_been_made;
   }
 
@@ -90,11 +90,12 @@ function LoanBankDetails(props:LoanCommonProps) {
     data["AID"] = props.AID;
     data["_loanId"] = props.loanId;
     data["BD"] = fieldValues;
-    console.log("SUBMITTED NOW",data);
+    //console.log("SUBMITTED NOW",data);
+    setEnableLoadingSign(true)
 
     const res = await createLoan(data);
     if (res==200){
-      console.log("response",res)
+      //console.log("response",res)
       props.goToNextSection();
       props.setChangesHaveBeenMade(true);
     }
@@ -105,7 +106,7 @@ function LoanBankDetails(props:LoanCommonProps) {
       <br/>
       <form onSubmit={submitForm}>
         <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={valuesExist} />
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={true} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
       </form>
     </div>
   )
