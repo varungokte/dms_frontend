@@ -33,14 +33,14 @@ function LoanBasicDetails(props:LoanCommonProps) {
     { id:"DD", name:"Downsell Date", type:"date", required: false },
     { id:"CD", name:"Loan Closure Date", type:"date", required: false },
     { id:"RED", name:"Repayment End Date", type:"date", required: false },
-    { id:"SA", name:"Sanction Amount", type:"number", numtype:"curr", required: true },
-    { id:"HA", name:"Hold Amount", type:"number", numtype:"curr", required: true },
-    { id:"DA", name:"Downsell Amount", type:"number", numtype:"curr", required: false },
-    { id:"OA", name:"Outstanding Amount", type:"number", numtype:"curr", required: false },
+    { id:"SA", name:"Sanction Amount", type:"integer",required: true },
+    { id:"HA", name:"Hold Amount", type:"integer", required: true },
+    { id:"DA", name:"Downsell Amount", type:"integer", required: false },
+    { id:"OA", name:"Outstanding Amount", type:"integer", required: false },
     { id:"A", name:"DSRA Applicability", type:"select", options:YesOrNoList, required: false },
     { id:"F", name:"DSRA Form", type:"select", options:DSRAFormList, required: false },
     { id:"S", name:"DSRA Created or Not", type:"select", options:YesOrNoList, required: false },
-    { id:"V", name:"DSRA Amount", type:"number", numtype:"curr", required: false },
+    { id:"V", name:"DSRA Amount", type:"integer", required: false },
     ]}
   );
 
@@ -125,6 +125,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
 
 
     const error_list:{[key:string]:string} ={};
+    console.log("error_list",error_list);
     if (data["GST"] && data["GST"].length!=15)
       error_list["GST"]="GST number must be 15 digits";
     if (data["PN"] && data["PN"].length!=10)
@@ -134,10 +135,11 @@ function LoanBasicDetails(props:LoanCommonProps) {
     
     const HA=data["HA"]?data["HA"]:props.preexistingValues["HA"];
     const SA=data["SA"]?data["SA"]:props.preexistingValues["SA"];
-    if (HA && SA && HA>SA)
+    if (HA && SA && Number(HA)>Number(SA))
       error_list["SA"]="This cannot be less than the Hold Amount";
 
     if (Object.keys(error_list).length>0){
+      console.log("ERROR",error_list)
       setValidationErrors(error_list);
       return;
     }
@@ -196,8 +198,8 @@ function LoanBasicDetails(props:LoanCommonProps) {
             
             if (field.type=="select")
               return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required||false} disabled={disabled} />
-            else if (field.type=="number")
-              return <NumberField key={field.id} index={field.id} id={field.id} name={field.name||""} type={field.numtype} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
+            else if (field.type=="integer")
+              return <NumberField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else if (field.type=="date")
               return <DateField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else

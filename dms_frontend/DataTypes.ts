@@ -5,8 +5,8 @@ type FieldValues = {[key:string]: any | any[]};
 //Data Types for table
 type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link";
 
-//Form Field data types
-type FieldDataTypes = "text" | "email" | "password" | "number" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
+//Form Field data types 
+type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
 
 //Form Fields
 type FormFieldsCommon = {
@@ -14,8 +14,8 @@ type FormFieldsCommon = {
   name:string,
   type: FieldDataTypes,
   required?: boolean,
+  disabled?:boolean,
   immutable?: boolean,
-  numtype?:"rate"|"curr", //for number
   options?:string[] | readonly string[], //for select
   multiple?:boolean, //for combobox 
   newRole?:boolean //for permissions/role

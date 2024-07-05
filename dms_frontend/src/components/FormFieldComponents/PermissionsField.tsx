@@ -6,6 +6,8 @@ import FieldLabel from "./FieldLabel";
 function PermissionsField (props:{index:number, id: string, name:string, permissionPreset:any, required?:boolean, disabled?:boolean, setPermissionSet:Function, multiple?:boolean}){
   const [permissionTypes] = useState (["access", "view", "delete","add","edit"]);
 
+  //useEffect(()=>console.log(props),[props])
+
   useEffect(()=>{
     if (props.multiple && props.permissionPreset.length==0)
       props.setPermissionSet((curr:any)=>{

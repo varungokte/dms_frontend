@@ -29,7 +29,7 @@ const handleDecryption = async (text:string) => {
 		return await obj;
 	}
 	catch (err){
-		return await decryptedString
+		return decryptedString;
 	}
 };
 
@@ -190,6 +190,7 @@ const editUser = async (data:object) => {
 	try {
 		const token = await getEncryptedToken();
 		const enc_data = await handleEncryption(data);
+		console.log("send data",data)
 		const response = await axios.post(`${Base_Url}/editUser`,{data:enc_data}, {
 			headers:{
 				"Authorization": `Bearer ${token}`
@@ -229,7 +230,7 @@ const getSingleUser = async (id:string) => {
 			params:{"_id":id}
 		});
 		const decryptedObject = await handleDecryption(response["data"]);
-		//console.log("Single user information", decryptedObject);
+		console.log("Single user information", decryptedObject);
 		return {status:response.status, obj:decryptedObject||{}};
 	}
 	catch(error:any) {

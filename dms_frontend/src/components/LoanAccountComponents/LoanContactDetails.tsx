@@ -32,11 +32,11 @@ function LoanContactDetails(props:LoanCommonProps) {
       { id: "MN", type:"text", name: "Mobile Number" },
       { id: "LN", type:"text", name: "Landline Number" },
       { id: "CE", type:"email", name: "Email Address", required:true, immutable:true }, 
-      { id: "RT", type:"select", name: "Email Recipient Type", options:EmailRecipientList },
+      { id: "RT", type:"select", name: "Email Recipient Type", options:EmailRecipientList, required:true },
     ]}, 
     { category: "grid", row: 2, sectionName:"Billing Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "BA", type:"text", name: "Bulding/Street/Locality Name" },
-      { id: "BP", type:"number", name: "Pincode" },
+      { id: "BP", type:"integer", name: "Pincode" },
     ]},
     { category:"grid", row: 3, fields:[
       { id: "BCC", type:"text", name: "Country" },
@@ -46,7 +46,7 @@ function LoanContactDetails(props:LoanCommonProps) {
     { category:"single", id:"add-same", name:"Billing and Registered Addresses are the same", type:"checkbox"},
     { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "RA", type:"text", name: "Bulding/Street/Locality Name" },
-      { id: "RP", type:"number", name: "Pincode" },
+      { id: "RP", type:"integer", name: "Pincode" },
     ]},
     { category: "grid", row: 3, fields:[
       { id: "RCC", type:"text", name: "Country" },

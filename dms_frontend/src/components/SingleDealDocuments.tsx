@@ -10,9 +10,9 @@ import ViewFileButton from "./BasicComponents/ViewFileButton";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 
-function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:DocumentSectionDetails}){
+function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:DocumentSectionDetails, added:boolean, setAdded:Function}){
   const [docData, setDocData] = useState<any>();
-  const [added, setAdded] = useState(true);
+  const [added, setAdded] = [props.added, props.setAdded]
   
   const {getDocumentsList} = useGlobalContext();
 

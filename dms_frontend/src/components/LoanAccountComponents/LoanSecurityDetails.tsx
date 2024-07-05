@@ -5,8 +5,8 @@ import { LoanCommonProps } from "../../../DataTypes";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import DateField from "../FormFieldComponents/DateField";
-import NumberField from "../FormFieldComponents/NumberField";
 import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
+import NumberDecimalField from "../FormFieldComponents/NumberDecimalField";
 
 function LoanSecurityDetails(props:LoanCommonProps){
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
@@ -14,11 +14,11 @@ function LoanSecurityDetails(props:LoanCommonProps){
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
 
   const [fieldList] = useState([
-    { id:"SP", name:"Share Percentage(%)", type:"number", numtype:"rate", required:false },
+    { id:"SP", name:"Share Percentage(%)", type:"float", numtype:"rate", required:false },
     { id:"DV", name:"Date of Valuation", type:"date",required:false },
     { id:"STV", name:"", type:"repeatable", fields:[
       { id:"T", name:"Security Type", type:"select", options:LoanSecurityTypeList,required:false },
-      { id:"V", name:"Security Value", type:"number",numtype:"curr",required:false },
+      { id:"V", name:"Security Value", type:"integer",numtype:"curr",required:false },
     ]}
   ]);
   
@@ -142,8 +142,8 @@ function LoanSecurityDetails(props:LoanCommonProps){
           {fieldList.map((field,index)=>{
             if (field.type=="date" && !disableFields)
               return <DateField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
-            else if (field.type=="number" && !disableFields)
-              return <NumberField key={index} index={index} id={field.id} name={field.name} type={field.numtype=="rate"||field.numtype=="curr"?field.numtype:"curr"} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+            else if (field.type=="float" && !disableFields)
+              return <NumberDecimalField key={index} index={index} id={field.id} name={field.name} type={field.numtype=="rate"||field.numtype=="curr"?field.numtype:"curr"} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
           })}
           </div>
 

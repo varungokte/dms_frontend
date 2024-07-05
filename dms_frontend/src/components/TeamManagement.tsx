@@ -21,6 +21,11 @@ function TeamManagement(props:{label:string}){
 
   const [teamList,setTeamList] = useState<any>();
 
+  /* Team Naming Format 
+    Combined: {TD:{M:[], C:[]}}
+    Separate: {TDM:[], TDC:[]}
+  */
+
   const [fieldList] = useState<FieldAttributesList>([
     { category:"grid", row:2, fields:[
       { id:"N", name:"Team Name", type:"text", required:true },
@@ -80,7 +85,7 @@ function TeamManagement(props:{label:string}){
     }
   },[added]);
 
-  const teamMembersToArr = (userValues:any) =>{
+  const teamMembersSeparateToCombined = (userValues:any) =>{
     const data:any={};
     data["N"] = userValues["N"];
     data["L"] = userValues["L"].values?userValues["L"].values["E"]:userValues["L"];
@@ -97,12 +102,12 @@ function TeamManagement(props:{label:string}){
   const createTeam = async (userValues:any, getSugg?:boolean) => {
     let data:any = {} 
     if (!getSugg)
-      data = teamMembersToArr(userValues);
+      data = teamMembersSeparateToCombined(userValues);
     else
       data = userValues;
     //console.log("SUBMITTED",data);
 
-    const res = await addTeam(data);
+    const res = 200//await addTeam(data);
     //console.log("response",res)
     if (res==200){
       setAdded(true);
@@ -117,8 +122,9 @@ function TeamManagement(props:{label:string}){
   }
 
   const editTeam = async (userValues:any) => {
-    const data = teamMembersToArr(userValues);
+    const data = teamMembersSeparateToCombined(userValues);
     data["_id"] = userValues["_id"];
+
     //console.log("SUBMITTED", data);
 
     const res = await addTeam(data);
@@ -171,12 +177,12 @@ function TeamManagement(props:{label:string}){
                 action={teamList.map((_:any, index:number)=>{
                   return(
                     <div className="flex flex-row">
-                      <FormDialog key={index} index={index} edit type="team"
+                      {/* <FormDialog key={index} index={index} edit type="team"
                         triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
                         formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
                         form={fieldList} currentFields={teamList[index]}
                         suggestions="RM"
-                      />
+                      /> */}
                       {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
                     </div>
                   )

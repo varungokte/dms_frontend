@@ -17,6 +17,7 @@ import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import TextField from "../FormFieldComponents/TextField";
 import { CircularProgress } from "@mui/material";
+import NumberDecimalField from "../FormFieldComponents/NumberDecimalField";
 
 type FormDialogProps = {
   index:number, type:FormDialogTypes, edit?:boolean, 
@@ -39,6 +40,11 @@ function FormDialog(props:FormDialogProps){
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [submitButtonText, setSubmitButtonText] = useState(<span>{props.submitButton}</span>);
 
+  useEffect(()=>{
+    if (!open)
+      setPrefillValues({});
+  },[open]);
+
   const teamMembersRenamingWhileSubmitting = () => {
     const data:FieldValues={};
     data["_id"]=prefillValues["_id"];
@@ -58,6 +64,7 @@ function FormDialog(props:FormDialogProps){
       data[`${section}C`] = prefillValues[`${section}C`].map((obj:any)=>obj.values["E"])
 
     }
+    console.log("teamMembersRenamingWhileSubmitting result",data);
     return data;
   }
 
@@ -83,10 +90,6 @@ function FormDialog(props:FormDialogProps){
     for (let i=0;i<Object.keys(requiredList).length;i++){
       let key = Object.keys(requiredList)[i];
       let value = requiredList[key];
-      if (key=="perm"){
-        key="R";
-        value=true;
-      }
       data = (props.type=="team" && props.edit)?teamMembersRenamingWhileSubmitting():{...prefillValues};
 
       if (key=="P" && props.edit)
@@ -116,17 +119,13 @@ function FormDialog(props:FormDialogProps){
     if(okToSubmit){
       //console.log("prefillValues",prefillValues)
       setSubmitButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />);
-      let res;
-      if (props.edit && props.type=="user")
-        res = await props.formSubmit(submittedData==false?prefillValues:submittedData,props.index);
-      else
-        res = await props.formSubmit(submittedData==false?prefillValues:submittedData);
+      const res = await props.formSubmit(submittedData==false?{...prefillValues}:submittedData,props.index);
       setSubmitButtonText(<span>{props.submitButton}</span>)
       if (res==200)
         setOpen(false);
       else if (res==422)
         setErrorMessage(<p className="text-red-600">Already exists.</p>);
-      else{
+      else {
         setErrorMessage(<p className="text-yellow-600">Something went wrong.</p>);
         prefillValues["UP"] = JSON.parse(prefillValues["UP"])
       }
@@ -161,29 +160,14 @@ function FormDialog(props:FormDialogProps){
 
 function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
   const [roles, setRoles] = useState<FieldValues[]>();
-  const [suggestionsUnformatted, setSuggestionsUnformatted] = useState<any>();
 
-  const [suggestionsList, setSuggestionsList] = useState<UserSuggestionsList>([]);
-  const [zone, setZone] = useState(-1);
+  const [allSuggestions, setAllSuggestions] = useState<UserSuggestionsList>([]);
+  const [filteredSuggestions, setFilteredSuggestions] = useState<UserSuggestionsList>([]);
+  const [oldZone, setOldZone] = useState("");
 
   const [teamMembers, setTeamMembers] = useState<FieldValues>({});
-  const [teamLead, setTeamLead] = useState<string>();
 
   const {getUserSuggestions, getSingleUser, getRolesList, getSingleTeam} = useGlobalContext();
-
-  useEffect(()=>{
-    if (props.formType=="team" && props.prefillValues && props.prefillValues["L"])
-      setTeamLead(props.prefillValues["L"].values["E"])
-  },[props])
-
-  useEffect(()=>{
-    if (props.formType=="team"&&props.formSubmit&& props.prefillValues["L"]){
-      getUserSuggestions("TL",props.prefillValues["L"].values["E"]).then(res=>{
-        console.log("suggestions TL",res)
-      })
-    }
-  },[teamLead])
-  
 
   const listRoles = async () => {
     const res = await getRolesList();
@@ -202,16 +186,14 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   const listSuggestions = async (suggestionType?:UserSuggestionTypes) => {
     const res = await getUserSuggestions(suggestionType?suggestionType:props.suggestions||"RM");
     //console.log("sugg",props.suggestions, res.obj)
-    if (res.status==200)
-      setSuggestionsUnformatted(res.obj);
+    if (res.status==200){
+      setAllSuggestions(res.obj);
+    }
     else
       return [];
   }
 
-  const filterSuggestions = () => {
-    if (suggestionsUnformatted==undefined)
-      return;
-
+  const filterSuggestions = (suggestionsList:any) => {
     const arr:any=[];
     let restrictedByZone = false;
     if (props.formType=="user"){
@@ -219,36 +201,36 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
       restrictedByZone=true;
     }
 
-    for (let i=0; i<suggestionsUnformatted.length; i++){
-      const obj = suggestionsUnformatted[i];
-      if (!restrictedByZone || (restrictedByZone && obj.Z==zone))
+    for (let i=0; i<suggestionsList.length; i++){
+      const obj = suggestionsList[i];
+      if (!restrictedByZone || (restrictedByZone && props.prefillValues && obj.Z==props.prefillValues["Z"]))
         arr.push({label:`${obj.N}<${obj.E}>`, values:obj})
     }
-    setSuggestionsList(arr);
+
+    setFilteredSuggestions(arr);
   }
 
   const getUserData = async () => {
     const res = await getSingleUser(props.currentFields["_id"]);
     if (res.status==200){
-      props.setPrefillValues(res.obj);
-      setZone(res.obj["Z"]||-1);
+      props.setPrefillValues({...res.obj});
+      setOldZone("");
     }
     else
-      props.setPrefillValues([]);
+      props.setPrefillValues({});
   }
 
   const getTeamData = async () => {
     const res = await getSingleTeam(props.currentFields["_id"]);
     if (res.status==200){
       res.obj["_id"]=props.currentFields["_id"];
-      props.setPrefillValues(res.obj);
+      props.setPrefillValues({...res.obj});
     }
-    
     else
-      props.setPrefillValues([]);
+      props.setPrefillValues({});
   }
 
-  const teamRolesRenaming = () => {
+  const teamMembersCombinedToSeparate = () => {
     const data:any={};
     data["_id"]=props.prefillValues["_id"];
     data["L"]=props.prefillValues["L"];
@@ -261,11 +243,6 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     }
     setTeamMembers(data);
   }
-
-  useEffect(()=>{
-    if (props.edit && props.formType=="team" && Object.keys(props.prefillValues).length!=0)
-      teamRolesRenaming()
-  },[props.prefillValues])
   
   useEffect(()=>{
     if (props.edit){
@@ -283,68 +260,91 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   },[]);
 
   useEffect(()=>{
-    if (props.suggestions)
-      filterSuggestions();
-  },[suggestionsUnformatted,zone])
+    filterSuggestions(allSuggestions);
+  },[allSuggestions,props.prefillValues["Z"]])
 
   useEffect(()=>{
-    props.setPrefillValues(props.currentFields);
+    if (props.edit && props.formType=="team" && Object.keys(props.prefillValues).length!=0)
+      teamMembersCombinedToSeparate();
+
+    if (props.formType=="team" && props.prefillValues && props.prefillValues["L"])
+      getUserSuggestions("TL",props.prefillValues["L"].values["E"]).then(res=>{
+        console.log("suggestions TL",res)
+      })
+  },[props.prefillValues]);
+
+  useEffect(()=>{
+    if (props.prefillValues && oldZone && props.prefillValues["Z"]!=oldZone){
+      props.setPrefillValues((curr:any)=>{
+        delete curr["RM"];
+        return {...curr};
+      })
+    }
+  },[oldZone]);
+
+  useEffect(()=>{
+    props.setPrefillValues({...props.currentFields});
   },[props.currentFields]);
 
   return (
-    props.form.map((field:any,index:number)=>{
+    props.form.map((field,index)=>{
       if (field["category"]=="label"){
         return <div key={index} className={field["sectionClassName"]}>{field["name"]}</div>
       }
       else if (field["category"]=="single"){
         if (field["type"]=="combobox")
           return <ComboboxField key={index} index={index} id={field["id"]} name={field["name"]} edit={props.edit}
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
-            prefillValue={props.formType=="user"?props.prefillValues[field["id"]]:teamMembers[field["id"]]} setPrefillValues={props.setPrefillValues} multiple={field["multiple"]} suggestions={suggestionsList}
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
+            prefillValue={props.formType=="user"?props.prefillValues[field["id"]]:teamMembers[field["id"]]} setPrefillValues={props.setPrefillValues} multiple={field["multiple"]} suggestions={filteredSuggestions}
           />
         else if (field["type"]=="role")
           return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} roleList={roles||[]}
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={{...props.prefillValues}} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="permissions")
           return <PermissionsField key={index} index={index} id={field["id"]} name={field["name"]} 
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             setPermissionSet={props.setPrefillValues} permissionPreset={props.prefillValues[field["id"]]||{}}
           />
         else if (field["type"]=="textarea")
           return <TextAreaField key={index} index={index} id={field["id"]} name={field["name"]} 
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
         else if (field["type"]=="date")
           return <DateField key={index} index={index} id={field["id"]} name={field["name"]} 
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
-        else if (field["type"]=="number")
-          return <NumberField key={index} index={index} id={field["id"]} name={field["name"]} type={field["numtype"]}
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+        else if (field["type"]=="integer")
+          return <NumberField key={index} index={index} id={field["id"]} name={field["name"]}
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
+            prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
+          />
+        else if (field["type"]=="float")
+          return <NumberDecimalField key={index} index={index} id={field["id"]} name={field["name"]}
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="multitext")
           return <MultiTextField key={index} index={index} id={field["id"]} name={field["name"]} 
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="checkbox")
           return <CheckboxField key={index} index={index} id={field["id"]} name={field["name"]} 
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />
         else if (field["type"]=="select") 
-          return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} options={field["options"]}
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+          return <SelectField key={index} index={index} id={field["id"]} name={field["name"]} options={field["options"]||[]}
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
         else
           return <TextField key={index} index={index} id={field["id"]} name={field["name"]} type={field["type"]}
-            required={field["required"]} disabled={field["disabled"]?true:(field["immutable"]?(props.edit&&true):false)} 
+            required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
       }
@@ -358,26 +358,26 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
           <div key={index+"grid"}>
             <div key={index+"grid name"} className={field["sectionClassName"]||""}>{field["sectionName"]}</div>
             <div key={index+"gridz"} className={gridStyle}>
-              {field.fields.map((item:any, itemIndex:number)=>{
+              {field.fields.map((item, itemIndex)=>{
                 if (item["type"]=="combobox")
                   return <span key={index+"_"+itemIndex} className="mr-3">
                     <ComboboxField key={index} index={index} id={item["id"]} name={item["name"]} edit={props.edit}
-                      required={item["required"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
-                      prefillValue={props.formType=="user"?props.prefillValues[item["id"]]:teamMembers[item["id"]]} setPrefillValues={props.setPrefillValues} multiple={item["multiple"]} suggestions={suggestionsList}
+                      required={item["required"]} disabled={item["disabled"]||(item["immutable"]&&props.edit)} 
+                      prefillValue={props.formType=="user"?props.prefillValues[item["id"]]:teamMembers[item["id"]]} setPrefillValues={props.setPrefillValues} multiple={item["multiple"]} suggestions={filteredSuggestions}
                     />
                   </span> 
                 else if (item["type"]=="select")
                   return <span key={index+"_"+itemIndex} className="mr-3">
-                    <SelectField key={index} index={index} id={item["id"]} name={item["name"]} options={item["options"]}
-                      required={item["required"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                    <SelectField key={index} index={index} id={item["id"]} name={item["name"]} options={item["options"]||[]}
+                      required={item["required"]} disabled={item["disabled"]||(item["immutable"]&&props.edit)} 
                       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
-                      setZone={item["id"]=="Z"?setZone:undefined}
+                      setOldZone={item["id"]=="Z"?setOldZone:undefined}
                     />
                   </span>
                 else
                   return <span key={index+"_"+itemIndex} className="mr-3">
                     <TextField key={index} index={index} id={item["id"]} name={item["name"]} type={item["type"]}
-                      required={item["required"]} disabled={item["disabled"]?true:(item["immutable"]?(props.edit&&true):false)} 
+                      required={item["required"]} disabled={item["disabled"]||(item["immutable"]&&props.edit)} 
                       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
                     />
                   </span>

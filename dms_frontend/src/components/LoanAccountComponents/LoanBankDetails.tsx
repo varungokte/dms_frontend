@@ -35,10 +35,13 @@ function LoanBankDetails(props:LoanCommonProps) {
           all_fields_empty=false;
       }
     }
-    return all_fields_empty
+    return all_fields_empty;
   }
   
   const compareFieldsToPreexisting = () => {
+    if (!props.preexistingValues || !props.preexistingValues["BD"])
+      return true;
+    
     let changes_have_been_made=false;
     for (let i=0; i<fieldList["fields"].length; i++){
       const field = fieldList["fields"][i];
@@ -48,9 +51,6 @@ function LoanBankDetails(props:LoanCommonProps) {
     }
     return changes_have_been_made;
   }
-
-  useEffect(()=>{
-  },[props.preexistingValues])
     
   useEffect(()=>{
     if (props.preexistingValues["BD"]){
@@ -72,7 +72,7 @@ function LoanBankDetails(props:LoanCommonProps) {
   },[]);
 
   useEffect(()=>{
-    if (Object.keys(props.preexistingValues).length!=0)
+    if (props.preexistingValues && props.preexistingValues["BD"] && Object.keys(props.preexistingValues["BD"]).length!=0)
       props.setUnsavedWarning(compareFieldsToPreexisting());
     else
       props.setUnsavedWarning(!areAllFieldsEmpty());

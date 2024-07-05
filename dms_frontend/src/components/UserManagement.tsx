@@ -12,14 +12,14 @@ import edit_icon from "./static/edit_icon.svg";
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
-import { FieldAttributesList } from "DataTypes";
+import { FieldAttributesList, FieldValues } from "DataTypes";
 
 function UserManagement(props:{label:string}){
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
 
-  const [userData, setUserData]= useState<any>();
+  const [userData, setUserData]= useState<FieldValues[]>();
   
   const [fieldList] = useState<FieldAttributesList>([
     { category: "grid", row: 2, fields: [
@@ -30,7 +30,7 @@ function UserManagement(props:{label:string}){
     ]},
     { category:"single", id: "RM", name: "Reporting Manager", type:"combobox", required:true },
     { category:"single", id: "M", name: "User is a Manager", type:"checkbox", required:false },
-    { category:"single", id: "perm", name:"", type:"role", required:true },
+    { category:"single", id: "R", name:"Role", type:"role", required:true },
   ]);
 
   const [roleFilter] = useState(-1);
@@ -47,6 +47,7 @@ function UserManagement(props:{label:string}){
     if (added)
       getUsers().then((res)=>{
         if (res.status==200){
+          //console.log("response",res.obj);
           setUserData(res.obj);
           setAdded(false);
         }
@@ -71,6 +72,7 @@ function UserManagement(props:{label:string}){
         }
       }
     }
+    console.log("valid data",data)
     if (userValues["RM"]){
       const email = userValues["RM"]["values"]["E"];
       userValues["RM"]=email;
@@ -91,8 +93,8 @@ function UserManagement(props:{label:string}){
     return res;
   }
 
-  const editUser = async (userValues:any, index?:number) => {
-    if (selectedUser==-1 && !index)
+  const editUser = async (userValues:any, index:number) => {
+    if (selectedUser==-1 && !index || !userData)
       return;
   
     if (selectedUser!=-1){
@@ -100,21 +102,36 @@ function UserManagement(props:{label:string}){
       userValues["_id"] = id;
     }
 
+    for (let i=0; i<Object.keys(userData[index]).length; i++){
+      const key = Object.keys(userData[index])[i];
+      if (userData[index][key]==userValues[key])
+        delete userValues[key];
+    }
+
+    userValues["_id"] = userData[index]["_id"]
+
+    if (userValues["RM"] && typeof userValues["RM"]!="string"){
+      const email = userValues["RM"]["values"]["E"];
+      userValues["RM"]=email;
+    }
+    
+    if (userValues["UP"]){
+      const obj = userValues["UP"];
+      userValues["UP"] = JSON.stringify(obj);
+    }
+
     //console.log("SUBMITTING", userValues);
 
     const res = await changeUserInfo(userValues);
 
-    if (res==200){
+    if (res==200)
       setAdded(true);
-    }
 
     return res;
   }
 
   useEffect(()=>{
-    editUser({"S":userStatus}).then(()=>{
-    }).catch(err=>{console.log(err)})
-    ;
+    editUser({"S":userStatus}, selectedUser);
   },[userStatus]);
 
   /* const deleteUser = (index:number) =>{

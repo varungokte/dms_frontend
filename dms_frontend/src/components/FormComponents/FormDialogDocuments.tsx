@@ -41,6 +41,11 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
   const [buttonText, setButtonText] = useState(<span>{currentTab=="details"?"Next":"Save"}</span>);
 
   useEffect(()=>{
+    if (!open)
+      setPrefillValues({});
+  },[open]);
+
+  useEffect(()=>{
     if (props.edit){
       if (props.currentFields["FD"]){
         setFileList(props.currentFields["FD"]);

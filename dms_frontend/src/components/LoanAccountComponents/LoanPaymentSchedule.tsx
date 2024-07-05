@@ -13,37 +13,44 @@ import NumberField from "../FormFieldComponents/NumberField";
 import RadioGroupField from "../FormFieldComponents/RadioGroupField";
 import SelectField from "../FormFieldComponents/SelectField";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
+import NumberDecimalField from "../FormFieldComponents/NumberDecimalField";
 
 function LoanPaymentSchedule(props:LoanCommonProps){
   const [fieldList] = useState<GridFieldAttributes>(
     {category:"grid", row:2, fields:[
-      {id:"P", name:"Principal", type:"number", numtype:"curr", required:true},
+      {id:"P", name:"Principal", type:"integer", required:true},
       {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true, immutable:true},
       {id:"SD", name:"Start Date", type:"date", required:true},
       {id:"ED", name:"End Date", type:"date", required:true},
       {id:"H", name:"Holiday Convention", type:"select", options:HolidayConventionList, required:true, immutable:true},
-      {id:"T", name:"Interest Type", type:"radio", options:InterestTypeList, required:true, immutable:true},
+      {id:"T", name:"Interest Type (%)", type:"radio", options:InterestTypeList, required:true, immutable:true},
     ]},
   );
 
-  const [fieldValues,setFieldValues] = useState<FieldValues>({});
+  const [fieldValues,setFieldValues] = useState<FieldValues>({T:InterestTypeList[1]});
   const [schedule, setSchedule] = useState<{D:string,I?:number|string}[]>([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [installmentError, setInstallmentError] = useState(<></>);
   const [editMode, setEditMode] = useState(false);
+  const [added, setAdded] = useState(true);
 
   const {addPaymentSchedule, getPaymentSchedule} = useGlobalContext();
 
   useEffect(()=>{
-    getPaymentSchedule(props.loanId).then(res=>{
-      //console.log("response",res);
-      if (res.status==200 && res.obj && Object.keys(res.obj).length!=0){
-        setFieldValues(res.obj);
-        setEditMode(true);
-      }
-    })
-  },[]);
+    if (added)
+      getPaymentSchedule(props.loanId).then(res=>{
+        //console.log("response",res);
+        if (res.status==200)
+          setAdded(false);
+        if (res.status==200 && res.obj && Object.keys(res.obj).length!=0){
+          setFieldValues(res.obj);
+          setEditMode(true);
+        }
+      })
+  },[added]);
+
+  useEffect(()=>console.log("edit mode",editMode),[editMode])
 
 
   const validateFields = () => {
@@ -137,6 +144,8 @@ function LoanPaymentSchedule(props:LoanCommonProps){
     if (res==200){
       setDialogOpen(false);
       setFieldValues({});
+      setErrorMessage(<p className="text-green-600">Schedule successfully generated.</p>);
+      setAdded(true);
     }
     else{
       if (fieldValues["T"]==InterestTypeList[1])
@@ -150,8 +159,8 @@ function LoanPaymentSchedule(props:LoanCommonProps){
     <div>
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
-          if (field.type=="number")
-            return <NumberField key={index} index={index} id={field.id} name={field.name} type={field.numtype} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable}/>
+          if (field.type=="integer")
+            return <NumberField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable}/>
           else if (field.type=="date")
             return <DateField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
           else if (field.type=="select")
@@ -160,13 +169,14 @@ function LoanPaymentSchedule(props:LoanCommonProps){
             return <RadioGroupField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
         })}
         {fieldValues["T"]!=InterestTypeList[2]
-          ?<NumberField key={5} index={5} id="I" name="Interest Rate" type="rate" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
+          ?<NumberDecimalField key={5} index={5} id="I" name="Interest Rate (%)" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
           :""
         }
         <div className="my-10">
           <button className={`${fieldValues["T"]!=InterestTypeList[2]?"float-right":"float-left"} h-[45px] w-[180px] rounded-xl text-white text-lg bg-custom-1`} onClick={validateFields}>
-          {fieldValues["T"]!=InterestTypeList[2]?"Generate Schedule":`${editMode?"Edit":"Enter"} Interest Rates`} 
-        </button></div>
+            {fieldValues["T"]!=InterestTypeList[2]?"Generate Schedule":`${editMode?"Edit":"Enter"} Interest Rates`} 
+          </button>
+        </div>
       </div>
       <Dialog open={dialogOpen} onClose={()=>setDialogOpen(false)} maxWidth="md" fullWidth>
         {dialogOpen

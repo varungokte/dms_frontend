@@ -19,12 +19,12 @@ const documentFieldList= (documentOptions:string[]):FieldAttributesList =>{
   return [
     { category:"single", id:"N", name:"Document Name", type:"text", required:true },
     { category:"grid", row:2, fields:[
-      { id:"C", name:"Document Category", type:"select", options:documentOptions, required:false, immutable:true },
+      { id:"C", name:"Document Category", type:"select", options:documentOptions, required:true, immutable:true },
       { id:"P", name:"Priority", type:"select", options:PriorityList, required:true },
       { id:"SD", name:"Start Date", type:"date", required:true },
       { id:"ED", name:"End Date", type:"date", required:true },
-      { id:"PL", name:"Physical Location", type:"text" },
-      { id:"EL", name:"Execution Location", type:"text" },
+      { id:"PL", name:"Physical Location", type:"text", required:true },
+      { id:"EL", name:"Execution Location", type:"text", required:true },
     ]},    
   ]
 }
@@ -41,8 +41,8 @@ const covenantFieldList = ():FieldAttributesList => {
     { category:"grid", row:2, fields:[  
       { id:"SD", name:"Start Date", type:"date", required:true },
       { id:"ED", name:"End Date", type:"date", required:true },
-      { id:"PL", name:"Physical Location", type:"text" },
-      { id:"EL", name:"Execution Location", type:"text" },
+      { id:"PL", name:"Physical Location", type:"text", required:true },
+      { id:"EL", name:"Execution Location", type:"text", required:true },
     ]},
     { category:"single", id:"D", name:"Description", type:"textarea" },
   ];
@@ -50,14 +50,14 @@ const covenantFieldList = ():FieldAttributesList => {
 
 const conditionsFieldList = (documentOptions:string[]):FieldAttributesList => {
   return [
-    { category:"single", id:"N", name:"Condition Name", type:"text" },
+    { category:"single", id:"N", name:"Condition Name", type:"text", required:true },
     { category:"grid", row:2, fields:[
-      { id:"C", name:"Condition Category", type:"select", options:documentOptions },
-      { id:"P", name: "Priority", type:"select", options:PriorityList},
+      { id:"C", name:"Condition Category", type:"select", options:documentOptions, required:true },
+      { id:"P", name: "Priority", type:"select", options:PriorityList, required:true},
       { id:"SD", name:"Start Date", type:"date", required:true },
       { id:"ED", name:"End Date", type:"date", required:true },
-      { id:"PL", name:"Physical Location", type:"text" },
-      { id:"EL", name:"Execution Location", type:"text" },
+      { id:"PL", name:"Physical Location", type:"text", required:true },
+      { id:"EL", name:"Execution Location", type:"text", required:true },
     ]},
     { category:"single", id:"D", name:"Description", type:"textarea" },
   ]

@@ -1,9 +1,11 @@
 import { useEffect, useState, createElement, FormEventHandler } from "react";
+import { FieldValues } from "DataTypes";
+    
 import TextField from "./TextField";
 import SelectField from "./SelectField";
 import DateField from "./DateField";
 import NumberField from "./NumberField";
-import { FieldValues } from "DataTypes";
+import NumberDecimalField from "./NumberDecimalField";
 
 function FormRepeatableGrid(props:{fieldList:FieldValues[], fieldValues:FieldValues, setFieldValues:Function, submitForm:FormEventHandler, fieldsInRow:number, preexistingValues?:boolean}) {
   const [currentForm, setCurrentForm] = useState(0);
@@ -76,8 +78,10 @@ function RenderForm(props:{grid:any, fieldValues:any, setter:Function, formIndex
   return props.grid.map((item:any,index:number)=>{
     if (item.type=="select")
       return <SelectField id={item.id} key={index} index={index} name={item.name} options={item.options} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
-    else if (item.type=="number")
+    else if (item.type=="integer")
       return <NumberField id={item.id} key={index} index={index} name={item.name} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+    else if (item.type=="float")
+      return <NumberDecimalField id={item.id} key={index} index={index} name={item.name} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
     else if (item.type=="date")
       return <DateField id={item.id} key={index} index={index} name={item.name} disabled={false} prefillValues={props.fieldValues} setPrefillValues={props.setter} required={item.required} repeatFields={props.repeatFields} formIndex={props.formIndex} />
     else

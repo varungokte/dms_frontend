@@ -4,13 +4,19 @@ import PermissionsField from "./PermissionsField";
 import { FieldValues } from "DataTypes";
 
 function RoleField (props:{index:number, id: string, name:string, roleList:FieldValues[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function}){
-
   const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
   const [currentRole, setCurrentRole] = useState("");
+  const [showRolePreset, setShowRolePreset] = useState(false);
+
+  useEffect(()=>console.log(props),[props])
 
   useEffect(()=>{
-    if (props.prefillValues["R"] && props.prefillValues["R"]!=currentRole)
-      setCurrentRole(props.prefillValues["R"])
+    if (props.prefillValues["R"] && props.prefillValues["R"]!=currentRole){
+      if (currentRole!="" || !props.prefillValues["UP"] || (props.prefillValues["UP"] && Object.keys(props.prefillValues["UP"]).length==0))
+        setShowRolePreset(true);
+
+      setCurrentRole(props.prefillValues["R"]);
+    }
   },[props.prefillValues])
 
   useEffect(()=>{
@@ -23,17 +29,16 @@ function RoleField (props:{index:number, id: string, name:string, roleList:Field
   },[props.roleList])
 
   useEffect(()=>{
-    props.setPrefillValues((curr:any)=>{
-      curr["UP"]=allRolesPermissionsList[currentRole];
-      return {...curr};
-    })
+    if (showRolePreset){
+      props.setPrefillValues((curr:any)=>{
+        curr["UP"]=allRolesPermissionsList[currentRole];
+        return {...curr};
+      })}
   },[allRolesPermissionsList,currentRole])
 
-  useEffect(()=>{
-  },[allRolesPermissionsList])
   return (
     <div>
-      <SelectField index={props.index} id={"R"} name={"Role"} options={["-"].concat(Object.keys(allRolesPermissionsList))} required={props.required} disabled={props.disabled} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} setRole={setCurrentRole} />
+      <SelectField index={props.index} id={props.id} name={props.name} options={["-"].concat(Object.keys(allRolesPermissionsList))} required={props.required} disabled={props.disabled} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
       {currentRole==""
         ?<></>
         :<PermissionsField index={props.index} id={"UP"} name={"Permission"} 

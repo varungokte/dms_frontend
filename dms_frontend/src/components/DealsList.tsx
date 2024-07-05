@@ -82,6 +82,7 @@ function DealsList(props:{label:string}) {
 
 function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:DocumentSectionDetails, searchString:string}) {
   const [progressValue, setProgressValue] = useState(0);
+  const [added, setAdded] = useState(true);
 
   useEffect(()=>{
     const totalDocs = props.deal.details.length;
@@ -90,10 +91,10 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:DocumentS
       if (props.deal.details[i]["S"]=="Verified")
         verifiedDocs++;
     }
-    const percentage = verifiedDocs/totalDocs*100
-    const rounded_percentage = Math.round(percentage*100)/100
-    setProgressValue(rounded_percentage);
-  },[props.deal])
+    const percentage = (verifiedDocs/totalDocs*100).toFixed(2);
+    //const rounded_percentage = Math.round(percentage*100)/100
+    setProgressValue(Number(percentage));
+  },[props.deal,added]);
 
   const tableTopRow:[string,string][] = [
     [props.deal.AID, "w-[20%] font-medium text-base"],
@@ -118,7 +119,7 @@ function SingleDealDetails(props:{deal:DocumentDetails, sectionDetails:DocumentS
       bottomRow={tableBottomRow}
       content={props.sectionDetails.sectionType=="pay"
         ?<SingleDealPayments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} />
-        :<SingleDealDocuments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} />
+        :<SingleDealDocuments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded}  />
       }
       searchString={props.searchString}
     />

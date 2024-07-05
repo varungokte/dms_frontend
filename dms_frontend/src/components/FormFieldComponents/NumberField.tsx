@@ -2,6 +2,126 @@ import {  useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
 import { FieldValues } from "DataTypes";
 
+function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number }) {
+  const [errorMessage, setErrorMessage] = useState(<></>);
+  const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
+
+  const numberFormatter = (num:number) => {
+      return commaSeparate(num.toString());
+  } 
+
+  const [amountFields] = useState(["SA", "HA", "DA", "OA","P","V"]);
+  useEffect(()=>{
+    if (amountFields.includes(props.id)){
+      let num;
+      if (props.repeatFields)
+        num = props.prefillValues[props.formIndex||0][props.id];
+      else
+        num = props.prefillValues[props.id];
+      
+      if (num==0)
+        num=0
+      else if (!num)
+        num=-1
+      else if (num=="00")
+        num=0;
+      numberToWords(Number(num),setWordsMessage,props.index);
+    }
+  },[props])
+  
+  return(
+    <div key={props.index} className="mb-5 mx-2">
+      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
+      <input key={props.index+props.id+"t_2"} id={props.id} type="text"
+        className={props.className || `border rounded-if w-full p-4 ${props.name==""?"mt-7":""}`}
+        disabled={props.disabled} required={props.required}
+
+        value={props.repeatFields
+          ?props.prefillValues[props.formIndex||0][props.id]?numberFormatter(Number(props.prefillValues[props.formIndex||0][props.id])):""
+          :props.prefillValues[props.id]!==undefined?numberFormatter(Number(props.prefillValues[props.id])):""
+        }
+
+        onChange={props.repeatFields && props.formIndex!=null
+          ?(e)=>{
+            const val_w_commas = e.target.value;
+            let val="";
+            for (let i=0; i<val_w_commas.length; i++)
+              if (!isNaN(Number(val_w_commas[i])))
+                val+=val_w_commas[i];
+
+            if (isNaN(Number(val)))
+              return;
+
+            props.setPrefillValues((curr:any)=>{
+              curr[props.formIndex||0][props.id]=val;
+              return [...curr];
+            })
+          }
+          :(e)=>{
+            const val_w_commas = e.target.value;
+            let val="";
+            for (let i=0; i<val_w_commas.length; i++){
+              //if (props.type=="rate")
+              if (val_w_commas[i]==".")
+                val+=".";
+              else if (!isNaN(Number(val_w_commas[i])))
+                val+=val_w_commas[i];
+            }
+
+            if (isNaN(Number(val)))
+              return;
+            const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage);
+          
+            props.setPrefillValues((curr:any)=>{
+              curr[props.id]=val; 
+              if (downsell_amount!=="NO")
+                curr["DA"]=downsell_amount;
+              return {...curr};
+            })
+          }
+        }
+      />
+      {wordsMessage}
+      {errorMessage}
+    </div>
+  )
+};
+
+const commaSeparate = (num:string) =>{
+  console.log("comma separated",num);
+  let decimalLocation=-1;
+  let decimalValue="", numberValue="";
+  let res="";
+  for (let i=0; i<num.length; i++){
+    if (num[i]==".")
+      decimalLocation=i;
+    else if (decimalLocation>-1 && i>decimalLocation)
+      decimalValue+=num[i];
+    else
+      numberValue+=num[i];
+  }
+  const len = numberValue.length;
+
+  let val="";
+  for (let i=len-1; i>=0; i--){
+    const digit = numberValue[i];
+    const reverseIndex = len-i-1
+    if (reverseIndex==3)
+      val+=",";
+    if (reverseIndex<3)
+      val+=digit;
+    else{
+      val+=digit;
+      if (reverseIndex%2==0 && i!=0)
+        val+=","
+    }
+  }
+  for (let i=0; i<val.length; i++)
+    res+=val.charAt(val.length-i-1);
+  res+=/* "."+ */decimalValue;
+  return res;
+}
+
 const numberToWords = (num:number, setMessage:Function, index:number|string):void => {
   const wordsClassName = "mx-2 text-blue-700 text-sm mt-1";
   
@@ -127,94 +247,5 @@ const validateDownsellAmount = (value:number, id:string, prefillValues:FieldValu
   return downsell_amount;
 }
 
-function NumberField (props:{index:number|string, type?:"curr"|"rate", id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number, enableDecimal?:boolean }) {
-  const [errorMessage, setErrorMessage] = useState(<></>);
-  const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
-
-  const numberFormatter = (num:number) => {
-    if (props.type=="curr")
-      return new Intl.NumberFormat("en-IN").format(num);
-    /* else if (props.type=="rate")
-      return new Intl.NumberFormat("en-IN",{style:"percent"}).format(num/100); */
-    else
-      return num;
-  } 
-
-  const [amountFields] = useState(["SA", "HA", "DA", "OA","P","V"]);
-  useEffect(()=>{
-    if (amountFields.includes(props.id)){
-      let num;
-      if (props.repeatFields)
-        num = props.prefillValues[props.formIndex||0][props.id];
-      else
-        num = props.prefillValues[props.id];
-      
-      if (num==0)
-        num=0
-      else if (!num)
-        num=-1
-      else if (num=="00")
-        num=0;
-      numberToWords(Number(num),setWordsMessage,props.index);
-    }
-  },[props])
-  
-  return(
-    <div key={props.index} className="mb-5 mx-2">
-      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
-      <input key={props.index+props.id+"t_2"} id={props.id} type="text"
-        className={props.className || `border rounded-if w-full p-4 ${props.name==""?"mt-7":""}`}
-        disabled={props.disabled} required={props.required}
-
-        value={props.repeatFields
-          ?props.prefillValues[props.formIndex||0][props.id]?numberFormatter(Number(props.prefillValues[props.formIndex||0][props.id])):""
-          :props.prefillValues[props.id]!==undefined?numberFormatter(Number(props.prefillValues[props.id])):""
-        }
-
-        onChange={props.repeatFields && props.formIndex!=null
-          ?(e)=>{
-            const val_w_commas = e.target.value;
-            let val="";
-            for (let i=0; i<val_w_commas.length; i++)
-              if (!isNaN(Number(val_w_commas[i])))
-                val+=val_w_commas[i];
-
-            if (isNaN(Number(val)))
-              return;
-
-            props.setPrefillValues((curr:any)=>{
-              curr[props.formIndex||0][props.id]=val;
-              return [...curr];
-            })
-          }
-          :(e)=>{
-            const val_w_commas = e.target.value;
-            let val="";
-            for (let i=0; i<val_w_commas.length; i++){
-              //if (props.type=="rate")
-              /* if (val_w_commas[i]!=".")
-                val+=".";
-              else */ if (!isNaN(Number(val_w_commas[i])))
-                val+=val_w_commas[i];
-            }
-
-            if (isNaN(Number(val)))
-              return;
-            const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage);
-          
-            props.setPrefillValues((curr:any)=>{
-              curr[props.id]=val; 
-              if (downsell_amount!=="NO")
-                curr["DA"]=downsell_amount;
-              return {...curr};
-            })
-          }
-        }
-      />
-      {wordsMessage}
-      {errorMessage}
-    </div>
-  )
-};
 
 export default NumberField;

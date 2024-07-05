@@ -1,7 +1,7 @@
 //import { useEffect } from "react";
 import FieldLabel from "./FieldLabel";
 
-function SelectField (props:{index:number|string, id:string, name: string, options: string[]|readonly string[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, sectionType?:string, setFileType?:Function, setCovType?:Function, setRole?:Function, setZone?:Function}){
+function SelectField (props:{index:number|string, id:string, name: string, options: string[]|readonly string[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, sectionType?:string, setFileType?:Function, setCovType?:Function, setOldZone?:Function}){
   //useEffect(()=>console.log(props),[props]);
 
   return(
@@ -24,18 +24,17 @@ function SelectField (props:{index:number|string, id:string, name: string, optio
               return [...curr];
             })}
           :(e)=>{
-            const num = e.target.value;
-            props.setPrefillValues((curr:any)=>{curr[props.id]=num; return {...curr}})
-            if (props.id=="T" && props.setFileType){
-              props.setFileType(num);
-              if (props.setCovType && props.sectionType=="cov")
-                props.setCovType(num);
-            }
-            else if (props.setRole && props.id=="R")
-              props.setRole(num);
+            const val = e.target.value;
             
-            else if (props.setZone && props.id=="Z")
-              props.setZone(num);
+            props.setPrefillValues((curr:any)=>{curr[props.id]=val; return {...curr}});
+            
+            if (props.id=="T" && props.setFileType){
+              props.setFileType(val);
+              if (props.setCovType && props.sectionType=="cov")
+                props.setCovType(val);
+            }
+            else if (props.setOldZone && props.id=="Z")
+              props.setOldZone(props.prefillValues["Z"]);
           }
         }
       >
