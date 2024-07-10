@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
@@ -9,20 +8,17 @@ import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 function LoanBankDetails(props:LoanCommonProps) {
   const {createLoan} = useGlobalContext();
 
-  const [fieldList] = useState<GridFieldAttributes>({
-    category:"grid", row:4, fields:[
-      { id:"AN", name:"Account Name", type:"text", required:false },
-      { id:"BAN", name:"Account Number", type:"text",required:false },
-      { id:"AT", name:"Account Type", type:"select", options:BankAccountTypeList,required:false },
-      { id:"IFSC", name:"IFSC", type:"text",required:false },
-      { id:"BN", name:"Bank Name", type:"text",required:false},
-      { id:"LB", name:"Branch Name", type:"text",required:false },
-      { id:"BA", name:"Branch Address", type:"text",required:false },
-    ]
-  });
+  const [fieldList] = useState<GridFieldAttributes>( {category:"grid", row:4, fields:[
+    { id:"AN", name:"Account Name", type:"text", required:false },
+    { id:"BAN", name:"Account Number", type:"text",required:false },
+    { id:"AT", name:"Account Type", type:"select", options:BankAccountTypeList,required:false },
+    { id:"IFSC", name:"IFSC", type:"text",required:false },
+    { id:"BN", name:"Bank Name", type:"text",required:false},
+    { id:"LB", name:"Branch Name", type:"text",required:false },
+    { id:"BA", name:"Branch Address", type:"text",required:false },
+  ]});
   
   const [fieldValues, setFieldValues] = useState<any>([{}]);
-  const [valuesExist, setValuesExist] = useState(false);
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
 
   const areAllFieldsEmpty = () => {
@@ -38,42 +34,39 @@ function LoanBankDetails(props:LoanCommonProps) {
     return all_fields_empty;
   }
   
-  const compareFieldsToPreexisting = () => {
-    if (!props.preexistingValues || !props.preexistingValues["BD"])
+  const valuesHaveBeenEdited = () => {
+    if (!props.preexistingValues || !props.preexistingValues["BD"] || fieldValues.length!=props.preexistingValues["BD"].length)
       return true;
     
     let changes_have_been_made=false;
     for (let i=0; i<fieldList["fields"].length; i++){
       const field = fieldList["fields"][i];
-      for (let j=0; j<fieldValues.length; j++)
-        if (fieldValues[j][field.id] &&  props.preexistingValues["BD"] && fieldValues[j][field.id]!=props.preexistingValues["BD"][j][field.id])
-        changes_have_been_made=true;
+      for (let j=0; j<fieldValues.length; j++){
+        let preexisingValue = undefined;
+        let newValue = undefined;
+        
+        if (fieldValues[j] && fieldValues[j][field.id])
+          newValue=fieldValues[j][field.id]
+        if (props.preexistingValues["BD"][j] && props.preexistingValues["BD"][j][field.id])
+          preexisingValue=props.preexistingValues["BD"][j][field.id];
+
+        if (preexisingValue!=newValue)
+          changes_have_been_made=true;
+      }
     }
     return changes_have_been_made;
   }
     
   useEffect(()=>{
-    if (props.preexistingValues["BD"]){
-      const arr:any=[];
-      props.preexistingValues["BD"].map((element:any)=>{
-        const obj:any={};
-        Object.keys(element).map(value=>{
-          obj[value] = element[value];
-        })
-        arr.push(obj);
-      });
-      setFieldValues(arr);
-
-      setValuesExist(true);
-      props.setUnsavedWarning(true);
-    }
+    if (props.preexistingValues["BD"] && props.preexistingValues["BD"].length!=0)
+      setFieldValues([...props.preexistingValues["BD"]]);
     else 
-      setFieldValues([{}])
+      setFieldValues([{}]);
   },[]);
 
   useEffect(()=>{
     if (props.preexistingValues && props.preexistingValues["BD"] && Object.keys(props.preexistingValues["BD"]).length!=0)
-      props.setUnsavedWarning(compareFieldsToPreexisting());
+      props.setUnsavedWarning(valuesHaveBeenEdited());
     else
       props.setUnsavedWarning(!areAllFieldsEmpty());
   },[fieldValues]);
@@ -81,7 +74,8 @@ function LoanBankDetails(props:LoanCommonProps) {
   const submitForm = async (e:any) =>{
     e.preventDefault();
 
-    if (!compareFieldsToPreexisting()){
+    //console.log("fieldValues",fieldValues)
+    if (!valuesHaveBeenEdited()){
       props.goToNextSection();
       return;
     }
@@ -91,21 +85,23 @@ function LoanBankDetails(props:LoanCommonProps) {
     data["_loanId"] = props.loanId;
     data["BD"] = fieldValues;
     //console.log("SUBMITTED NOW",data);
-    setEnableLoadingSign(true)
 
+    setEnableLoadingSign(true)
     const res = await createLoan(data);
     if (res==200){
       //console.log("response",res)
       props.goToNextSection();
       props.setChangesHaveBeenMade(true);
     }
+    else
+      setEnableLoadingSign(false)
   }
 
   return (
     <div className="">
       <br/>
       <form onSubmit={submitForm}>
-        <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} preexistingValues={valuesExist} />
+        <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} />
         <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
       </form>
     </div>

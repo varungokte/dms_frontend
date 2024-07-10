@@ -10,14 +10,14 @@ import CheckboxField from "../FormFieldComponents/CheckboxField";
 import ComboboxField from "../FormFieldComponents/ComboboxField";
 import DateField from "../FormFieldComponents/DateField";
 import MultiTextField from "../FormFieldComponents/MultiTextField";
-import NumberField from "../FormFieldComponents/NumberField";
 import PermissionsField from "../FormFieldComponents/PermissionsField";
 import RoleField from "../FormFieldComponents/RoleField";
 import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import TextField from "../FormFieldComponents/TextField";
 import { CircularProgress } from "@mui/material";
-import NumberDecimalField from "../FormFieldComponents/NumberDecimalField";
+import NumberDecimalField from "../FormFieldComponents/FloatNumberField";
+import IntegerField from "../FormFieldComponents/IntegerField";
 
 type FormDialogProps = {
   index:number, type:FormDialogTypes, edit?:boolean, 
@@ -318,7 +318,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
           />
         else if (field["type"]=="integer")
-          return <NumberField key={index} index={index} id={field["id"]} name={field["name"]}
+          return <IntegerField key={index} index={index} id={field["id"]} name={field["name"]}
             required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
             prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
           />

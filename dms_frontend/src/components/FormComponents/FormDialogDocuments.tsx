@@ -320,20 +320,22 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
   return (
     <div>
       {props.fileList && props.fileList.length!=0?
-        <p className="text-orange-500 my-2 text-center">Note: If you upload a file now, it will replace the one you have already uploaded</p>
-        :<></>
-      }
-      <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
-        <input {...getInputProps()} multiple={false} />
-        <div className="my-2 text-center">
-          <span className="inline-block align-middle text-custom-1"><Upload/></span>
-          <p className="text-custom-1">Choose File to {props.fileList && props.fileList.length!=0?"Replace":"Upload"}</p>
+        <p className="text-orange-500 my-2 text-center">Note: If you upload a file now, you will have to first delete the existing file</p>
+        :<div>
+          <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
+            <input {...getInputProps()} multiple={false} />
+            <div className="my-2 text-center">
+              <span className="inline-block align-middle text-custom-1"><Upload/></span>
+              <p className="text-custom-1">Choose File to {props.fileList && props.fileList.length!=0?"Replace":"Upload"}</p>
+            </div>
+          </div>
+          <br/>
+          <div className="flex flex-row">
+            <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{FileTypeList.slice(1).map(ft=>" "+ft).toString()}</p>
+          </div>
         </div>
-      </div>
-      <br/>
-      <div className="flex flex-row">
-        <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{FileTypeList.slice(1).map(ft=>" "+ft).toString()}</p>
-      </div>
+      }
+      
       <br/>
       {error}
       <br/>

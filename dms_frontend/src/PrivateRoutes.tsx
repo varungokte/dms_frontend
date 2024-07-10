@@ -35,7 +35,7 @@ function EmailVerification(props:any){
   useEffect(()=>{
     //console.log("email verification props",props)
   },[])
-  
+  //return <MenuRouter />
   if (!props.token)
     return <Navigate to="/login"/>
   if (props.token["S"]==UserStatusList[2]){

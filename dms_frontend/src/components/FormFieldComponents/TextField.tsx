@@ -15,8 +15,10 @@ function TextField (props:{index:number|string, id:string, name: string, type: s
       <input key={props.index+props.id+"t_2"} autoComplete="new-password" id={props.id} 
         type={props.type} disabled={props.disabled} required={props.required}
         className={`border rounded-if w-full p-4  ${props.name==""?"mt-7":""} placeholder:text-slate-800`}
-        value={props.repeatFields
-          ?props.prefillValues[props.formIndex||0][props.id]||""
+        value={props.repeatFields && props.formIndex!=undefined
+          ?props.prefillValues[props.formIndex] && props.prefillValues[props.formIndex][props.id]
+            ?props.prefillValues[props.formIndex][props.id]
+            :""
           :props.prefillValues[props.id]|| ""
         }
         

@@ -9,7 +9,7 @@ type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "do
 type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
 
 //Form Fields
-type FormFieldsCommon = {
+type FormFieldAttributes = {
   id:string,
   name:string,
   type: FieldDataTypes,
@@ -21,7 +21,7 @@ type FormFieldsCommon = {
   newRole?:boolean //for permissions/role
 };
 
-type SingleFieldAttributes = {category:"single"} & FormFieldsCommon;
+type SingleFieldAttributes = {category:"single"} & FormFieldAttributes;
 
 type GridFieldAttributes = {
   category:"grid",
@@ -29,7 +29,7 @@ type GridFieldAttributes = {
   sectionName?:string,
   sectionClassName?:string,
   customWidth?:string,
-  fields: FormFieldsCommon[]
+  fields: FormFieldAttributes[]
 };
 
 type LabelFieldAttributes = {
@@ -74,14 +74,17 @@ type LoanCommonProps = {
   preexistingValues:FieldValues,
 }
 
+type ToastOptionsAttributes ={open:boolean, type:"error"|"success", action:"add"|"delete"|"edit",section:string};
+
 export {
   type FieldValues,
   type TableDataTypes, type FieldDataTypes,
-  type SingleFieldAttributes, type GridFieldAttributes, type LabelFieldAttributes, type FieldAttributesList,
+  type FormFieldAttributes, type SingleFieldAttributes, type GridFieldAttributes, type LabelFieldAttributes, type FieldAttributesList,
   type FormDialogTypes, 
   type DocumentSectionTypes, type DocumentSectionNames, type DocumentSectionDetails,
   type UserSuggestionTypes, type UserSuggestionsList,
   type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority,
   type CommonFileViewerProps, type DocumentFileViewerProps, type PaymentFileViewerProps,
   type LoanCommonProps,
+  type ToastOptionsAttributes,
 }

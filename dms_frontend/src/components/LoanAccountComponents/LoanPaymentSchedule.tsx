@@ -5,15 +5,14 @@ import { FieldValues, GridFieldAttributes, LoanCommonProps } from "./../../../Da
 import useGlobalContext from "./../../../GlobalContext";
 
 import {Dialog,DialogTitle,DialogContent} from '@mui/material';
-import { Table } from "../ui/table";
-import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
+import { DataTable } from "../BasicComponents/Table";
 
 import DateField from "../FormFieldComponents/DateField";
-import NumberField from "../FormFieldComponents/NumberField";
+import IntegerField from "../FormFieldComponents/IntegerField";
 import RadioGroupField from "../FormFieldComponents/RadioGroupField";
 import SelectField from "../FormFieldComponents/SelectField";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import NumberDecimalField from "../FormFieldComponents/NumberDecimalField";
+import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 function LoanPaymentSchedule(props:LoanCommonProps){
   const [fieldList] = useState<GridFieldAttributes>(
@@ -160,7 +159,7 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="integer")
-            return <NumberField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable}/>
+            return <IntegerField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable}/>
           else if (field.type=="date")
             return <DateField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
           else if (field.type=="select")
@@ -169,7 +168,7 @@ function LoanPaymentSchedule(props:LoanCommonProps){
             return <RadioGroupField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
         })}
         {fieldValues["T"]!=InterestTypeList[2]
-          ?<NumberDecimalField key={5} index={5} id="I" name="Interest Rate (%)" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
+          ?<FloatNumberField key={5} index={5} id="I" name="Interest Rate (%)" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
           :""
         }
         <div className="my-10">
@@ -183,13 +182,11 @@ function LoanPaymentSchedule(props:LoanCommonProps){
           ?<>
             <DialogTitle>Enter Interest Rates</DialogTitle>
             <DialogContent>
-              <Table>
-                <HeaderRows headingRows={["Installment Number","Installment Date", "Installment Interest Rate(%)"]} headingClassNames={["w-[30%]","w-[30%]",""]} />
-                <BodyRowsMapping
-                  list={schedule} columns={["D","I"]} dataType={["index","date","text-field"]} cellClassName={["","","border-2 rounded-if h-8 float-left p-2"]}
-                  setValues={setSchedule} 
-                />
-              </Table>
+              <DataTable 
+                headingRows={["Installment Number","Installment Date", "Installment Interest Rate(%)"]} headingClassNames={["w-[30%]","w-[30%]",""]}
+                tableData={schedule} columnIDs={["D","I"]} dataTypes={["index","date","text-field"]} cellClassName={["","","border-2 rounded-if h-8 float-left p-2"]}
+                setValues={setSchedule} 
+              />
               {installmentError}
               <button className="float-right my-9 h-[50px] w-[150px] rounded-xl text-white text-md bg-custom-1" onClick={()=>validateInstallmentAmounts()}>Generate Schedule</button>
             </DialogContent>

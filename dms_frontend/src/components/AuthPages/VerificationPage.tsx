@@ -65,6 +65,12 @@ function VerificationComponent(){
     setMove( <Navigate to="/" />)
   }
 
+
+	const logoutUser = () => {
+		localStorage.removeItem("Beacon-DMS-token");
+		navigate("/login");
+	}
+
   const stages = [
     <div className="text-center">
       <button onClick={()=>clickVerify()} className="text-white bg-green-500 h-12 w-56 font-medium text-xl rounded-xl text-center">Verify</button>
@@ -82,6 +88,9 @@ function VerificationComponent(){
 
   return (
     <div className="m-auto w-1/2 mt-28 p-5 border border-black rounded-xl bg-white">
+      <div className=' m-3 absolute inset-y-5 right-0 w-50'>
+        <button className="text-blue-700" onClick={logoutUser}>Logout</button>
+      </div>
       {heading}
       <br/>
       {stages[inputField]}

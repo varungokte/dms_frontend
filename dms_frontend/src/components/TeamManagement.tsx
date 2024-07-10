@@ -1,18 +1,16 @@
 import { useEffect, useState } from "react";
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
-import { Table } from "./ui/table";
-
 import useGlobalContext from "./../../GlobalContext";
-import FormDialog from "./FormComponents/FormDialog";
+
+import { DataTable } from "./BasicComponents/Table";
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import edit_icon from "./static/edit_icon.svg";
 import Search from "./BasicComponents/Search";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
-import { useToast } from "./ui/use-toast";
-import { Toaster } from "./ui/toaster";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
-import { FieldAttributesList } from "../../DataTypes";
+import { FieldAttributesList, ToastOptionsAttributes } from "../../DataTypes";
+import FormDialogTeam from "./FormComponents/FormDialogTeam";
+import Toast from "./BasicComponents/Toast";
 
 function TeamManagement(props:{label:string}){
   useEffect(()=>{
@@ -29,7 +27,7 @@ function TeamManagement(props:{label:string}){
   const [fieldList] = useState<FieldAttributesList>([
     { category:"grid", row:2, fields:[
       { id:"N", name:"Team Name", type:"text", required:true },
-      { id:"L", name:"Team Lead", type:"combobox", multiple:false, required:true },
+      { id:"L", name:"Team Lead", type:"combobox", multiple:false, immutable:true, required:true },
     ]},
     { category:"label", name:"Team Members", sectionClassName:"text-2xl font-medium my-2" },
     { category:"grid", row:2, sectionName:"Transaction Documents", sectionClassName:"text-lg font-medium my-2", fields:[
@@ -61,9 +59,9 @@ function TeamManagement(props:{label:string}){
   const [added, setAdded] = useState(true);
   const [selectedTeam, setSelectedTeam] = useState("");
   const [teamStatus, setTeamStatus] = useState(-1);
-  
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
+
   const { addTeam, getTeamsList} = useGlobalContext();
-  const { toast } = useToast();
 
   const [searchString, setSearchString] = useState("");
 
@@ -99,25 +97,17 @@ function TeamManagement(props:{label:string}){
     return data;
   }
 
-  const createTeam = async (userValues:any, getSugg?:boolean) => {
-    let data:any = {} 
-    if (!getSugg)
-      data = teamMembersSeparateToCombined(userValues);
-    else
-      data = userValues;
+  const createTeam = async (userValues:any) => {
+    const data = teamMembersSeparateToCombined(userValues);    
     //console.log("SUBMITTED",data);
 
-    const res = 200//await addTeam(data);
-    //console.log("response",res)
+    const res = await addTeam(data);
     if (res==200){
       setAdded(true);
-      toast({
-        title: "Success!",
-        description: "The team has been created",
-        className:"bg-white"
-      });
-    };
-
+      setToastOptions({open:true, type:"success", action:"add", section:"Team"});
+    }
+    else
+      setToastOptions({open:true, type:"error", action:"add", section:"Team"});
     return res;
   }
 
@@ -125,27 +115,24 @@ function TeamManagement(props:{label:string}){
     const data = teamMembersSeparateToCombined(userValues);
     data["_id"] = userValues["_id"];
 
-    //console.log("SUBMITTED", data);
+    console.log("SUBMITTED", data);
 
     const res = await addTeam(data);
 
     if (res==200){
       setAdded(true);
-      toast({
-        title: "Success!",
-        description: "Team members added",
-        className:"bg-white"
-      });
-    };
-
+      setToastOptions({open:true, type:"success", action:"edit", section:"Team"});
+    }
+    else
+      setToastOptions({open:true, type:"error", action:"add", section:"Team"});
     return res;
   }
-
+/* 
   useEffect(()=>{
     editTeam({"S":teamStatus}).then(()=>{
     }).catch(err=>{console.log(err)})
     ;
-  },[teamStatus]);
+  },[teamStatus]); */
 
   //const deleteTeam = () => {}
 
@@ -153,15 +140,13 @@ function TeamManagement(props:{label:string}){
     <div>
 			<p className="text-3xl font-bold m-7">{props.label}</p>
       <br/>
-      <Toaster/>
       <div className="flex flex-row">
         <div className="flex-auto"><Search label={"Search by Team Name"} setter={setSearchString} className=" mx-7" /></div>
         <div>
-          <FormDialog key={-1} index={-1} type="team"
+          <FormDialogTeam key={-1} index={-1} type="team"
             triggerText="Add Team" triggerClassName={`${CreateButtonStyling} mx-7`} formSize="medium"
             formTitle="Add Team" formSubmit={createTeam} submitButton="Add"
             form={fieldList} currentFields={{}}
-            suggestions="RM"
           />
         </div>
       </div>
@@ -169,29 +154,28 @@ function TeamManagement(props:{label:string}){
         {teamList
           ?teamList.length==0
             ?<EmptyPageMessage sectionName="teams"/>
-            :<Table className="bg-white rounded-xl">
-              <HeaderRows headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}  />
-              <BodyRowsMapping 
-                list={teamList} columns={["N","L","M","createdAt","S"]} dataType={["text", "text", "count-team","date", "team-status", "action"]}
-                setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
-                action={teamList.map((_:any, index:number)=>{
-                  return(
-                    <div className="flex flex-row">
-                      {/* <FormDialog key={index} index={index} edit type="team"
-                        triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                        formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
-                        form={fieldList} currentFields={teamList[index]}
-                        suggestions="RM"
-                      /> */}
-                      {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
-                    </div>
-                  )
-                })}
-              />
-            </Table>  
+            :<DataTable className="bg-white rounded-xl"
+              headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}
+              tableData={teamList} columnIDs={["N","L","M","createdAt","S"]} dataTypes={["text", "text", "count-team","date", "team-status", "action"]}
+              setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
+              action={teamList.map((_:any, index:number)=>{
+                return(
+                  <div className="flex flex-row">
+                    <FormDialogTeam key={index} index={index} edit type="team"
+                      triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                      formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
+                      form={fieldList} currentFields={teamList[index]}
+                    />
+                    {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
+                  </div>
+                )
+              })}
+
+            /> 
           :<LoadingMessage sectionName="teams" />
         }
       </div>
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
     </div>
   )
 }

@@ -3,9 +3,8 @@ import { DocumentStatusList } from "./../../Constants";
 //import useGlobalContext from "../../GlobalContext";
 import { FieldValues } from "./../../DataTypes";
 
-import { Table } from "@/components/ui/table";
 import Search from "./BasicComponents/Search";
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import { DataTable } from "./BasicComponents/Table";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import UploadFileButton from "./BasicComponents/UploadFileButton";
@@ -46,31 +45,30 @@ function Default(props:{label:string}) {
         {defaultData
           ?defaultData.length==0
             ?<EmptyPageMessage sectionName="default cases" />
-            :<Table className="rounded-xl bg-white">
-              <HeaderRows headingRows={["Sr. No.", "Name", "Agreement ID", "Default Type", "Default Date", "Action"]} />
-              <BodyRowsMapping cellClassName={["font-medium","","","",""]}
-                list={defaultData} dataType={["index","doc-link","text","text","action"]} columns={["AID","N","T", "D"]}
-                searchRows={searchString==""?[]:[searchString,0]} filterRows={[]} 
-                documentLinks={[]}
-                action={
-                  defaultData.map((doc:any,index:number)=>{
-                    return <></>
-                    if (doc["S"]==DocumentStatusList[1])
-                      return <UploadFileButton key={index} index={index} 
-                      AID={doc["AID"]} sectionName={doc["SN"]} docId={doc._id} 
-                      setAdded={setAdded} 
+            :<DataTable className="rounded-xl bg-white"
+              headingRows={["Sr. No.", "Name", "Agreement ID", "Default Type", "Default Date", "Action"]}
+              headingClassNames={["font-medium text-center","text-center","text-center","text-center","text-center","text-center "]}
+              cellClassName={["w-[100px]","","","","","w-[200px]"]}
+              tableData={defaultData} dataTypes={["index","doc-link","text","text", "date","action"]} columnIDs={["AID","N","T", "D"]}
+              searchRows={searchString==""?[]:[searchString,0]} filterRows={[]} 
+              documentLinks={[]}
+              action={
+                defaultData.map((doc:any,index:number)=>{
+                  if (!doc["S"] || doc["S"]==DocumentStatusList[1])
+                    return <UploadFileButton key={index} index={index} 
+                    AID={doc["AID"]} sectionName={doc["SN"]} docId={doc._id} 
+                    setAdded={setAdded} 
+                  />
+                  else
+                    return <ViewFileButton key={index} type="doc" 
+                    AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={doc["SN"]} 
+                    status={doc["S"]} rejectionReason={doc["R"]} 
+                    setAdded={setAdded}
+                    actualName={doc.FD[0].originalname||""} fileName={doc.FD[0].filename||""}
                     />
-                    else
-                      return <ViewFileButton key={index} type="doc" 
-                      AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={doc["SN"]} 
-                      status={doc["S"]} rejectionReason={doc["R"]} 
-                      setAdded={setAdded}
-                      actualName={doc.FD[0].originalname||""} fileName={doc.FD[0].filename||""}
-                      />
-                  })
-                }
+                })
+              }
               />
-            </Table>
           :<LoadingMessage sectionName="data" />
         }
       </div>

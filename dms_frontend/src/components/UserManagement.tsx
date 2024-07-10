@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-import { Table, } from "@/components/ui/table";
 import useGlobalContext from "./../../GlobalContext";
 
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import { DataTable } from "./BasicComponents/Table";
 import { ZoneList } from "../../Constants";
 import FormDialog from "./FormComponents/FormDialog";
 import Search from "./BasicComponents/Search";
@@ -164,26 +163,25 @@ function UserManagement(props:{label:string}){
         {userData
           ?userData.length==0
             ?<EmptyPageMessage sectionName="users" emotion />
-            :<Table className="bg-white rounded-xl">
-              <HeaderRows headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]} />
-              <BodyRowsMapping
-                list={userData} columns={["N","E", "RM", "Z", "R","S"]} dataType={["text", "text", "text", "text","text", "user-status", "action"]}
-                searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
-                setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
-                action = {userData.map((_:any, index:number)=>{
-                  return(
-                    <div className="flex flex-row">
-                      <FormDialog key={index} index={index} type="user" edit
-                        triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                        formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
-                        form={fieldList} currentFields={userData[index]} suggestions="RM" getRoles
-                      />
-                      {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */}
-                    </div>
-                  )
-                })}
-              />
-            </Table>
+            :<DataTable className="bg-white rounded-xl" 
+              headingRows={["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status", "Action"]}
+              tableData={userData} columnIDs={["N","E", "RM", "Z", "R","S"]} dataTypes={["text", "text", "text", "text","text", "user-status", "action"]}
+              searchRows={searchString==""?[]:[searchString,"N","E"]} filterRows={roleFilter==-1?[]:[roleFilter,"S"]}
+              setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
+              action = {userData.map((_:any, index:number)=>{
+                return(
+                  <div className="flex flex-row">
+                    <FormDialog key={index} index={index} type="user" edit
+                      triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                      formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="medium"
+                      form={fieldList} currentFields={userData[index]} suggestions="RM" getRoles
+                    />
+                    {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */}
+                  </div>
+                )
+              })}
+            />
+            
           :<LoadingMessage sectionName="users" />
         }
       </div>

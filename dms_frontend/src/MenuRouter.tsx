@@ -9,10 +9,11 @@ import { FieldValues } from './../DataTypes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
 
-import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, /*  ReminderIcon,  CriticalIcon, ReportsIcon */ } from "./../src/components/static/PanelIcons"
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, /*  ReminderIcon,  CriticalIcon,  */ } from "./../src/components/static/PanelIcons"
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
 import PageNotFound from './components/PageNotFound';
+//import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 import Dashboard from './components/Dashboard';
 import LoanAccount from './components/LoanAccount';
@@ -24,6 +25,7 @@ import FilterPage from './components/FilterPage';
 import TeamManagement from './components/TeamManagement';
 import Masters from './components/Masters';
 import DefaultCases from './components/DefaultCases';
+import Reports from './components/Reports';
 
 export const MenuRouter = () => {
 	const [hover,setHover] = useState(-1);
@@ -43,8 +45,8 @@ export const MenuRouter = () => {
           const idArr:string[]=[];
           res.obj.map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
           setMasterLists(obj);
-					//console.log("MASTERS",obj);
-          setMastersIdList(idArr);
+					console.log("MASTERS",obj);
+					setMastersIdList(idArr);
           setChangeInMasters(false);
         }
         else
@@ -96,10 +98,10 @@ export const MenuRouter = () => {
 		})
 	},[])
 
-	const logoutUser = () => {
-		localStorage.removeItem("Beacon-DMS-token");
-		navigate("/login");
-	}
+		const logoutUser = () => {
+			localStorage.removeItem("Beacon-DMS-token");
+			navigate("/login");
+		}
 	
 	const [userInfo, setUserInfo] = useState(<p>Loading</p>);
 	
@@ -114,22 +116,25 @@ export const MenuRouter = () => {
 			//console.log("token",res);
 			if (res)
 			setUserInfo(
-				<DropdownMenu>
-					<DropdownMenuTrigger className='mb-3 mx-6'>
-						<div className="flex flex-row">
-							<div><ProfileIcon name={res["N"]||"User"} size="small" showStatus={socketIsConnected}/></div>
-							<div className="text-left mx-3">
-								<p>{res["N"]}</p>
-								<p className="font-light">{res["R"]||res["E"]||""}</p>
+				<div>
+					{/* <NotificationsNoneIcon fontSize="large" sx={{color:"rgba(80, 65, 188, 1)"}}/> */}
+					<DropdownMenu>
+						<DropdownMenuTrigger className='mb-3 mx-6'>
+							<div className="flex flex-row">
+								<div><ProfileIcon name={res["N"]||"User"} size="small" showStatus={socketIsConnected}/></div>
+								<div className="text-left mx-3">
+									<p>{res["N"]}</p>
+									<p className="font-light">{res["R"]||res["E"]||""}</p>
+								</div>
 							</div>
-						</div>
-						</DropdownMenuTrigger>
-					<DropdownMenuContent className='bg-white'>
-						<DropdownMenuItem>Profile</DropdownMenuItem>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
+							</DropdownMenuTrigger>
+						<DropdownMenuContent className='bg-white'>
+							<DropdownMenuItem>Profile</DropdownMenuItem>
+							<DropdownMenuSeparator />
+							<DropdownMenuItem ><button onClick={logoutUser}>Logout</button></DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			);
 		})
 	},[socketIsConnected]);
@@ -150,10 +155,10 @@ export const MenuRouter = () => {
 		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },
 		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
 		{ name: "Default Cases", path:"/default", component: DefaultCases, icon: DefaultIcon },
+		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
 
 		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
 		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
-		//{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
 	]);
 	
 	return (

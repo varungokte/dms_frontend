@@ -35,7 +35,7 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
 
   return(
     <div key={props.index}>
-      <label className="flex flex-row border-2 border-dashed rounded-xl m-auto p-3 w-28 inline-block align-middle" 
+      <label className="flex flex-row border-2 border-dashed rounded-xl p-3 w-28 " 
         style={{backgroundColor: "rgba(225, 237, 255, 1)", borderColor: "rgba(148, 192, 255, 1)"}} 
         htmlFor={props.index+"upload"}
       >
@@ -57,5 +57,7 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
     </div>
   )
 };
+
+//inline-block align-middle m-auto
 
 export default UploadFileButton;

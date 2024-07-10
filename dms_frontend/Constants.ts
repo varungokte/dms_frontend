@@ -5,9 +5,10 @@ const LoanProductList:string[] = ["-"];
 const ZoneList:string[] = ["-"];
 const FileTypeList:string[] = ["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"];
 const UserRoleList:string[] = ["-"];
-const IndustryList:string[] = ["-"];/* , "Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others" */
+const IndustryList:string[] = ["-",""];/* , "Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others" */
 const LoanTypeList:string[] = ["-", "Long Term", "Short Term"];
 const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant"];
+const TableRowsPerPage:number[] = [-1,2,5,10];
 
 //Statuses
 const PriorityList =["-", "Low", "Medium", "High"] as const;
@@ -63,7 +64,7 @@ const MastersMapping:FieldValues = {
 }
 
 export { MastersMapping,
-  LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, 
+  LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,
   ProjectStatusList,DSRAFormList, LoanSecurityTypeList,BankAccountTypeList, 

@@ -297,6 +297,23 @@ const createLoan = async (data:object) => {
 	}
 }
 
+const deleteLoan = async (loanId:string) => {
+	try {
+		const token = getEncryptedToken();
+		const response = await axios.delete(`${Base_Url}/deleteLoan`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params: { "_id": loanId },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return 0;
+		else
+			return error.response.status;
+	}
+}
+
 const createAID = async (data:object) =>{
 	try {
 		const token = await getEncryptedToken();
@@ -768,6 +785,8 @@ const getPaymentSchedule = async (loanId:string) =>  {
 	}
 };
 
+//deleteContact
+
 const useGlobalContext = () => {
 	return {
 		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
@@ -776,7 +795,7 @@ const useGlobalContext = () => {
 		createUser, editUser, getAllUsers, getSingleUser,
 		createLoan, createAID,
 		addContact, getContacts,
-		getLoanList, getLoanFields,
+		getLoanList, getLoanFields, deleteLoan,
 		addRating, getRatingsList,
 		addRole, getRolesList,
 		getUserSuggestions,

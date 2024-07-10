@@ -7,16 +7,16 @@ import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanTypeL
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
 import { useToast } from "@/components/ui/use-toast"
+
 import SelectField from "../FormFieldComponents/SelectField";
-import NumberField from "../FormFieldComponents/NumberField";
 import DateField from "../FormFieldComponents/DateField";
 import TextField from "../FormFieldComponents/TextField";
+import IntegerField from "../FormFieldComponents/IntegerField";
 
 function LoanBasicDetails(props:LoanCommonProps) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   
-  const [fieldList] = useState<GridFieldAttributes>(
-    {category:"grid",row:4, fields:[
+  const [fieldList] = useState<GridFieldAttributes>( {category:"grid",row:4, fields:[
     { id:"CN", name:"Company Name", type:"text", required: true },
     { id:"GN", name:"Group Name", type:"text", required: false },
     { id:"I", name:"Industry", type:"select", options:IndustryList, required: true },
@@ -49,7 +49,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
 
   useEffect(()=>{
     if (Object.keys(props.preexistingValues).length!=0){
-      console.log("preexising values",props.preexistingValues)
+      //console.log("preexising values",props.preexistingValues)
       const obj:FieldValues={};
       Object.keys(props.preexistingValues).map(value=>{
         if (value=="SD" || value=="DD" || value=="CD" || value=="RED")
@@ -125,7 +125,6 @@ function LoanBasicDetails(props:LoanCommonProps) {
 
 
     const error_list:{[key:string]:string} ={};
-    console.log("error_list",error_list);
     if (data["GST"] && data["GST"].length!=15)
       error_list["GST"]="GST number must be 15 digits";
     if (data["PN"] && data["PN"].length!=10)
@@ -139,13 +138,11 @@ function LoanBasicDetails(props:LoanCommonProps) {
       error_list["SA"]="This cannot be less than the Hold Amount";
 
     if (Object.keys(error_list).length>0){
-      console.log("ERROR",error_list)
       setValidationErrors(error_list);
       return;
     }
 
     if (Object.keys(data).length!=0){
-
       data["AID"]= props.AID;
       data["_loanId"]= props.loanId;
 
@@ -199,7 +196,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
             if (field.type=="select")
               return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required||false} disabled={disabled} />
             else if (field.type=="integer")
-              return <NumberField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
+              return <IntegerField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else if (field.type=="date")
               return <DateField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
             else

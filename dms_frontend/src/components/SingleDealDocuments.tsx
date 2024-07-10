@@ -3,8 +3,7 @@ import useGlobalContext from "./../../GlobalContext";
 import { DocumentStatusList } from "./../../Constants";
 import { DocumentSectionDetails } from "./../../DataTypes";
 
-import { Table } from "@/components/ui/table"
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import { DataTable } from "./BasicComponents/Table";
 import UploadFileButton from "./BasicComponents/UploadFileButton";
 import ViewFileButton from "./BasicComponents/ViewFileButton";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
@@ -37,35 +36,30 @@ function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:Do
       {docData
         ?docData.length==0
           ?<EmptyPageMessage sectionName="documents" />
-          :<Table>
-            <HeaderRows 
-              headingRows={["Document Name", "Document Category", "Physical Location", "Execution Location", "Priority", "Start Date", "End Date", "Status", "Action"]}
-              headingClassNames={[ "w-[15%] text-center","w-[15%] text-center", "w-[10%] text-center", "w-[10%] text-center", "w-[5%] text-center", "w-[10%] text-center","w-[10%] text-center","w-[10%] text-center","text-center"]} 
-            />
-            <BodyRowsMapping list={docData} 
-              columns={["N", "C", "PL","EL","P", "SD","ED","S"]} 
-              dataType={["text","text","text","text","priority","date","date","doc-status","action"]}
-              cellClassName={["text-center","text-center","text-center","text-center","text-center","text-center","text-center","text-center"]}
-              searchRows={[]} filterRows={[]}
-              action={
-                docData.map((doc:any,index:number)=>{
-                  if (doc["S"]==DocumentStatusList[1])
-                    return <UploadFileButton key={index} index={index} 
-                    AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={doc._id} 
-                    setAdded={setAdded} 
+          :<DataTable 
+            headingRows={["Document Name", "Document Category", "Physical Location", "Execution Location", "Priority", "Start Date", "End Date", "Status", "Action"]}
+            headingClassNames={[ "w-[15%] text-center","w-[15%] text-center", "w-[10%] text-center", "w-[10%] text-center", "w-[5%] text-center", "w-[10%] text-center","w-[10%] text-center","w-[10%] text-center","text-center"]} 
+            tableData={docData} columnIDs={["N", "C", "PL","EL","P", "SD","ED","S"]} dataTypes={["text","text","text","text","priority","date","date","doc-status","action"]}
+            cellClassName={["text-center","text-center","text-center","text-center","text-center","text-center","text-center","text-center"]}
+            searchRows={[]} filterRows={[]}
+            action={
+              docData.map((doc:any,index:number)=>{
+                if (doc["S"]==DocumentStatusList[1])
+                  return <UploadFileButton key={index} index={index} 
+                  AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={doc._id} 
+                  setAdded={setAdded} 
+                />
+                else
+                  return <ViewFileButton key={index} type="doc" 
+                  AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionName={props.sectionDetails.sectionName} 
+                  status={doc["S"]} rejectionReason={doc["R"]} 
+                  setAdded={setAdded} 
+                  actualName={(doc.FD && doc.FD[0] && doc.FD[0].originalname)?doc.FD[0].originalname:""} 
+                  fileName={(doc.FD && doc.FD[0] && doc.FD[0].filename)?doc.FD[0].filename:""} 
                   />
-                  else
-                    return <ViewFileButton key={index} type="doc" 
-                    AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionName={props.sectionDetails.sectionName} 
-                    status={doc["S"]} rejectionReason={doc["R"]} 
-                    setAdded={setAdded} 
-                    actualName={(doc.FD && doc.FD[0] && doc.FD[0].originalname)?doc.FD[0].originalname:""} 
-                    fileName={(doc.FD && doc.FD[0] && doc.FD[0].filename)?doc.FD[0].filename:""} 
-                    />
-                })
-              }
-            />
-          </Table>
+              })
+            } 
+          />
         :<LoadingMessage sectionName="documents" />
       }
     </div>

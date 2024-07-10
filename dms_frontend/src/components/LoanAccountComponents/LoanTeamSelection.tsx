@@ -50,6 +50,7 @@ function LoanTeamSelection(props:LoanCommonProps){
       </div>
 
       <form onSubmit={sendTeam}>
+        <div className="text-lg mx-3 text-blue-600">Select one of the following teams</div>
         <div className="flex flex-row flex-wrap">
           {teamsList
             ?teamsList.length==0

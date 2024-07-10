@@ -11,7 +11,7 @@ function ViewFileButton(props:CommonFileViewerProps & (DocumentFileViewerProps|P
   return (
     <div>
       <button onClick={()=>setOpenDialog(true)}
-       className="flex flex-row rounded-xl m-auto p-3 w-28 inline-block align-middle" 
+       className="flex flex-row rounded-xl p-3 w-28" 
        style={{backgroundColor:"rgba(255, 245, 204, 1)"}}
       >
         <img className="m-auto" src={view_icon} />
@@ -26,7 +26,5 @@ function ViewFileButton(props:CommonFileViewerProps & (DocumentFileViewerProps|P
     </div>
   )
 };
-
-
 
 export default ViewFileButton;

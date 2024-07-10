@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host",
-    "build":"tsc && vite build && pm2 start ecosystem.config.cjs --env production",
+    "build": "tsc && vite build && pm2 start ecosystem.config.cjs --env production",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview"
   },
@@ -15,6 +15,7 @@
     "@mui/icons-material": "^5.15.19",
     "@mui/lab": "^5.0.0-alpha.170",
     "@mui/material": "^5.15.19",
+    "@mui/x-charts": "^7.9.0",
     "@radix-ui/react-alert-dialog": "^1.0.5",
     "@radix-ui/react-collapsible": "^1.0.3",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -40,6 +41,7 @@
     "pm2": "^5.4.1",
     "react": "^18.2.0",
     "react-circular-progressbar": "^2.1.0",
+    "react-csv": "^2.2.2",
     "react-d3-tree": "^3.6.2",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
@@ -53,6 +55,7 @@
     "@types/crypto-js": "^4.2.2",
     "@types/node": "^20.11.29",
     "@types/react": "^18.2.64",
+    "@types/react-csv": "^1.1.10",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",

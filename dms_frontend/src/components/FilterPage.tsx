@@ -4,8 +4,7 @@ import { FieldValues } from "./../../DataTypes";
 import { LoanProductList, ZoneList } from "./../../Constants";
 import { Link } from "react-router-dom";
 
-import { Table } from "./ui/table";
-import { BodyRowsMapping, HeaderRows } from "./BasicComponents/Table";
+import { DataTable } from "./BasicComponents/Table";
 import Filter from "./BasicComponents/Filter";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
@@ -59,22 +58,19 @@ function FilterPage(props:{label:string}){
 				{loanList
 					?loanList.length==0
 						?<span><br/><EmptyPageMessage sectionName="loans"/></span>
-						:<Table className="bg-white my-5">
-							<HeaderRows headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount","Action"]} 
-                headingClassNames={["w-[80px]","w-[20%] text-center"," w-[20%] text-center","text-center","text-center","text-center","text-center"]}
-              />
-							<BodyRowsMapping list={loanList} columns={["AID", "CN", "GN", "Z", "SA"]} 
-                dataType={["index","text","text","text","text","text","action"]} 
-                cellClassName={["font-medium text-center", "text-center text-custom-1","text-center","text-center","text-center","text-center"]} 
-                action = {loanList.map((item:any)=>{
-                  return(
-                    <div className="flex flex-row">
-                      <Link className="m-2" to="../loan/create" state={{linkSource: "EDIT", loanId: item["_id"], AID: item.AID}}><img src={edit_icon}/></Link>
-                    </div>
-                  )
-                })}
-              />
-						</Table>
+						:<DataTable className="bg-white my-5" 
+							headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount","Action"]} 
+							headingClassNames={["w-[80px]","w-[20%] text-center"," w-[20%] text-center","text-center","text-center","text-center","text-center"]}
+							tableData={loanList} columnIDs={["AID", "CN", "GN", "Z", "SA"]} dataTypes={["index","text","text","text","text","text","action"]} 
+							cellClassName={["font-medium text-center", "text-center text-custom-1","text-center","text-center","text-center","text-center"]} 
+							action = {loanList.map((item:any)=>{
+								return(
+									<div className="flex flex-row">
+										<Link className="m-2" to="../loan/create" state={{linkSource: "EDIT", loanId: item["_id"], AID: item.AID}}><img src={edit_icon}/></Link>
+									</div>
+								)
+							})}
+						/>
 					:<LoadingMessage sectionName="data" />
 				}
 				<br />

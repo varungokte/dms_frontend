@@ -6,6 +6,8 @@ import CircularProgress from "@mui/material/CircularProgress";
 function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean}) {
   const navigate = useNavigate();
 
+  const [nextButtonValue, setNextButtonValue] = useState(<div className="flex flex-row place-content-center"><div>Next</div><ChevronRight/></div>);
+  
   useEffect(()=>{
     if (props.enableLoadingSign)
       setNextButtonValue(<CircularProgress className="mt-1" sx={{color:"white"}} />);
@@ -20,7 +22,6 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
     });
   };
 
-  const [nextButtonValue, setNextButtonValue] = useState(<div className="flex flex-row place-content-center"><div>Next</div><ChevronRight/></div>);
 
   return (
     <div className="flex flex-row">

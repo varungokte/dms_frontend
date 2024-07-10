@@ -4,11 +4,9 @@ import { Link } from "react-router-dom";
 import { DocumentStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../Constants";
 import { DocumentStatus, FieldValues, Priority, TableDataTypes, TeamStatus, UserStatus } from "DataTypes";
 
-import { TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@/components/ui/table";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, } from "@/components/ui/dropdown-menu";
-import NumberField from "../FormFieldComponents/NumberField";
-
-import chevron_down from "./../static/chevron-down.svg";
+import {Paper, Table as MUITable,TableContainer} from '@mui/material';
+import {TableBody, TableCell, TableHead, TableRow} from '@mui/material';
+import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 const PriorityStyling = ["-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100"];
 const UserStatusStyling = ["-", "text-yellow-600 bg-yellow-100", "text-green-600 bg-green-100", "text-red-600 bg-red-100"];
@@ -16,22 +14,36 @@ const TeamStatusStyling = ["-", "text-green-600 bg-green-100", "text-red-600 bg-
 const DocumentStatusStyling = ["-", "text-yellow-500", "text-blue-500", "text-green-600", "text-red-600"];
 //const FileStatusStyling = ["-", "text-yellow-500", "text-green-600"];
 
-function HeaderRows(props:{headingRows:string[], headingClassNames?:string[]}){
+type HeaderRowsProps = {headingRows:string[], headingClassNames?:string[]};
+type BodyRowsMappingProps = {tableData:FieldValues[], columnIDs:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataTypes:TableDataTypes[], action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function, documentLinks?:string[]}
+
+function DataTable(props:(HeaderRowsProps & BodyRowsMappingProps &{className?:string})){
   return(
-    <TableHeader>
-      <TableRow>
-      {props.headingRows.map((heading,index)=>{
-        return <TableHead key={index} className={(props.headingClassNames && props.headingClassNames[index])?props.headingClassNames[index]:""}>{heading}</TableHead>
-      })}
-      </TableRow>
-    </TableHeader>
+    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius:"13px"}} className=" rounded-xl">
+      <MUITable className={`${props.className}`}>
+        <HeaderRows headingRows={props.headingRows} headingClassNames={props.headingClassNames}/>
+        <BodyRowsMapping {...props}  />
+      </MUITable>
+    </TableContainer>
   )
 }
 
-function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataType:TableDataTypes[], action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function, documentLinks?:string[]}){
+function HeaderRows(props:HeaderRowsProps){
+  return(
+    <TableHead>
+      <TableRow>
+      {props.headingRows.map((heading,index)=>{
+        return <TableCell key={index} className={(props.headingClassNames && props.headingClassNames[index])?props.headingClassNames[index]:""}>{heading}</TableCell>
+      })}
+      </TableRow>
+    </TableHead>
+  )
+}
+
+function BodyRowsMapping(props:BodyRowsMappingProps){
   return(
     <TableBody>
-      {props.list.map((singleRow,index)=>{
+      {props.tableData.map((singleRow,index)=>{
         let searchValid = true;
         if (props.searchRows && props.searchRows.length>0){
           searchValid = false;
@@ -51,7 +63,7 @@ function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassN
         }
 
         if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataType={props.dataType} action={props.action} columns={props.columns} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} documentLinks={props.documentLinks}/>
+          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataTypes={props.dataTypes} action={props.action} columns={props.columnIDs} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} documentLinks={props.documentLinks}/>
         else
           return ""
       })}
@@ -59,10 +71,10 @@ function BodyRowsMapping(props:{list:FieldValues[], columns:string[], cellClassN
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function, documentLinks?:string[]}){ 
+function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function, documentLinks?:string[]}){ 
   return(
     <TableRow style={{backgroundColor:"rgba(251, 251, 255, 1)"}} key={props.rowIndex}>
-      {props.dataType.map((dataType, index)=>{
+      {props.dataTypes.map((dataType, index)=>{
         const uniqueIndex = props.rowIndex+"_"+index;
         const cellClassName=(props.cellClassName && props.cellClassName[index])?props.cellClassName[index]:"";
       
@@ -75,7 +87,7 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:st
         else if (dataType=="count-team")
           return handleCountTeam(props.singleRow, cellClassName, uniqueIndex);
     
-        const item = props.singleRow[props.columns[props.dataType[0]=="index"?index-1:index]];
+        const item = props.singleRow[props.columns[props.dataTypes[0]=="index"?index-1:index]];
         const documentLink=(props.documentLinks && props.documentLinks[index])?props.documentLinks[index]:"";
         
         if (dataType=="date")
@@ -91,7 +103,7 @@ function SingleRow(props:{rowIndex:number, dataType:TableDataTypes[], columns:st
         else if (dataType=="obj-name")
           return handleObjName(item, cellClassName, uniqueIndex);
         else if (dataType=="text-field")
-          return handleTextField(item,cellClassName,uniqueIndex, props.rowIndex, props.columns[props.dataType[0]=="index"?index-1:index], props.setValues||(()=>{}));
+          return handleTextField(item,cellClassName,uniqueIndex, props.rowIndex, props.columns[props.dataTypes[0]=="index"?index-1:index], props.setValues||(()=>{}));
         else if (dataType=="doc-link")
           return handleDocumentLink(item, cellClassName, uniqueIndex, documentLink);
         else
@@ -132,42 +144,29 @@ const handleDocStatus = (status:DocumentStatus, cellClassName:string, uniqueInde
 }
 
 const handleUserStatus = (status:UserStatus, cellClassName:string, uniqueIndex:string, selectedUser:number, setSelectedUser:Function, setUserStatus:Function) => {
-
   return (
     <TableCell key={uniqueIndex} className={cellClassName}>
-      <DropdownMenu>
-      <DropdownMenuTrigger className={`${UserStatusStyling[UserStatusList.indexOf(status)]} w-28 h-10 text-center rounded-xl `}>
-        <div className="flex flex-row w-full" >
-          <p className=" m-auto">{status}</p>
-          <img className="mr-2" src={chevron_down} />
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(UserStatusList[1])}} className={`${UserStatusStyling[1]} bg-white`}>{UserStatusList[1]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(UserStatusList[2])}} className={`${UserStatusStyling[2]} bg-white`}>{UserStatusList[2]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedUser(selectedUser); setUserStatus(UserStatusList[3])}} className={`${UserStatusStyling[3]} bg-white`}>{UserStatusList[3]}</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <select className={`${UserStatusStyling[UserStatusList.indexOf(status)]} w-28 h-10 text-center rounded-xl `} 
+        value={status} onChange={e=>{setSelectedUser(selectedUser); setUserStatus(e.target.value)}}>
+        {UserStatusList.map((status,index)=>{
+          if (status!="-")
+            return <option key={index} className={`${UserStatusStyling[index]}`}>{status}</option>
+        })}
+      </select>
   </TableCell>
   )
 }
 
 const handleTeamStatus = (status:TeamStatus, cellClassName:string, uniqueIndex:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function) => {
-  
   return (
     <TableCell key={uniqueIndex} className={cellClassName}>
-      <DropdownMenu>
-      <DropdownMenuTrigger className={`${TeamStatusStyling[TeamStatusList.indexOf(status)]} w-28 h-10 text-center rounded-xl `}>
-        <div className="flex flex-row w-full" >
-          <p className=" m-auto">{status}</p>
-          <img className="mr-2" src={chevron_down} />
-        </div>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="bg-white">
-        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[1])}} className={`${TeamStatusStyling[1]} bg-white`}>{TeamStatusList[1]}</DropdownMenuItem>
-        <DropdownMenuItem onClick={()=>{setSelectedTeam(selectedTeam); setTeamStatus(TeamStatusList[2])}} className={`${TeamStatusStyling[2]} bg-white`}>{TeamStatusList[2]}</DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+      <select className={`${TeamStatusStyling[TeamStatusList.indexOf(status)]} w-28 h-10 text-center rounded-xl `} 
+        value={status} onChange={e=>{setSelectedTeam(selectedTeam); setTeamStatus(e.target.value)}}>
+        {TeamStatusList.map((status,index)=>{
+          if (status!="-")
+            return <option key={index} className={`${TeamStatusStyling[index]}`}>{status}</option>
+        })}
+      </select>
   </TableCell>
   )
 }
@@ -191,9 +190,9 @@ const handleCountTeam = (obj:any, cellClassName:string, uniqueIndex:string) => {
 
 const handleTextField = (prefillValue:any, cellClassName:string, uniqueIndex:string, tableIndex:number, columnId:string, setPrefillValue:Function) => {
   return <TableCell key={uniqueIndex} className="p-2">
-    <NumberField key={uniqueIndex} index={tableIndex} id={columnId} name="" className={cellClassName}
+    <FloatNumberField key={uniqueIndex} index={tableIndex} id={columnId} name="" className={cellClassName}
       prefillValues={{[tableIndex]:{[columnId]:prefillValue}}} setPrefillValues={setPrefillValue} 
-      repeatFields formIndex={tableIndex} enableDecimal
+      repeatFields formIndex={tableIndex}
     />
   </TableCell>
 }
@@ -204,4 +203,4 @@ const handleDocumentLink = (item:ReactElement, cellClassName:string, uniqueIndex
   </TableCell>
 }
 
-export { HeaderRows, BodyRowsMapping };
+export { DataTable, HeaderRows, BodyRowsMapping };

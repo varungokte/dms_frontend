@@ -9,7 +9,7 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
 
   const [parameterToBeSent] = useState("E"); //Later this will be a prop
 
-  //useEffect(()=>console.log("combobox prefill values",props.prefillValue),[props.prefillValue])
+  //useEffect(()=>console.log("combobox prefill values",props.prefillValue, props.suggestions),[props.prefillValue])
 
   useEffect(()=>{
     if (props.prefillValue && props.suggestions.length!=0){

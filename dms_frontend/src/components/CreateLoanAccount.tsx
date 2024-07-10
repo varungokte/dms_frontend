@@ -70,12 +70,15 @@ function CreateLoanAccount() {
 
   const getOldData = async () => {
     const res = await getLoanFields(loanId);
-    //console.log("preexisting data",res)
+    console.log("preexisting data",res)
     if (res.status==200){
+      if (res.obj["STV"] && res.obj["STV"].length==0)
+        res.obj["STV"]=[{}];
       if (res.obj["ST"] && res.obj["ST"]==LoanSecurityTypeList[2])
         setShowSecurityDetails(false);
       if (res.obj["CN"])
         setPreexistingData(res.obj);
+      console.log("res.obj",res.obj)
       setDataHasLoaded(true);
     }
   }
@@ -185,7 +188,9 @@ function CreateLoanAccount() {
                         onClick={()=>{
                           unsavedWarning
                             ?(confirm("WARNING:\nYour unsaved data will be lost.\nTo save your data, close this dialog and click \"Save & Next\"")
-                              ?setCurrentSection(index):"")
+                              ?setCurrentSection(index)
+                              :""
+                            )
                             :setCurrentSection(index)                      
                         }}
                       >
@@ -252,10 +257,10 @@ function CreateLoanAccount() {
           } 
         </div>
       </div>
-      <button onClick={()=>{
+      {/* <button onClick={()=>{
         setOkToFrolic(true);
         setCurrentSection(2);}}>Skip
-      </button>
+      </button> */}
     </div>
   )
 }

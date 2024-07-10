@@ -134,13 +134,16 @@ function LoanDocuments(props:LoanCommonProps) {
           :sectionDetails.sectionType=="doc"
             ?<LoanDocumentView docData={docData} label={props.label} fieldList={sectionDetails.fieldList}
               editDocumentFunction={editDocument} deleteDocumentFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+              setAdded={setAdded}
             />
             :sectionDetails.sectionType=="cov"
               ?<LoanCovenantView covData={docData} label={props.label} type={covenantType} fieldList={sectionDetails.fieldList}
                 editCovenantFunction={editDocument} deleteCovenantFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+                setAdded={setAdded}
               />
               :<LoanConditionView conData={docData} label={props.label} fieldList={sectionDetails.fieldList}
                 editConditionFunction={editDocument} deleteConditionFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+                setAdded={setAdded}
               />
           :<LoadingMessage sectionName="list" />
         }

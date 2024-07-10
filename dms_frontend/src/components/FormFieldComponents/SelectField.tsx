@@ -12,9 +12,13 @@ function SelectField (props:{index:number|string, id:string, name: string, optio
         id={props.id} 
         className="bg-white border rounded-if w-full h-10/12 p-4"
         required={props.required} disabled={props.disabled}
-        value={props.repeatFields
-          ?props.prefillValues[props.formIndex||0][props.id]||""
-          :props.prefillValues[props.id]|| ""
+        value={props.repeatFields && props.formIndex!=null
+          ?props.prefillValues[props.formIndex] && props.prefillValues[props.formIndex][props.id]
+            ?props.prefillValues[props.formIndex||0][props.id]
+            :""
+          :props.prefillValues[props.id]
+            ?props.prefillValues[props.id]
+            :""
         }
         
         onChange={props.repeatFields && props.formIndex!=null

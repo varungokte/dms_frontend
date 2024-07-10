@@ -3,8 +3,7 @@ import useGlobalContext from "../../../GlobalContext";
 import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "../../../Constants";
 import { FieldValues, FieldAttributesList, LoanCommonProps } from "DataTypes";
 
-import { Table } from "@/components/ui/table"
-import { BodyRowsMapping, HeaderRows } from "../BasicComponents/Table";
+import { DataTable } from "../BasicComponents/Table";
 import FormDialog from "../FormComponents/FormDialog";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
@@ -98,13 +97,11 @@ function LoanRatings(props:LoanCommonProps) {
         {ratingsList
           ?ratingsList.length==0
             ?<EmptyPageMessage sectionName="ratings" />
-            :<Table className="border">
-              <HeaderRows headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]} headingClassNames={["text-center","text-center","text-center","text-center","text-center","text-center"]} />
-
-              <BodyRowsMapping list={ratingsList} columns={["A","T","DT","O","L","V",]} dataType={["text", "text", "date", "text", "text", "text"]}
-                searchRows={[]} filterRows={[]} cellClassName={["text-center","text-center","text-center","text-center","text-center text-blue-500","text-center"]} 
-              />
-          </Table>
+            :<DataTable className="border"
+              headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]} headingClassNames={["text-center","text-center","text-center","text-center","text-center","text-center"]} 
+              tableData={ratingsList} columnIDs={["A","T","DT","O","L","V",]} dataTypes={["text", "text", "date", "text", "text", "text"]}
+              searchRows={[]} filterRows={[]} cellClassName={["text-center","text-center","text-center","text-center","text-center text-blue-500","text-center"]} 
+            />
           :<LoadingMessage sectionName="ratings" />
         }
       </div>
