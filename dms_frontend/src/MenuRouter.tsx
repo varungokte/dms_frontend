@@ -9,7 +9,7 @@ import { FieldValues } from './../DataTypes';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger, } from "./components/ui/dropdown-menu";
 import { Toaster } from './components/ui/toaster';
 
-import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, /*  ReminderIcon,  CriticalIcon,  */ } from "./../src/components/static/PanelIcons"
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, CriticalIcon, ReminderIcon } from "./../src/components/static/PanelIcons"
 import beacon_logo from "./components/static/beacon_logo.png"
 import ProfileIcon from './components/BasicComponents/ProfileIcon';
 import PageNotFound from './components/PageNotFound';
@@ -24,7 +24,8 @@ import RoleManagement from './components/RoleManagement';
 import FilterPage from './components/FilterPage';
 import TeamManagement from './components/TeamManagement';
 import Masters from './components/Masters';
-import DefaultCases from './components/DefaultCases';
+import SpecialCases from './components/SpecialCases';
+import Reminders from './components/Reminders';
 import Reports from './components/Reports';
 
 export const MenuRouter = () => {
@@ -45,12 +46,12 @@ export const MenuRouter = () => {
           const idArr:string[]=[];
           res.obj.map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
           setMasterLists(obj);
-					console.log("MASTERS",obj);
+					//console.log("MASTERS",obj);
 					setMastersIdList(idArr);
           setChangeInMasters(false);
         }
         else
-				setMasterLists({});
+					setMasterLists({});
       }).catch(()=>{
         setMasterLists({})
       })
@@ -154,11 +155,10 @@ export const MenuRouter = () => {
 		{ name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },
 		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },
 		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
-		{ name: "Default Cases", path:"/default", component: DefaultCases, icon: DefaultIcon },
+		{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
+		{ name: "Default Cases", path:"/default", component: SpecialCases, icon: DefaultIcon },
+		{ name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },
 		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
-
-		//{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
-		//{ name: "Critical Cases", path:"/critical", component: CriticalCases, icon: CriticalIcon },
 	]);
 	
 	return (

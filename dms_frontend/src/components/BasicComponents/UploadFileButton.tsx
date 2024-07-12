@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 
-import { toast } from "../ui/use-toast";
 import upload_icon from "./../static/upload_icon.svg";
+import Toast from "./Toast";
+import { ToastOptionsAttributes } from "./../../../DataTypes";
 
 function UploadFileButton(props:{index:number, AID:string, sectionName:string, docId:number|string, setAdded:Function, _id?:string, isPayment?:boolean}){
   const [files, setFiles] = useState<any>([]);
+
+  //useEffect(()=>console.log("file props",props),[props]);
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
   const uploadFile = async (userFiles:any) => {
     const { uploadFile } = useGlobalContext();
@@ -14,7 +18,7 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
     for (let i=0; i<userFiles.length; i++)
       formData.append("file", userFiles[i]);
 
-    console.log("submitting file","AID",props.AID,"index",props.docId,)
+    //console.log("submitting file",props)
     const res = await uploadFile(formData, `${props.AID}/${props.sectionName}`,props.docId, props._id, props.isPayment);
     return res;
   }
@@ -23,13 +27,12 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
     if (files && files.length>0)
       uploadFile(files).then(res=>{
         console.log("FILE UPLOADED",res);
-        if (res==200)
+        if (res==200){
           props.setAdded(true);
+          setToastOptions({open:true,type:"success", action:"add",section:"File"});
+        }
         else
-          toast({
-            description:"An error has occured",
-            className:"bg-white"
-          })
+          setToastOptions({open:true,type:"error", action:"add",section:"File"});
       });
   },[files]);
 
@@ -54,6 +57,7 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
           })
         }
       />
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
     </div>
   )
 };

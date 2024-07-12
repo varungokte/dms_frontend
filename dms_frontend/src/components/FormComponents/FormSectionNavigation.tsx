@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 
-function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean}) {
+function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, sectionCount:number, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean}) {
   const navigate = useNavigate();
 
   const [nextButtonValue, setNextButtonValue] = useState(<div className="flex flex-row place-content-center"><div>Next</div><ChevronRight/></div>);
@@ -39,10 +39,12 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
             </div>
           </button>
         }
-        
-        <button className="text-white bg-custom-1 rounded-xl h-12 w-36" type={props.isForm?"submit":"button"} onClick={()=>{props.isForm?{}:props.goToNextSection()}}>
+        {props.currentSection<props.sectionCount
+        ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36" type={props.isForm?"submit":"button"} onClick={()=>{props.isForm?{}:props.goToNextSection()}}>
           {nextButtonValue}
         </button>
+        :<></>
+        }
       </div>
   </div>
   )

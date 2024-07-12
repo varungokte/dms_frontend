@@ -136,8 +136,9 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   const submitSchedule = async (arr:{D:string, I?:number|string}[]) => {
     fieldValues["GS"] = arr;
     fieldValues["_loanId"] = props.loanId;
-    fieldValues["P"] = Number(fieldValues["P"])
+    fieldValues["P"] = Number(fieldValues["P"]);
     console.log("submitted", fieldValues);
+    fieldValues["ND"] = arr[0]["D"];
     const res = await addPaymentSchedule(fieldValues);
     console.log("response",res)
     if (res==200){
@@ -196,7 +197,7 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       </Dialog>
       {errorMessage}
       <br />
-      <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm={false} />
+      <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm={false} />
     </div>
   )
 }

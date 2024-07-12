@@ -1,12 +1,10 @@
 import { ReactElement, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { FieldAttributesList, FieldValues, LoanCommonProps } from "./../../../DataTypes";
+import { FieldAttributesList, FieldValues, LoanCommonProps, ToastOptionsAttributes } from "./../../../DataTypes";
 import { ContactTypeList, EmailRecipientList } from "../../../Constants";
 
 import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
-import { useToast } from "@/components/ui/use-toast";
-import { Toaster } from "../ui/toaster";
 
 import Filter from "../BasicComponents/Filter";
 import FormDialog from "../FormComponents/FormDialog";
@@ -18,6 +16,7 @@ import LoadingMessage from "../BasicComponents/LoadingMessage";
 import ProfileIcon from "../BasicComponents/ProfileIcon";
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
+import Toast from "../BasicComponents/Toast";
 
 function LoanContactDetails(props:LoanCommonProps) {
   const allContacts = "All Contacts";
@@ -58,9 +57,9 @@ function LoanContactDetails(props:LoanCommonProps) {
   const [searchString, setSearchString] = useState("");
   const [role, setRole] = useState(allContacts);
   const [added, setAdded] = useState(true);
-
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
+ 
   const {addContact, getContacts} = useGlobalContext();
-  const { toast } = useToast();
 
   useEffect(()=>{
     if (added)
@@ -108,12 +107,11 @@ function LoanContactDetails(props:LoanCommonProps) {
       
       if (res==200){
         setAdded(true);
-        toast({
-          title: "Success!",
-          description: "Contact Created",
-          className:"bg-white"
-        })
+        setToastOptions({open:true, type:"success", action:"add", section:"Contact"});
       }
+      else
+        setToastOptions({open:true, type:"error", action:"add", section:"Contact"});
+  
 
       return res;
     }
@@ -175,7 +173,6 @@ function LoanContactDetails(props:LoanCommonProps) {
           />
         </div>  
       </div>
-      <Toaster/>
       <div className="flex flex-row flex-wrap">
         {contacts
           ?role==allContacts && Object.keys(contacts).length!=0
@@ -197,7 +194,8 @@ function LoanContactDetails(props:LoanCommonProps) {
         }
       </div>
       <br/>
-      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

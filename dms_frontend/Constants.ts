@@ -1,4 +1,57 @@
 import { FieldValues } from "DataTypes";
+//import { useState } from "react";
+
+/* function mastersData(){
+  const [masters, setMasters] = useState({
+    ZoneList: ["-"],
+    LoanProductList:["-"],
+    FileTypeList:["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"],
+    UserRoleList:["-"],
+    IndustryList:["-"],
+    LoanTypeList:["-", "Long Term", "Short Term"],
+    DocumentRejectionReasonList:["-","Document is expired", "Document is incomplete", "Document is irrelevant"],
+    TableRowsPerPage:[-1,2,5,10]
+  });
+  
+  const [statusValues, setStatusValues] = useState({
+    PriorityList:["-", "Low", "Medium", "High"] as const,
+    UserStatusList:["-", "Unverified", "Active", "Inactive"] as const,
+    TeamStatusList:["-", "Active", "Inactive"] as const,
+    DocumentStatusList:["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const,
+    FileStatusList:["-", "Pending",  "Verified"] as const,
+  });
+  
+  const [constants, setConstants] = useState({
+    FrequencyList:["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"],
+    LoanSecuredList:["-","Secured","Unsecured"],
+    YesOrNoList:["-", "Yes","No"],
+    HolidayConventionList:["-","Precedent","Subsequent","None"],
+    InterestTypeList:["-", "Fixed","Manual"],
+  });
+  
+  const [documentCategories, setDocumentCategories] = useState({
+    TransactionCategoryList:["-", "Common Loan Agreements","Security Trustee Agreement","Lenders Agent Agreement","Escrow Agreement","Substitution Agreement","Subordination Agreement","Supplementary Escrow Agreement","Sponsors Undertakings","Security documents","Pledge Agreement","Consent to Assignment","Trust and Retention Account Agreement"],
+    ComplianceCategoryList:["-","Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement"],
+    CovenantCategoryList:["-", "Financial Covenant","Non-Financial Covenant"],
+    CovenantTypeList:["-", "Periodic", "Event-Based"],
+    ConditionPrecedentCategoryList:["-", "[PLACEHOLDER DATA] Condition A", "[PLACEHOLDER DATA] Condition B"],
+    ConditionSubsequentCategoryList:["-", "[PLACEHOLDER DATA] Condition A", "[PLACEHOLDER DATA] Condition B"],
+  });
+
+} */
+
+const masters = () =>{
+  return{
+    ZoneList: ZoneList,
+    LoanProductList:["-"],
+    FileTypeList:["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"],
+    UserRoleList:["-"],
+    IndustryList:["-"],
+    LoanTypeList:["-", "Long Term", "Short Term"],
+    DocumentRejectionReasonList:["-","Document is expired", "Document is incomplete", "Document is irrelevant"],
+    TableRowsPerPage:[-1,2,5,10]
+  }
+};
 
 //Masters
 const LoanProductList:string[] = ["-"];
@@ -63,7 +116,7 @@ const MastersMapping:FieldValues = {
   "Condition Subsequent Categories":ConditionSubsequentCategoryList,
 }
 
-export { MastersMapping,
+export { MastersMapping, masters,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,

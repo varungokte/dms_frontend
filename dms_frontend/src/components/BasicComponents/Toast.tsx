@@ -18,7 +18,7 @@ function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Funct
   
   return (
     <Snackbar open={props.toastOptions.open} 
-    onClose={handleClose}
+      onClose={handleClose}
       anchorOrigin={{vertical:"bottom", horizontal:"right"}} 
       autoHideDuration={5000}
     >

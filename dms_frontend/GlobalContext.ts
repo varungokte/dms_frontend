@@ -3,8 +3,8 @@ import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { FieldValues, UserSuggestionTypes } from 'DataTypes';
 
-const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
-//const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
+//const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
+const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
 //const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
 
 const encryption_key = "JAIBAJRANGBALI";
@@ -190,7 +190,6 @@ const editUser = async (data:object) => {
 	try {
 		const token = await getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		console.log("send data",data)
 		const response = await axios.post(`${Base_Url}/editUser`,{data:enc_data}, {
 			headers:{
 				"Authorization": `Bearer ${token}`
@@ -230,7 +229,6 @@ const getSingleUser = async (id:string) => {
 			params:{"_id":id}
 		});
 		const decryptedObject = await handleDecryption(response["data"]);
-		console.log("Single user information", decryptedObject);
 		return {status:response.status, obj:decryptedObject||{}};
 	}
 	catch(error:any) {
@@ -628,7 +626,7 @@ const fetchDocument = async (AID:string,section_name:string, file_name:string) =
 			responseType: 'blob',
 		});
 
-		const blob = new Blob([response.data], {type:"application/pdf"});
+		const blob = new Blob([response.data], {type:response.data.type});
 		let url = URL.createObjectURL(blob);
 		//URL.revokeObjectURL(url);
 		
@@ -787,6 +785,28 @@ const getPaymentSchedule = async (loanId:string) =>  {
 
 //deleteContact
 
+//assignlistCriticalCases
+
+//assignListDefault
+const getSpecialList = async (type:"def"|"crit") =>  {
+	try {
+		const token = getEncryptedToken();
+		const route = type=="def"?"assignlistDefault":"assignlistCriticalCases";
+		const response = await axios.get(`${Base_Url}/${route}`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		const decryptedObject = await handleDecryption(response.data);
+		
+		return {status: response.status, obj:decryptedObject||null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else
+			return {status: error.reponse.status, obj:null};;
+	}
+};
+
 const useGlobalContext = () => {
 	return {
 		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
@@ -805,6 +825,7 @@ const useGlobalContext = () => {
 		addToMasters,getMastersList,
 		getDealList,
 		addPaymentSchedule, getPaymentSchedule,
+		getSpecialList,
 	}
 }
 

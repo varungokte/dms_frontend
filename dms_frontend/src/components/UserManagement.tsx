@@ -11,7 +11,8 @@ import edit_icon from "./static/edit_icon.svg";
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
-import { FieldAttributesList, FieldValues } from "DataTypes";
+import { FieldAttributesList, FieldValues, ToastOptionsAttributes } from "DataTypes";
+import Toast from "./BasicComponents/Toast";
 
 function UserManagement(props:{label:string}){
   useEffect(()=>{
@@ -37,7 +38,8 @@ function UserManagement(props:{label:string}){
   const [added, setAdded] = useState(true);
   const [selectedUser,setSelectedUser] = useState(-1);
   const [userStatus, setUserStatus] = useState(-1);
-
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
+  
   const newUser = useGlobalContext().createUser;
   const changeUserInfo = useGlobalContext().editUser;
   const getUsers = useGlobalContext().getAllUsers;
@@ -86,8 +88,13 @@ function UserManagement(props:{label:string}){
 
     const res = await newUser(userValues);
 
-    if (res==200)
-      setAdded(true); 
+    if (res==200){
+      setAdded(true);
+      setToastOptions({open:true, type:"success", action:"add", section:"User"});
+    }
+    else
+      setToastOptions({open:true, type:"error", action:"add", section:"User"});
+
     
     return res;
   }
@@ -119,12 +126,16 @@ function UserManagement(props:{label:string}){
       userValues["UP"] = JSON.stringify(obj);
     }
 
-    //console.log("SUBMITTING", userValues);
+    console.log("SUBMITTING", userValues);
 
     const res = await changeUserInfo(userValues);
 
-    if (res==200)
+    if (res==200){
       setAdded(true);
+      setToastOptions({open:true, type:"success", action:"edit", section:"User"});
+    }
+    else
+      setToastOptions({open:true, type:"error", action:"edit", section:"User"});
 
     return res;
   }
@@ -185,6 +196,7 @@ function UserManagement(props:{label:string}){
           :<LoadingMessage sectionName="users" />
         }
       </div>
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
     </div>
   )
 }

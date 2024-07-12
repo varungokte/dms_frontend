@@ -65,7 +65,7 @@ type LoanCommonProps = {
   actionType:string, label:string, 
   AID:string, setAID:Function, 
   loanId:string, setLoanId:Function, 
-  currentSection:number, setCurrentSection:Function, 
+  currentSection:number, setCurrentSection:Function, sectionCount:number,
   goToNextSection:Function, 
   setOkToFrolic:Function, setUnsavedWarning:Function,
   showSecurityDetails:boolean, setShowSecurityDetails:Function,

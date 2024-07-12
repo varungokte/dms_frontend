@@ -3,21 +3,28 @@ import SelectField from "./SelectField";
 import PermissionsField from "./PermissionsField";
 import { FieldValues } from "DataTypes";
 
-function RoleField (props:{index:number, id: string, name:string, roleList:FieldValues[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function}){
+function RoleField (props:{index:number, id: string, name:string, roleList:FieldValues[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, edit?:boolean}){
   const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
-  const [currentRole, setCurrentRole] = useState("");
-  const [showRolePreset, setShowRolePreset] = useState(false);
+  const [currentRole, setCurrentRole] = useState<string>();
+  const [permissionsExist, setPermissionsExist] = useState(false);
 
-  useEffect(()=>console.log(props),[props])
+  //useEffect(()=>console.log("role props.prefillValues",props),[props])
 
   useEffect(()=>{
-    if (props.prefillValues["R"] && props.prefillValues["R"]!=currentRole){
-      if (currentRole!="" || !props.prefillValues["UP"] || (props.prefillValues["UP"] && Object.keys(props.prefillValues["UP"]).length==0))
-        setShowRolePreset(true);
+    if (!props.prefillValues)
+      return;
 
+    if (!permissionsExist && !currentRole){
+      setPermissionsExist(true);
+      if (props.prefillValues["R"])
+        setCurrentRole(props.prefillValues["R"]);
+    }
+
+    else if (currentRole!=props.prefillValues["R"]){
+      setPermissionsExist(false);
       setCurrentRole(props.prefillValues["R"]);
     }
-  },[props.prefillValues])
+  },[props.prefillValues]);
 
   useEffect(()=>{
     if (props.roleList==undefined)
@@ -26,29 +33,33 @@ function RoleField (props:{index:number, id: string, name:string, roleList:Field
     for (let i=0; i<props.roleList.length; i++)
       obj[props.roleList[i]["N"]]=props.roleList[i]["P"];
     setAllRolesPermissionsList(obj);
-  },[props.roleList])
+  },[props.roleList]);
 
   useEffect(()=>{
-    if (showRolePreset){
+    if (!currentRole)
+      return;
+    
+    if (!permissionsExist){
       props.setPrefillValues((curr:any)=>{
         curr["UP"]=allRolesPermissionsList[currentRole];
         return {...curr};
-      })}
-  },[allRolesPermissionsList,currentRole])
+      })
+    }
+  },[allRolesPermissionsList,currentRole,permissionsExist])
 
   return (
     <div>
       <SelectField index={props.index} id={props.id} name={props.name} options={["-"].concat(Object.keys(allRolesPermissionsList))} required={props.required} disabled={props.disabled} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
-      {currentRole==""
-        ?<></>
-        :<PermissionsField index={props.index} id={"UP"} name={"Permission"} 
+      {currentRole
+        ?<PermissionsField index={props.index} id={"UP"} name={"Permission"} 
           permissionPreset={props.prefillValues["UP"]} 
           required={props.required} disabled={props.disabled} 
           setPermissionSet={props.setPrefillValues}
         />
+        :<></>
       }
     </div>
   )
 };
 
-export default RoleField
+export default RoleField;

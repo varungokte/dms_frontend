@@ -27,7 +27,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
   useEffect(()=>{
     fetchDocument(props.AID, props.sectionName,props.fileName).then(res=>{
       if (res.status==200)
-        setShowDoc(<embed src={res.url+"#toolbar=0"} width="97%" height="95%" title="Document Viewer"/>)
+      setShowDoc(<iframe src={res.url+"#toolbar=0"} width="97%" height="95%" title="Document Viewer"></iframe>)
       else
         setShowDoc(<p className="text-center m-auto text-red-600">There was an error getting this file.</p>)
     }).catch(()=>{

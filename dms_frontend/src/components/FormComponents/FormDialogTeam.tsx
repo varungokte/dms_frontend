@@ -175,11 +175,12 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
   const getMemberSuggestions = async () => {
     const leadName = props.edit?props.prefillValues["L"]:props.prefillValues["L"].values["E"];
+    console.log("leadName",leadName);
     const res = await getUserSuggestions("TL",leadName);
+    console.log("member data", res);
     if (res.status==200){
       const arr = filterSuggestions(res.obj);
       setMemberSuggestions(arr);
-      //console.log ("THE MEMBER SUGGESTIONS", res.obj)
     }
     else
       setMemberSuggestions([]);
@@ -190,7 +191,6 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     if (res.status==200){
       res.obj["_id"]=props.currentFields["_id"];
       props.setPrefillValues({...res.obj});
-      //console.log("the returning data",res.obj)
       getLeaderSuggestions();
     }
     else
@@ -250,15 +250,16 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
               {field.fields.map((item, itemIndex)=>{
                 if (item.type=="combobox"){
                   let disableTeam = false;
-                  if ((item.id!="L" && !leaderSelected) || (item.id=="L" && leaderSelected))
+                  if ((item.id!="L" && !leaderSelected))
                     disableTeam=true;
 
                   const immutable = item.immutable==undefined?false:item.immutable
                   const disabled = item.disabled==undefined?false:item.disabled;
-                  //console.log(item.id,"is disabled", "disabled:",disabled, "immutable",immutable, "disableTeam", disableTeam,"final", (disabled||immutable) && disableTeam)
+                  if (item.id=="L")
+                    console.log(item.id,"is disabled", "disabled:",disabled, "immutable",immutable, "disableTeam", disableTeam,"final", (disabled||immutable) && disableTeam)
                   return <span key={index+"_"+itemIndex} className="mr-3">
                     <ComboboxField key={index} index={index} id={item.id} name={item.name} edit={props.edit}
-                      required={item.required} disabled={disabled||immutable||disableTeam} 
+                      required={item.required} disabled={disabled||immutable&&disableTeam} 
                       prefillValue={props.formType=="user"?props.prefillValues[item.id]:teamMembers[item.id]} setPrefillValues={props.setPrefillValues} multiple={item.multiple} suggestions={item.id=="L"?leaderSuggestions:memberSuggestions}
                     />
                   </span>

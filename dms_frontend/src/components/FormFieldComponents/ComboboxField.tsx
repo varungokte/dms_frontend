@@ -9,7 +9,9 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
 
   const [parameterToBeSent] = useState("E"); //Later this will be a prop
 
-  //useEffect(()=>console.log("combobox prefill values",props.prefillValue, props.suggestions),[props.prefillValue])
+  useEffect(()=>{
+      console.log("combobox props",props)
+  },[props])
 
   useEffect(()=>{
     if (props.prefillValue && props.suggestions.length!=0){
@@ -26,6 +28,10 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
     else  
       setDefaultValue(undefined);
   },[props.prefillValue,props.suggestions])
+
+/*   useEffect(()=>{
+    setDefaultValue(defaultValue) 
+  },[props.suggestions]) */
 
   useEffect(()=>{
     props.setPrefillValues((curr:any)=>{
@@ -51,10 +57,7 @@ function ComboboxField (props:{index:number|string, id: string, name:string, sug
         limitTags={1}
         //value={(props.edit && !props.multiple)?(defaultValue||null):(defaultValue||undefined)}
         
-        defaultValue={props.multiple
-          ?defaultValue 
-          :defaultValue
-        }
+        defaultValue={defaultValue}
 
         options={props.suggestions}
         getOptionLabel={(option:any)=>option.label}

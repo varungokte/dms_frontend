@@ -204,7 +204,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
           })}
         </div>
         <br/>
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
       </form>
       <br/>
     </div>

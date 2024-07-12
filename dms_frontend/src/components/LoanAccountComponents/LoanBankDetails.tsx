@@ -102,7 +102,7 @@ function LoanBankDetails(props:LoanCommonProps) {
       <br/>
       <form onSubmit={submitForm}>
         <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} />
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
       </form>
     </div>
   )

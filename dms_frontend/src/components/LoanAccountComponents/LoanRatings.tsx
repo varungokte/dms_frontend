@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "../../../Constants";
-import { FieldValues, FieldAttributesList, LoanCommonProps } from "DataTypes";
+import { FieldValues, FieldAttributesList, LoanCommonProps, ToastOptionsAttributes } from "DataTypes";
 
 import { DataTable } from "../BasicComponents/Table";
 import FormDialog from "../FormComponents/FormDialog";
@@ -10,6 +10,7 @@ import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
 import LoadingMessage from "../BasicComponents/LoadingMessage";
 
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import Toast from "../BasicComponents/Toast";
 //import Search from "../BasicComponents/Search";
 
 function LoanRatings(props:LoanCommonProps) {
@@ -29,6 +30,7 @@ function LoanRatings(props:LoanCommonProps) {
 
   const [ratingsList, setRatingsList] = useState<FieldValues[]>();
   const [added, setAdded] = useState(true);
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
   // const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
@@ -71,10 +73,13 @@ function LoanRatings(props:LoanCommonProps) {
     //console.log("SUBMITTED ratings NOW", data);
 
     const res  = await addRating(data);
+    
     if (res==200){
       setAdded(true);
+      setToastOptions({open:true, type:"success", action:"add", section:"Rating"});
     }
-    
+    else
+      setToastOptions({open:true, type:"error", action:"add", section:"Rating"});
     return res;
   }
 
@@ -98,14 +103,15 @@ function LoanRatings(props:LoanCommonProps) {
           ?ratingsList.length==0
             ?<EmptyPageMessage sectionName="ratings" />
             :<DataTable className="border"
-              headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]} headingClassNames={["text-center","text-center","text-center","text-center","text-center","text-center"]} 
+              headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]} 
               tableData={ratingsList} columnIDs={["A","T","DT","O","L","V",]} dataTypes={["text", "text", "date", "text", "text", "text"]}
               searchRows={[]} filterRows={[]} cellClassName={["text-center","text-center","text-center","text-center","text-center text-blue-500","text-center"]} 
             />
           :<LoadingMessage sectionName="ratings" />
         }
       </div>
-      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} />
     </div>
   )
 };

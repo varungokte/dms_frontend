@@ -149,7 +149,7 @@ function LoanDocuments(props:LoanCommonProps) {
         }
       </div>
       <br/>
-      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+      <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} />
     </div>
   )
 }

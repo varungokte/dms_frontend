@@ -251,6 +251,7 @@ function CreateLoanAccount() {
                 preexistingValues: preexistingData||{},
                 assignedTeam:assignedTeam||"",
                 teamList:teamList,
+                sectionCount:formSections.length-1
               }
             )
             :<LoadingMessage sectionName="details" />

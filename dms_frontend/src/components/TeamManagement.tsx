@@ -66,9 +66,6 @@ function TeamManagement(props:{label:string}){
   const [searchString, setSearchString] = useState("");
 
   useEffect(()=>{
-    selectedTeam;
-    searchString;
-    teamStatus;
     if (added){
       getTeamsList().then(res=>{
         console.log("res",res)

@@ -77,7 +77,7 @@ function LoanTeamSelection(props:LoanCommonProps){
             :<LoadingMessage sectionName="a list of teams" />
           }
         </div>
-        <FormSectionNavigation isForm={true} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} />
+        <FormSectionNavigation isForm={true} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} />
       </form>
     </div>
   )

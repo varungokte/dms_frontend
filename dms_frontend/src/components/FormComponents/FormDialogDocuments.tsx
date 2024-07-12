@@ -37,19 +37,25 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
   const [covType, setCovType]= useState("");
   const [enableUpload, setEnableUpload] = useState(false);
   const [docId, setDocId] = useState("");
-  const [recievedFilesFromServer, setRecievedFilesFromServer] = useState(false);
+  const [receivedFilesFromServer, setReceivedFilesFromServer] = useState(false);
   const [buttonText, setButtonText] = useState(<span>{currentTab=="details"?"Next":"Save"}</span>);
 
   useEffect(()=>{
-    if (!open)
+    if (!open){
       setPrefillValues({});
+      setFileList([]);
+      setEnableUpload(false);
+    }
   },[open]);
 
   useEffect(()=>{
+    if (!open)
+      return;
+
     if (props.edit){
       if (props.currentFields["FD"]){
         setFileList(props.currentFields["FD"]);
-        setRecievedFilesFromServer(true);
+        setReceivedFilesFromServer(true);
       }
 
       setDocId(props.currentFields["_id"]||"")
@@ -58,7 +64,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
     }
     else
       setPrefillValues({...props.currentFields});
-  },[props.currentFields]);
+  },[props.currentFields,open]);
 
 
   useEffect(()=>{
@@ -260,7 +266,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
           <TabsContent value="upload">
             <Card className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
               <CardContent className="border-0">
-                <FileField key={100} index={100} fileType={fileType} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} receivedFilesFromServer={recievedFilesFromServer} />
+                <FileField key={100} index={100} fileType={fileType} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} receivedFilesFromServer={receivedFilesFromServer} setReceivedFilesFromServer={setReceivedFilesFromServer} />
               </CardContent>
             </Card>
           </TabsContent>
@@ -276,11 +282,11 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
   )
 };
 
-function FileField (props:{index:number, fileType:number, fileList:any, fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean }) {
+function FileField (props:{index:number, fileType:number, fileList:any, fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean, setReceivedFilesFromServer:Function }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone({multiple:false, useFsAccessApi:false});
   
   const [error, setError] = useState(<></>);
-  
+
   useEffect(()=>{
     updateFilelist();
   },[acceptedFiles]);
@@ -304,14 +310,18 @@ function FileField (props:{index:number, fileType:number, fileList:any, fileSett
   }
 
   const obliterateFile = async () => {
-    if (!props.receivedFilesFromServer){
+    if (acceptedFiles.length>0){
       acceptedFiles.pop();
       updateFilelist(true);
     }
-    else{
-      const res = await props.deleteFile(props.docId,props.fileList[0].filename);
-      if (res==200)
+    
+    if (props.receivedFilesFromServer && props.fileList && props.fileList.length>0){
+      const filename = props.fileList[0].filename;
+      const res = await props.deleteFile(props.docId,filename);
+      if (res==200){
         updateFilelist(true);
+        props.setReceivedFilesFromServer(false);
+      }
       else
         setError(<p className="text-yellow-700">Something went wrong. Try again later.</p>)
     }  

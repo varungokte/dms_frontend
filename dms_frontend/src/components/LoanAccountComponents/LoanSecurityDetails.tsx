@@ -146,7 +146,7 @@ function LoanSecurityDetails(props:LoanCommonProps){
             })}
           </div>
           <FormRepeatableGrid key={2} fieldList={fieldListRepeatable.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} />
-          <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
+          <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} sectionCount={props.sectionCount} isForm enableLoadingSign={enableLoadingSign} />
           <br/>
         </form>
       }

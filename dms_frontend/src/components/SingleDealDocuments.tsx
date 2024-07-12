@@ -39,9 +39,10 @@ function SingleDealDocuments(props:{loanId:string, AID:string, sectionDetails:Do
           :<DataTable 
             headingRows={["Document Name", "Document Category", "Physical Location", "Execution Location", "Priority", "Start Date", "End Date", "Status", "Action"]}
             headingClassNames={[ "w-[15%] text-center","w-[15%] text-center", "w-[10%] text-center", "w-[10%] text-center", "w-[5%] text-center", "w-[10%] text-center","w-[10%] text-center","w-[10%] text-center","text-center"]} 
-            tableData={docData} columnIDs={["N", "C", "PL","EL","P", "SD","ED","S"]} dataTypes={["text","text","text","text","priority","date","date","doc-status","action"]}
+            tableData={docData} 
+            columnIDs={["N", "C", "PL","EL","P", "SD","ED","S"]} 
+            dataTypes={["text","text","text","text","priority","date","date","doc-status","action"]}
             cellClassName={["text-center","text-center","text-center","text-center","text-center","text-center","text-center","text-center"]}
-            searchRows={[]} filterRows={[]}
             action={
               docData.map((doc:any,index:number)=>{
                 if (doc["S"]==DocumentStatusList[1])

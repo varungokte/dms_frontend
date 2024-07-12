@@ -45,29 +45,6 @@ function FormDialog(props:FormDialogProps){
       setPrefillValues({});
   },[open]);
 
-  const teamMembersRenamingWhileSubmitting = () => {
-    const data:FieldValues={};
-    data["_id"]=prefillValues["_id"];
-    data["N"]=prefillValues["N"];
-    data["L"]=prefillValues["L"];
-    const sections = ["TD","CD","C","CP","CS","PD"];
-    for (let i=0; i<sections.length; i++){
-      const section = sections[i];
-      const obj = prefillValues[section];
-      if (!prefillValues[`${section}M`])
-        data[`${section}M`] = obj["M"];
-      else
-        data[`${section}M`] = prefillValues[`${section}M`].map((obj:any)=>obj.values["E"])
-      if (!prefillValues[`${section}C`])
-        data[`${section}C`] = obj["C"];
-      else
-      data[`${section}C`] = prefillValues[`${section}C`].map((obj:any)=>obj.values["E"])
-
-    }
-    console.log("teamMembersRenamingWhileSubmitting result",data);
-    return data;
-  }
-
   const findMissingFields = () => {
     const data:any={};
     for (let i=0; i<props.form.length; i++){
@@ -90,7 +67,7 @@ function FormDialog(props:FormDialogProps){
     for (let i=0;i<Object.keys(requiredList).length;i++){
       let key = Object.keys(requiredList)[i];
       let value = requiredList[key];
-      data = (props.type=="team" && props.edit)?teamMembersRenamingWhileSubmitting():{...prefillValues};
+      data = {...prefillValues};
 
       if (key=="P" && props.edit)
         continue;
@@ -103,23 +80,15 @@ function FormDialog(props:FormDialogProps){
     }
 
     setErrorMessage(<></>);
-    if (props.type=="team" && props.edit)
-      return data;
     return true;
   }
 
   const submitFunction = async () => {
-    let okToSubmit = validateRequiredFields();
-    let submittedData:any = false;
-    //console.log("VALIDATED",okToSubmit);
-    if (typeof okToSubmit!="boolean"){
-      submittedData=okToSubmit;
-      okToSubmit=true;
-    }
+    const okToSubmit = validateRequiredFields();
     if(okToSubmit){
       //console.log("prefillValues",prefillValues)
       setSubmitButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />);
-      const res = await props.formSubmit(submittedData==false?{...prefillValues}:submittedData,props.index);
+      const res = await props.formSubmit({...prefillValues},props.index);
       setSubmitButtonText(<span>{props.submitButton}</span>)
       if (res==200)
         setOpen(false);
@@ -165,9 +134,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   const [filteredSuggestions, setFilteredSuggestions] = useState<UserSuggestionsList>([]);
   const [oldZone, setOldZone] = useState("");
 
-  const [teamMembers, setTeamMembers] = useState<FieldValues>({});
-
-  const {getUserSuggestions, getSingleUser, getRolesList, getSingleTeam} = useGlobalContext();
+  const {getUserSuggestions, getSingleUser, getRolesList} = useGlobalContext();
 
   const listRoles = async () => {
     const res = await getRolesList();
@@ -185,10 +152,9 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
   const listSuggestions = async (suggestionType?:UserSuggestionTypes) => {
     const res = await getUserSuggestions(suggestionType?suggestionType:props.suggestions||"RM");
-    //console.log("sugg",props.suggestions, res.obj)
-    if (res.status==200){
+    console.log("sugg",props.suggestions, res.obj)
+    if (res.status==200)
       setAllSuggestions(res.obj);
-    }
     else
       return [];
   }
@@ -206,13 +172,15 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
       if (!restrictedByZone || (restrictedByZone && props.prefillValues && obj.Z==props.prefillValues["Z"]))
         arr.push({label:`${obj.N}<${obj.E}>`, values:obj})
     }
-
     setFilteredSuggestions(arr);
   }
+
+  useEffect(()=>console.log("filtered suggestions",filteredSuggestions),[filteredSuggestions])
 
   const getUserData = async () => {
     const res = await getSingleUser(props.currentFields["_id"]);
     if (res.status==200){
+      console.log("single user data",res.obj)
       props.setPrefillValues({...res.obj});
       setOldZone("");
     }
@@ -220,36 +188,9 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
       props.setPrefillValues({});
   }
 
-  const getTeamData = async () => {
-    const res = await getSingleTeam(props.currentFields["_id"]);
-    if (res.status==200){
-      res.obj["_id"]=props.currentFields["_id"];
-      props.setPrefillValues({...res.obj});
-    }
-    else
-      props.setPrefillValues({});
-  }
-
-  const teamMembersCombinedToSeparate = () => {
-    const data:any={};
-    data["_id"]=props.prefillValues["_id"];
-    data["L"]=props.prefillValues["L"];
-    const sections = ["TD","CD","C","CP","CS","PD"];
-    for (let i=0; i<sections.length; i++){
-      const section = sections[i];
-      const obj = props.prefillValues[section];
-      data[`${section}M`] = obj["M"];
-      data[`${section}C`] = obj["C"];
-    }
-    setTeamMembers(data);
-  }
-  
   useEffect(()=>{
-    if (props.edit){
-      if (props.formType=="user")
+    if (props.edit&& props.formType=="user"){
         getUserData();
-      else if (props.formType=="team")
-        getTeamData();
     }
 
     if (props.getRoles)
@@ -262,16 +203,6 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   useEffect(()=>{
     filterSuggestions(allSuggestions);
   },[allSuggestions,props.prefillValues["Z"]])
-
-  useEffect(()=>{
-    if (props.edit && props.formType=="team" && Object.keys(props.prefillValues).length!=0)
-      teamMembersCombinedToSeparate();
-
-    if (props.formType=="team" && props.prefillValues && props.prefillValues["L"])
-      getUserSuggestions("TL",props.prefillValues["L"].values["E"]).then(res=>{
-        console.log("suggestions TL",res)
-      })
-  },[props.prefillValues]);
 
   useEffect(()=>{
     if (props.prefillValues && oldZone && props.prefillValues["Z"]!=oldZone){
@@ -295,7 +226,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
         if (field["type"]=="combobox")
           return <ComboboxField key={index} index={index} id={field["id"]} name={field["name"]} edit={props.edit}
             required={field["required"]} disabled={field["disabled"]||(field["immutable"]&&props.edit)} 
-            prefillValue={props.formType=="user"?props.prefillValues[field["id"]]:teamMembers[field["id"]]} setPrefillValues={props.setPrefillValues} multiple={field["multiple"]} suggestions={filteredSuggestions}
+            prefillValue={props.prefillValues[field["id"]]} setPrefillValues={props.setPrefillValues} multiple={field["multiple"]} suggestions={filteredSuggestions}
           />
         else if (field["type"]=="role")
           return <RoleField key={index} index={index} id={field["id"]} name={field["name"]} roleList={roles||[]}
@@ -363,7 +294,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
                   return <span key={index+"_"+itemIndex} className="mr-3">
                     <ComboboxField key={index} index={index} id={item["id"]} name={item["name"]} edit={props.edit}
                       required={item["required"]} disabled={item["disabled"]||(item["immutable"]&&props.edit)} 
-                      prefillValue={props.formType=="user"?props.prefillValues[item["id"]]:teamMembers[item["id"]]} setPrefillValues={props.setPrefillValues} multiple={item["multiple"]} suggestions={filteredSuggestions}
+                      prefillValue={props.prefillValues[item["id"]]} setPrefillValues={props.setPrefillValues} multiple={item["multiple"]} suggestions={filteredSuggestions}
                     />
                   </span> 
                 else if (item["type"]=="select")

@@ -33,7 +33,9 @@ function HeaderRows(props:HeaderRowsProps){
     <TableHead>
       <TableRow>
       {props.headingRows.map((heading,index)=>{
-        return <TableCell key={index} className={(props.headingClassNames && props.headingClassNames[index])?props.headingClassNames[index]:""}>{heading}</TableCell>
+        return <TableCell key={index}>
+          <div className={(props.headingClassNames && props.headingClassNames[index])?props.headingClassNames[index]:""}>{heading}</div>
+        </TableCell>
       })}
       </TableRow>
     </TableHead>
@@ -88,7 +90,7 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
           return handleCountTeam(props.singleRow, cellClassName, uniqueIndex);
     
         const item = props.singleRow[props.columns[props.dataTypes[0]=="index"?index-1:index]];
-        const documentLink=(props.documentLinks && props.documentLinks[index])?props.documentLinks[index]:"";
+        const documentLink=(props.documentLinks && props.documentLinks[props.rowIndex])?props.documentLinks[props.rowIndex]:"";
         
         if (dataType=="date")
           return handleDate(item, cellClassName,uniqueIndex);
@@ -114,7 +116,7 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
 }
 
 const handleIndex = (index:number, cellClassName:string, uniqueIndex:string) =>{
-  return <TableCell key={uniqueIndex}  className={cellClassName}>{index}</TableCell>
+  return <TableCell key={uniqueIndex}><div className={cellClassName}>{index}</div></TableCell>
 }
 
 const handleText = (item:string, cellClassName:string, uniqueIndex:string) => {
@@ -137,8 +139,8 @@ const handlePriority = (priority:Priority, cellClassName:string, uniqueIndex:str
 
 const handleDocStatus = (status:DocumentStatus, cellClassName:string, uniqueIndex:string) => {
   return(
-    <TableCell key={uniqueIndex} className={`${DocumentStatusStyling[DocumentStatusList.indexOf(status)]} ${cellClassName}`}>
-      {status}
+    <TableCell key={uniqueIndex}>
+      <span className={`${DocumentStatusStyling[DocumentStatusList.indexOf(status)]} ${cellClassName}`}>{status}</span> 
     </TableCell>
   )
 }

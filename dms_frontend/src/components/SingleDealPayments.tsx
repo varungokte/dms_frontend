@@ -21,6 +21,8 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
       getPaymentSchedule(props.loanId).then((res)=>{
         console.log("payment schedule",res);
         if (res.status==200){
+          if (res.obj["T"]=="Fixed")
+            res.obj["GS"].map((inst:any)=>{inst["I"]=res.obj["I"];});
           setPaymentData(res.obj["GS"]);
           setAdded(false);
           setScheduleId(res.obj["_id"])
@@ -39,9 +41,9 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
         ?paymentData.length==0
           ?<EmptyPageMessage sectionName="installments" />
           :<DataTable 
-            headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Action"]} headingClassNames={["w-[100px] text-center","text-center","text-center","text-center"]}
+            headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Action"]} headingClassNames={["w-[100px] text-center","",""," w-[200px]"]}
             tableData={paymentData} columnIDs={["D","I"]} dataTypes={["index","date","text","action"]}
-            cellClassName={["w-[100px] text-center","text-center","text-center","text-center"]} 
+            cellClassName={["w-[100px] text-center","text-center","text-center","text-center w-[200px]"]} 
             searchRows={[]} filterRows={[]}
             action={
               paymentData.map((inst:any,index:number)=>{
