@@ -2,7 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import moment from "moment";
 import { FieldValues, GridFieldAttributes, LoanCommonProps } from "DataTypes";
-import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanTypeList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
+import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanStatusList, LoanTypeList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
 
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
@@ -16,19 +16,19 @@ import IntegerField from "../FormFieldComponents/IntegerField";
 function LoanBasicDetails(props:LoanCommonProps) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   
-  const [fieldList] = useState<GridFieldAttributes>( {category:"grid",row:4, fields:[
+  const fieldList:GridFieldAttributes = {category:"grid",row:4, fields:[
     { id:"CN", name:"Company Name", type:"text", required: true },
     { id:"GN", name:"Group Name", type:"text", required: false },
     { id:"I", name:"Industry", type:"select", options:IndustryList, required: true },
     { id:"Z", name:"Zone", type:"select", options:ZoneList, required: true },
-    { id:"P", name:"Loan Product", type:"select", options:LoanProductList, required: false },
+    { id:"P", name:"Loan Product", type:"select", options:LoanProductList, required: true },
     { id:"T", name:"Loan Type", type:"select", options:LoanTypeList, required: true },
     { id:"ST", name:"Secured", type:"select", options:LoanSecuredList, required: true }, 
     { id:"PS", name:"Project Status", type:"select", options:ProjectStatusList, required: true },
+    { id:"S", name:"Loan Status", type:"select", options:LoanStatusList, required:true},
     { id:"PN", name:"PAN Number", type:"text", required: false },
     { id:"GST", name:"GST Number", type:"text", required: false },
     { id:"CIN", name:"CIN Number", type:"text", required: false },
-    { id:"break", name:"break", type:"break", required:false },
     { id:"SD", name:"Sanction Date", type:"date", required: true },
     { id:"DD", name:"Downsell Date", type:"date", required: false },
     { id:"CD", name:"Loan Closure Date", type:"date", required: false },
@@ -39,10 +39,9 @@ function LoanBasicDetails(props:LoanCommonProps) {
     { id:"OA", name:"Outstanding Amount", type:"integer", required: false },
     { id:"A", name:"DSRA Applicability", type:"select", options:YesOrNoList, required: false },
     { id:"F", name:"DSRA Form", type:"select", options:DSRAFormList, required: false },
-    { id:"S", name:"DSRA Created or Not", type:"select", options:YesOrNoList, required: false },
+    { id:"DS", name:"DSRA Created or Not", type:"select", options:YesOrNoList, required: false },
     { id:"V", name:"DSRA Amount", type:"integer", required: false },
-    ]}
-  );
+    ]};
 
   const [validationErrors, setValidationErrors] = useState<{[key:string]:string}>({});
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
@@ -77,9 +76,24 @@ function LoanBasicDetails(props:LoanCommonProps) {
   },[props.preexistingValues]);
 
   useEffect(()=>{
-    if (Object.keys(props.preexistingValues).length!=0)
+    //console.log("Field values",fieldValues)
+    if (Object.keys(props.preexistingValues).length!=0){
+      //console.log("no changes?",compareFieldsToPreexisting())
       props.setUnsavedWarning(!compareFieldsToPreexisting());
-  },[fieldValues,props.preexistingValues])
+    }
+  },[fieldValues,props.preexistingValues]);
+
+  useEffect(()=>{
+    if (fieldValues["A"] && fieldValues["A"]==YesOrNoList[2]){
+      setFieldValues(curr=>{
+        curr["F"] = "";
+        curr["DS"] = "";
+        curr["V"] = "";
+        return {...curr};
+      })
+    }
+  },[fieldValues["A"]])
+
 
   const {createLoan} = useGlobalContext();  
   const { toast } = useToast();
@@ -88,26 +102,26 @@ function LoanBasicDetails(props:LoanCommonProps) {
     let no_changes = true;
     for (let i=0; i<fieldList["fields"].length; i++){
       const id = fieldList["fields"][i].id;
-      if (id=="break")
-        break;
+      if (id=="break"||id=="DA")
+        continue;
       let isDateField = false;
       fieldList["fields"].map(obj=>{if (obj.id==id && obj.type=="date") isDateField=true;})
-      if (fieldValues[id] && (props.preexistingValues[id]!=fieldValues[id] || (isDateField && fieldValues[id]==moment(props.preexistingValues[id]).format("yyyy-MM-DD"))))
-        no_changes= false;
+      if (fieldValues[id] && (!isDateField && props.preexistingValues[id]!=fieldValues[id] || (isDateField && fieldValues[id]!=moment(props.preexistingValues[id]).format("yyyy-MM-DD")))){
+        console.log("a change - ",id,"fieldvalues", fieldValues[id], "prefil value",props.preexistingValues[id], moment(props.preexistingValues[id]).format("yyyy-MM-DD"))
+        no_changes= false;}
     }
     return no_changes;
   }
 
   const submitForm = async (e:FormEvent) => {
     e.preventDefault();
-    
     const data:FieldValues={};
     const dsra:FieldValues={};
 
     Object.keys(fieldValues).map(field=>{
       if (field=="A" && fieldValues[field]==YesOrNoList[2])
         dsra[field] = fieldValues[field]
-      else if (field=="A" || field=="F" || field=="S" || field=="V"){
+      else if (field=="A" || field=="F" || field=="DS" || field=="V"){
         if (fieldValues[field] && fieldValues[field]!=props.preexistingValues[field])
           dsra[field] = fieldValues[field];
       }
@@ -188,23 +202,23 @@ function LoanBasicDetails(props:LoanCommonProps) {
             let disabled = false;
             if (field.id=="break")
               return<div key={index}></div>
-            else if ((!fieldValues["A"] || fieldValues["A"]=="" || fieldValues["A"]==YesOrNoList[2]) && (field.id=="F" || field.id=="S" || field.id=="V"))
+            else if ((!fieldValues["A"] || fieldValues["A"]=="" || fieldValues["A"]==YesOrNoList[2]) && (field.id=="F" || field.id=="DS" || field.id=="V"))
               disabled=true;
-            else if (field.id=="DA")            
+            else if (field.id=="DA")    
               disabled=true;
             
             if (field.type=="select")
-              return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required||false} disabled={disabled} />
+              return <SelectField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
             else if (field.type=="integer")
-              return <IntegerField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
+              return <IntegerField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
             else if (field.type=="date")
-              return <DateField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={disabled} />
+              return <DateField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
             else
-              return <TextField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} type={field.type||""} required={field.required||false} disabled={disabled} errorMessage={errorMessage} />
+              return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} size="large" disabled={props.actionType=="VIEW"||disabled} />
           })}
         </div>
         <br/>
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} actionType={props.actionType} />
       </form>
       <br/>
     </div>

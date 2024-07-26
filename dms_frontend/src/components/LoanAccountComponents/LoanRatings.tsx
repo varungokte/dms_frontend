@@ -11,20 +11,21 @@ import LoadingMessage from "../BasicComponents/LoadingMessage";
 
 import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import Toast from "../BasicComponents/Toast";
+import { Pagination } from "../BasicComponents/Pagination";
 //import Search from "../BasicComponents/Search";
 
 function LoanRatings(props:LoanCommonProps) {
 
-  const [fieldList] = useState<FieldAttributesList>([
+  const fieldList: FieldAttributesList = [
     { category: "grid", row:2, sectionName:"", fields: [
       { id: "A", type: "select", name: "Rating Agency", options: RatingAgencyList, required:true },
       { id: "T", type: "select", name: "Rating Type", options: RatingTypeList, required:true },
       { id: "DT", type: "date", name: "Date", required:true },
       { id: "O", type: "select", name: "Outlook", options: RatingOutlookList, required:true },
-      { id: "L", type: "text", name: "Link", required:true },
       { id: "V", type: "text", name: "Rating Value", required:true },
+      { id: "L", type: "text", name: "Link", required:true },
     ]}
-  ]);
+  ];
 
   const {addRating, getRatingsList} = useGlobalContext();
 
@@ -33,16 +34,26 @@ function LoanRatings(props:LoanCommonProps) {
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
   // const [searchString, setSearchString] = useState("");
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   useEffect(()=>{
     props.setUnsavedWarning(false);
-  },[])
+  },[]);
+
+  useEffect(()=>{
+    setAdded(true);
+  },[currentPage,rowsPerPage]);
 
   useEffect(()=>{
     if (added){
-      getRatingsList(props.loanId).then((res)=>{
-        //console.log(res.arr)
-        if (res.status==200)
-          setRatingsList(res.arr);
+      getRatingsList({loanId:props.loanId, currentPage:currentPage, rowsPerPage:rowsPerPage}).then((res)=>{
+        console.log("ratings response",res.arr)
+        if (res.status==200){
+          setRatingsList(res.arr[0]["data"]);
+          setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+        }
         else
           setRatingsList([]);
       }).catch(err=>{
@@ -51,7 +62,7 @@ function LoanRatings(props:LoanCommonProps) {
       })
       setAdded(false);
     }
-  },[added])
+  },[added]);
 
   const createRating = async (userValues:any) =>{
     const data:FieldValues = {};
@@ -90,27 +101,36 @@ function LoanRatings(props:LoanCommonProps) {
           {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
         <div>
-          <FormDialog index={-1} type="rate"
-            triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
-            formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
-            form={fieldList} currentFields={{}}
-          />
+          {props.actionType=="VIEW"
+            ?<></>
+            :<FormDialog index={-1} type="rate"
+              triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
+              formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
+              form={fieldList} currentFields={{}}
+            />
+          }
         </div>
       </div>
 
+    
       <div className="m-5">
         {ratingsList
           ?ratingsList.length==0
             ?<EmptyPageMessage sectionName="ratings" />
             :<DataTable className="border"
-              headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Link", "Rating Value"]} 
-              tableData={ratingsList} columnIDs={["A","T","DT","O","L","V",]} dataTypes={["text", "text", "date", "text", "text", "text"]}
-              searchRows={[]} filterRows={[]} cellClassName={["text-center","text-center","text-center","text-center","text-center text-blue-500","text-center"]} 
+              headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Rating Value", "Link"]} 
+              tableData={ratingsList} columnIDs={["A","T","DT","O","V","L"]} dataTypes={["text", "text", "date", "text", "text", "text"]}
+              searchRows={[]} filterRows={[]} cellClassName={["","","","","","text-blue-500"]} 
             />
           :<LoadingMessage sectionName="ratings" />
         }
       </div>
+      {ratingsList && ratingsList.length>0
+        ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        :<></>
+      }
       {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
+      <br />
       <FormSectionNavigation isForm={false} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} />
     </div>
   )

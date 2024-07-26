@@ -1,57 +1,81 @@
 import { FieldValues } from "DataTypes";
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, CriticalIcon, ReminderIcon } from "./src/components/static/PanelIcons"
+
+import Dashboard from './src/components/Dashboard';
+import LoanAccount from './src//components/LoanAccount';
+import DealsList from './src//components/DealsList';
+import UserManagement from './src//components/UserManagement';
+import RoleManagement from './src//components/RoleManagement';
+import FilterPage from './src//components/FilterPage';
+import TeamManagement from './src//components/TeamManagement';
+import Masters from './src//components/Masters';
+import SpecialCases from './src//components/SpecialCases';
+import Reminders from './src//components/Reminders';
+import Reports from './src//components/Reports';
+import _TestComponent from './src//components/_TestComponent';
 //import { useState } from "react";
 
-/* function mastersData(){
-  const [masters, setMasters] = useState({
-    ZoneList: ["-"],
-    LoanProductList:["-"],
-    FileTypeList:["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"],
-    UserRoleList:["-"],
-    IndustryList:["-"],
-    LoanTypeList:["-", "Long Term", "Short Term"],
-    DocumentRejectionReasonList:["-","Document is expired", "Document is incomplete", "Document is irrelevant"],
-    TableRowsPerPage:[-1,2,5,10]
-  });
-  
-  const [statusValues, setStatusValues] = useState({
-    PriorityList:["-", "Low", "Medium", "High"] as const,
-    UserStatusList:["-", "Unverified", "Active", "Inactive"] as const,
-    TeamStatusList:["-", "Active", "Inactive"] as const,
-    DocumentStatusList:["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const,
-    FileStatusList:["-", "Pending",  "Verified"] as const,
-  });
-  
-  const [constants, setConstants] = useState({
-    FrequencyList:["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"],
-    LoanSecuredList:["-","Secured","Unsecured"],
-    YesOrNoList:["-", "Yes","No"],
-    HolidayConventionList:["-","Precedent","Subsequent","None"],
-    InterestTypeList:["-", "Fixed","Manual"],
-  });
-  
-  const [documentCategories, setDocumentCategories] = useState({
-    TransactionCategoryList:["-", "Common Loan Agreements","Security Trustee Agreement","Lenders Agent Agreement","Escrow Agreement","Substitution Agreement","Subordination Agreement","Supplementary Escrow Agreement","Sponsors Undertakings","Security documents","Pledge Agreement","Consent to Assignment","Trust and Retention Account Agreement"],
-    ComplianceCategoryList:["-","Common Loan Agreement", "Lenders' Agent Agreement", "Power Purchase Agreement", "Escrow Agreement", "Subordinate Agreement", "Supplementary Escrow Agreement"],
-    CovenantCategoryList:["-", "Financial Covenant","Non-Financial Covenant"],
-    CovenantTypeList:["-", "Periodic", "Event-Based"],
-    ConditionPrecedentCategoryList:["-", "[PLACEHOLDER DATA] Condition A", "[PLACEHOLDER DATA] Condition B"],
-    ConditionSubsequentCategoryList:["-", "[PLACEHOLDER DATA] Condition A", "[PLACEHOLDER DATA] Condition B"],
-  });
+const sectionNames:FieldValues = {
+  "Masters":"masters",
+  "Role Management":"role",
+  "Team Management":"team",
+  "User Management":"user",
+  "Loan Account":"loan",
+  "Contact Details":"contact",
+  "Ratings":"rating",
+  "Transaction Documents":"transaction",
+  "Compliance Documents":"compliance",
+  "Covenants":"covenants",
+  "Condition Precedent":"precedent",
+  "Condition Subsequent":"subsequent",
+  "Payment Schedule":"payment",
+  "Reminders":"reminders",
+  "Default Cases":"default",
+  "Critical Cases":"critical",
+  "Reports":"reports",
+}
 
-} */
+const allComponents = [
+  { name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
+  { name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
+  { name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
+  { name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
+  { name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
+  { name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
+  { name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },
+  { name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },
+  { name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },
+  { name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },
+  { name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },
+  { name: "Payment Schedule", path:"/schedule", component: DealsList, icon: ScheduleIcon},
+  { name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },
+  { name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },
+  { name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
+  { name: "Default Cases", path:"/default", component: SpecialCases, icon: DefaultIcon },
+  { name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },
+  { name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
+  { name: "Test", path:"/test", component: _TestComponent },
+];
 
-const masters = () =>{
-  return{
-    ZoneList: ZoneList,
-    LoanProductList:["-"],
-    FileTypeList:["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"],
-    UserRoleList:["-"],
-    IndustryList:["-"],
-    LoanTypeList:["-", "Long Term", "Short Term"],
-    DocumentRejectionReasonList:["-","Document is expired", "Document is incomplete", "Document is irrelevant"],
-    TableRowsPerPage:[-1,2,5,10]
-  }
+const documentSectionNames = [
+  { fullname: "Transaction Documents", shortname: "transaction", keyname:"TD", type: "doc" },
+  { fullname: "Compliance Documents", shortname: "compliance", keyname:"CD", type: "doc" },
+  { fullname: "Covenants", shortname: "covenants", keyname:"C", type: "cov" },
+  { fullname: "Condition Precedent", shortname: "precedent", keyname:"CP", type: "con" },
+  { fullname: "Condition Subsequent", shortname: "subsequent", keyname:"CS", type: "con" },
+  { fullname: "Payment Schedule", shortname: "payment", keyname:"PD", type: "pay" }
+];
+
+const getDocSecName = (inputName:string, inputType:"fullname"|"keyname"|"shortname"|"type", outputType:"fullname"|"keyname"|"shortname"|"type") => {
+  documentSectionNames.map(doc=>{
+    if (doc[inputType]==inputName)
+      return doc[outputType];
+  });
+  return "";
 };
+const getDocSecList = (outputType:"fullname"|"keyname"|"shortname"|"type") =>{
+  return documentSectionNames.map(doc=>doc[outputType]);
+} 
 
 //Masters
 const LoanProductList:string[] = ["-"];
@@ -69,6 +93,7 @@ const UserStatusList = ["-", "Unverified", "Active", "Inactive"] as const;
 const TeamStatusList = ["-", "Active", "Inactive"] as const;
 const DocumentStatusList = ["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const;
 const FileStatusList = ["-", "Pending",  "Verified"] as const;
+const LoanStatusList = ["-","Preliminary", "Document", "Live", "Hold", "Cancel"] as const;
 
 //Basics
 const FrequencyList:string[] = ["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"];
@@ -116,14 +141,15 @@ const MastersMapping:FieldValues = {
   "Condition Subsequent Categories":ConditionSubsequentCategoryList,
 }
 
-export { MastersMapping, masters,
+export { 
+  MastersMapping, sectionNames, allComponents, getDocSecList,getDocSecName,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
-  PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList,
+  PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList, LoanStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,
   ProjectStatusList,DSRAFormList, LoanSecurityTypeList,BankAccountTypeList, 
   ContactTypeList, EmailRecipientList,
   RatingAgencyList,RatingTypeList,RatingOutlookList,
   TransactionCategoryList,ComplianceCategoryList,
   CovenantCategoryList,CovenantTypeList,
-  ConditionPrecedentCategoryList,ConditionSubsequentCategoryList
+  ConditionPrecedentCategoryList,ConditionSubsequentCategoryList,
 };

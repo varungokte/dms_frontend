@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { FieldAttributesList, FieldValues, FormDialogTypes, UserSuggestionsList } from "DataTypes";
+import { FieldAttributesList, FieldValues, UserSuggestionsList } from "DataTypes";
 
 import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
@@ -8,10 +8,11 @@ import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
 import ComboboxField from "../FormFieldComponents/ComboboxField";
 import TextField from "../FormFieldComponents/TextField";
-import { CircularProgress } from "@mui/material";
+import SubmitButton from "../BasicComponents/SubmitButton";
+import FormFieldsRender from "./FormFieldsRender";
 
 type FormDialogProps = {
-  index:number, type:FormDialogTypes, edit?:boolean, 
+  index:number, edit?:boolean, 
   triggerText:string|ReactElement, triggerClassName?:string, 
   formSize:"small"|"medium"|"large", formTitle:string, submitButton:string, formSubmit:Function, 
   form:FieldAttributesList, 
@@ -28,7 +29,6 @@ function FormDialogTeam(props:FormDialogProps){
   const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
-  const [submitButtonText, setSubmitButtonText] = useState(<span>{props.submitButton}</span>);
 
   useEffect(()=>{
     if (!open)
@@ -80,7 +80,7 @@ function FormDialogTeam(props:FormDialogProps){
     for (let i=0;i<Object.keys(requiredList).length;i++){
       let key = Object.keys(requiredList)[i];
       let value = requiredList[key];
-      data = (props.type=="team" && props.edit)?teamMembersRenamingWhileSubmitting():{...prefillValues};
+      data = props.edit?teamMembersRenamingWhileSubmitting():{...prefillValues};
 
       if (key=="P" && props.edit)
         continue;
@@ -93,7 +93,7 @@ function FormDialogTeam(props:FormDialogProps){
     }
 
     setErrorMessage(<></>);
-    if (props.type=="team" && props.edit)
+    if (props.edit)
       return data;
     return true;
   }
@@ -108,15 +108,14 @@ function FormDialogTeam(props:FormDialogProps){
     }
     if(okToSubmit){
       //console.log("prefillValues",prefillValues)
-      setSubmitButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />);
       const res = await props.formSubmit(submittedData==false?{...prefillValues}:submittedData,props.index);
-      setSubmitButtonText(<span>{props.submitButton}</span>)
       if (res==200)
         setOpen(false);
       else if (res==422)
         setErrorMessage(<p className="text-red-600">Already exists.</p>);
       else 
         setErrorMessage(<p className="text-yellow-600">Something went wrong.</p>);
+      return res;
     }
   }
   return (
@@ -129,15 +128,13 @@ function FormDialogTeam(props:FormDialogProps){
             <hr/>
           </DialogHeader>
             <RequiredFieldsNote />
-            <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} />
+            <RenderForm key={"f0"} edit={props.edit||false} teamId={props.currentFields["_id"]} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} />
             {errorMessage}
             <br/>
             <div className="flex flex-row">
               <div className="flex-auto"></div>
               <DialogClose className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</DialogClose>
-              <button className={`float-right ${SubmitButtonStyling}`} type="button" onClick={()=>submitFunction()} >
-                {submitButtonText}
-              </button>
+              <SubmitButton className={`float-right ${SubmitButtonStyling}`} submitFunction={submitFunction} submitButtonText={props.submitButton} />
             </div>
         </DialogContent>
         :<></>
@@ -146,7 +143,7 @@ function FormDialogTeam(props:FormDialogProps){
   )
 }
 
-function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function}){
+function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function}){
   const [leaderSuggestions, setLeaderSuggestions] = useState<UserSuggestionsList>([]);
   const [memberSuggestions, setMemberSuggestions] = useState<UserSuggestionsList>([]);
   const [leaderSelected, setLeaderSelected] = useState(false);
@@ -175,9 +172,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
   const getMemberSuggestions = async () => {
     const leadName = props.edit?props.prefillValues["L"]:props.prefillValues["L"].values["E"];
-    console.log("leadName",leadName);
     const res = await getUserSuggestions("TL",leadName);
-    console.log("member data", res);
     if (res.status==200){
       const arr = filterSuggestions(res.obj);
       setMemberSuggestions(arr);
@@ -187,9 +182,10 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   }
 
   const getTeamData = async () => {
-    const res = await getSingleTeam(props.currentFields["_id"]);
+    const res = await getSingleTeam(props.teamId);
     if (res.status==200){
-      res.obj["_id"]=props.currentFields["_id"];
+      console.log("RES>obj",res.obj)
+      res.obj["_id"]=props.teamId;
       props.setPrefillValues({...res.obj});
       getLeaderSuggestions();
     }
@@ -205,8 +201,10 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     for (let i=0; i<sections.length; i++){
       const section = sections[i];
       const obj = props.prefillValues[section];
-      data[`${section}M`] = obj["M"];
-      data[`${section}C`] = obj["C"];
+      if (obj){
+        data[`${section}M`] = obj["M"];
+        data[`${section}C`] = obj["C"];
+      }
     }
     setTeamMembers(data);
   }
@@ -229,11 +227,8 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     //console.log("new prefillvalues",props.prefillValues)
   },[props.prefillValues]);
 
-  useEffect(()=>{
-    props.setPrefillValues({...props.currentFields});
-  },[props.currentFields]);
-
-
+  return <FormFieldsRender form={props.form} formType="team" prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} edit={props.edit} />
+/* 
   return (
     props.form.map((field,index)=>{
       if (field.category=="label"){
@@ -255,18 +250,16 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
                   const immutable = item.immutable==undefined?false:item.immutable
                   const disabled = item.disabled==undefined?false:item.disabled;
-                  if (item.id=="L")
-                    console.log(item.id,"is disabled", "disabled:",disabled, "immutable",immutable, "disableTeam", disableTeam,"final", (disabled||immutable) && disableTeam)
                   return <span key={index+"_"+itemIndex} className="mr-3">
                     <ComboboxField key={index} index={index} id={item.id} name={item.name} edit={props.edit}
                       required={item.required} disabled={disabled||immutable&&disableTeam} 
-                      prefillValue={props.formType=="user"?props.prefillValues[item.id]:teamMembers[item.id]} setPrefillValues={props.setPrefillValues} multiple={item.multiple} suggestions={item.id=="L"?leaderSuggestions:memberSuggestions}
+                      prefillValue={teamMembers[item.id]} setPrefillValues={props.setPrefillValues} multiple={item.multiple} suggestions={item.id=="L"?leaderSuggestions:memberSuggestions}
                     />
                   </span>
                 }
                 else
                   return <span key={index+"_"+itemIndex} className="mr-3">
-                    <TextField key={index} index={index} id={item["id"]} name={item["name"]} type={item["type"]}
+                    <TextField key={index} index={index} id={item["id"]} name={item["name"]} type={item["type"]} size="large"
                       required={item["required"]} disabled={item["disabled"]||(item["immutable"]&&props.edit)} 
                       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
                     />
@@ -277,7 +270,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
         )
       }
     })
-  )
+  ) */
 }
 
 export default FormDialogTeam;

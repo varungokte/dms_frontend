@@ -1,99 +1,104 @@
-import { FormEvent, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { LinearProgress } from "@mui/material";
-import { Link } from "react-router-dom";
+import { FieldValues, SingleFieldAttributes } from "./../../../DataTypes";
+import { sectionNames } from "./../../../Constants";
 
-export const RegistrationPage = () => {
+import { Link } from "react-router-dom";
+import PasswordField from "../FormFieldComponents/PasswordField";
+import TextField from "../FormFieldComponents/TextField";
+import SubmitButton from "../BasicComponents/SubmitButton";
+
+function RegistrationPage(){
   useEffect(()=>{
 		document.title="Register | Beacon DMS"
 	},[]);
-	const [companyName, setCompanyName] = useState("");
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
-	const [maximumUsers, /* setMaximumUsers */] = useState(1);
-	const [zone, /* setZone */] = useState("West");
-	const [reportingManager,/* setReportingManager */] = useState("ABC");
-	const [isManager, /* setIsManager */]  = useState(true);
+
+	const fieldList:SingleFieldAttributes[] = [
+		{category:"single", id:"N", name:"Name", type:"text", required:true},
+		{category:"single", id:"E", name:"Email", type:"email", required:true},
+		{category:"single", id:"P", name:"Password", type:"password", required:true},
+	];
+	
+	const [fieldValues, setFieldValues] = useState<FieldValues>({});
+	
 	const [message, setMessage] = useState(<></>);
 
 	const {registerAdmin} = useGlobalContext();
 
-	const handleRegister = (e: FormEvent) => {
-		e.preventDefault();
-		if (companyName==""||email==""||password==""){
-			setMessage(<p className="text-red-600">All fields must be filled.</p>);
-			return;
+	const handleRegister = async () => {
+		for (let i=0; i<Object.keys(fieldValues).length; i++){
+			const field = Object.keys(fieldValues)[i]
+			if (!fieldValues[field] || fieldValues[field]==""){
+				setMessage(<p className="text-red-600">{fieldValues[field].name} is required</p>);
+				return;
+			}
 		}
+
+		const defaultPermissions:FieldValues={}
+		Object.values(sectionNames).map(section=>defaultPermissions[section]=["access", "add", "edit","view","delete"]);
+		defaultPermissions["team"].push("select")
+		defaultPermissions["transaction"] = {
+			docs: ["access","view","add","edit", "delete"],
+			file: ["access","view","add","edit","delete"]
+		}
+		defaultPermissions["compliance"] = {
+			docs: ["access","view","add","edit", "delete"],
+			file: ["access","view","add","edit","delete"]
+		}
+		defaultPermissions["covenants"] = {
+			docs: ["access","view","add","edit", "delete"],
+			file: ["access","view","add","edit","delete"]
+		}
+		defaultPermissions["precedent"] = {
+			docs: ["access","view","add","edit", "delete"],
+			file: ["access","view","add","edit","delete"]
+		}
+		defaultPermissions["subsequent"] = {
+			docs: ["access","view","add","edit", "delete"],
+			file: ["access","view","add","edit","delete"]
+		}
+
+		defaultPermissions["payment"] = {
+			docs: ["access","view","add","edit", "delete"],
+			file: ["access","view","add","edit","delete"]
+		}
+
+		console.log("SEND PERMISSIONS",defaultPermissions);
 		const data = {
-			E: email,
-			N: companyName,
-			P: password,
-			MU: maximumUsers,
+			...fieldValues,
+			MU: 1,
 			R: "Admin",
-			Z: zone,
-			M: isManager,
-			RM: reportingManager,
-			UP:JSON.stringify({
-				"Loan Account": ["access", "view", "delete","add","edit"],
-				"Product": ["access", "view", "delete","add","edit"],
-				"Transaction Documents": ["access", "view", "delete","add","edit"],
-				"Compliance Documents": ["access", "view", "delete","add","edit"],
-				"Covenants": ["access", "view", "delete","add","edit"],
-			})
+			Z: "West",
+			M: true,
+			RM: "root",
+			UP:defaultPermissions
 		}
+		//console.log("data",data)
 
-		setMessage(<LinearProgress />)
-
-		registerAdmin(data).then((res:any)=>{
-			if (res==200)
-				setMessage(<div className="text-center"> <span className="text-green-600">Admin successfully created.</span> <Link to="/login" className="text-blue-500 underline decoration-solid	">Go to login page.</Link></div>);
-			else if (res==422)
-				setMessage(<p className="text-red-600">User already exists.</p>);
-			else
-				setMessage(<p className="text-red-600">Something Went Wrong.</p>);
-		})
-		.catch(()=>{
+		const res =  await registerAdmin(data);
+		if (res==200)
+			setMessage(<div className="text-center"> <span className="text-green-600">Admin successfully created.</span> <Link to="/login" className="text-blue-500 underline decoration-solid	">Go to login page.</Link></div>);
+		else if (res==422)
+			setMessage(<p className="text-red-600">User already exists.</p>);
+		else
 			setMessage(<p className="text-red-600">Something Went Wrong.</p>);
-		})
+			
+		return;
 	}
 
 	return (
 		<div style={{margin:"auto", width:"425px", marginTop:"150px", padding:"20px", borderWidth:"1px", borderColor:"blueviolet", borderRadius:"9px"}}>
 			<p className="text-2xl font-bold">Admin Registration Page</p>
 			<br/>
-			<form onSubmit={(e)=>handleRegister(e)}>
-				<label htmlFor="name" className="my-1">Username <span className="text-red-600">*</span></label>
-				<br/>
-				<input type="text" id="name" name="name" className="p-2 rounded-if w-full" value={companyName} placeholder="Username" onChange={(e)=>setCompanyName(e.target.value)} />
-				<br/><br/>
-				
-				<label htmlFor="email">Email <span className="text-red-600">*</span></label>
-				<br/>
-				<input type="email" id="email" className="p-2 rounded-if w-full" value={email} placeholder="Email" onChange={(e)=>setEmail(e.target.value)} />	
-				<br/><br/>
-				
-				<label htmlFor="password">Password <span className="text-red-600">*</span></label>
-				<br/>
-				<input type="password" id="password" className="p-2 rounded-if  w-full" value={password} placeholder="Password" onChange={(e)=>setPassword(e.target.value)} />
-				<br/><br/>
-
-				{/*
-					<label htmlFor="cname">Maximum Users</label>
-					<br/>
-					<input type="number" id="max" value={maximumUsers} onChange={(e:any)=>setMaximumUsers(e.target.value)} />
-					<br/><br/>
-					
-					<label htmlFor="cname">Zone</label>
-					<br/>
-					<input type="number" id="z" value={zone} onChange={(e:any) => setZone(e.target.value)} />
-					<br/><br/>
-					
-					<label htmlFor="cname">Reporting Manager</label>
-					<br/>
-					<input id="repman" type="text" value={reportingManager} placeholder="Reporting Manager" onChange={(e) => setReportingManager(e.target.value)} /> 
-					<br/><br/>
-				*/}
-				<button type="submit" className="bg-custom-1 p-2 rounded-if text-white  w-full" value="Register">Register</button>
+			<form>
+				{fieldList.map((field,index)=>{
+					if (field.type=="password")
+						return <PasswordField key={index} index={index} fieldData={field} size="small" prefillValues={fieldValues} setPrefillValues={setFieldValues} edit={false} />
+					else
+						return <TextField key={index} index={index} fieldData={field} size="small" padding={2} prefillValues={fieldValues} setPrefillValues={setFieldValues} edit={false} />
+				})}
+				<br />
+				<SubmitButton className="bg-custom-1 p-2 rounded-if text-white w-full" submitFunction={handleRegister} submitButtonText="Register" />
 			</form>
 			<br/>
 			
@@ -101,3 +106,5 @@ export const RegistrationPage = () => {
 		</div>
 	)
 }
+
+export default RegistrationPage;

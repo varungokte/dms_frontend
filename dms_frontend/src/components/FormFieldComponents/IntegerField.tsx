@@ -1,8 +1,8 @@
 import {  useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
-import { FieldValues } from "DataTypes";
+import { FieldValues, FormFieldAttributes } from "DataTypes";
 
-function IntegerField (props:{index:number|string, type?:"curr"|"rate", id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number }) {
+function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
 
@@ -17,11 +17,11 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate", id:strin
     
     let num;
     if (props.repeatFields && props.formIndex!=undefined)
-      num =props.prefillValues[props.formIndex]?props.prefillValues[props.formIndex||0][props.id]:undefined;
+      num =props.prefillValues[props.formIndex]?props.prefillValues[props.formIndex||0][props.fieldData.id]:undefined;
     else
-      num = props.prefillValues[props.id];
+      num = props.prefillValues[props.fieldData.id];
     
-    if (amountFields.includes(props.id) && num!=undefined){
+    if (amountFields.includes(props.fieldData.id) && num!=undefined){
       if (num==0)
         num=0
       else if (!num)
@@ -34,16 +34,16 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate", id:strin
   
   return(
     <div key={props.index} className="mb-5 mx-2">
-      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
-      <input key={props.index+props.id+"t_2"} id={props.id} type="text"
-        className={props.className || `border rounded-if w-full p-4 ${props.name==""?"mt-7":""}`}
-        disabled={props.disabled} required={props.required}
+      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
+      <input key={props.index+props.fieldData.id+"t_2"} id={props.fieldData.id} type="text"
+        className={props.className || `border rounded-if w-full p-3 ${props.fieldData.name==""?"mt-7":""}`}
+        disabled={props.disabled} required={props.fieldData.required}
 
         value={props.repeatFields && props.formIndex!=undefined
-          ?props.prefillValues[props.formIndex]&&props.prefillValues[props.formIndex||0][props.id]
-            ?numberFormatter(Number(props.prefillValues[props.formIndex||0][props.id]))
+          ?props.prefillValues[props.formIndex]&&props.prefillValues[props.formIndex||0][props.fieldData.id]
+            ?numberFormatter(Number(props.prefillValues[props.formIndex||0][props.fieldData.id]))
             :""
-          :props.prefillValues[props.id]?numberFormatter(Number(props.prefillValues[props.id])):""
+          :props.prefillValues[props.fieldData.id]?numberFormatter(Number(props.prefillValues[props.fieldData.id])):""
         }
 
         onChange={props.repeatFields && props.formIndex!=null
@@ -58,7 +58,7 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate", id:strin
               return;
 
             props.setPrefillValues((curr:any)=>{
-              curr[props.formIndex||0][props.id]=val;
+              curr[props.formIndex||0][props.fieldData.id]=val;
               return [...curr];
             })
           }
@@ -74,10 +74,10 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate", id:strin
 
             if (isNaN(Number(val)))
               return;
-            const downsell_amount = validateDownsellAmount(Number(val),props.id,props.prefillValues,setErrorMessage);
+            const downsell_amount = validateDownsellAmount(Number(val),props.fieldData.id,props.prefillValues,setErrorMessage);
           
             props.setPrefillValues((curr:any)=>{
-              curr[props.id]=val; 
+              curr[props.fieldData.id]=val; 
               if (downsell_amount!=="NO")
                 curr["DA"]=downsell_amount;
               return {...curr};
@@ -126,6 +126,11 @@ const separateByCommas = (num:string) =>{
 }
 
 const numberToWords = (num:number, setMessage:Function, index:number|string):void => {
+  if (num==-1 || num==0){
+    setMessage(<></>);
+    return;
+  }
+  
   const wordsClassName = "mx-2 text-blue-700 text-sm mt-1";
   
   const words_1to19 = ["","One","Two","Three","Four","Five","Six","Seven","Eight","Nine","Ten","Eleven","Twelve","Thirteen","Fourteen","Fifteen","Sixteen","Seventeen","Eighteen","Nineteen"];

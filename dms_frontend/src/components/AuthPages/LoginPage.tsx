@@ -1,59 +1,56 @@
-import { FormEvent, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom";
+
+import { FieldValues, SingleFieldAttributes } from "DataTypes";
 import useGlobalContext from "../../../GlobalContext";
 
 import login_img from "./../static/login_img.png";
-import eye from "./../static/eye.svg";
-import eye_slash from "./../static/eye-slash.svg";
-import CircularProgress from "@mui/material/CircularProgress";
+import TextField from "../FormFieldComponents/TextField";
+import PasswordField from "../FormFieldComponents/PasswordField";
+import SubmitButton from "../BasicComponents/SubmitButton";
 
-export const LoginPage = () => {
+function LoginPage() {
   useEffect(()=>{
 		document.title="Login | Beacon DMS"
 	},[]);
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
 
-  const [showPassword, setShowPassword] = useState(false);
+  const fieldList:SingleFieldAttributes[] =[
+    {category:"single", id:"E", name:"Email", type:"email", required:true},
+    {category:"single", id:"P", name:"Password", type:"password", required:true}
+  ];
+
+  const [fieldValues, setFieldValues] = useState<FieldValues>({});
+
   const [errorMessage, setErrorMessage] = useState(<></>);
-  const [buttonText, setButtonText] = useState(<span>Log in</span>);
-  const [disableButton, setDisableButton] = useState(false);
 
+  useEffect(()=>console.log("fieldValues",fieldValues),[fieldValues])
 	const navigate = useNavigate();
 	const { loginUser } = useGlobalContext();
 
-	const submitData = (e: FormEvent) => {
-		e.preventDefault();
+	const submitData = async () => {
 
-		if (email===""){
-      setErrorMessage(<p className="text-red-600">Email is required</p>)
+		if (!fieldValues["E"] || fieldValues["E"]===""){
+      setErrorMessage(<p className="text-red-600">Email is required</p>);
       return;
     }
-    if (password===""){
+    if (!fieldValues["P"] || fieldValues["P"]===""){
       setErrorMessage(<p className="text-red-600">Password is required</p>);
       return;
     }
 
-		const data = {
-			E: email,
-			P: password
-		}
-
-    setTimeout(()=>setButtonText(<CircularProgress className="mt-1" sx={{color:"white"}} />), 300)
-    setDisableButton(true);
-
-		loginUser(data).then((res:any) => {
-      if (res==401 || res==412){
-        setErrorMessage(<p className="text-red-600">Incorrect Username or Password</p>)
-        return;
-      }
-      if (res==409)
-        setErrorMessage(<p className="text-red-600">Inactive User. Contact your administrator.</p>)
-      else{
-        console.log("NAVIGAING TO DASHOARD")
-        navigate('/')
-      }
-    })
+    //console.log('sending fieldvalues',fieldValues);
+		const res = await loginUser(fieldValues);
+    //console.log("RESPONSE",res);
+    
+    if (res==200)
+      navigate('/');
+    else if (res.status==401 || res.status==412)
+      setErrorMessage(<p className="text-red-600">Incorrect Username or Password</p>);
+    else if (res.status==409)
+      setErrorMessage(<p className="text-red-600">Inactive User. Contact your administrator.</p>);
+    else
+      setErrorMessage(<p className="text-red-600">Something went wrong.</p>);
+    return;
 	}
 
 	return (		
@@ -63,34 +60,16 @@ export const LoginPage = () => {
       </div>
       <div className="m-3" style={{marginTop:"7%", marginLeft:"5%", width:"35%"}}>
         <p className="text-4xl font-bold mb-7 mx-12" style={{color:"slateblue"}}>Welcome Back!</p>
-        <form onSubmit={submitData}>
-          <label htmlFor="email" className="font-light">Email Address</label>
-          <br/>
-          <input id="email" type="text" style={{height:"50px", width:"100%", borderRadius:"12px", paddingLeft:"3%"}} onChange={(e)=>setEmail(e.target.value)}/>
-          <br/>
-          <br/>
-          
-          <label htmlFor="password" className="font-light">Password</label>
-          <br/>
-          <div className="flex flex-row">
-            <div style={{height:"50px", width:"130%", borderRadius:"12px"}}>
-              <input id="password" type={showPassword?"text":"password"} style={{height:"50px", width:"100%", borderRadius:"12px 0px 0px 12px", paddingLeft:"3%"}} onChange={(e)=>setPassword(e.target.value)}/>
-            </div>
-            <div style={{float:"right", backgroundColor:"white", paddingTop:"13px", paddingRight:"5px", borderRadius:"0px 12px 12px 0px"}}><img src={showPassword?eye:eye_slash} width={"30px"} onClick={()=>setShowPassword((curr)=>{return !curr})}/></div>
-          </div>
-          <br/>
-          <div className="flex flex-row relative">
-            <div style={{marginRight:"55%"}}>
-              {/* <input type="checkbox" id="remember"/>
-              <label htmlFor="remember">Remember me</label> */}
-            </div>
-          </div>
-          <br/>
+        <form>
+          <TextField index={0} fieldData={fieldList[0]} size="large" prefillValues={fieldValues} setPrefillValues={setFieldValues} edit={false} />
+          <PasswordField index={1} fieldData={fieldList[1]} prefillValues={fieldValues} size="large" setPrefillValues={setFieldValues} edit={false} />
           {errorMessage}
           <br/>
-          <button type="submit" style={{backgroundColor:"slateblue", color:"white", borderRadius:"12px",width:"100%", height:"50px"}}  className="self-center" disabled={disableButton}>{buttonText}</button>
+          <SubmitButton className="bg-custom-1 text-white rounded-if w-full h-[50px] self-center" submitFunction={submitData} submitButtonText={"Log in"} />
         </form>
       </div>
     </div>
 	)
 }
+
+export default LoginPage

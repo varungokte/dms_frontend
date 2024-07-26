@@ -1,9 +1,9 @@
-import { DocumentStatusList, FileStatusList, PriorityList, TeamStatusList, UserStatusList } from "Constants";
+import { DocumentStatusList, FileStatusList, LoanStatusList, PriorityList, TeamStatusList, UserStatusList } from "Constants";
 
 type FieldValues = {[key:string]: any | any[]};
 
 //Data Types for table
-type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link";
+type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link";
 
 //Form Field data types 
 type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
@@ -55,14 +55,15 @@ type UserStatus = typeof UserStatusList[number];
 type DocumentStatus = typeof DocumentStatusList[number];
 type FileStatus = typeof FileStatusList[number];
 type TeamStatus = typeof TeamStatusList[number];
+type LoanStatus = typeof LoanStatusList[number];
 type Priority = typeof PriorityList[number];
 
-type CommonFileViewerProps = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:Function,sectionName:string };
+type CommonFileViewerProps = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:Function,sectionName:string, disabled?:boolean };
 type DocumentFileViewerProps = {type:"doc", loanId:string, docId:string, };
 type PaymentFileViewerProps = {type:"pay", _id:string, index:number, schedule:FieldValues[] };
 
 type LoanCommonProps = {
-  actionType:string, label:string, 
+  actionType:"CREATE"|"EDIT"|"VIEW", label:string, 
   AID:string, setAID:Function, 
   loanId:string, setLoanId:Function, 
   currentSection:number, setCurrentSection:Function, sectionCount:number,
@@ -70,7 +71,7 @@ type LoanCommonProps = {
   setOkToFrolic:Function, setUnsavedWarning:Function,
   showSecurityDetails:boolean, setShowSecurityDetails:Function,
   setChangesHaveBeenMade:Function, setEnableDocumentSections:Function,
-  assignedTeam:string, teamList:any
+  assignedTeam:string,
   preexistingValues:FieldValues,
 }
 
@@ -83,7 +84,7 @@ export {
   type FormDialogTypes, 
   type DocumentSectionTypes, type DocumentSectionNames, type DocumentSectionDetails,
   type UserSuggestionTypes, type UserSuggestionsList,
-  type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority,
+  type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority, type LoanStatus,
   type CommonFileViewerProps, type DocumentFileViewerProps, type PaymentFileViewerProps,
   type LoanCommonProps,
   type ToastOptionsAttributes,

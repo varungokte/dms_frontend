@@ -1,18 +1,17 @@
 import { Autocomplete, TextField as MUITextField } from "@mui/material";
-import { FieldValues } from "DataTypes";
+import { FieldValues, FormFieldAttributes } from "DataTypes";
 import { useEffect, useState } from "react";
 
-const MultiTextField = (props:{index:number, id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:FieldValues, setPrefillValues:Function}) => {
+const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, prefillValues:FieldValues, setPrefillValues:Function, disabled:boolean}) => {
   const [results,setResults] = useState<string[]>([]);
 
   useEffect(()=>{
     props.setPrefillValues((curr:any)=>{
-      curr[props.id]=results;
+      curr[props.fieldData.id]=results;
       return {...curr};
     })
   },[results])
 
-  
   return (
     <Autocomplete 
       disabled={props.disabled}
@@ -25,8 +24,8 @@ const MultiTextField = (props:{index:number, id:string, name: string, required?:
       renderInput={
         (vals)=><MUITextField 
           {...vals} 
-          label={<p>{props.name}{props.required?<span className="text-red-600">*</span>:""}</p>} 
-          placeholder={`Add ${props.name.toLowerCase()}`} 
+          label={<p>{props.fieldData.name}{props.fieldData.required?<span className="text-red-600">*</span>:""}</p>} 
+          placeholder={`Add ${props.fieldData.name.toLowerCase()}`} 
         />} 
     />
   )

@@ -15,16 +15,14 @@ import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 function LoanPaymentSchedule(props:LoanCommonProps){
-  const [fieldList] = useState<GridFieldAttributes>(
-    {category:"grid", row:2, fields:[
-      {id:"P", name:"Principal", type:"integer", required:true},
-      {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true, immutable:true},
-      {id:"SD", name:"Start Date", type:"date", required:true},
-      {id:"ED", name:"End Date", type:"date", required:true},
-      {id:"H", name:"Holiday Convention", type:"select", options:HolidayConventionList, required:true, immutable:true},
-      {id:"T", name:"Interest Type (%)", type:"radio", options:InterestTypeList, required:true, immutable:true},
-    ]},
-  );
+  const fieldList:GridFieldAttributes = {category:"grid", row:2, fields:[
+    {id:"P", name:"Principal", type:"integer", required:true, immutable:true},
+    {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true, immutable:true},
+    {id:"SD", name:"Start Date", type:"date", required:true, immutable:true},
+    {id:"ED", name:"End Date", type:"date", required:true, immutable:true},
+    {id:"H", name:"Holiday Convention", type:"select", options:HolidayConventionList, required:true, immutable:true},
+    {id:"T", name:"Interest Type (%)", type:"radio", options:InterestTypeList, required:true, immutable:true},
+  ]};
 
   const [fieldValues,setFieldValues] = useState<FieldValues>({T:InterestTypeList[1]});
   const [schedule, setSchedule] = useState<{D:string,I?:number|string}[]>([]);
@@ -40,17 +38,17 @@ function LoanPaymentSchedule(props:LoanCommonProps){
     if (added)
       getPaymentSchedule(props.loanId).then(res=>{
         //console.log("response",res);
-        if (res.status==200)
-          setAdded(false);
-        if (res.status==200 && res.obj && Object.keys(res.obj).length!=0){
-          setFieldValues(res.obj);
+        setAdded(false);
+        if (res.status==200 && res.obj && res.obj[0] && res.obj[0]["data"] && Object.keys(res.obj[0]["data"]).length!=0){
+          setFieldValues(res.obj[0]["data"]);
           setEditMode(true);
+          if (res.obj[0]["data"]["GS"])
+            setSchedule(res.obj[0]["data"]["GS"]);
         }
       })
   },[added]);
 
-  useEffect(()=>console.log("edit mode",editMode),[editMode])
-
+  //useEffect(()=>console.log("SCHEDULE",schedule),[schedule]);
 
   const validateFields = () => {
     for (let i=0; i<fieldList.fields.length; i++){
@@ -99,6 +97,8 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   }
 
   const generateSchedule = () => {
+    if (editMode)
+      return schedule;
     const arr=[];
     const startDate = Date.parse(fieldValues["SD"]);
     const endDate = Date.parse(fieldValues["ED"]);
@@ -137,10 +137,10 @@ function LoanPaymentSchedule(props:LoanCommonProps){
     fieldValues["GS"] = arr;
     fieldValues["_loanId"] = props.loanId;
     fieldValues["P"] = Number(fieldValues["P"]);
-    console.log("submitted", fieldValues);
     fieldValues["ND"] = arr[0]["D"];
+    //console.log("submitted", fieldValues);
     const res = await addPaymentSchedule(fieldValues);
-    console.log("response",res)
+    //console.log("response",res)
     if (res==200){
       setDialogOpen(false);
       setFieldValues({});
@@ -160,22 +160,25 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="integer")
-            return <IntegerField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable}/>
+            return <IntegerField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))}/>
           else if (field.type=="date")
-            return <DateField key={index} index={index} id={field.id} name={field.name} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
+            return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
           else if (field.type=="select")
-            return <SelectField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
+            return <SelectField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
           else if (field.type=="radio")
-            return <RadioGroupField key={index} index={index} id={field.id} name={field.name} options={field.options||[]} required={field.required} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={editMode&&field.immutable} />
+            return <RadioGroupField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
         })}
         {fieldValues["T"]!=InterestTypeList[2]
-          ?<FloatNumberField key={5} index={5} id="I" name="Interest Rate (%)" prefillValues={fieldValues} setPrefillValues={setFieldValues} required />
+          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&true)}/>
           :""
         }
         <div className="my-10">
-          <button className={`${fieldValues["T"]!=InterestTypeList[2]?"float-right":"float-left"} h-[45px] w-[180px] rounded-xl text-white text-lg bg-custom-1`} onClick={validateFields}>
-            {fieldValues["T"]!=InterestTypeList[2]?"Generate Schedule":`${editMode?"Edit":"Enter"} Interest Rates`} 
-          </button>
+          {props.actionType=="VIEW"
+            ?<></>
+            :<button className={`${fieldValues["T"]!=InterestTypeList[2]?"float-right":"float-left"} h-[45px] w-[180px] rounded-xl text-white text-lg bg-custom-1`} onClick={validateFields}>
+              {fieldValues["T"]!=InterestTypeList[2]?"Generate Schedule":`${editMode?"Edit":"Enter"} Interest Rates`} 
+            </button>
+          }
         </div>
       </div>
       <Dialog open={dialogOpen} onClose={()=>setDialogOpen(false)} maxWidth="md" fullWidth>
@@ -185,7 +188,7 @@ function LoanPaymentSchedule(props:LoanCommonProps){
             <DialogContent>
               <DataTable 
                 headingRows={["Installment Number","Installment Date", "Installment Interest Rate(%)"]} headingClassNames={["w-[30%]","w-[30%]",""]}
-                tableData={schedule} columnIDs={["D","I"]} dataTypes={["index","date","text-field"]} cellClassName={["","","border-2 rounded-if h-8 float-left p-2"]}
+                tableData={schedule} columnIDs={["D","I"]} dataTypes={["index","date","text-field"]} cellClassName={["","",""]}
                 setValues={setSchedule} 
               />
               {installmentError}

@@ -1,10 +1,13 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useContext, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FieldAttributesList, FieldValues, LoanCommonProps, ToastOptionsAttributes } from "./../../../DataTypes";
-import { ContactTypeList, EmailRecipientList } from "../../../Constants";
+import { PermissionContext } from "@/MenuRouter";
+import { ContactTypeList, EmailRecipientList, sectionNames } from "../../../Constants";
 
-import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, } from "@/components/ui/dialog";
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 
 import Filter from "../BasicComponents/Filter";
 import FormDialog from "../FormComponents/FormDialog";
@@ -20,9 +23,11 @@ import Toast from "../BasicComponents/Toast";
 
 function LoanContactDetails(props:LoanCommonProps) {
   const allContacts = "All Contacts";
-
   const [contacts, setContacts] = useState<{[key:string]:FieldValues}>();
-  const [fieldList] = useState<FieldAttributesList>([
+
+  const {userPermissions} = useContext(PermissionContext);
+  
+  const fieldList: FieldAttributesList = [
     { category: "grid", row:3, sectionName:"", fields: [
       { id: "CT", type: "select", name: "Contact Type", options: ContactTypeList, required:true, immutable:true },
       { id: "CN", type:"text", name: "Company Name", required:true },
@@ -42,7 +47,7 @@ function LoanContactDetails(props:LoanCommonProps) {
       { id: "BS", type:"text", name: "State" },
       { id: "BC", type:"text", name: "City" },
     ]}, 
-    { category:"single", id:"add-same", name:"Billing and Registered Addresses are the same", type:"checkbox"},
+    /* { category:"single", id:"add-same", name:"Billing and Registered Addresses are the same", type:"checkbox"}, */
     { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "RA", type:"text", name: "Bulding/Street/Locality Name" },
       { id: "RP", type:"integer", name: "Pincode" },
@@ -52,30 +57,32 @@ function LoanContactDetails(props:LoanCommonProps) {
       { id: "RS", type:"text", name: "State" },
       { id: "RC", type:"text", name: "City" },
     ]},
-  ]);
+  ];
 
   const [searchString, setSearchString] = useState("");
   const [role, setRole] = useState(allContacts);
   const [added, setAdded] = useState(true);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
  
-  const {addContact, getContacts} = useGlobalContext();
+  const {addContact, getContactsList} = useGlobalContext();
 
   useEffect(()=>{
     if (added)
-      getContacts(props.loanId).then(res=>{
+      getContactsList(props.loanId).then(res=>{
         if (res.status!=200)
           return;
-        //console.log("contacts reponse",res)
+        console.log("contacts reponse",res)
         const obj:any={};
-        res.data.map((contact:any)=>{
+        res.data[0]["data"].map((contact:any)=>{
+          console.log("contact",contact)
           if (contact.CT=="-")
             return;
           if (obj[contact.CT])
             obj[contact.CT].push(contact);  
           else
             obj[contact.CT] = [contact];
-        })
+        });
+        //console.log("OBJ",obj)
         setContacts(obj);
         setAdded(false);
       })
@@ -103,7 +110,7 @@ function LoanContactDetails(props:LoanCommonProps) {
       data["AID"]=props.AID;
       data["_loanId"]= props.loanId;
 
-      const res = await addContact(data,"");
+      const res = await addContact(data);
       
       if (res==200){
         setAdded(true);
@@ -111,8 +118,6 @@ function LoanContactDetails(props:LoanCommonProps) {
       }
       else
         setToastOptions({open:true, type:"error", action:"add", section:"Contact"});
-  
-
       return res;
     }
   }
@@ -143,13 +148,16 @@ function LoanContactDetails(props:LoanCommonProps) {
 
     data["AID"]=props.AID;
     data["_loanId"]=props.loanId;
-    data["_contactId"]=userValues._id
-
+    data["_contactId"]=userValues._id;
+    
     //console.log("submitted data", data)
-    const res = await addContact(data,"EDIT");
+    const res = await addContact(data);
     if (res==200){
       setAdded(true);
+      setToastOptions({open:true, type:"success", action:"add", section:"Contact"});
     }
+    else
+      setToastOptions({open:true, type:"error", action:"add", section:"Contact"});
     
     return res;
   }
@@ -166,11 +174,14 @@ function LoanContactDetails(props:LoanCommonProps) {
         </div>
       
         <div className="mr-3">
-          <FormDialog key={-5} index={-5} edit={false} type="cont"
-            triggerText={<div className="flex flex-row"><Plus className="mt-1"/> <p className="">Add Contact</p></div>} triggerClassName={CreateButtonStyling} formSize="large"
-            formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
-            form={fieldList} currentFields={{}}
-          />
+          {props.actionType!="VIEW" && userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add")
+            ?<FormDialog key={-5} index={-5} edit={false} type="cont"
+              triggerText={<div className="flex flex-row"><Plus className="mt-1"/> <p className="">Add Contact</p></div>} triggerClassName={CreateButtonStyling} formSize="large"
+              formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
+              form={fieldList} currentFields={{}}
+            />
+            :<></>
+          }
         </div>  
       </div>
       <div className="flex flex-row flex-wrap">
@@ -180,14 +191,14 @@ function LoanContactDetails(props:LoanCommonProps) {
               return contacts[category].map((person:FieldValues,index:number)=>{
                 const regEx = new RegExp(searchString, "i");
                 if (searchString=="" || (person.PN+"").search(regEx)!==-1)
-                return <ContactCard key={categoryIndex+"_"+index} index={index} person={person} editFunction={editContact} formFields={fieldList} />
+                return <ContactCard key={categoryIndex+"_"+index} index={index} person={person} editFunction={editContact} formFields={fieldList} actionType={props.actionType} userPermissions={userPermissions} />
               })
             })
             :(contacts[role] && contacts[role].length>0)
               ?contacts[role].map((person:any,index:number)=>{
                 const regEx = new RegExp(searchString, "i");
                 if (searchString=="" || (person.PN+"").search(regEx)!==-1)
-                  return <ContactCard key={index} index={index} person={person} editFunction={editContact} formFields={fieldList} />
+                  return <ContactCard key={index} index={index} person={person} editFunction={editContact} formFields={fieldList} actionType={props.actionType} userPermissions={userPermissions} />
                 })
               :<EmptyPageMessage sectionName={role!=allContacts?role.toLowerCase()+"s":"contacts"} />
           :<LoadingMessage sectionName="contacts" />
@@ -200,17 +211,70 @@ function LoanContactDetails(props:LoanCommonProps) {
   )
 }
 
-function ContactCard(props:{index:number, person:FieldValues, editFunction:Function, formFields:FieldAttributesList }){
+function ContactCard(props:{index:number, person:FieldValues, editFunction:Function, formFields:FieldAttributesList, actionType:"CREATE"|"EDIT"|"VIEW", userPermissions:any }){
+  const [open, setOpen] = useState(false);
+  
+  return (
+    <Card key={props.index+props.person.CT} className="m-5 w-72 rounded-xl" style={{borderRadius:"10px"}} variant="outlined">
+      <CardContent className="text-left">
+        <div className="flex flex-row">
+          <div className="flex-auto">
+            <ProfileIcon name={props.person.PN} size="small" />
+          </div>
+          <div className="">
+            <div className="flex flex-row">
+              {props.actionType!="VIEW" && props.userPermissions && props.userPermissions["loan"].includes("edit") && props.userPermissions["contact"].includes("edit")
+                ?<FormDialog key={props.index} index={props.index} edit={true} type="cont"
+                  triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
+                  formTitle="Edit Contact" formSubmit={props.editFunction} submitButton="Edit Contact"
+                  form={props.formFields} currentFields={props.person}
+                />
+                :<></>
+              }
+              <div className="ml-2">
+                <button onClick={()=>setOpen(true)}><CircleUserIcon/></button>
+                {open?<ViewContact personId={props.person["_id"]} open={open} setOpen={setOpen} />:<></>}
+              </div>
+            </div>
+          </div>
+        </div>
+        <p className="font-medium">{props.person.PN || "person_name"}</p>
+        <p className="font-light">{props.person.CE || "email"}</p>
+        <p className="font-light">{props.person.CT}</p>     
+        <br/>
+      </CardContent>
+    </Card>
+  )
+}
+
+function ViewContact(props:{personId:string, open:boolean, setOpen:Function}){
   const [billingAddress, setBillingAddress] = useState<ReactElement>();
   const [registeredAddress, setRegisteredAddress] = useState<ReactElement>();
+  const [personDetails, setPersonDetails] = useState<FieldValues>();
+
+  const {getSingleContact} = useGlobalContext();
+  
+  useEffect(()=>{
+    getSingleContact(props.personId).then(res=>{
+      console.log("SINGLE PERSON DATA",res);
+      if (res.status==200)
+        setPersonDetails(res.data);
+      else
+        setPersonDetails({});
+    })
+  },[])
+  
 
   const constructAddresses = () => {
+    if (!personDetails)
+      return;
+
     const addressPieces = ["A","C","S","CC","P"];
 
     const baArr:string[] = [];
     for (let i=0; i<addressPieces.length; i++){
-      if (props.person[`B${addressPieces[i]}`])
-        baArr.push(props.person[`B${addressPieces[i]}`])
+      if (personDetails[`B${addressPieces[i]}`])
+        baArr.push(personDetails[`B${addressPieces[i]}`])
     }
     if (baArr.length==0)
       setBillingAddress(<span>N/A</span>);
@@ -227,8 +291,8 @@ function ContactCard(props:{index:number, person:FieldValues, editFunction:Funct
     
     const raArr:string[] = [];
     for (let i=0; i<addressPieces.length; i++){
-      if (props.person[`R${addressPieces[i]}`])
-        raArr.push(props.person[`R${addressPieces[i]}`])
+      if (personDetails[`R${addressPieces[i]}`])
+        raArr.push(personDetails[`R${addressPieces[i]}`])
     }
     if (raArr.length==0)
       setRegisteredAddress(<span>N/A</span>);
@@ -246,92 +310,63 @@ function ContactCard(props:{index:number, person:FieldValues, editFunction:Funct
   
   useEffect(()=>{
     constructAddresses();
-  },[props])
+  },[personDetails]);
+
+  if (!personDetails)
+    return <></>
+
   return (
-    <Card key={props.index+props.person.CT} className="m-5 w-72 rounded-xl">
-      <CardHeader>
-        <CardTitle>	
-          <div className="flex flex-row">
-            <div className="flex-auto">
-              <ProfileIcon name={props.person.PN} size="small" />
-            </div>
-            <div className="">
-              <div className="flex flex-row">
-              <FormDialog key={props.index} index={props.index} edit={true} type="cont"
-                triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
-                formTitle="Edit Contact" formSubmit={props.editFunction} submitButton="Edit Contact"
-                form={props.formFields} currentFields={props.person}
-              />
-              <div className="ml-2">
-              <Dialog>
-                <DialogTrigger><CircleUserIcon/></DialogTrigger>
-                <DialogContent className="bg-white min-w-[700px] min-h-[300px]">
-                  <DialogHeader>
-                    <DialogTitle>
-                      <div className="flex flex-row">
-                        <ProfileIcon name={props.person.PN} size="small" />
-                        <div className="px-3">
-                          <p className="my-1 font-normal text-custom-1">{props.person.PN || "person_name"}</p>
-                          <p className="font-light text-base">{props.person.D}</p>
-                        </div>
-                      </div>
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="grid grid-rows-5 grid-flow-col w-full">
-                    <div className="m-5">
-                      <p className="font-medium">{props.person.PN || "N/A"}</p>
-                      <p className="font-light">Contact Person Name</p>
-                    </div>
-
-                    <div className="m-5">
-                      <p className="font-medium">{props.person.D || "N/A"}</p>
-                      <p className="font-light">Designation</p>
-                    </div>
-                    
-                    <div className="m-5">
-                      <p className="font-medium">{props.person.CE || "N/A"}</p>
-                      <p className="font-light">Email</p>
-                    </div>
-
-                    <div className="m-5">
-                      <p className="font-medium">{props.person.MN || "N/A"}</p>
-                      <p className="font-light">Mobile Number</p>
-                    </div>
-
-                    <div className="m-5">
-                      <p className="font-medium">{props.person.LN || "N/A"}</p>
-                      <p className="font-light">Landline Number</p>
-                    </div>
-
-                    <div className="m-5">
-                      <div className="font-medium">
-                        {registeredAddress}
-                      </div>
-                      <p className="font-light">Registered Address</p>
-                    </div>
-
-                    <div className="m-5">
-                      <div className="font-medium">
-                        {billingAddress}
-                      </div>
-                      <p className="font-light">Billing Address</p>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
+    <Dialog open={props.open} onClose={()=>props.setOpen(false)} fullWidth>
+      <DialogTitle>
+        <div className="flex flex-row">
+          <ProfileIcon name={personDetails.PN} size="small" className="mt-2" />
+          <div className="px-3">
+            <p className="my-1 font-normal text-custom-1">{personDetails.PN || "person_name"}</p>
+            <p className="font-light text-base">{personDetails.D}</p>
           </div>
         </div>
-      </div>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="text-left">
-        <p className="font-medium">{props.person.PN || "person_name"}</p>
-        <p className="font-light">{props.person.CE || "email"}</p>
-        <p className="font-light">{props.person.CT}</p>     
-        <br/>
-      </CardContent>
-    </Card>
+      </DialogTitle>
+        <div className="grid grid-rows-5 grid-flow-col w-full">
+          <div className="m-5">
+            <p className="font-medium">{personDetails.PN || "N/A"}</p>
+            <p className="font-light">Contact Person Name</p>
+          </div>
+
+          <div className="m-5">
+            <p className="font-medium">{personDetails.D || "N/A"}</p>
+            <p className="font-light">Designation</p>
+          </div>
+          
+          <div className="m-5">
+            <p className="font-medium">{personDetails.CE || "N/A"}</p>
+            <p className="font-light">Email</p>
+          </div>
+
+          <div className="m-5">
+            <p className="font-medium">{personDetails.MN || "N/A"}</p>
+            <p className="font-light">Mobile Number</p>
+          </div>
+
+          <div className="m-5">
+            <p className="font-medium">{personDetails.LN || "N/A"}</p>
+            <p className="font-light">Landline Number</p>
+          </div>
+
+          <div className="m-5">
+            <div className="font-medium">
+              {registeredAddress}
+            </div>
+            <p className="font-light">Registered Address</p>
+          </div>
+
+          <div className="m-5">
+            <div className="font-medium">
+              {billingAddress}
+            </div>
+            <p className="font-light">Billing Address</p>
+          </div>
+        </div>
+    </Dialog>
   )
 }
 

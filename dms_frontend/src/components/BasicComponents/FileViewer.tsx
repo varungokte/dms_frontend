@@ -69,10 +69,12 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
         data["R"]=rejectionReason=="Other"?rejectionText:rejectionReason;
       else if (status=="Verified" && data["R"])
         delete data["R"];
-     
-      res = (await editDocument(data)).status;
+      console.log("Data",data)
+      res = await editDocument(data);
+      console.log("res",res);
+
     }
-    if (res==200){
+    if (res.status==200){
       if (status=="Verified")
         setVerified(true);
       else
@@ -88,8 +90,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
     <div className="flex flex-row p-2 bg-black">
       <p className="flex-auto text-white m-auto mx-2 ">{props.actualName}</p>
       
-      {/* <button className="border-2 m-auto mx-5 p-2 rounded-if border-white text-white">Replace</button>
-      <button className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600">Delete</button> */}
+      {/* <button className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600">Delete</button> */}
       
       {rejected
         ?<span className="text-red-500 flex-auto my-auto">Document Rejected: {props.rejectionReason}</span>

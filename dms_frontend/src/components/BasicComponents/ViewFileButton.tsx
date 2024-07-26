@@ -7,15 +7,17 @@ import view_icon from "./../static/view_files_icon.svg";
 
 function ViewFileButton(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps)){
   const [openDialog, setOpenDialog] = useState(false);
-
+  const disabledOpacity="opacity-70";
   return (
     <div>
-      <button onClick={()=>setOpenDialog(true)}
-       className="flex flex-row rounded-xl p-3 w-28" 
-       style={{backgroundColor:"rgba(255, 245, 204, 1)"}}
+      <button
+        disabled={props.disabled}
+        className={`flex flex-row rounded-xl p-3 w-28 ${props.disabled?"hover:cursor-not-allowed":"hover:cursor-pointer"} ${props.disabled?disabledOpacity:""} `}
+        style={{backgroundColor:"rgba(255, 245, 204, 1)"}}
+        onClick={()=>setOpenDialog(true)}
       >
-        <img className="m-auto" src={view_icon} />
-        <span className="m-auto" style={{color:"rgba(255, 178, 0, 1)"}}>View</span>
+        <img className={`m-auto  ${props.disabled?disabledOpacity:""}`} src={view_icon} />
+        <span className={`m-auto  ${props.disabled?disabledOpacity:""}`} style={{color:"rgba(255, 178, 0, 1)"}}>View</span>
       </button>
       {openDialog
         ?<Dialog open={openDialog} onClose={()=>setOpenDialog(false)} fullScreen>

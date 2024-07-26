@@ -1,9 +1,8 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
-import { useLocation } from "react-router-dom";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { LoanSecurityTypeList } from "./../../Constants";
 
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger, } from "@/components/ui/tooltip";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 
 import LoanIDAssignment from "./LoanAccountComponents/LoanIDAssignment";
@@ -17,27 +16,31 @@ import LoanTeamSelection from "./LoanAccountComponents/LoanTeamSelection";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 
 import { FieldValues } from "DataTypes";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Tab, Tabs } from "@mui/material";
 
 function CreateLoanAccount() {
+  const {state} = useLocation();
+	const navigate = useNavigate();
+
+  if (!state)
+    return <Navigate to="../loan" />
+  
   useEffect(()=>{
 		document.title=`${(state.linkSource.charAt(0).toUpperCase()+state.linkSource.toLowerCase().slice(1))} Loan Account`+" | Beacon DMS"
 	},[]);
 
-  const {state} = useLocation();
+  useEffect(()=>{
+    if (!state)
+      navigate("../loan");
+  },[state])
 
-  const {getLoanFields, getTeamsList} = useGlobalContext();
-
-  const navRef = useRef<any>(null);
-  const sectionRef = useRef<any>([]);
+  const {getLoanFields} = useGlobalContext();
   
-  const [actionType] = useState<"CREATE"|"EDIT">(state.linkSource);
+  const actionType:"CREATE"|"EDIT"|"VIEW" =state.linkSource;
 
   const [loanId, setLoanId] = useState(state.linkSource=="CREATE"?"":state.loanId);
   const [AID, setAID] = useState(state.linkSource=="CREATE"?"":state.AID);
   const [currentSection, setCurrentSection] = useState(state.linkSource=="CREATE"?0:1);
-  const [navbarLastSections, setNavbarLastSections] = useState([0]);//The last section to be displayed on the navbar
-  const [jumpNumber, setJumpNumber] = useState(0);
 
   const [preexistingData, setPreexistingData] = useState<FieldValues>();
   
@@ -50,9 +53,10 @@ function CreateLoanAccount() {
   const [dataHasLoaded, setDataHasLoaded] = useState(state.linkSource=="CREATE"?true:false);
 
   const [assignedTeam,setAssignedTeam] = useState<string>();
-  const [teamList,setTeamList] = useState<any>();
 
-  const [formSections] = useState([
+  useEffect(()=>console.log("unsaved warning",unsavedWarning),[unsavedWarning]);
+
+  const formSections = [
     { name: "Create Agreement ID", component: LoanIDAssignment },
     { name: "Basic Details", component: LoanBasicDetails },
     { name: "Security Details", component: LoanSecurityDetails },
@@ -66,7 +70,7 @@ function CreateLoanAccount() {
     { name: "Covenants", component: LoanDocuments },
     { name: "Condition Precedent", component: LoanDocuments },
     { name: "Condition Subsequent", component: LoanDocuments },
-  ]);
+  ];
 
   const getOldData = async () => {
     const res = await getLoanFields(loanId);
@@ -78,12 +82,15 @@ function CreateLoanAccount() {
         setShowSecurityDetails(false);
       if (res.obj["CN"])
         setPreexistingData(res.obj);
-      console.log("res.obj",res.obj)
+      if (res.obj["_teamId"]){
+        setAssignedTeam(res.obj["_teamId"]);
+        setEnableDocumentSections(true);
+      }
       setDataHasLoaded(true);
     }
   }
 
-  const getAssignedTeam = async() => {
+  /* const getAssignedTeam = async() => {
     if (loanId){
       const res = await getTeamsList(loanId);
       if (res.status==200 && res.obj && res.obj.currentTeam && Object.keys(res.obj.currentTeam).length!=0){
@@ -96,12 +103,12 @@ function CreateLoanAccount() {
     }
     else
       setEnableDocumentSections(false);
-  }
+  } */
 
   useEffect(()=>{
-    if (actionType=="EDIT"){
+    if (actionType=="EDIT" || actionType=="VIEW"){
       getOldData();
-      getAssignedTeam();
+      //getAssignedTeam();
     }
   },[]);
   
@@ -126,107 +133,62 @@ function CreateLoanAccount() {
     });
   };
 
-  const navigateForward = () => {
-    if (navbarLastSections && navbarLastSections[jumpNumber+1]){
-      sectionRef.current[navbarLastSections[jumpNumber+1]].scrollIntoView({inline:"start"});
-      setJumpNumber(curr=>curr+1)
-    }
-    //console.log("get bounding client rect", sectionRef.current[4].getBoundingClientRect());
-  }
-
-  const backwardNavigation = () => {
-    if (navbarLastSections && navbarLastSections[jumpNumber-1]!=undefined){
-      sectionRef.current[navbarLastSections[jumpNumber-1]].scrollIntoView({inline:"start"});
-      setJumpNumber(curr=>curr-1)
-    }
-  }
-
-/*   const bringIntoFocus = (sectionIndex:number) => {
-    if (navbarLastSections.includes(sectionIndex))
-  }
- */
-  const calculateSectionBreaks = () =>{
-    //console.log(navRef.current.clientWidth)
-    let total_width=0;
-    const breaks:number[]=[];
-    for (let i=0; i<formSections.length; i++){
-      total_width+=sectionRef.current[i].offsetWidth+24;
-      if (total_width>=navRef.current.clientWidth){
-        breaks.push(i);
-        total_width=0;
-      }
-    }
-    setNavbarLastSections(curr=>curr.concat(breaks));
-  }
-
-  useEffect(()=>{
-    //console.log(navbarLastSections);
-    //console.log("get bounding client rect", sectionRef.current[9].getBoundingClientRect());
-  },[navbarLastSections])
-
-  useEffect(()=>{
-    calculateSectionBreaks();
-
-  },[])
-  
   return(
     <div style={{width:"relative"}}>
 			<p className="text-3xl font-bold mx-7 my-2 page-heading">{(actionType.charAt(0).toUpperCase()+actionType.toLowerCase().slice(1))} Loan Account</p>
       {AID?<p className="mx-7 mt-3 text-lg"><span className="font-normal">Agreement ID: </span><span className="text-custom-1">{AID}</span></p>:""}
       <br/>
       <div className="bg-white mx-7 p-2 rounded-xl">
-        <div className="flex flex-row" style={{position:"relative"}}>
-          <button><ChevronLeft className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={backwardNavigation}/></button>
-            <div style={{ width: '100%', overflowX: 'scroll', whiteSpace: 'nowrap', scrollbarWidth:"none" }} className="" ref={navRef}>
-              <TooltipProvider>
-                {formSections.map((section, index:number)=>{
-                  return(
-                    <Tooltip key={index}>
-                      <TooltipTrigger key={index} ref={el=>sectionRef.current[index]=el} 
-                        disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
-                        className={`py-3 px-2 border-2 border-zinc-300 rounded-xl m-3 min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`} 
-                        onClick={()=>{
-                          unsavedWarning
-                            ?(confirm("WARNING:\nYour unsaved data will be lost.\nTo save your data, close this dialog and click \"Save & Next\"")
-                              ?setCurrentSection(index)
-                              :""
-                            )
-                            :setCurrentSection(index)                      
-                        }}
-                      >
-                        <div className="flex flex-row">
-                          <div className={
-                            `border rounded-full ${index===0
-                              ?currentSection===index?
-                                "border-white"
-                                :"text-zinc-500 border-zinc-300"
-                              :currentSection===index?
-                                "border-white"
-                                :"text-zinc-700 border-zinc-500"
-                            }`} 
-                            style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}
-                          </div>
-                          <div className={`m-auto ${currentSection==0 && currentSection!==index?"text-zinc-500":""}`}>{section.name}</div>
-                        </div>
-                      </TooltipTrigger>
-                      {!okToFrolic && currentSection==1 && index>1
-                        ?<TooltipContent className="bg-white">
-                          <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
-                        </TooltipContent>
-                        
-                        :!enableDocumentSections && currentSection!=0 && index>=7
-                          ?<TooltipContent className="bg-white">
-                            <p className="">Please <span className="font-bold">select a team</span> to move to this page</p>
-                          </TooltipContent>
-                          :<></>
-                      }
-                    </Tooltip>
-                  )
-                })}
-              </TooltipProvider>
-            </div>
-          <button><ChevronRight className="text-white bg-custom-1 my-7" style={{borderRadius: "50%"}} onClick={navigateForward}/></button>
-        </div>
+      <Tabs
+        TabIndicatorProps={{style:{display:"none"}}}
+        value={currentSection}
+        onChange={(_,val)=>setCurrentSection(val)}
+        variant="scrollable"
+        scrollButtons
+        allowScrollButtonsMobile
+        aria-label="scrollable force tabs example"
+      >
+        {formSections.map((section, index:number)=>{
+          return <Tab key={index} disableRipple={false} disableFocusRipple={false}
+            label={
+              <div className={`flex flex-row py-3 px-2 border-2 border-zinc-300 rounded-xl min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`}>
+                <div className={
+                  `border rounded-full ${index===0
+                    ?currentSection===index?
+                      "border-white"
+                      :"text-zinc-500 border-zinc-300"
+                    :currentSection===index?
+                      "border-white"
+                      :"text-zinc-700 border-zinc-500"
+                  }`} 
+                  style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}
+                </div>
+                <div className={`m-auto ${currentSection==0 && currentSection!==index?"text-zinc-500":""}`}>{section.name}</div>
+              </div>
+            }
+            disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
+            onClick={()=>{
+              unsavedWarning
+                ?(confirm("WARNING:\nYour unsaved data will be lost.\nTo save your data, close this dialog and click \"Save & Next\"")
+                  ?setCurrentSection(index)
+                  :setCurrentSection(currentSection)
+                )
+                :setCurrentSection(index)                      
+            }}
+          />
+            {/* {!okToFrolic && currentSection==1 && index>1
+              ?<TooltipContent className="bg-white">
+                <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>
+              </TooltipContent>
+              
+              :!enableDocumentSections && currentSection!=0 && index>=7
+                ?<TooltipContent className="bg-white">
+                  <p className="">Please <span className="font-bold">select a team</span> to move to this page</p>
+                </TooltipContent>
+                :<></>
+            } */}
+        })}
+      </Tabs>
 
         <div className="mx-10">
           {dataHasLoaded
@@ -250,7 +212,6 @@ function CreateLoanAccount() {
                 setOkToFrolic: currentSection<2?setOkToFrolic:()=>{},
                 preexistingValues: preexistingData||{},
                 assignedTeam:assignedTeam||"",
-                teamList:teamList,
                 sectionCount:formSections.length-1
               }
             )

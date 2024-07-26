@@ -15,10 +15,14 @@ function LoanTeamSelection(props:LoanCommonProps){
   const [selectedTeam, setSelectedTeam] = useState("");
 
   useEffect(()=>{
-    getTeamsList(props.loanId).then(res=>{
-      if (res.status==200){ //console.log("response",res.obj)
-        setSelectedTeam(res.obj.currentTeam._teamId)
-        setTeamList(res.obj.list);}
+    getTeamsList({loanId:props.loanId}).then(res=>{
+      if (res.status==200){ 
+        console.log("response",res.obj)
+        if (res.obj["currentTeam"])
+          setSelectedTeam(res.obj.currentTeam._teamId);
+        //console.log("teams list",res.obj.list[0]["data"])
+        setTeamList(res.obj.list[0]["data"]);
+      }
       else
         setTeamList([]);
     }).catch(()=>{
@@ -32,9 +36,9 @@ function LoanTeamSelection(props:LoanCommonProps){
       "_loanId":props.loanId,
       "_teamId": selectedTeam
     }
-    //console.log("data",data)
+    console.log("data",data)
     selectTeam(data).then(res=>{
-      //console.log("res",res);
+      console.log("res",res);
       if (res==200){
         props.goToNextSection();
         props.setEnableDocumentSections(true);
@@ -57,7 +61,10 @@ function LoanTeamSelection(props:LoanCommonProps){
               ?<EmptyPageMessage sectionName="teams" />
               :teamsList.map((team:any,index:number)=>{
                 return (
-                  <Card key={index} className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2 border-double border-violet-800	":""}`} onClick={()=>setSelectedTeam(team["_id"])}>
+                  <Card key={index} 
+                    className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2 border-double border-violet-800	":""}`} 
+                    onClick={()=>{if (props.actionType!=="VIEW")setSelectedTeam(team["_id"])}}
+                  >
                     <CardHeader>
                       <CardTitle>	
                         <div className="flex flex-row">
@@ -77,7 +84,7 @@ function LoanTeamSelection(props:LoanCommonProps){
             :<LoadingMessage sectionName="a list of teams" />
           }
         </div>
-        <FormSectionNavigation isForm={true} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} />
+        <FormSectionNavigation isForm={true} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} actionType={props.actionType} />
       </form>
     </div>
   )

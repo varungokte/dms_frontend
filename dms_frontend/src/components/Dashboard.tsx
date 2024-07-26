@@ -11,8 +11,9 @@ import Search from "./BasicComponents/Search";
 import { PieChart } from '@mui/x-charts/PieChart';
 import 'react-circular-progressbar/dist/styles.css';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { KanbanBoard } from "./BasicComponents/KanbanBoard";
-import ThisWeekView from "./BasicComponents/ThisWeekView";
+import { KanbanBoard } from "./UnusedComponents/KanbanBoard";
+import { LineChart } from "@mui/x-charts";
+import DashboardComponent from "./DashboardComponent/DashboardComponent";
 
 type ZoneList = {
 	[key:string]:{
@@ -23,7 +24,8 @@ type ZoneList = {
 }
 
 function Dashboard(props:{label:string}) {
-	useEffect(()=>{
+	return <DashboardComponent />
+	/* useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
 
@@ -38,7 +40,7 @@ function Dashboard(props:{label:string}) {
 		{ completed: 30, in_progress:20, not_started:80 },
 		{ completed: 2, in_progress:10, not_started:1 },
 		{ completed: 710, in_progress:1029, not_started:809 },
-	]
+	];
 		zoneList.map((zone:any,index:number)=>{
 			if (zone!="-")
 				obj[zone] = amounts[index]
@@ -84,9 +86,19 @@ function Dashboard(props:{label:string}) {
 				:<LoadingMessage sectionName="data" />
 			}
 			<KanbanBoard />
-			{/* <ThisWeekView className="mx-10 w-[200px] " /> */}
+			 <ThisWeekView className="mx-10 w-[200px] " /> 
+			<LineChart
+				xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+				series={[
+					{
+						data: [2, 5.5, 2, 8.5, 1.5, 5],
+					},
+				]}
+				width={500}
+				height={300}
+			/>
 		</div>
-	)
+	) */
 };
 
 function AllZones(props:{zones:ZoneList, searchString:string, setter:Function}){

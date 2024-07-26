@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { DocumentStatusList } from "../../Constants";
+import { useContext, useEffect, useState } from "react";
+import { DocumentStatusList, sectionNames } from "../../Constants";
 import useGlobalContext from "../../GlobalContext";
 import { FieldValues } from "../../DataTypes";
 
@@ -11,6 +11,8 @@ import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 
 import UploadFileButton from "./BasicComponents/UploadFileButton";
 import ViewFileButton from "./BasicComponents/ViewFileButton";
+import { PermissionContext } from "@/MenuRouter";
+import { Pagination } from "./BasicComponents/Pagination";
 
 function SpecialCases(props:{label:string}) {
   useEffect(()=>{
@@ -22,9 +24,17 @@ function SpecialCases(props:{label:string}) {
 
   const [searchString, setSearchString] = useState("");
   const [added, setAdded] = useState(true);
-  const [documentLinks,setDocumentLinks] = useState<string[]>([]);
+  const [documentLinks,setDocumentLinks] = useState<{section:string,index:string|number}[]>([]);
 
   const {getSpecialList} = useGlobalContext();
+  const {userPermissions} = useContext(PermissionContext);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const [startIndex, setStartIndex] = useState(0);
+  const [endIndex, setEndIndex] = useState(10);
 
   const sectionNameBeautify:{[key:string]:string} = {
     "transactions": "Transaction Documents",
@@ -44,7 +54,7 @@ function SpecialCases(props:{label:string}) {
     "payment": "PD"
   }
 
-  const getDocsLoanData = (docList:FieldValues[],loanDetails:FieldValues[],teamName:string,section:string,arr:FieldValues[],links:string[]) => {
+  const getDocsLoanData = (docList:FieldValues[],loanDetails:FieldValues[],teamName:string,section:string,arr:FieldValues[],links:{section:string,index:string|number}[]) => {
     for (let j=0; j<docList.length; j++){
       const singleDoc = docList[j];
       const loanId = singleDoc["_loanId"];
@@ -52,6 +62,8 @@ function SpecialCases(props:{label:string}) {
       obj["_id"] = singleDoc["_id"]
       obj["_loanId"] = loanId;
       obj["TN"] = teamName;
+
+      obj["N"] = singleDoc["N"];
       if (singleDoc["R"])
         obj["R"] = singleDoc["R"];
 
@@ -80,8 +92,9 @@ function SpecialCases(props:{label:string}) {
       }
 
       obj["link"] = <div>
-        <p className="text-blue-500 text-base">{sectionNameBeautify[section]}</p>
-        <p className="font-light">{obj["C"]}</p>
+        <p className="text-blue-500 text-base">{obj["N"]}</p>
+        <p className="font-light text-sm">{obj["C"]}</p>
+        <p className="text-xs">{sectionNameBeautify[section]}</p>
       </div>;
 
       for (let k=0; k<loanDetails.length; k++){
@@ -92,26 +105,25 @@ function SpecialCases(props:{label:string}) {
       }
       arr.push(obj);
       if (section=="payment"){
-        console.log("the section",section)
-        links.push("../schedule");
+        links.push({section:"../schedule", index:obj["AID"]});
       }
       else if (section=="covenants")
-        links.push("../"+section);
+        links.push({section:"../"+section, index:obj["AID"]});
       else if (section.charAt(section.length-1)=="s")
-        links.push("../"+section.slice(0,section.length-1));
+        links.push({section:"../"+section.slice(0,section.length-1), index:obj["AID"]});
       else
-        links.push("../"+section);
+        links.push({section:"../"+section,index:obj["AID"]});
     }
   }
 
   useEffect(()=>{
     if (added){
-      getSpecialList(type).then(res=>{
+      getSpecialList({type, currentPage, rowsPerPage}).then(res=>{
         console.log("response",res);
         if (res.status==200){
           const arr:any = [];
-          const data = res.obj;
-          const links:string[] = [];
+          const data = res.obj[0]["data"];
+          const links:{section:string,index:string|number}[] = [];
           for (let i=0; i<data.length; i++){
             const teamName = data[i]["N"];
             const loanDetails = data[i]["loanDetails"];
@@ -126,7 +138,6 @@ function SpecialCases(props:{label:string}) {
                 getDocsLoanData(docs,loanDetails,teamName,section,arr,links)
             }   
           }
-          console.log("The result", arr);
           setDefaultData(arr);
           setDocumentLinks(links);
         }
@@ -135,7 +146,18 @@ function SpecialCases(props:{label:string}) {
       })
       setAdded(false);
     }
-  },[added])
+  },[added]);
+
+  useEffect(()=>{
+    setAdded(true);
+    if (defaultData){
+      setTotalPages(Math.ceil(defaultData.length/Number(rowsPerPage)));
+      setStartIndex((currentPage-1)*rowsPerPage);
+      setEndIndex(currentPage*rowsPerPage);
+    }
+  },[currentPage,rowsPerPage]);
+
+  useEffect(()=>console.log("default data",defaultData),[defaultData])
   
   return(
     <div>
@@ -159,10 +181,8 @@ function SpecialCases(props:{label:string}) {
               documentLinks={documentLinks}
               action={
                 defaultData.map((doc:any,index:number)=>{
-                  if (doc["GS"])
-                    console.log("single doc",doc);
                   if (!doc["S"] || doc["S"]==DocumentStatusList[1])
-                    return <UploadFileButton key={index} index={index} 
+                    return <UploadFileButton key={index} index={index}  disabled={!userPermissions[sectionNames[props.label]].includes("add")}
                       AID={doc["AID"]} sectionName={doc["SN"]}
                       setAdded={setAdded}
                       isPayment={doc["SN"]=="PD"}
@@ -170,15 +190,20 @@ function SpecialCases(props:{label:string}) {
                       _id={doc["SN"]=="PD"?doc._id:undefined}
                   />
                   else
-                    return <ViewFileButton key={index} type="doc" 
+                    return <ViewFileButton key={index} type="doc" disabled={!userPermissions[sectionNames[props.label]].includes("view")}
                       AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={doc["SN"]} 
                       status={doc["S"]} rejectionReason={doc["R"]} 
                       setAdded={setAdded} 
                       actualName={doc["SN"]=="PD"
-                        ?(doc.FD && doc.FD[0] && doc.FD[0].originalname)?doc.FD[0].originalname:""
-                        :doc.FD[0].originalname||""} 
+                        ?(doc.FD && doc.FD[0] && doc.FD[0].originalname)
+                          ?doc.FD[0].originalname
+                          :""
+                        :doc.FD[0].originalname||""
+                      } 
                       fileName={doc["SN"]=="PD"
-                        ?(doc.FD && doc.FD[0] && doc.FD[0].filename)?doc.FD[0].filename:""
+                        ?(doc.FD && doc.FD[0] && doc.FD[0].filename)
+                          ?doc.FD[0].filename
+                          :""
                         :doc.FD[0].filename||""
                       }
                     />
@@ -188,6 +213,11 @@ function SpecialCases(props:{label:string}) {
           :<LoadingMessage sectionName="data" />
         }
       </div>
+
+      {defaultData && defaultData.length>0
+        ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        :<></>
+      }
     </div>
   )
 }

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
-import { FieldValues } from "./../../DataTypes";
+import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "./../../DataTypes";
 import { LoanProductList, ZoneList } from "./../../Constants";
 import { Link } from "react-router-dom";
 
@@ -8,9 +8,13 @@ import { DataTable } from "./BasicComponents/Table";
 import Filter from "./BasicComponents/Filter";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 
 import edit_icon from "./static/edit_icon.svg";
-
+import view_icon from "./static/view_icon.svg";
+import Toast from "./BasicComponents/Toast";
+import { PermissionContext } from "@/MenuRouter";
+import { Pagination } from "./BasicComponents/Pagination";
 
 function FilterPage(props:{label:string}){
   const filterTypes:{[key:string]:{label:"Z"|"P",options:string[]}} = {
@@ -32,18 +36,61 @@ function FilterPage(props:{label:string}){
 	const [loanList, setLoanList] = useState<FieldValues[]>();
 	const [filtersList, setFiltersList] = useState<string[]>([]);
 
-	const { getLoanList} = useGlobalContext();
+  const [tableHeadings, setTableHeadings] = useState(["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount"]);
+  const [tableDataTypes, setTableDataTypes] = useState<TableDataTypes[]>(["index","text","text","text","text"]);
+
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
+
+	const { getLoanList,deleteLoan} = useGlobalContext();
+
+  const {userPermissions} = useContext(PermissionContext);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  useEffect(()=>{
+    const editPermission = userPermissions["loan"].includes("edit");
+    const viewPermission = userPermissions["loan"].includes("view");
+    const deletePermission = userPermissions["loan"].includes("delete");
+
+    if (editPermission || viewPermission || deletePermission){
+      setTableHeadings(curr=>{
+        curr.push("Action");
+        return [...curr];
+      });
+      setTableDataTypes(curr=>{
+        curr.push("action");
+        return [...curr];
+      });
+    }
+  },[userPermissions]);
+
 
 	useEffect(()=>{
 		setLoanList(undefined);
-		getLoanList(filterCategory.label,filtersList.length==0?[]:filtersList).then(res=>{
-      console.log("Response",res)
-			if (res.status==200)
-				setLoanList(res.arr);
+		getLoanList({filterType:filterCategory.label,filterCategory:filtersList.length==0?[]:filtersList, currentPage,rowsPerPage}).then(res=>{
+      //console.log("Response",res)
+			if (res.status==200){
+				setLoanList(res.arr[0]["data"]);
+        setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+      }
 			else
 				setLoanList([])
 		})
-	},[filtersList]);
+	},[filtersList,currentPage,rowsPerPage]);
+
+	const deleteLoanAccount = async (currIndex:number) => {
+    if (!loanList)
+      return;
+    const loanId = loanList[currIndex]["_id"];
+    const res = await deleteLoan(loanId);
+
+    if (res==200)
+      setToastOptions({open:true,type:"success", action:"delete",section:"Loan account"});
+    else
+      setToastOptions({open:true,type:"error", action:"delete",section:"Loan account"});
+  }
 	
 	return(
 		<div className="m-5">
@@ -53,21 +100,30 @@ function FilterPage(props:{label:string}){
           <Filter value={filtersList} setValue={setFiltersList} options={filterCategory.options} placeholderValue={props.label} multiple /> 
         </div>
 			</div>
-
+			<br />
 			<div>
 				{loanList
 					?loanList.length==0
 						?<span><br/><EmptyPageMessage sectionName="loans"/></span>
-						:<DataTable className="bg-white my-5" 
-							headingRows={["Sr. No.", "Agreement ID", "Company Name", "Group Name", "Zone", "Sanction Amount","Action"]} 
-							headingClassNames={["w-[80px]","w-[20%] text-center"," w-[20%] text-center","text-center","text-center","text-center","text-center"]}
-							tableData={loanList} columnIDs={["AID", "CN", "GN", "Z", "SA"]} dataTypes={["index","text","text","text","text","text","action"]} 
-							cellClassName={["font-medium text-center", "text-center text-custom-1","text-center","text-center","text-center","text-center"]} 
-							action = {loanList.map((item:any)=>{
+						:<DataTable className="bg-white" 
+							headingRows={tableHeadings} 
+							tableData={loanList} columnIDs={["AID", "CN", "Z", "SA"]} dataTypes={tableDataTypes}
+              indexStartsAt={(currentPage-1)*rowsPerPage}
+							action = {loanList.map((item,index)=>{
 								return(
-									<div className="flex flex-row">
-										<Link className="m-2" to="../loan/create" state={{linkSource: "EDIT", loanId: item["_id"], AID: item.AID}}><img src={edit_icon}/></Link>
-									</div>
+                  <div className="flex flex-row">
+                    {userPermissions["loan"].includes("edit")
+                      ?<Link className="m-2" to="../loan/create" state={{linkSource: "EDIT", loanId: item["_id"], AID: item.AID}}><img src={edit_icon}/></Link>
+                      :userPermissions["loan"].includes("view")
+                        ?<Link className="m-2" to="../loan/create" state={{linkSource: "VIEW", loanId: item["_id"], AID: item.AID}}><img src={view_icon}/></Link>
+                        :<></>
+                    }
+                    
+                    {userPermissions["loan"].includes("delete")
+                      ?<DeleteConfirmation thing="loan account" deleteFunction={deleteLoanAccount} currIndex={index}/>
+                      :<></>
+                    }
+                  </div>
 								)
 							})}
 						/>
@@ -75,6 +131,11 @@ function FilterPage(props:{label:string}){
 				}
 				<br />
 			</div>
+      {loanList && loanList.length>0
+        ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        :<></>
+      }
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
 		</div>
 	)
 }

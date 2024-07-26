@@ -5,11 +5,12 @@ import upload_icon from "./../static/upload_icon.svg";
 import Toast from "./Toast";
 import { ToastOptionsAttributes } from "./../../../DataTypes";
 
-function UploadFileButton(props:{index:number, AID:string, sectionName:string, docId:number|string, setAdded:Function, _id?:string, isPayment?:boolean}){
+function UploadFileButton(props:{index:number, AID:string, sectionName:string, docId:number|string, setAdded:Function, _id?:string, isPayment?:boolean, disabled?:boolean}){
   const [files, setFiles] = useState<any>([]);
+  const disabledOpacity="opacity-70"; 
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
   //useEffect(()=>console.log("file props",props),[props]);
-  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
   const uploadFile = async (userFiles:any) => {
     const { uploadFile } = useGlobalContext();
@@ -26,7 +27,7 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
   useEffect(()=>{
     if (files && files.length>0)
       uploadFile(files).then(res=>{
-        console.log("FILE UPLOADED",res);
+        //console.log("FILE UPLOADED",res);
         if (res==200){
           props.setAdded(true);
           setToastOptions({open:true,type:"success", action:"add",section:"File"});
@@ -37,15 +38,16 @@ function UploadFileButton(props:{index:number, AID:string, sectionName:string, d
   },[files]);
 
   return(
-    <div key={props.index}>
-      <label className="flex flex-row border-2 border-dashed rounded-xl p-3 w-28 " 
+    <div key={props.index} className="h-12">
+      <label className={`flex flex-row border-2 border-dashed rounded-xl p-3 w-28 ${props.disabled?"hover:cursor-not-allowed":"hover:cursor-pointer"} ${props.disabled?disabledOpacity:""}`}
         style={{backgroundColor: "rgba(225, 237, 255, 1)", borderColor: "rgba(148, 192, 255, 1)"}} 
         htmlFor={props.index+"upload"}
       >
-        <div className="m-auto"><img src={upload_icon}/></div>
-        <div className="m-auto"><span style={{color: "rgba(71, 145, 249, 1)"}}>Upload</span></div>
+        <div className={`m-auto ${props.disabled?disabledOpacity:""}`}><img src={upload_icon}/></div>
+        <div className={`m-auto ${props.disabled?disabledOpacity:""}`}><span style={{color: "rgba(71, 145, 249, 1)"}}>Upload</span></div>
       </label>
       <input id={props.index+"upload"} type="file" style={{width:"0.1px", opacity:"0"}} 
+        disabled={props.disabled}
         multiple
         onChange={
           (e)=>setFiles((curr:any)=>{

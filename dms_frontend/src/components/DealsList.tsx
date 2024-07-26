@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useState } from "react";
+import { ReactElement, useEffect, useRef, useState } from "react";
 import useGlobalContext from "../../GlobalContext";
 import moment from "moment";
 import { DocumentStatus, DocumentSectionDetails } from "DataTypes";
@@ -11,6 +11,8 @@ import Search from "./BasicComponents/Search";
 import ProgressBar from "./BasicComponents/ProgressBar";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+import { useLocation } from "react-router-dom";
+import { Pagination } from "./BasicComponents/Pagination";
 
 type DocumentDetails= {
   _id:string,
@@ -24,10 +26,11 @@ function DealsList(props:{label:string}) {
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
-  
-  const [dealData, setDealData] = useState<DocumentDetails[]>();
-  const [showDeals, setShowDeals] = useState<boolean[]>();
-  const [calculate, setCalculate] = useState(true);
+
+  const {state} = useLocation();
+  const dealRefs = useRef<any>([]);
+
+  useEffect(()=>console.log("state",state),[state])
 
   const setSection = (): DocumentSectionDetails => {
     if (props.label=="Transaction Documents")
@@ -46,26 +49,65 @@ function DealsList(props:{label:string}) {
 
   const [sectionDetails] = useState(setSection());
 
+  const [dealData, setDealData] = useState<DocumentDetails[]>();
+
+  const [calculate, setCalculate] = useState(true);
   const [searchString, setSearchString] = useState("");
+  const [showDeals, setShowDeals] = useState<boolean[]>();
+  const [fromRedirect, setFromRedirect] = useState(true);
+  const [currentTab, setCurrentTab] = useState(-1);
 
   const { getDealList} = useGlobalContext();
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
   useEffect(()=>{
-    console.log("calculate",calculate)
+    setCalculate(true);
+  },[currentPage,rowsPerPage]);
+
+  useEffect(()=>{
     if (calculate){
-      console.log("get datass")
-      getDealList(sectionDetails.sectionName).then(res=>{
-        console.log("response",res)
-        setDealData(res.obj);
-        setShowDeals(new Array(res.obj.length).fill(false));
+      getDealList({sectionName:sectionDetails.sectionName, currentPage, rowsPerPage}).then(res=>{
+        try{
+          setDealData(res.obj[0]["data"]);
+          const arr = new Array(res.obj.length).fill(false);
+          if (currentTab!=-1)
+            arr[currentTab] = true;
+          setShowDeals(arr);
+          setCurrentTab(-1);
+          setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+        }
+        catch(e){
+          setDealData([]);
+        }
       });
+      setCalculate(false);
     }
   },[calculate]);
 
   useEffect(()=>{
-    console.log("deal data has been changed");
-    setCalculate(true);
-  },[dealData])
+    if (!state)
+      setFromRedirect(false);
+    else if (fromRedirect)
+      openDeal();
+  },[state,dealData]);
+
+  const openDeal = () =>{
+    if (!dealData || !showDeals)
+      return;
+
+    let dealIndex = -1;
+    dealData.map((deal,index)=>{if (deal.AID==state)dealIndex=index});
+    if (dealIndex)
+      setShowDeals((curr:boolean[]|undefined)=>{
+        if (!curr)
+          return;
+        curr[dealIndex] = true;
+        return [...curr];
+    })
+  }
 
   return(
     <div>
@@ -83,36 +125,34 @@ function DealsList(props:{label:string}) {
           :dealData.length==0
             ?<EmptyPageMessage sectionName="deals"/>
             :dealData.map((deal,index)=>{
-                return <SingleDealDetails key={index} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} />
+                return <div ref={el=>dealRefs.current[index]=el} key={index}>
+                  <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} />
+                </div>
             })
         }
         <br/>
+        {dealData && dealData.length>0
+          ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+          :<></>
+        }
       </div>
     </div>
   )
 }
 
-function SingleDealDetails(props:{index:number, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, searchString:string, showDeals:boolean[],setShowDeals:Function, calculate:boolean, setCalculate:Function}) {
+function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, searchString:string, showDeals:boolean[],setShowDeals:Function, calculate:boolean, setCalculate:Function, linkSource?:string,setCurrentTab:Function}) {
   const [added,setAdded] = useState(true);
   const [progressValue, setProgressValue] = useState(0);
 
-  /* useEffect(()=>{
-    console.log("props.deal has changed",props.deal);
-    props.setCalculate(true)
-  },[props.deal]) */
-
   useEffect(()=>{
-    console.log("inside added",added)
     if (added){
-      console.log("setcalculate")
       props.setCalculate(true);
+      if (props.showDeals[props.index])
+        props.setCurrentTab(props.index);
     }
-  },[added])
+  },[added]);
 
   useEffect(()=>{
-    if (!props.calculate)
-      return;
-
     const totalDocs = props.deal.details.length;
     let verifiedDocs = 0;
     for (let i=0; i<totalDocs; i++){
@@ -120,9 +160,7 @@ function SingleDealDetails(props:{index:number, deal:DocumentDetails, sectionDet
         verifiedDocs++;
     }
     const percentage = (verifiedDocs/totalDocs*100).toFixed(2);
-    //console.log("percentage calculated",percentage)
     setProgressValue(Number(percentage));
-    props.setCalculate(false);
   },[props.deal,props.calculate]);
 
   const tableTopRow:[string,string][] = [
@@ -146,10 +184,10 @@ function SingleDealDetails(props:{index:number, deal:DocumentDetails, sectionDet
     <TableCollapsible key={props.index} index={props.index}
       topRow={tableTopRow}
       bottomRow={tableBottomRow}
-      showDeals={props.showDeals} setShowDeals={props.setShowDeals}
+      showTabs={props.showDeals} setShowTabs={props.setShowDeals}
       content={props.sectionDetails.sectionType=="pay"
-        ?<SingleDealPayments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} />
-        :<SingleDealDocuments loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded} />
+        ?<SingleDealPayments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} />
+        :<SingleDealDocuments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded} open={props.showDeals[props.index]}/>
       }
       searchString={props.searchString}
     />

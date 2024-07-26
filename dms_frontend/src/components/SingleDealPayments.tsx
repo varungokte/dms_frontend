@@ -1,31 +1,39 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useGlobalContext from "../../GlobalContext";
 import { DocumentSectionDetails } from "DataTypes";
-import { DocumentStatusList } from "../../Constants";
+import { DocumentStatusList, sectionNames } from "../../Constants";
 
 import { DataTable } from "./BasicComponents/Table";
 import UploadFileButton from "./BasicComponents/UploadFileButton";
 import ViewFileButton from "./BasicComponents/ViewFileButton";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
+import { PermissionContext } from "@/MenuRouter";
+import { Pagination } from "./BasicComponents/Pagination";
 
-function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:DocumentSectionDetails}){
+function SingleDealPayments(props:{label:string, loanId:string, AID:string, sectionDetails:DocumentSectionDetails}){
   const [paymentData, setPaymentData] = useState<any>();
   const [added, setAdded] = useState(true);
   const [scheduleId, setScheduleId] = useState("");
   
   const {getPaymentSchedule} = useGlobalContext();
+  const {userPermissions} = useContext(PermissionContext);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(()=>{
     if (added)
-      getPaymentSchedule(props.loanId).then((res)=>{
-        console.log("payment schedule",res);
+      getPaymentSchedule(props.loanId).then(res=>{
+        setAdded(false);
         if (res.status==200){
-          if (res.obj["T"]=="Fixed")
-            res.obj["GS"].map((inst:any)=>{inst["I"]=res.obj["I"];});
+          const data = res.obj[0]["data"];
+          setScheduleId(data["_id"]);
+          if (data["T"]=="Fixed")
+            res.obj["GS"].map((inst:any)=>{inst["I"]=data["I"]});
           setPaymentData(res.obj["GS"]);
-          setAdded(false);
-          setScheduleId(res.obj["_id"])
+          setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
         }
         else
           setPaymentData([]);
@@ -34,6 +42,10 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
       })
   },[added]);
 
+  useEffect(()=>{
+    setAdded(true);
+  },[currentPage,rowsPerPage]);
+
   return (
     <div className="p-5 mx-3 my-2 ">
       <br />
@@ -41,19 +53,21 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
         ?paymentData.length==0
           ?<EmptyPageMessage sectionName="installments" />
           :<DataTable 
-            headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Action"]} headingClassNames={["w-[100px] text-center","",""," w-[200px]"]}
+            headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Action"]} headingClassNames={["w-[100px]","",""," w-[200px]"]}
             tableData={paymentData} columnIDs={["D","I"]} dataTypes={["index","date","text","action"]}
-            cellClassName={["w-[100px] text-center","text-center","text-center","text-center w-[200px]"]} 
+            cellClassName={["w-[100px]","","","w-[200px]"]} 
             searchRows={[]} filterRows={[]}
             action={
               paymentData.map((inst:any,index:number)=>{
-                if (!inst["S"] || inst["S"]==DocumentStatusList[1])
-                  return <UploadFileButton key={props.AID+index} index={index}
+                if (inst==null)
+                  return <></>;
+                else if (!inst["S"] || inst["S"]==DocumentStatusList[1])
+                  return <UploadFileButton key={props.AID+index} index={index} disabled={!userPermissions[sectionNames[props.label]].includes("add")}
                     AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={index} _id={scheduleId}
                     setAdded={setAdded} isPayment
                   />
                 else
-                  return <ViewFileButton key={props.AID+index} type="pay"
+                  return <ViewFileButton key={props.AID+index} type="pay" disabled={!userPermissions[sectionNames[props.label]].includes("add")}
                     AID={props.AID} _id={scheduleId} sectionName={props.sectionDetails.sectionName} index={index}
                     setAdded={setAdded} schedule={paymentData}
                     status={inst["S"]} rejectionReason={inst["R"]} 
@@ -64,6 +78,10 @@ function SingleDealPayments(props:{loanId:string, AID:string, sectionDetails:Doc
             }  
           />
         :<LoadingMessage sectionName="data" />
+      }
+      {paymentData && paymentData.length>0
+        ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        :<></>
       }
     </div>
   )

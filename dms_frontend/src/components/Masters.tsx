@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import useGlobalContext from "./../../GlobalContext";
 import { FieldValues, FieldAttributesList } from 'DataTypes';
 import { MastersMapping } from './../../Constants';
@@ -13,6 +13,7 @@ import { CreateButtonStyling } from './BasicComponents/PurpleButtonStyling';
 import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
+import { PermissionContext } from "@/MenuRouter";
 
 function Masters(props:{label:string, masterLists: FieldValues, idList:string[], callMasterLists:Function}){
   useEffect(()=>{
@@ -21,12 +22,14 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
   
   const [fieldList, setFieldList] = useState<FieldAttributesList>([
     { category: "single", id:"N", name: "Category Name", type:"select", options:Object.keys(MastersMapping), required:true },
-    { category: "single", id:"V", name: "Values (Enter values separated by commas)", type:"textarea", required:true},
+    { category: "single", id:"V", name: "Values", type:"multitext", required:true},
   ]);
 
   const [selected, setSelected] = useState(0);
   const [added,setAdded] = useState(true);
   const [newValues, setNewValues] = useState<{N:string, V:string[]}>();
+
+  const {userPermissions} = useContext(PermissionContext);
 
   const [informationMessages] =  useState({
     "duplicate":<p className="text-red-700 text-base m-2">All values must be unique</p>,
@@ -67,7 +70,7 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
     setNewValues({N:key, V:value});
   },[selected,props.masterLists]);
 
-  const cleanUpInput = (str:string):string[] =>{
+  /* const cleanUpInput = (str:string):string[] =>{
     let val=str.trim();
 
     val=val.replaceAll("\n","");
@@ -79,11 +82,11 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
       val=val.slice(0,val.length-1);
     const arr = val.split(",");
     return [...(new Set(arr))];
-  }
+  } */
 
   const createMaster = async (userValues:FieldValues) =>{
-    userValues["V"]= cleanUpInput(userValues["V"]);
-    //console.log(" ", userValues);
+    //userValues["V"]= cleanUpInput(userValues["V"]);
+    console.log("uservalues", userValues);
     const res = await addToMasters(userValues);
     if (res==200)
       setAdded(true);
@@ -153,11 +156,15 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
     
       <div className="flex flex-row">
         <div className="flex-auto"></div>
-        <FormDialog key={-1} index={-1} type="mast"
-          triggerText={<div className="flex flex-row"><AddIcon/><span className="m-auto"> Add</span></div>} triggerClassName={`${CreateButtonStyling} `} formSize="medium"
-          formTitle="Add To Masters" formSubmit={createMaster} submitButton="Add" 
-          form={fieldList} currentFields={{}}
-        />
+        {userPermissions["masters"].includes("add")
+          ?<FormDialog key={-1} index={-1} type="mast"
+            triggerText={<div className="flex flex-row"><AddIcon/><span className="m-auto"> Add</span></div>} triggerClassName={`${CreateButtonStyling} `} formSize="medium"
+            formTitle="Add To Masters" formSubmit={createMaster} submitButton="Add" 
+            form={fieldList} currentFields={{}}
+          />
+          :<></>
+        }
+        
       </div>
       {props.masterLists
         ?Object.keys(props.masterLists).length!=0
@@ -179,22 +186,26 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
             </div>
 
             <div className="mx-20"></div>
-            {newValues
+            {newValues && newValues["V"]
               ?<div className="mr-28 w-[50%]">
                 <Table className="rounded-2xl bg-white">
                   <HeaderRows headingRows={[Object.keys(props.masterLists)[selected]]} headingClassNames={["text-2xl"]} />
                   <TableBody>
-                    {newValues.V.map((data:any,index:number)=>{
+                    {newValues["V"].map((data:any,index:number)=>{
                       if (data==="-")
                         return <></>
                       return (
                         <TableRow key={index} className="border-none">
                           <TableCell>
                             <div className="flex flex-row">
-                              <input className={`text-xl p-1 rounded-if bg-gray-100 w-full`} value={data} onChange={(e)=>editValue(e.target.value,index)} />
-                              <button className='p-1' onClick={()=>removeValue(index)}>
-                                <RemoveCircleIcon fontSize="medium" className="mx-2" sx={{color:"red"}} />
-                              </button>
+                              <input disabled={!userPermissions["masters"].includes("edit")} className={`text-xl p-1 rounded-if bg-gray-100 w-full`} value={data} onChange={(e)=>editValue(e.target.value,index)} />
+
+                              {userPermissions["masters"].includes("edit")
+                                ?<button className='p-1' onClick={()=>removeValue(index)}>
+                                  <RemoveCircleIcon fontSize="medium" className="mx-2" sx={{color:"red"}} />
+                                </button>
+                                :<></>
+                              }
                             </div>
                           </TableCell>
                         </TableRow>
@@ -202,17 +213,23 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
                     })}
                     <TableRow>
                       <TableCell>
-                        <button onClick={createNewEntry}><AddCircleIcon sx={{color:"rgba(80, 65, 188, 1)"}} /></button>
+                        {userPermissions["masters"].includes("edit")
+                          ?<button onClick={createNewEntry}><AddCircleIcon sx={{color:"rgba(80, 65, 188, 1)"}} /></button>
+                          :<></>
+                        }
                         {informationMessages[information]}
                       </TableCell>
                     </TableRow>
-                    <TableRow>
-                      <TableCell>
-                        <button className={`w-full h-[40px] rounded-if text-white text-lg bg-custom-1 hover:bg-custom-1`} onClick={editMaster}>
-                          Save Changes
-                        </button>
-                      </TableCell>
-                    </TableRow>
+                    {userPermissions["masters"].includes("edit")
+                      ?<TableRow>
+                        <TableCell>
+                          <button className={`w-full h-[40px] rounded-if text-white text-lg bg-custom-1 hover:bg-custom-1`} onClick={editMaster}>
+                            Save Changes
+                          </button>
+                        </TableCell>
+                      </TableRow>
+                      :<></>
+                    }
                   </TableBody>
                 </Table>
              </div>

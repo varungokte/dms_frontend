@@ -10,11 +10,7 @@ function PrivateRoutes(){
   const {getDecryptedToken} = useGlobalContext();
   useEffect(()=>{
     getDecryptedToken().then((resToken:any)=>{
-      //console.log(resToken)
-     // console.log("private routes token", resToken)
-      /* if (JSON.stringify(token)===JSON.stringify(resToken) && Object.keys(resToken).length>0)
-        return;
-       */if (resToken)
+      if (resToken)
         setToken(resToken);
       else
         setToken("INVALID");
@@ -22,7 +18,8 @@ function PrivateRoutes(){
       setToken("INVALID");
     })
   },[]);
-
+  //console.log("private routes token",token);
+  
   if (token=="INVALID")
     return <Navigate to="/login"/>
   else if (token)

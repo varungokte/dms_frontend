@@ -1,65 +1,73 @@
 import { useEffect, useState } from "react";
+import { FieldValues, FormFieldAttributes } from "DataTypes";
+
 import SelectField from "./SelectField";
 import PermissionsField from "./PermissionsField";
-import { FieldValues } from "DataTypes";
 
-function RoleField (props:{index:number, id: string, name:string, roleList:FieldValues[], required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, edit?:boolean}){
-  const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
-  const [currentRole, setCurrentRole] = useState<string>();
-  const [permissionsExist, setPermissionsExist] = useState(false);
-
-  //useEffect(()=>console.log("role props.prefillValues",props),[props])
-
-  useEffect(()=>{
-    if (!props.prefillValues)
-      return;
-
-    if (!permissionsExist && !currentRole){
-      setPermissionsExist(true);
-      if (props.prefillValues["R"])
-        setCurrentRole(props.prefillValues["R"]);
-    }
-
-    else if (currentRole!=props.prefillValues["R"]){
-      setPermissionsExist(false);
-      setCurrentRole(props.prefillValues["R"]);
-    }
-  },[props.prefillValues]);
-
-  useEffect(()=>{
-    if (props.roleList==undefined)
-      return;
-    const obj:any={}
-    for (let i=0; i<props.roleList.length; i++)
-      obj[props.roleList[i]["N"]]=props.roleList[i]["P"];
-    setAllRolesPermissionsList(obj);
-  },[props.roleList]);
-
-  useEffect(()=>{
-    if (!currentRole)
-      return;
-    
-    if (!permissionsExist){
-      props.setPrefillValues((curr:any)=>{
-        curr["UP"]=allRolesPermissionsList[currentRole];
-        return {...curr};
-      })
-    }
-  },[allRolesPermissionsList,currentRole,permissionsExist])
-
-  return (
-    <div>
-      <SelectField index={props.index} id={props.id} name={props.name} options={["-"].concat(Object.keys(allRolesPermissionsList))} required={props.required} disabled={props.disabled} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} />
-      {currentRole
-        ?<PermissionsField index={props.index} id={"UP"} name={"Permission"} 
-          permissionPreset={props.prefillValues["UP"]} 
-          required={props.required} disabled={props.disabled} 
-          setPermissionSet={props.setPrefillValues}
-        />
-        :<></>
+function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList:FieldValues[], prefillValues:any, setPrefillValues:Function, disabled:boolean}){
+  try{
+    const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
+    const [currentRole, setCurrentRole] = useState<string>();
+    const [firstTime, setFirstTime] = useState(true);
+    const [permissionsExist, setPermissionsExist] = useState(false);
+  
+    //useEffect(()=>console.log("role props",props),[props])
+  
+    useEffect(()=>{
+      //console.log("props.prefillValues",props.prefillValues)
+      if (!props.prefillValues)
+        return;
+      else if (firstTime){
+        setFirstTime(false);
+        if (Object.keys(props.prefillValues).length!=0)
+          setPermissionsExist(true);
+        else
+          setPermissionsExist(false);
       }
-    </div>
-  )
+  
+      if (currentRole!=props.prefillValues["R"]){
+        setCurrentRole(props.prefillValues["R"]);
+        if (currentRole)
+          setPermissionsExist(false);
+      }
+    },[props.prefillValues]);
+  
+    //useEffect(()=>console.log("permissionsExist has been changed",permissionsExist),[permissionsExist])
+  
+    useEffect(()=>{
+      if (props.roleList==undefined)
+        return;
+      const obj:any={}
+      for (let i=0; i<props.roleList.length; i++)
+        obj[props.roleList[i]["N"]]=props.roleList[i]["P"];
+      setAllRolesPermissionsList(obj);
+    },[props.roleList]);
+  
+    useEffect(()=>{
+      if (!currentRole)
+        return;
+      //console.log("permissions exisit",permissionsExist)
+      if (!permissionsExist){
+        props.setPrefillValues((curr:any)=>{
+          curr["UP"]= allRolesPermissionsList[currentRole];
+          return {...curr};
+        })
+      }
+    },[allRolesPermissionsList,currentRole,permissionsExist])
+  
+    return (
+      <div>
+        <SelectField index={props.index} fieldData={{id:props.fieldData.id, name:props.fieldData.name, type:"select", options:["-"].concat(Object.keys(allRolesPermissionsList)),required:props.fieldData.required}}  prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} disabled={props.disabled} />
+        {currentRole
+          ?<PermissionsField index={props.index} fieldData={{id:"UP", name:"Permissions", type:"permissions", required:props.fieldData.required, disabled:props.fieldData.disabled}}  permissionPreset={props.prefillValues["UP"]} setPermissionSet={props.setPrefillValues}disabled={props.disabled} />
+          :<></>
+        }
+      </div>
+    )
+  }
+  catch(e){
+    return <p className="my-5 text-red-600">An error has occured</p>
+  }
 };
 
 export default RoleField;

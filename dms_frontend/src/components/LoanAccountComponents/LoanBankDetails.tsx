@@ -8,7 +8,7 @@ import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
 function LoanBankDetails(props:LoanCommonProps) {
   const {createLoan} = useGlobalContext();
 
-  const [fieldList] = useState<GridFieldAttributes>( {category:"grid", row:4, fields:[
+  const fieldList:GridFieldAttributes = {category:"grid", row:4, fields:[
     { id:"AN", name:"Account Name", type:"text", required:false },
     { id:"BAN", name:"Account Number", type:"text",required:false },
     { id:"AT", name:"Account Type", type:"select", options:BankAccountTypeList,required:false },
@@ -16,7 +16,7 @@ function LoanBankDetails(props:LoanCommonProps) {
     { id:"BN", name:"Bank Name", type:"text",required:false},
     { id:"LB", name:"Branch Name", type:"text",required:false },
     { id:"BA", name:"Branch Address", type:"text",required:false },
-  ]});
+  ]};
   
   const [fieldValues, setFieldValues] = useState<any>([{}]);
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
@@ -100,9 +100,9 @@ function LoanBankDetails(props:LoanCommonProps) {
   return (
     <div className="">
       <br/>
-      <form onSubmit={submitForm}>
-        <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} />
-        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} />
+      <form onSubmit={submitForm} >
+        <FormRepeatableGrid fieldList={fieldList["fields"]} fieldValues={fieldValues} setFieldValues={setFieldValues} submitForm={submitForm} fieldsInRow={3} disabled={props.actionType=="VIEW"} />
+        <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm enableLoadingSign={enableLoadingSign} actionType={props.actionType} />
       </form>
     </div>
   )

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useGlobalContext from "./../../GlobalContext";
 
 import { DataTable } from "./BasicComponents/Table";
@@ -8,9 +8,12 @@ import Search from "./BasicComponents/Search";
 import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
 import LoadingMessage from "./BasicComponents/LoadingMessage";
-import { FieldAttributesList, ToastOptionsAttributes } from "../../DataTypes";
+import { FieldAttributesList, TableDataTypes, ToastOptionsAttributes } from "../../DataTypes";
 import FormDialogTeam from "./FormComponents/FormDialogTeam";
 import Toast from "./BasicComponents/Toast";
+import { sectionNames } from "./../../Constants";
+import { PermissionContext } from "@/MenuRouter";
+import { Pagination } from "./BasicComponents/Pagination";
 
 function TeamManagement(props:{label:string}){
   useEffect(()=>{
@@ -18,6 +21,7 @@ function TeamManagement(props:{label:string}){
 	},[]);
 
   const [teamList,setTeamList] = useState<any>();
+  const {userPermissions} = useContext(PermissionContext);
 
   /* Team Naming Format 
     Combined: {TD:{M:[], C:[]}}
@@ -64,13 +68,44 @@ function TeamManagement(props:{label:string}){
   const { addTeam, getTeamsList} = useGlobalContext();
 
   const [searchString, setSearchString] = useState("");
+  const [tableHeadings, setTableHeadings] = useState(["Team Name", "Team Lead", "Created On", "Status"]);
+  const [tableDataTypes, setTableDataTypes] = useState<TableDataTypes[]>(["text", "text","date", "team-status"]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  useEffect(()=>{
+    const editPermission = userPermissions[sectionNames[props.label]].includes("edit");
+    const deletePermission = userPermissions[sectionNames[props.label]].includes("delete");
+    if (editPermission || deletePermission){
+      setTableHeadings(curr=>{
+        if (curr [curr.length-1]!="Action")
+          curr.push("Action");
+        return [...curr];
+      });
+      setTableDataTypes(curr=>{
+        if (curr [curr.length-1]!="action")
+          curr.push("action");
+        return [...curr];
+      });
+    }
+  },[userPermissions])
 
   useEffect(()=>{
     if (added){
-      getTeamsList().then(res=>{
-        console.log("res",res)
-        if (res.status==200 && res.obj.length!=0){
-         setTeamList(res.obj.list);}
+      getTeamsList({currentPage:currentPage, rowsPerPage:rowsPerPage}).then(res=>{
+          console.log("res",res)
+        if (res.status==200){
+          try{
+            const data = res["obj"]["list"][0]["data"];
+            setTotalPages(Math.ceil(Number(res.obj["list"][0]["metadata"][0]["total"])/Number(rowsPerPage)));
+            setTeamList(data);
+          }
+          catch(e){
+            setTeamList([]);
+          }
+        }
         else
           setTeamList([])
       }).catch(()=>{
@@ -79,6 +114,10 @@ function TeamManagement(props:{label:string}){
       setAdded(false);
     }
   },[added]);
+
+  useEffect(()=>{
+    setAdded(true);
+  },[currentPage,rowsPerPage]);
 
   const teamMembersSeparateToCombined = (userValues:any) =>{
     const data:any={};
@@ -112,7 +151,7 @@ function TeamManagement(props:{label:string}){
     const data = teamMembersSeparateToCombined(userValues);
     data["_id"] = userValues["_id"];
 
-    console.log("SUBMITTED", data);
+    //console.log("SUBMITTED", data);
 
     const res = await addTeam(data);
 
@@ -140,11 +179,14 @@ function TeamManagement(props:{label:string}){
       <div className="flex flex-row">
         <div className="flex-auto"><Search label={"Search by Team Name"} setter={setSearchString} className=" mx-7" /></div>
         <div>
-          <FormDialogTeam key={-1} index={-1} type="team"
-            triggerText="Add Team" triggerClassName={`${CreateButtonStyling} mx-7`} formSize="medium"
-            formTitle="Add Team" formSubmit={createTeam} submitButton="Add"
-            form={fieldList} currentFields={{}}
-          />
+          {userPermissions[sectionNames[props.label]].includes("add")
+            ?<FormDialogTeam key={-1} index={-1}
+              triggerText="Add Team" triggerClassName={`${CreateButtonStyling} mx-7`} formSize="medium"
+              formTitle="Add Team" formSubmit={createTeam} submitButton="Add"
+              form={fieldList} currentFields={{}}
+            />
+            :<></>
+          }
         </div>
       </div>
       <div className="m-7">
@@ -152,17 +194,21 @@ function TeamManagement(props:{label:string}){
           ?teamList.length==0
             ?<EmptyPageMessage sectionName="teams"/>
             :<DataTable className="bg-white rounded-xl"
-              headingRows={["Team Name", "Team Lead", "Total Members", "Created On", "Status","Action"]}
-              tableData={teamList} columnIDs={["N","L","M","createdAt","S"]} dataTypes={["text", "text", "count-team","date", "team-status", "action"]}
+              headingRows={tableHeadings}
+              tableData={teamList} columnIDs={["N","L","createdAt","S"]} dataTypes={tableDataTypes}
+              cellClassName={["","","","", userPermissions[sectionNames[props.label]].includes("edit")?"editable":"",""]}
               setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
               action={teamList.map((_:any, index:number)=>{
                 return(
                   <div className="flex flex-row">
-                    <FormDialogTeam key={index} index={index} edit type="team"
-                      triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
-                      formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
-                      form={fieldList} currentFields={teamList[index]}
-                    />
+                    {userPermissions[sectionNames[props.label]].includes("edit")
+                      ?<FormDialogTeam key={index} index={index} edit
+                        triggerClassName={""} triggerText={<img src={edit_icon} className="mr-5"/>}
+                        formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="medium"
+                        form={fieldList} currentFields={teamList[index]}
+                      />
+                      :<></>
+                    }
                     {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
                   </div>
                 )
@@ -172,6 +218,11 @@ function TeamManagement(props:{label:string}){
           :<LoadingMessage sectionName="teams" />
         }
       </div>
+      <br />
+      {teamList && teamList.length>0
+        ?<Pagination className="mx-7" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        :<></>
+      }
       {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
     </div>
   )

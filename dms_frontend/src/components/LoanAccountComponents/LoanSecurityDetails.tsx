@@ -13,14 +13,14 @@ function LoanSecurityDetails(props:LoanCommonProps){
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
   
-  const [fieldListFixed] = useState<GridFieldAttributes>({category:"grid",row:2,fields:[
+  const fieldListFixed:GridFieldAttributes = {category:"grid",row:2,fields:[
     { id:"SP", name:"Share Percentage(%)", type:"float", required:false },
     { id:"DV", name:"Date of Valuation", type:"date",required:false },
-  ]});
-  const [fieldListRepeatable] = useState<GridFieldAttributes>({category:"grid",row:2,fields:[
+  ]};
+  const fieldListRepeatable:GridFieldAttributes = {category:"grid",row:2,fields:[
     { id:"T", name:"Security Type", type:"select", options:LoanSecurityTypeList,required:false },
     { id:"V", name:"Security Value", type:"integer",required:false },
-  ]});
+  ]};
   
   const {createLoan} = useGlobalContext();
 
@@ -135,18 +135,21 @@ function LoanSecurityDetails(props:LoanCommonProps){
     <div className="">
       <br/>
       {disableFields
-        ?<p className="text-red-600 m-5">These fields are not applicable because the security type was marked unsecured in the previous section.<br/>Please move on to the next section</p>
+        ?<div>
+          <p className="text-red-600 m-5">These fields are not applicable because the security type was marked unsecured in the previous section.<br/>Please move on to the next section</p>
+          <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} sectionCount={props.sectionCount} isForm={false} enableLoadingSign={enableLoadingSign} actionType={props.actionType} />
+          </div>
         :<form onSubmit={submitForm}>
           <div className="grid grid-cols-2">
             {fieldListFixed.fields.map((field,index)=>{
               if (field.type=="date")
-                return <DateField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+                return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} repeatFields={false} formIndex={-1}/>
               else if (field.type=="float")
-                return <FloatNumberField key={index} index={index} id={field.id} name={field.name} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={disableFields} required={field.required||false} repeatFields={false} formIndex={-1}/>
+                return <FloatNumberField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields}  repeatFields={false} formIndex={-1}/>
             })}
           </div>
-          <FormRepeatableGrid key={2} fieldList={fieldListRepeatable.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} />
-          <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} sectionCount={props.sectionCount} isForm enableLoadingSign={enableLoadingSign} />
+          <FormRepeatableGrid key={2} fieldList={fieldListRepeatable.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} disabled={props.actionType=="VIEW"} />
+          <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} sectionCount={props.sectionCount} isForm enableLoadingSign={enableLoadingSign} actionType={props.actionType} />
           <br/>
         </form>
       }

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 
-function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, sectionCount:number, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean}) {
+function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, sectionCount:number, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean, actionType?:"CREATE"|"EDIT"|"VIEW"}) {
   const navigate = useNavigate();
 
   const [nextButtonValue, setNextButtonValue] = useState(<div className="flex flex-row place-content-center"><div>Next</div><ChevronRight/></div>);
@@ -22,7 +22,6 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
     });
   };
 
-
   return (
     <div className="flex flex-row">
       <div className="flex-auto">
@@ -40,7 +39,7 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
           </button>
         }
         {props.currentSection<props.sectionCount
-        ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36" type={props.isForm?"submit":"button"} onClick={()=>{props.isForm?{}:props.goToNextSection()}}>
+        ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36" type={props.isForm&&props.actionType!="VIEW"?"submit":"button"} onClick={()=>{props.isForm&&props.actionType!="VIEW"?{}:props.goToNextSection()}}>
           {nextButtonValue}
         </button>
         :<></>

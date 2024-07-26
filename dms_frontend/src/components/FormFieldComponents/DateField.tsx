@@ -1,6 +1,6 @@
 import moment from "moment";
 import FieldLabel from "./FieldLabel";
-import { FieldValues } from "DataTypes";
+import { FieldValues, FormFieldAttributes } from "DataTypes";
 import { useEffect, useState } from "react";
 
 const getValidMinDate = (id:string, prefillValues:FieldValues):string => {
@@ -17,38 +17,38 @@ const getValidMinDate = (id:string, prefillValues:FieldValues):string => {
   return date;
 } */
 
-function DateField (props:{index:number|string, id:string, name: string, required?:boolean, disabled?:boolean, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number }) {
+function DateField (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
   const [prefillValue, setPrefillValue] = useState<string>();
 
   useEffect(()=>{
-    if (props.prefillValues && props.prefillValues[props.id] && !prefillValue)
-      setPrefillValue(props.prefillValues[props.id]);
+    if (props.prefillValues && props.prefillValues[props.fieldData.id] && !prefillValue)
+      setPrefillValue(props.prefillValues[props.fieldData.id]);
   },[props.prefillValues]);
 
   return(
     <div key={props.index} className="mb-5 mx-2">
-      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.id} name={props.name} required={props.required} disabled={props.disabled} />
-      <input key={props.index+props.id+"t_2"} 
-        id={props.id} 
+      <FieldLabel key={props.index+"t_1"} index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
+      <input key={props.index+props.fieldData.id+"t_2"} 
+        id={props.fieldData.id} 
         type="date" 
         disabled={props.disabled} 
-        required={props.required}
-        className={`border rounded-if w-full p-4 text-black ${props.name==""?"mt-7":""}`}
-        value={props.prefillValues[props.id]
-          ?moment(props.prefillValues[props.id]).format("yyyy-MM-DD")
+        required={props.fieldData.required}
+        className={`border rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
+        value={props.prefillValues[props.fieldData.id]
+          ?moment(props.prefillValues[props.fieldData.id]).format("yyyy-MM-DD")
           :""
         }
-        min={props.prefillValues && props.prefillValues[props.id]
-          ?props.prefillValues[props.id]
-          :getValidMinDate(props.id, props.prefillValues)
+        min={props.prefillValues && props.prefillValues[props.fieldData.id]
+          ?props.prefillValues[props.fieldData.id]
+          :getValidMinDate(props.fieldData.id, props.prefillValues)
         } 
         /* max={props.prefillValues && props.prefillValues[props.id]
           ?props.prefillValues[props.id]
           :getValidMaxDate(props.id,props.prefillValues)
         } */
         onChange={props.repeatFields && props.formIndex!=null
-          ?(e)=>{props.setPrefillValues((curr:any)=>{curr[props.formIndex||0][props.id]=e.target.value; return [...curr];})}
-          :(e)=>{props.setPrefillValues((curr:any)=>{console.log("e.target.value",e.target.value); curr[props.id]=e.target.value; console.log("new curr",curr); return {...curr};})}
+          ?(e)=>{props.setPrefillValues((curr:any)=>{curr[props.formIndex||0][props.fieldData.id]=e.target.value; return [...curr];})}
+          :(e)=>{props.setPrefillValues((curr:any)=>{curr[props.fieldData.id]=e.target.value; return {...curr};})}
         }
       />
     </div>
