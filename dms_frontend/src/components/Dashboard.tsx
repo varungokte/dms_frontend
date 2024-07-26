@@ -1,13 +1,6 @@
-import { useState, useEffect } from "react";
-//import useGlobalContext from "../../GlobalContext";
-//import { masters } from "./../../Constants";
 
-import { Card, CardContent, CardFooter, CardHeader, CardTitle, } from "@/components/ui/card";
-import { DataTable } from "./BasicComponents/Table";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import Search from "./BasicComponents/Search";
 
+<<<<<<< HEAD
 import { PieChart } from '@mui/x-charts/PieChart';
 import 'react-circular-progressbar/dist/styles.css';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -56,8 +49,15 @@ function Dashboard(props:{label:string}) {
 	]);
 
 	const [searchString, setSearchString] = useState("");
+=======
+import React from 'react'
+import DashboardComponent from './DashboardComponent/DashboardComponent.js'
+import DashboardTwo from './DashboardComponent/DashboardTwo.js'
+>>>>>>> eb11b0781c0e48c547d57e902855326f49a9ef4d
 
+const Dashboard = () => {
 	return (
+<<<<<<< HEAD
 		<div>
 			<p className="text-3xl font-bold m-7">
 				{currentZone==""
@@ -143,7 +143,12 @@ function SingleZone(props:any){
 			tableData={props.zoneDetails} columnIDs={["AID", "CN","SD"]} 
 			cellClassName={["font-medium","","","text-right"]} dataTypes={["text", "text", "text", "text"]} 
 		/>
+=======
+		<div className=''>
+			<DashboardTwo label='dashboard 2' />
+		</div>
+>>>>>>> eb11b0781c0e48c547d57e902855326f49a9ef4d
 	)
 }
 
-export default Dashboard;
+export default Dashboard
