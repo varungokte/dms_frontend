@@ -5,8 +5,7 @@ import { FieldValues, GridFieldAttributes, LoanCommonProps } from "DataTypes";
 import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanStatusList, LoanTypeList, ProjectStatusList, YesOrNoList, ZoneList } from "../../../Constants";
 
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
-import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
-import { useToast } from "@/components/ui/use-toast"
+import RequiredFieldsNote from "../BasicMessages/RequiredFieldsNote";
 
 import SelectField from "../FormFieldComponents/SelectField";
 import DateField from "../FormFieldComponents/DateField";
@@ -46,6 +45,8 @@ function LoanBasicDetails(props:LoanCommonProps) {
   const [validationErrors, setValidationErrors] = useState<{[key:string]:string}>({});
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
 
+  const dsraFields = ["A","F","DS","V"]; 
+
   useEffect(()=>{
     if (Object.keys(props.preexistingValues).length!=0){
       //console.log("preexising values",props.preexistingValues)
@@ -61,7 +62,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
       if (props.preexistingValues["DSRA"] && Object.keys(props.preexistingValues["DSRA"]).length!=0){
         for (let i=0; i<Object.keys(props.preexistingValues["DSRA"]).length; i++){
           const key = Object.keys(props.preexistingValues["DSRA"])[i];
-          obj[key] = props.preexistingValues["DSRA"][key]
+          obj[key=="S"?"DS":key] = props.preexistingValues["DSRA"][key];
         }
       }
       setFieldValues((curr)=>{
@@ -78,7 +79,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
   useEffect(()=>{
     //console.log("Field values",fieldValues)
     if (Object.keys(props.preexistingValues).length!=0){
-      //console.log("no changes?",compareFieldsToPreexisting())
+      console.log("no changes?",compareFieldsToPreexisting())
       props.setUnsavedWarning(!compareFieldsToPreexisting());
     }
   },[fieldValues,props.preexistingValues]);
@@ -90,13 +91,12 @@ function LoanBasicDetails(props:LoanCommonProps) {
         curr["DS"] = "";
         curr["V"] = "";
         return {...curr};
-      })
+      });
     }
   },[fieldValues["A"]])
 
 
-  const {createLoan} = useGlobalContext();  
-  const { toast } = useToast();
+  const {createLoan} = useGlobalContext(); 
 
   const compareFieldsToPreexisting = () => {
     let no_changes = true;
@@ -106,9 +106,22 @@ function LoanBasicDetails(props:LoanCommonProps) {
         continue;
       let isDateField = false;
       fieldList["fields"].map(obj=>{if (obj.id==id && obj.type=="date") isDateField=true;})
-      if (fieldValues[id] && (!isDateField && props.preexistingValues[id]!=fieldValues[id] || (isDateField && fieldValues[id]!=moment(props.preexistingValues[id]).format("yyyy-MM-DD")))){
-        console.log("a change - ",id,"fieldvalues", fieldValues[id], "prefil value",props.preexistingValues[id], moment(props.preexistingValues[id]).format("yyyy-MM-DD"))
-        no_changes= false;}
+
+      const isDsraField = dsraFields.includes(id);
+
+      const dsraFieldError = fieldValues["id"] && props.preexistingValues["DSRA"] && props.preexistingValues["DSRA"]["id"] && fieldValues[id]!= props.preexistingValues["DSRA"][id=="DS"?"S":id];
+      const dateFieldError = fieldValues[id] && props.preexistingValues["id"] && fieldValues[id]!=moment(props.preexistingValues[id]).format("yyyy-MM-DD");
+      const regFieldError = fieldValues[id] && props.preexistingValues[id]!=fieldValues[id];
+
+      if ((isDsraField && dsraFieldError) || (isDateField && dateFieldError) || (!isDsraField && !isDateField && regFieldError )){
+        //console.log(id, "reg",regFieldError,"dsra",dsraFieldError,"date",dateFieldError)
+        //console.log("a change - ",id,"fieldvalues", fieldValues[id], "prefil value",props.preexistingValues[id], moment(props.preexistingValues[id]).format("yyyy-MM-DD"))
+        no_changes = false
+      }
+ 
+      /* if (fieldValues[id] && (!isDateField && props.preexistingValues[id]!=fieldValues[id] || (isDateField && fieldValues[id]!=moment(props.preexistingValues[id]).format("yyyy-MM-DD")))){
+        no_changes= false;
+      } */
     }
     return no_changes;
   }
@@ -123,7 +136,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
         dsra[field] = fieldValues[field]
       else if (field=="A" || field=="F" || field=="DS" || field=="V"){
         if (fieldValues[field] && fieldValues[field]!=props.preexistingValues[field])
-          dsra[field] = fieldValues[field];
+          dsra[field=="DS"?"S":field] = fieldValues[field];
       }
       else{
         let isDateField = false;
@@ -136,7 +149,6 @@ function LoanBasicDetails(props:LoanCommonProps) {
 
     if (dsra && Object.keys(dsra).length!=0)
       data["DSRA"] = dsra;
-
 
     const error_list:{[key:string]:string} ={};
     if (data["GST"] && data["GST"].length!=15)
@@ -166,6 +178,8 @@ function LoanBasicDetails(props:LoanCommonProps) {
         props.setShowSecurityDetails(true);
 
       setEnableLoadingSign(true);
+
+      console.log("Submitting",data)
       
       const res = await createLoan(data);
       if (res==200){
@@ -174,12 +188,6 @@ function LoanBasicDetails(props:LoanCommonProps) {
         props.setOkToFrolic(true);
         props.setChangesHaveBeenMade(true);
       }
-      else
-        toast({
-          title: "Error!",
-          description: "Something went wrong",
-          className:"bg-white"
-        })
     }
     else{
       if (fieldValues["ST"]==LoanSecuredList[2])
@@ -214,7 +222,7 @@ function LoanBasicDetails(props:LoanCommonProps) {
             else if (field.type=="date")
               return <DateField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
             else
-              return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} size="large" disabled={props.actionType=="VIEW"||disabled} />
+              return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} size="medium" disabled={props.actionType=="VIEW"||disabled} errorMessage={errorMessage} />
           })}
         </div>
         <br/>

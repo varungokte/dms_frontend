@@ -5,13 +5,13 @@ import { DocumentStatusList, sectionNames } from "./../../Constants";
 import { DocumentSectionDetails } from "./../../DataTypes";
 
 import { DataTable } from "./BasicComponents/Table";
-import UploadFileButton from "./BasicComponents/UploadFileButton";
-import ViewFileButton from "./BasicComponents/ViewFileButton";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
+import UploadFileButton from "./Buttons/UploadFileButton";
+import ViewFileButton from "./Buttons/ViewFileButton";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
 import { Pagination } from "./BasicComponents/Pagination";
 
-function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sectionDetails:DocumentSectionDetails, added:boolean, setAdded:Function, open:boolean}){
+function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sectionDetails:DocumentSectionDetails, added:boolean, setAdded:Function, open:boolean, admin:boolean}){
   const [docData, setDocData] = useState<any>();
   
   const {getDocumentsList} = useGlobalContext();
@@ -23,8 +23,9 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
 
   useEffect(()=>{
     if (props.added || props.open)
-      getDocumentsList({loanId:props.loanId, sectionName:props.sectionDetails.sectionName, currentPage, rowsPerPage}).then(res=>{
+      getDocumentsList({loanId:props.loanId, sectionName:props.sectionDetails.sectionName, currentPage, rowsPerPage, searchString:"",searchType:""}).then(res=>{
         if (res.status==200){
+          console.log("response",res)
           setDocData(res.obj[0]["data"]);
           props.setAdded(false);
           setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
@@ -49,14 +50,15 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
             dataTypes={["text","text","text","text","priority","date","date","doc-status","action"]}
             action={
               docData.map((doc:any,index:number)=>{
+                console.log(doc)
                 if (doc["S"]==DocumentStatusList[1]){
-                  return <UploadFileButton key={index} index={index} disabled={!userPermissions[sectionNames[props.label]]["file"].includes("add")}
+                  return <UploadFileButton key={index} index={index} disabled={!props.admin && !userPermissions[sectionNames[props.label]]["file"].includes("add")}
                     AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={doc._id} 
                     setAdded={props.setAdded} 
                   />
                 }
                 else
-                  return <ViewFileButton key={index} type="doc" disabled={!userPermissions[sectionNames[props.label]]["file"].includes("view")}
+                  return <ViewFileButton key={index} type="doc" disabled={!props.admin && !userPermissions[sectionNames[props.label]]["file"].includes("view")}
                     AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionName={props.sectionDetails.sectionName} 
                     status={doc["S"]} rejectionReason={doc["R"]} 
                     setAdded={props.setAdded} 
@@ -68,6 +70,7 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
           />
         :<LoadingMessage sectionName="documents" />
       }
+      <br />
       {docData && docData.length>0
         ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
         :<></>

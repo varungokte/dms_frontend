@@ -4,7 +4,7 @@ import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import edit_icon from "./../../static/edit_icon.svg";
 import { FieldValues, FieldAttributesList, TableDataTypes } from "DataTypes";
 
-function LoanConditionView(props:{conData:FieldValues[], label:string, fieldList:FieldAttributesList, editConditionFunction:Function, deleteConditionFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function, setAdded:Function, disableEdit?:boolean}){
+function LoanConditionView(props:{conData:FieldValues[], label:string, formOpen:boolean[], setFormOpen:Function, fieldList:FieldAttributesList, editConditionFunction:Function, deleteConditionFunction:Function, addFileFunction:Function, deleteFileFunction:Function, getFileListFunction:Function, setAdded:Function, disableEdit?:boolean}){
   const tableRows = ["Condition Name", "Phyical Location", "Execution Location", "Start Date","End Date", "Priority"]; 
   const tableDataTypes:TableDataTypes[] = ["text","text","text", "date", "date","priority"]
   
@@ -18,11 +18,17 @@ function LoanConditionView(props:{conData:FieldValues[], label:string, fieldList
           <div className="flex flex-row">
             {props.disableEdit
               ?<></>
-              :<FormDialogDocuments key={index} index={index} edit={true} type="con" 
-                triggerText={<img src={edit_icon} /* className="mr-5" *//>} triggerClassName={""} titleText={props.label}  
-                detailSubmit={props.editConditionFunction} fileSubmit={props.addFileFunction} deleteFile={props.deleteFileFunction} getFiles={props.getFileListFunction}
-                formFields={props.fieldList} currentFields={props.conData[index]} currIndex={index} setAdded={props.setAdded}
-              />
+              :<div>
+                <button onClick={()=>props.setFormOpen((curr:boolean[])=>{curr[index]=true;return [...curr]})}><img src={edit_icon} /* className="mr-5" *//></button>
+                {props.formOpen[index]
+                  ?<FormDialogDocuments key={index} index={index} edit type="condition" 
+                    formOpen={props.formOpen[index]} setFormOpen={props.setFormOpen} formTitle={props.label} formSize="md"
+                    detailSubmit={props.editConditionFunction} fileSubmit={props.addFileFunction} deleteFile={props.deleteFileFunction} getFiles={props.getFileListFunction}
+                    formFields={props.fieldList} currentFields={props.conData[index]} currIndex={index} setAdded={props.setAdded}
+                  />
+                  :<></>
+                }
+              </div>
             }
             {/* <DeleteConfirmation thing="covenant" deleteFunction={props.deleteConditionFunction} currIndex={index}/> */}
           </div>

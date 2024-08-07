@@ -33,6 +33,14 @@ const sectionNames:FieldValues = {
   "Default Cases":"default",
   "Critical Cases":"critical",
   "Reports":"reports",
+  "Master Default Cases":"default/mst",
+  "Master Critical Cases":"critical/mst",
+  "Master Transaction Documents":"transaction/mst",
+  "Master Compliance Documents":"compliance/mst",
+  "Master Covenants":"covenants/mst",
+  "Master Condition Precedent":"precedent/mst",
+  "Master Condition Subsequent":"subsequent/mst",
+  "Master Payment Schedule":"payment/mst",
 }
 
 const allComponents = [
@@ -54,6 +62,16 @@ const allComponents = [
   { name: "Default Cases", path:"/default", component: SpecialCases, icon: DefaultIcon },
   { name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },
   { name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
+
+  { name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransIcon },
+  { name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: CompIcon },
+  { name: "Master Covenants", path:"/admin/covenants", component: DealsList, icon: CovenantIcon },
+  { name: "Master Condition Precedent", path:"/admin/precedent", component: DealsList, icon: ConditionsIcon },
+  { name: "Master Condition Subsequent", path:"/admin/subsequent", component: DealsList, icon: ConditionsIcon },
+  { name: "Master Payment Schedule", path:"/admin/schedule", component: DealsList, icon: ScheduleIcon},
+  { name: "Master Default Cases", path:"/admin/default", component:SpecialCases, icon:DefaultIcon,},
+  { name: "Master Critical Cases", path:"/admin/critical", component:SpecialCases, icon:CriticalIcon,},
+
   { name: "Test", path:"/test", component: _TestComponent },
 ];
 
@@ -67,15 +85,31 @@ const documentSectionNames = [
 ];
 
 const getDocSecName = (inputName:string, inputType:"fullname"|"keyname"|"shortname"|"type", outputType:"fullname"|"keyname"|"shortname"|"type") => {
-  documentSectionNames.map(doc=>{
+  for (let i=0; i<documentSectionNames.length; i++){
+    const doc = documentSectionNames[i];
     if (doc[inputType]==inputName)
       return doc[outputType];
-  });
+  }
   return "";
 };
 const getDocSecList = (outputType:"fullname"|"keyname"|"shortname"|"type") =>{
   return documentSectionNames.map(doc=>doc[outputType]);
 } 
+
+const checkObjectsAreEqual = (obj1:FieldValues, obj2:FieldValues) => {
+  for (let i=0; i<Object.keys(obj1).length; i++){
+    const key = Object.keys(obj1)[i];
+    const val1 = obj1[key];
+    const val2 = obj2[key];
+    console.log("key",key,"val1",val1, "val2",val2);
+    if (typeof val1 == "function" && typeof val2 == "function")
+      continue;
+    else if (Array.isArray(val1) && Array.isArray(val2)){}
+    else if (val1!==val2){console.log("UNEQUAL",val1,val2);
+      return false;}
+  }
+  return true;
+}
 
 //Masters
 const LoanProductList:string[] = ["-"];
@@ -109,7 +143,7 @@ const LoanSecurityTypeList:string[] = ["-","[PLACEHOLDER DATA] Type A","[PLACEHO
 const BankAccountTypeList:string[] = ["-", "Saving", "Current"];
 
 //Contact Details
-const ContactTypeList:string[] = ["-", "Borrower" , "Promotor", "Lender", "Lender Agent", "Legal Council", "Banks Legal Team", "Lender Insurance Agent", "Lenders Independent Engineer"];
+const ContactTypeList:string[] = ["-", "Borrower", "Lender", "Lender Agent", "Promotor", "Legal Council", "Banks Legal Team", "Lender Insurance Agent", "Lenders Independent Engineer"];
 const EmailRecipientList:string[] = ["-","To", "Cc","Bcc"];
 
 //Ratings
@@ -142,7 +176,7 @@ const MastersMapping:FieldValues = {
 }
 
 export { 
-  MastersMapping, sectionNames, allComponents, getDocSecList,getDocSecName,
+  MastersMapping, sectionNames, allComponents, getDocSecList,getDocSecName, checkObjectsAreEqual,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList, LoanStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,

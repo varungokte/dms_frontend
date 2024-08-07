@@ -1,6 +1,7 @@
 import {  useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
 import { FieldValues, FormFieldAttributes } from "DataTypes";
+import { TextField } from "@mui/material";
 
 function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
   const [errorMessage, setErrorMessage] = useState(<></>);
@@ -35,7 +36,8 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
   return(
     <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
-      <input key={props.index+props.fieldData.id+"t_2"} id={props.fieldData.id} type="text"
+      <TextField key={props.index+props.fieldData.id+"t_2"} id={props.fieldData.id} type="text"
+        size="medium" color="secondary"
         className={props.className || `border rounded-if w-full p-3 ${props.fieldData.name==""?"mt-7":""}`}
         disabled={props.disabled} required={props.fieldData.required}
 
@@ -83,8 +85,8 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
               return {...curr};
             })
           }
-        }
-      />
+        } />
+    
       {wordsMessage}
       {errorMessage}
     </div>

@@ -17,7 +17,7 @@ const getValidMinDate = (id:string, prefillValues:FieldValues):string => {
   return date;
 } */
 
-function DateField (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
+function DateField (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, error?:boolean, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
   const [prefillValue, setPrefillValue] = useState<string>();
 
   useEffect(()=>{
@@ -28,12 +28,12 @@ function DateField (props:{index:number|string, fieldData:FormFieldAttributes, p
   return(
     <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
-      <input key={props.index+props.fieldData.id+"t_2"} 
+      <input key={props.index+props.fieldData.id+"t_2"}
         id={props.fieldData.id} 
         type="date" 
         disabled={props.disabled} 
         required={props.fieldData.required}
-        className={`border rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
+        className={`border ${props.error?"border-red-600":""} rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
         value={props.prefillValues[props.fieldData.id]
           ?moment(props.prefillValues[props.fieldData.id]).format("yyyy-MM-DD")
           :""

@@ -4,14 +4,14 @@ import LoginPage  from './components/AuthPages/LoginPage';
 import PrivateRoutes from './PrivateRoutes';
 
 function App() {
-  return (
-     	<BrowserRouter>
-				<Routes>
-				<Route path="/register" element={<RegistrationPage />} />
-				<Route path='/login' element={<LoginPage />} />
-				<Route path='/*' element={<PrivateRoutes />} />
-				</Routes>
-     </BrowserRouter>
+	return (
+		<BrowserRouter>
+      <Routes>
+      <Route path="/register" element={<RegistrationPage />} />
+      <Route path='/login' element={<LoginPage />} />
+      <Route path='/*' element={<PrivateRoutes />} />
+      </Routes>
+		</BrowserRouter>
   )
 }
 

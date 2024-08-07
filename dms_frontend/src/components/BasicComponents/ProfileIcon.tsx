@@ -1,12 +1,26 @@
 function ProfileIcon(props:{size:"large"|"small", name:string, showStatus?:boolean, className?:string}) {
+  const sizes = {
+    large:{
+      height:"200px",
+      width:"200px",
+      lineHeight:"200px",
+      fontSize:"60px",
+    },
+    small:{
+      height:"50px",
+      width:"50px",
+      lineHeight:"50px",
+      fontSize:"15px",
+    }
+  }
   return (
     <div style={{
-      height:props.size=="large"?"100px":"50px", 
-      width:props.size=="large"?"100px":"50px", 
-      lineHeight:props.size=="large"?"100px":"50px", 
+      height:sizes[props.size].height, 
+      width:sizes[props.size].width, 
+      lineHeight:sizes[props.size].lineHeight, 
       borderRadius:"50%", textAlign:"center", backgroundColor: "goldenrod", color:"white"
     }} className={props.className} >
-      <div style={{textAlign:"center", fontSize:props.size=="large"?"30px":"15px"}}>
+      <div style={{textAlign:"center", fontSize:sizes[props.size].fontSize}}>
         {(props.name||"E R R").split(" ").map(name=>name.charAt(0))}
       </div>
 

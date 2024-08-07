@@ -4,9 +4,10 @@ import { Link } from "react-router-dom";
 import { DocumentStatusList, LoanStatusList, PriorityList, TeamStatusList, UserStatusList } from "../../../Constants";
 import { DocumentStatus, FieldValues, LoanStatus, Priority, TableDataTypes, TeamStatus, UserStatus } from "DataTypes";
 
-import {Paper, Table as MUITable,TableContainer} from '@mui/material';
+import { Table as MUITable } from '@mui/material';
 import {TableBody, TableCell, TableHead, TableRow} from '@mui/material';
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
+import Checkbox from '@mui/material/Checkbox';
 import Badge from '@mui/material/Badge';
 
 const PriorityStyling = ["-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100"];
@@ -17,16 +18,22 @@ const LoanStatusStyling = ["-", "text-yellow-500", "text-blue-500", "text-green-
 //const FileStatusStyling = ["-", "text-yellow-500", "text-green-600"];
 
 type HeaderRowsProps = {headingRows:string[], headingClassNames?:string[]};
-type BodyRowsMappingProps = {tableData:FieldValues[], columnIDs:string[], cellClassName?:string[], searchRows?:any, filterRows?:any, dataTypes:TableDataTypes[], action?:ReactElement[], setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function, documentLinks?:{section:string,index:string|number}[], defaultBadges?:boolean, indexStartsAt?:number}
+type BodyRowsMappingProps = {
+  tableData:FieldValues[], columnIDs:string[], dataTypes:TableDataTypes[], 
+  cellClassName?:string[],
+  action?:ReactElement[], 
+  setEntityStatus?:Function, setSelectedEntity?:Function, setValues?:Function, 
+  documentLinks?:{section:string,index:string|number}[], 
+  defaultBadges?:boolean, indexStartsAt?:number
+  selectable?:boolean, selectedEntity?:string
+}
 
 function DataTable(props:(HeaderRowsProps & BodyRowsMappingProps &{className?:string})){
   return(
-    <TableContainer component={Paper} variant="outlined" sx={{ borderRadius:"13px"}} className="rounded-xl">
-      <MUITable className={`${props.className}`} sx={{minWidth:700}}>
-        <HeaderRows headingRows={props.headingRows} headingClassNames={props.headingClassNames}/>
-        <BodyRowsMapping {...props}  />
-      </MUITable>
-    </TableContainer>
+    <MUITable className={`${props.className} rounded-xl border`} sx={{minWidth:700,borderRadius:"13px" }}>
+      <HeaderRows headingRows={props.headingRows} headingClassNames={props.headingClassNames}/>
+      <BodyRowsMapping {...props}  />
+    </MUITable>
   )
 }
 
@@ -48,37 +55,21 @@ function BodyRowsMapping(props:BodyRowsMappingProps){
   return(
     <TableBody>
       {props.tableData.map((singleRow,index)=>{
-        let searchValid = true;
-        if (props.searchRows && props.searchRows.length>0){
-          searchValid = false;
-          const regEx = new RegExp(props.searchRows[0], "i");
-          for (let i=1; i<props.searchRows.length; i++)
-            if ((singleRow[props.searchRows[i]]+"").search(regEx)!==-1)
-            searchValid=true;
-        }
-
-        let filterValid = true;
-        if (props.filterRows && props.filterRows.length>0){
-          filterValid = false;
-          const filter = props.filterRows[0];
-          for (let i=1; i<props.filterRows.length; i++)
-            if ((singleRow[props.filterRows[i]])==Number(filter))
-              filterValid = true;
-        }
-
-        if (searchValid && filterValid)
-          return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataTypes={props.dataTypes} action={props.action} columns={props.columnIDs} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} documentLinks={props.documentLinks} defaultBadges={props.defaultBadges} indexStartsAt={props.indexStartsAt||0} />
-        else
-          return ""
+        return <SingleRow key={index} rowIndex={index} singleRow={singleRow} cellClassName={props.cellClassName || []} dataTypes={props.dataTypes} action={props.action} columns={props.columnIDs} setEntityStatus={props.setEntityStatus} setSelectedEntity={props.setSelectedEntity} setValues={props.setValues} documentLinks={props.documentLinks} defaultBadges={props.defaultBadges} indexStartsAt={props.indexStartsAt||0} selectable={props.selectable} selectedEntity={props.selectedEntity} />
       })}
     </TableBody>
   )
 }
 
-function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function, documentLinks?:{section:string,index:string|number}[],defaultBadges?:boolean, indexStartsAt:number}){ 
+function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:string[], cellClassName?:string[], singleRow:FieldValues, action?:ReactElement[], setEntityStatus?:Function,setSelectedEntity?:Function, setValues?:Function, documentLinks?:{section:string,index:string|number}[],defaultBadges?:boolean, indexStartsAt:number, selectable?:boolean, selectedEntity?:string}){ 
   //console.log("single row props",props)
   return (
-    <TableRow key={props.rowIndex} sx={{backgroundColor:"rgba(251, 251, 255, 1)"}}>
+    <TableRow key={props.rowIndex} 
+      selected={props.selectable&&props.selectedEntity==props.singleRow["_id"]}
+      onClick={()=>{props.selectable&&props.setSelectedEntity?props.setSelectedEntity(props.singleRow["_id"]):{}}} 
+      sx={{backgroundColor:"rgba(251, 251, 255, 1)", cursor:props.selectable?"pointer":"default"}} 
+      hover 
+    >
       {props.dataTypes.map((dataType, index)=>{
         let setBadge=false;
         if (props.defaultBadges && props.singleRow && props.singleRow["DEF"]==1 && index==0)
@@ -92,6 +83,8 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
         return (
           <TableCell key={props.rowIndex+"_"+index} className={`${cellClassName} ${textOverflow}`}>
             {(()=>{
+              if (props.selectable && index==0)
+                return handleCheckbox(props.singleRow["_id"], props.selectedEntity||"", props.setSelectedEntity||(()=>{}));
               if (dataType=="index")
                 return handleIndex(props.indexStartsAt+props.rowIndex+1, cellClassName);
             
@@ -101,7 +94,7 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
               else if (dataType=="count-team")
                 return handleCountTeam(props.singleRow, cellClassName);
               
-              const item = props.singleRow[props.columns[props.dataTypes[0]=="index"?index-1:index]];
+              const item = props.singleRow[props.columns[props.dataTypes[0]=="index"||props.selectable?index-1:index]];
               const documentLink=(props.documentLinks && props.documentLinks[props.rowIndex])?props.documentLinks[props.rowIndex]:undefined;
               if (dataType=="date")
                 return handleDate(item, cellClassName);
@@ -137,15 +130,15 @@ const handleIndex = (index:number, cellClassName:string) =>{
 
 const handleText = (item:string, cellClassName:string, setBadge?:boolean) => {
   return <div className={cellClassName}>
-    {setBadge?<Badge
-      badgeContent="Default"
-      color="error"
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'left',
-      }} sx={{ marginLeft:"10px", marginBottom:"15px", zIndex:39}}
-      >
-    </Badge>:<></>}
+    {setBadge
+      ?<Badge
+        badgeContent="Default"
+        color="error"
+        anchorOrigin={{ vertical: 'top', horizontal: 'left' }} 
+        sx={{ marginLeft:"10px", marginBottom:"15px", zIndex:39 }}
+      />
+      :<></>
+    }
     <div>{item}</div>
   </div>
 }
@@ -208,14 +201,12 @@ const handleObjName = (item:any, cellClassName:string) =>{
 
 const handleCountTeam = (obj:any, cellClassName:string) => {
   const sections = ["TD","CD","C","CP","CS"];
-  console.log("IN handleTeamCOunt", obj)
   let count = 1;
   sections.map(name=>{
     count+=obj[name]["M"].length+obj[name]["C"].length
   });
   return <div className={cellClassName}>{count}</div>
 }
-
 const handleTextField = (prefillValue:any, cellClassName:string, tableIndex:number, columnId:string, setPrefillValue:Function) => {
   return <div className={cellClassName}>
     <FloatNumberField index={tableIndex} fieldData={{id:columnId, name:"", type:"float"}} disabled={false} className={"border-2 rounded-if h-7 mt-5 p-1"}
@@ -227,6 +218,10 @@ const handleTextField = (prefillValue:any, cellClassName:string, tableIndex:numb
 
 const handleDocumentLink = (item:ReactElement, cellClassName:string, link:{section:string,index:string|number}|undefined) => {
   if (link) return <Link to={link.section} className={cellClassName} state={link.index}>{item}</Link>
+}
+
+const handleCheckbox = (id:string, selectedEntity:string, setSelectedEntity:Function) => {
+  return <Checkbox color="secondary" checked={id==selectedEntity} onChange={()=>setSelectedEntity(id)} />
 }
 
 export { DataTable, HeaderRows, BodyRowsMapping };

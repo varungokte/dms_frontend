@@ -1,18 +1,22 @@
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { DocumentSectionTypes, FieldAttributesList, FieldValues} from "./../../../DataTypes";
 
-import { AlertDialog, AlertDialogCancel, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from "@/components/ui/alert-dialog";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 
-import SubmitButton from "../BasicComponents/SubmitButton";
+import SubmitButton from "../Buttons/SubmitButton";
 import FileField from "../FormFieldComponents/FileField";
 import FormFieldsRender from "./FormFieldsRender";
+import CloseIcon from '@mui/icons-material/Close';
+import CancelButton from "../Buttons/CancelButton";
 
 type FormDialogDocumentsProps = {
   index:number, type:DocumentSectionTypes, edit:boolean,
-  triggerText:string|ReactElement, triggerClassName:string, titleText:string,
+  formOpen:boolean, setFormOpen:Function,
+  formSize:"sm"|"md"|"lg", formTitle:string,
   currentFields:FieldValues,
   detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, 
   formFields:FieldAttributesList, 
@@ -23,28 +27,31 @@ type FormDialogDocumentsProps = {
 //{currentTab=="details"?"Next":"Save"}
 
 function FormDialogDocuments(props:FormDialogDocumentsProps){
-  const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [fileList, setFileList] = useState<any>([]);
+
   const [errorMessage, setErrorMessage] = useState(<></>);
+  const [errorList, setErrorList] = useState<string[]>([]);
+
   const [currentTab, setCurrentTab] = useState("details");
   const [enableUpload, setEnableUpload] = useState(false);
+  
   const [covType, setCovType]= useState("");
   const [docId, setDocId] = useState("");
   const [receivedFilesFromServer, setReceivedFilesFromServer] = useState(false);
 
   useEffect(()=>{
-    if (!open){
+    if (!props.formOpen){
       setPrefillValues({});
       setFileList([]);
       setEnableUpload(false);
     }
-  },[open]);
+  },[props.formOpen]);
 
   //useEffect(()=>console.log(props.index,"fileList", fileList),[fileList]);
 
   useEffect(()=>{
-    if (!open)
+    if (!props.formOpen)
       return;
 
     if (props.edit){
@@ -59,12 +66,12 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
     }
     else
       setPrefillValues({...props.currentFields});
-  },[props.currentFields,open]);
+  },[props.currentFields,props.formOpen]);
 
 
   useEffect(()=>{
     setCurrentTab("details");
-  },[open]);
+  },[props.formOpen]);
   
   const checkForChanges = () => {
     if (currentTab=="upload"){
@@ -88,6 +95,8 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
 
   const validateRequiredFields = ()=>{
     const data:any={};
+    const arr=[];
+
     for (let i=0; i<props.formFields.length; i++){
       const field = props.formFields[i];
 
@@ -104,14 +113,29 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
     for (let i=0;i<Object.keys(data).length;i++){
       const key = Object.keys(data)[i];
       const value = data[key];  
-      if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1)){
-        setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
-        return false;
-      }
+      if (value && (!(Object.keys(prefillValues).includes(key)) || prefillValues[key]=="" || prefillValues[key]==-1))
+        arr.push(key);
     }
-    return true;
+    
+    if (arr.length>0){
+      setErrorList(arr);
+      setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>)
+      return false;
+
+    }
+    else{
+      setErrorMessage(<></>);
+      return true;
+    }
   }
 
+  const closeDialog = () => {
+    props.setFormOpen((curr:boolean[])=>{
+      curr[props.index]=false; 
+      return [...curr];
+    });
+  }
+  
   const submitDetails = async () => {
     const changesHaveBeenMade = checkForChanges();
     if (!changesHaveBeenMade){
@@ -146,14 +170,14 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
 
   const submitFile = async () => {
     if (!fileList || fileList.length==0){
-      setOpen(false);
+      closeDialog();
       props.setAdded(true);
       return;
     }
 
     const changesHaveBeenMade = checkForChanges();
     if (!changesHaveBeenMade){
-      setOpen(false);
+      closeDialog()
       return;
     }
 
@@ -163,20 +187,22 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
       setErrorMessage(<></>);
       console.log("have submitted",fileList);
       props.setAdded(true);
-      setOpen(false);
+      closeDialog();
     }
     else
       setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
   }
 
   return(
-    <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger className={props.triggerClassName}>{props.triggerText}</AlertDialogTrigger>
-      <AlertDialogContent className={`bg-white overflow-y-auto max-h-screen min-w-[800px]`}>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="text-2xl font-normal">{props.titleText}</AlertDialogTitle>
-          <hr/>
-        </AlertDialogHeader>
+    <Dialog open={props.formOpen} onClose={closeDialog} maxWidth={props.formSize} fullWidth>
+      <DialogTitle>
+        <div className="flex flex-row">
+          <div className="flex-auto"><p className="text-2xl font-normal">{props.formTitle}</p></div>
+          <div><button onClick={closeDialog}><CloseIcon/></button></div>
+        </div>
+      </DialogTitle>
+      <hr/>
+      <div>
         <Tabs value={currentTab} onValueChange={setCurrentTab} defaultValue={"details"} className="w-full h-full">
           <TabsList className="grid w-full grid-cols-2 border-0">
             <TabsTrigger value="details" className="h-10 ">Document Details</TabsTrigger>
@@ -186,7 +212,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
             <Card className="border-0">
               <CardContent className="mt-5"  style={{borderWidth:"0px", borderColor:"white"}}>
                 <form onSubmit={(e)=>{props.detailSubmit(e);}}>
-                  <FormFieldsRender form={props.formFields} formType="docs" prefillValues={prefillValues} setPrefillValues={setPrefillValues} edit={props.edit} covType={covType} setCovType={setCovType} sectionType={props.type}  />
+                  <FormFieldsRender form={props.formFields} formType="docs" prefillValues={prefillValues} setPrefillValues={setPrefillValues} edit={props.edit} covType={covType} setCovType={setCovType} sectionType={props.type} errorList={errorList} />
                   {errorMessage}
                 </form>
               </CardContent>
@@ -201,13 +227,14 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
           </TabsContent>
         </Tabs>
         <br/>
-        <br/>
-        <AlertDialogFooter className="bottom-0 h-12">
-          <AlertDialogCancel className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</AlertDialogCancel>
-          <SubmitButton className={SubmitButtonStyling} submitFunction={currentTab=="details"?submitDetails:submitFile} submitButtonText={currentTab=="details"?"Next":"Save"} />
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>  
+        <div className="flex flex-row m-3">
+          <div className="flex-auto"></div>
+          <CancelButton onClick={closeDialog} />
+          <SubmitButton submitFunction={currentTab=="details"?submitDetails:submitFile} submitButtonText={currentTab=="details"?"Next":"Save"} />
+        </div>
+        <br />
+      </div>
+    </Dialog>  
   )
 };
     

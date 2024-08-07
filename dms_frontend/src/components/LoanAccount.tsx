@@ -2,19 +2,20 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useGlobalContext from "./../../GlobalContext";
 
-import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { DataTable } from "./BasicComponents/Table";
 import edit_icon from "./static/edit_icon.svg";
 import view_icon from "./static/view_icon.svg";
 
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
 import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "DataTypes";
 import Toast from "./BasicComponents/Toast";
 import { sectionNames } from "./../../Constants";
 import { Pagination } from "./BasicComponents/Pagination";
 import { PermissionContext } from "@/MenuRouter";
+import SearchByType from "./BasicComponents/SearchByType";
+import AddButton from "./Buttons/AddButton";
 
 function LoanAccount(props:{label:string}) {
   useEffect(()=>{
@@ -28,20 +29,30 @@ function LoanAccount(props:{label:string}) {
 
   const [added,setAdded] = useState(true);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
-  const [tableHeadings, setTableHeadings] = useState(["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount", "Loan Status"]);
-  const [tableDataTypes, setTableDataTypes] = useState<TableDataTypes[]>(["index","text","text","text","text","loan-status"]);
+
+  const editPermission = userPermissions[sectionNames[props.label]].includes("edit");
+  const viewPermission = userPermissions[sectionNames[props.label]].includes("view");
+  const deletePermission = userPermissions[sectionNames[props.label]].includes("delete");
+
+  const tableHeadings =["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount", "Loan Status"];
+  const tableDataTypes:TableDataTypes[] = ["index","text","text","text","text","loan-status"];
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchString, setSearchString] = useState("");
+  const [searchType, setSearchType] = useState("");
+  const searchOptions = [{label:"Agreement ID", value:"AID"}, {label:"Company Name", value:"CN"}];
 
   const getData = async () => {
     if (!added)
       return;
-    const res = await getLoanList({currentPage:currentPage, rowsPerPage:rowsPerPage})
+    const res = await getLoanList({currentPage, rowsPerPage, searchString, searchType});
     if (res.status==200){
-      setAccountList(res.arr[0]["data"]);
-      setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+      if (res.arr && res.arr[0] && res.arr[0]["data"])
+        setAccountList(res.arr[0]["data"]);
+      if (res.arr && res.arr[0] && res.arr[0]["metadata"] && res.arr[0]["metadata"][0] && res.arr[0]["metadata"][0])
+        setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
     }
     else
       setAccountList([]);
@@ -49,33 +60,12 @@ function LoanAccount(props:{label:string}) {
   };
 
   useEffect(()=>{
+    setAdded(true);
+  },[currentPage,rowsPerPage,searchString,searchType]);
+
+  useEffect(()=>{
     getData();
   },[added]);
-
-  useEffect(()=>{
-    setAdded(true);
-  },[currentPage,rowsPerPage]);
-
-  useEffect(()=>{
-    const editPermission = userPermissions[sectionNames[props.label]].includes("edit");
-    const viewPermission = userPermissions[sectionNames[props.label]].includes("view");
-    const deletePermission = userPermissions[sectionNames[props.label]].includes("delete");
-
-    if (editPermission || viewPermission || deletePermission){
-      setTableHeadings(curr=>{
-        if (curr [curr.length-1]!="Action")
-          curr.push("Action");
-        return [...curr];
-      });
-      setTableDataTypes(curr=>{
-        if (curr [curr.length-1]!="action")
-          curr.push("action");
-        return [...curr];
-      });
-    }
-  },[userPermissions]);
-
-  //const [searchString, setSearchString] = useState("");
 
   const deleteLoanAccount = async (currIndex:number) => {
     if (!accountList)
@@ -95,26 +85,34 @@ function LoanAccount(props:{label:string}) {
     return <></>;
   
   return(
-    <div className="bg-white rounded-xl m-5">
-      <br/>
-			<p className="text-3xl font-bold mx-5 mb-5">Loan Account</p>
-      <hr/>
-      <br/>
+    <div>
+			<p className="text-3xl font-bold m-7">{props.label}</p>
       <div className="flex flex-row">
-        <div className="m-auto flex-auto"> {/* <Search label="Search by Agreement ID" setter={setSearchString}/> */}</div>
+        <div className="m-auto flex-auto">
+          <SearchByType 
+            className="mx-7"
+            searchString={searchString} setSearchString={setSearchString} 
+            searchType={searchType} setSearchType={setSearchType} 
+            typeOptions={searchOptions} 
+          />
+        </div>
         {userPermissions[sectionNames[props.label]].includes("add")
-          ?<div className="m-auto"><Link className={`${CreateButtonStyling} p-4`} to="create" state={{linkSource: "CREATE"}}>Add a Loan Account</Link></div>
+          ?<div className="">
+            <Link to="create" state={{linkSource: "CREATE"}}>
+              <AddButton sectionName="loan account" onClick={()=>{console.log("Clicked")}} />
+            </Link>
+          </div>
           :<></>
         }
       </div>
-      <div className="m-5">
+      <div className="m-7">
         {accountList
           ?accountList.length==0
             ?<EmptyPageMessage sectionName="loan accounts"/>
-            :<DataTable 
-              headingRows={tableHeadings} headingClassNames={["w-[100px]"]}
-              tableData={accountList} columnIDs={["AID", "CN", "Z", "SA","S"]} dataTypes={tableDataTypes} 
-              cellClassName={["font-medium", "text-custom-1","","","","",""]} searchRows={[]} filterRows={[]}
+            :<DataTable className="bg-white rounded-xl"
+              headingRows={editPermission||viewPermission||deletePermission?tableHeadings.concat("Action"):tableHeadings} headingClassNames={["w-[100px]"]}
+              tableData={accountList} columnIDs={["AID", "CN", "Z", "SA","S"]} dataTypes={editPermission||viewPermission||deletePermission?tableDataTypes.concat("action"):tableDataTypes} 
+              cellClassName={["font-medium", "text-custom-1","","","","",""]}
               indexStartsAt={(currentPage-1)*rowsPerPage}
               action = {accountList.map((item,index)=>{
                 return(
@@ -127,7 +125,9 @@ function LoanAccount(props:{label:string}) {
                     }
                     
                     {userPermissions[sectionNames[props.label]].includes("delete")
-                      ?<DeleteConfirmation thing="loan account" deleteFunction={deleteLoanAccount} currIndex={index}/>
+                      ?<div>
+                        <DeleteConfirmation thing="loan account" deleteFunction={deleteLoanAccount} currIndex={index}/>
+                        </div> 
                       :<></>
                     }
                   </div>

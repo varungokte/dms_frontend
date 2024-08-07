@@ -22,7 +22,7 @@ function Pagination(props:{totalPages:number, currentPage:number, setCurrentPage
     <div className={`flex flex-row ${props.className}`}>
       <div className="flex-auto my-1"><EntriesPerPage rowsPerPage={props.rowsPerPage} setRowsPerPage={props.setRowsPerPage} /></div>
       <div className="">
-        <PaginationBar count={props.totalPages} page={props.currentPage} onChange={(_,page)=>props.setCurrentPage(page)}  color="secondary"
+        <PaginationBar count={props.totalPages} page={props.currentPage} onChange={(_,page)=>props.setCurrentPage(page)} color="secondary"
           renderItem={item => (
             <PaginationItem
               slots={{ previous: ArrowBackIcon, next: ArrowForwardIcon }} sx={item.selected?{color:"rgba(80, 65, 188, 1)"}:{}}

@@ -1,13 +1,13 @@
-import { useEffect, useRef, useState } from "react";
-import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
-import { CSVLink } from "react-csv";
-import { FieldValues, GridFieldAttributes } from "DataTypes";
-import TextField from "./FormFieldComponents/TextField";
-import DateField from "./FormFieldComponents/DateField";
-import SelectField from "./FormFieldComponents/SelectField";
+//import { useEffect, useRef, useState } from "react";
+//import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
+//import { CSVLink } from "react-csv";
+//import { FieldValues, GridFieldAttributes } from "DataTypes";
+//import TextField from "./FormFieldComponents/TextField";
+//import DateField from "./FormFieldComponents/DateField";
+//import SelectField from "./FormFieldComponents/SelectField";
 
 function Reports(props:{label:string}) {
-  useEffect(()=>{
+  /* useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
 
@@ -46,28 +46,29 @@ function Reports(props:{label:string}) {
       downloadRef.current.link.click();
   }
 
-  const [fieldValues, setFieldValues] = useState<FieldValues>({});
+  const [fieldValues, setFieldValues] = useState<FieldValues>({}); */
   
   return(
     <div>
-      <p className="text-3xl font-bold m-7">{props.label}</p>
+      {props.label}
+      {/* <p className="text-3xl font-bold m-7">{props.label}</p>
       <div className="bg-white rounded-xl m-7 p-5">
         <form onSubmit={submitForm}>
           <div className="grid grid-cols-2">
             {fieldList["fields"].map((field)=>{
               if (field.type=="select")
-                return <SelectField key={field.id} index={field.id} id={field.id} name={field.name} setPrefillValues={setFieldValues} prefillValues={fieldValues} options={field.options||[]} required={field.required||false} disabled={field.disabled} />
+                return <SelectField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={field.disabled||false} />
               else if (field.type=="date")
-                return <DateField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} required={field.required||false} disabled={field.disabled} />
+                return <DateField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={field.disabled||false} />
               else
-                return <TextField key={field.id} index={field.id} id={field.id} name={field.name||""} setPrefillValues={setFieldValues} prefillValues={fieldValues} type={field.type||""} required={field.required||false} disabled={field.disabled} />
+                return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={field.disabled||false} size="large" />
             })}
           </div>
           <br/>
           <button className={CreateButtonStyling} type="submit">Download Report</button>
         </form>
         <CSVLink ref={downloadRef} headers={headers} data={data||[{}]} filename={filename}></CSVLink>
-      </div>
+      </div> */}
     </div>
   )
 }

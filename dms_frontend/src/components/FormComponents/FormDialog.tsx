@@ -1,39 +1,35 @@
-import { ReactElement, useEffect, useState } from "react";
+import { memo, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FieldAttributesList, FieldValues, FormDialogTypes, UserSuggestionTypes, UserSuggestionsList } from "DataTypes";
 
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
-import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import SubmitButton from "../BasicComponents/SubmitButton";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
+
+import RequiredFieldsNote from "../BasicMessages/RequiredFieldsNote";
+import SubmitButton from "../Buttons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
+import CancelButton from "../Buttons/CancelButton";
 
 type FormDialogProps = {
-  index:number, type:FormDialogTypes, edit?:boolean, 
-  triggerText:string|ReactElement, triggerClassName?:string, 
-  formSize:"small"|"medium"|"large", formTitle:string, submitButton:string, formSubmit:Function, 
+  index:number, type:FormDialogTypes, edit?:boolean,  
+  formOpen:boolean, setFormOpen:Function,
+  formSize:"sm"|"md"|"lg", formTitle:string, submitButton:string, formSubmit:Function, 
   form:FieldAttributesList, 
   currentFields:FieldValues, repeatFields?:boolean, 
   suggestions?:UserSuggestionTypes, getRoles?:boolean 
 }
 
-enum FormSizes {
-  small="min-w-[600px] min-h-[300px]",
-  medium="min-w-[800px] min-h-[300px]",
-  large="min-w-[1000px] min-h-[300px]",
-};  
-
 function FormDialog(props:FormDialogProps){
-  const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
+  const [errorList, setErrorList] = useState<string[]>([]);
 
-  //useEffect(()=>console.log("FORM DIALOG LOADED"),[])
+  useEffect(()=>console.log("FORM DIALOG LOADED"),[])
 
   useEffect(()=>{
-    if (!open)
+    if (!props.formOpen)
       setPrefillValues({});
-  },[open]);
+  },[props.formOpen]);
 
   const findMissingFields = () => {
     const data:any={};
@@ -54,6 +50,7 @@ function FormDialog(props:FormDialogProps){
   const validateRequiredFields=()=>{
     const requiredList = findMissingFields();
     let data;
+    const arr=[];
     for (let i=0;i<Object.keys(requiredList).length;i++){
       let key = Object.keys(requiredList)[i];
       let value = requiredList[key];
@@ -63,14 +60,26 @@ function FormDialog(props:FormDialogProps){
         continue;
       
       //console.log("RECENTLY ASSIGEND DATA",data);
-      if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1)){
-        setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
-        return false;
-      }
+      if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1))
+        arr.push(key);
     }
 
-    setErrorMessage(<></>);
-    return true;
+    if (arr.length>0){
+      setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
+      setErrorList(arr);
+      return false;
+    }
+    else{
+      setErrorMessage(<></>);
+      return true;
+    }
+  }
+
+  const closeDialog = () => {
+    props.setFormOpen((curr:boolean[])=>{
+      curr[props.index]=false; 
+      return [...curr];
+    });
   }
 
   const submitFunction = async () => {
@@ -83,8 +92,8 @@ function FormDialog(props:FormDialogProps){
 
       console.log("submitFunction response",res);
 
-      if (res==200)
-        setOpen(false);
+      if (res==200 || res==403)
+        closeDialog();
       else if (res==422)
         setErrorMessage(<p className="text-red-600">Already exists.</p>);
       else 
@@ -93,40 +102,36 @@ function FormDialog(props:FormDialogProps){
     }
   }
   return (
-    <Dialog open={open} onOpenChange={setOpen} key={props.index}>
-      <DialogTrigger className={props.triggerClassName||""}>{props.triggerText}</DialogTrigger>
-      {open
-        ?<DialogContent className={`bg-white overflow-y-scroll max-h-screen ${FormSizes[props.formSize]} `}>
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-normal">{props.formTitle}</DialogTitle>
-            <hr/>
-          </DialogHeader>
-            <RequiredFieldsNote />
-            <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} suggestions={props.suggestions} getRoles={props.getRoles} formSubmit={props.formSubmit} />
-            {errorMessage}
-            <br/>
-            <div className="flex flex-row">
-              <div className="flex-auto"></div>
-              <DialogClose className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</DialogClose>
-              <SubmitButton className={`float-right ${SubmitButtonStyling}`} submitFunction={submitFunction} submitButtonText={props.submitButton} />
-            </div>
-        </DialogContent>
-        :<></>
-      }
+    <Dialog open={props.formOpen} onClose={closeDialog} key={props.index} maxWidth={props.formSize} fullWidth>
+      <DialogTitle className="text-2xl font-normal">{props.formTitle}</DialogTitle>
+      <hr/>
+      <div className="p-5">
+        <RequiredFieldsNote error={errorList.length>0} />
+        <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} errorList={errorList} suggestions={props.suggestions} getRoles={props.getRoles} formSubmit={props.formSubmit} />
+        {errorMessage}
+        <br/>
+        <div className="flex flex-row">
+          <div className="flex-auto"></div>
+          <CancelButton onClick={closeDialog} />
+          <SubmitButton  submitFunction={submitFunction} submitButtonText={props.submitButton} />
+        </div>
+      </div>
     </Dialog>
   )
 }
 
-function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
+function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, errorList:string[], suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
   const [roles, setRoles] = useState<FieldValues[]>();
 
   const [allSuggestions, setAllSuggestions] = useState<UserSuggestionsList>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<UserSuggestionsList>([]);
   const [oldZone, setOldZone] = useState("");
 
-  const {getUserSuggestions, getSingleUser, getRolesList} = useGlobalContext();
+  const {getUserSuggestions, getSingleUser, getSingleContact, getRolesList} = useGlobalContext();
 
   //useEffect(()=>console.log("form dialog props",props),[props])
+
+  useEffect(()=>console.log("error list",props.errorList));
 
   const listRoles = async () => {
     const res = await getRolesList();
@@ -180,10 +185,22 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
       props.setPrefillValues({});
   }
 
+  const getContactData = async () => {
+    console.log("contact id", props.currentFields["_id"])
+    const res = await getSingleContact(props.currentFields["_id"]);
+    if (res.status==200)
+      props.setPrefillValues({...res.data});
+    else
+      props.setPrefillValues({});
+
+  }
+
   useEffect(()=>{
-    if (props.edit&& props.formType=="user"){
-        getUserData();
-    }
+    if (props.edit&& props.formType=="user")
+      getUserData();
+    
+    else if (props.edit && props.formType=="cont")
+      getContactData();
 
     if (props.getRoles)
       listRoles();
@@ -209,13 +226,10 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
     props.setPrefillValues({...props.currentFields});
   },[props.currentFields]);
 
-  //useEffect(()=>console.log("IN RENDER FORM < THE PREFILL VLAUES",props.prefillValues),[props.prefillValues])
-
   if (props.edit && Object.keys(props.prefillValues).length==0)
     return <></>
   else
-    return <FormFieldsRender form={props.form} formType={props.formType} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} edit={props.edit} filteredSuggestions={filteredSuggestions} roles={roles} setOldZone={setOldZone} />
-  
+    return <FormFieldsRender form={props.form} formType={props.formType} prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} edit={props.edit} filteredSuggestions={filteredSuggestions} roles={roles} setOldZone={setOldZone} errorList={props.errorList}  />  
 }
 
-export default FormDialog;
+export default memo(FormDialog);

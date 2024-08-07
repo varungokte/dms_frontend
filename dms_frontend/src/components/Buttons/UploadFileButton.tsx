@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import useGlobalContext from "./../../../GlobalContext";
 
 import upload_icon from "./../static/upload_icon.svg";
-import Toast from "./Toast";
+import Toast from "./../BasicComponents/Toast";
 import { ToastOptionsAttributes } from "./../../../DataTypes";
 
 function UploadFileButton(props:{index:number, AID:string, sectionName:string, docId:number|string, setAdded:Function, _id?:string, isPayment?:boolean, disabled?:boolean}){

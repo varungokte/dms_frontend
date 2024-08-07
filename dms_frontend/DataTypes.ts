@@ -1,9 +1,10 @@
 import { DocumentStatusList, FileStatusList, LoanStatusList, PriorityList, TeamStatusList, UserStatusList } from "Constants";
+import { FunctionComponent } from "react";
 
 type FieldValues = {[key:string]: any | any[]};
 
 //Data Types for table
-type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link";
+type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link" | "checkbox";
 
 //Form Field data types 
 type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
@@ -44,7 +45,7 @@ type FieldAttributesList = (SingleFieldAttributes | GridFieldAttributes | LabelF
 type FormDialogTypes = "team"|"user"|"role"|"cont"|"rate"|"mast";
 
 //Document Sections
-type DocumentSectionTypes = "doc"|"cov"|"con"|"pay"|"undefined";
+type DocumentSectionTypes = "document"|"covenant"|"condition"|"payment"|"undefined";
 type DocumentSectionNames = "TD"|"CD"|"C"|"CP"|"CS"|"PD";
 type DocumentSectionDetails = { sectionName:DocumentSectionNames, sectionType:DocumentSectionTypes }
 
@@ -77,6 +78,8 @@ type LoanCommonProps = {
 
 type ToastOptionsAttributes ={open:boolean, type:"error"|"success", action:"add"|"delete"|"edit",section:string};
 
+type ComponentList = {name:string,path:string, component:FunctionComponent<any>, icon?:Function}[];
+
 export {
   type FieldValues,
   type TableDataTypes, type FieldDataTypes,
@@ -88,4 +91,5 @@ export {
   type CommonFileViewerProps, type DocumentFileViewerProps, type PaymentFileViewerProps,
   type LoanCommonProps,
   type ToastOptionsAttributes,
+  type ComponentList,
 }

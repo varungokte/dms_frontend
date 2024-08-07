@@ -3,7 +3,7 @@ import useGlobalContext from "./../../GlobalContext";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { LoanSecurityTypeList } from "./../../Constants";
 
-import LoadingMessage from "./BasicComponents/LoadingMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
 
 import LoanIDAssignment from "./LoanAccountComponents/LoanIDAssignment";
 import LoanBasicDetails from "./LoanAccountComponents/LoanBasicDetails";
@@ -15,8 +15,9 @@ import LoanContactDetails from "./LoanAccountComponents/LoanContactDetails";
 import LoanTeamSelection from "./LoanAccountComponents/LoanTeamSelection";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 
-import { FieldValues } from "DataTypes";
+//import Tooltip from '@mui/material/Tooltip';
 import { Tab, Tabs } from "@mui/material";
+import { FieldValues } from "DataTypes";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
@@ -53,8 +54,6 @@ function CreateLoanAccount() {
   const [dataHasLoaded, setDataHasLoaded] = useState(state.linkSource=="CREATE"?true:false);
 
   const [assignedTeam,setAssignedTeam] = useState<string>();
-
-  useEffect(()=>console.log("unsaved warning",unsavedWarning),[unsavedWarning]);
 
   const formSections = [
     { name: "Create Agreement ID", component: LoanIDAssignment },
@@ -149,33 +148,37 @@ function CreateLoanAccount() {
         aria-label="scrollable force tabs example"
       >
         {formSections.map((section, index:number)=>{
-          return <Tab key={index} disableRipple={false} disableFocusRipple={false}
-            label={
-              <div className={`flex flex-row py-3 px-2 border-2 border-zinc-300 rounded-xl min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`}>
-                <div className={
-                  `border rounded-full ${index===0
-                    ?currentSection===index?
-                      "border-white"
-                      :"text-zinc-500 border-zinc-300"
-                    :currentSection===index?
-                      "border-white"
-                      :"text-zinc-700 border-zinc-500"
-                  }`} 
-                  style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}
-                </div>
-                <div className={`m-auto ${currentSection==0 && currentSection!==index?"text-zinc-500":""}`}>{section.name}</div>
-              </div>
-            }
-            disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
-            onClick={()=>{
-              unsavedWarning
-                ?(confirm("WARNING:\nYour unsaved data will be lost.\nTo save your data, close this dialog and click \"Save & Next\"")
-                  ?setCurrentSection(index)
-                  :setCurrentSection(currentSection)
-                )
-                :setCurrentSection(index)                      
-            }}
-          />
+          return (
+            //<Tooltip key={index} title="A" placement="top">
+              <Tab key={index} disableRipple={false} disableFocusRipple={false}
+                label={
+                  <div className={`flex flex-row py-3 px-2 border-2 border-zinc-300 rounded-xl min-w-44 ${currentSection===index?"bg-custom-1 text-white":index===0?"text-slate-400 border-zinc-200":"white"}`}>
+                    <div className={
+                      `border rounded-full ${index===0
+                        ?currentSection===index?
+                          "border-white"
+                          :"text-zinc-500 border-zinc-300"
+                        :currentSection===index?
+                          "border-white"
+                          :"text-zinc-700 border-zinc-500"
+                      }`} 
+                      style={{ height:"30px", width:"30px", lineHeight:"30px", fontSize:"12px"}}>{`${index+1}.`}
+                    </div>
+                    <div className={`m-auto ${currentSection==0 && currentSection!==index?"text-zinc-500":""}`}>{section.name}</div>
+                  </div>
+                }
+                disabled={!okToFrolic || index==0 || (!enableDocumentSections && index>=7)}
+                onClick={()=>{
+                  unsavedWarning
+                    ?(confirm("WARNING:\nYour unsaved data will be lost.\nTo save your data, close this dialog and click \"Save & Next\"")
+                      ?setCurrentSection(index)
+                      :setCurrentSection(currentSection)
+                    )
+                    :setCurrentSection(index)                      
+                }}
+              />
+            //</Tooltip>
+          )
             {/* {!okToFrolic && currentSection==1 && index>1
               ?<TooltipContent className="bg-white">
                 <p className="">Please fill all <span className="font-bold">required fields</span> to move to this page</p>

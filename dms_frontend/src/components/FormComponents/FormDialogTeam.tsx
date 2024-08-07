@@ -1,39 +1,33 @@
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { FieldAttributesList, FieldValues, UserSuggestionsList } from "DataTypes";
 
-import { Dialog, DialogClose, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import RequiredFieldsNote from "../BasicComponents/RequiredFieldsNote";
-import { SubmitButtonStyling } from "../BasicComponents/PurpleButtonStyling";
+import Dialog from '@mui/material/Dialog';
+import DialogTitle from '@mui/material/DialogTitle';
 
-import ComboboxField from "../FormFieldComponents/ComboboxField";
-import TextField from "../FormFieldComponents/TextField";
-import SubmitButton from "../BasicComponents/SubmitButton";
+import RequiredFieldsNote from "../BasicMessages/RequiredFieldsNote";
+import CloseIcon from '@mui/icons-material/Close';
+import SubmitButton from "../Buttons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
 
 type FormDialogProps = {
   index:number, edit?:boolean, 
-  triggerText:string|ReactElement, triggerClassName?:string, 
-  formSize:"small"|"medium"|"large", formTitle:string, submitButton:string, formSubmit:Function, 
+  formOpen:boolean, setFormOpen:Function,
+  formSize:"sm"|"md"|"lg", formTitle:string, 
+  submitButton:string, formSubmit:Function, 
   form:FieldAttributesList, 
   currentFields:FieldValues, repeatFields?:boolean,
 }
 
-enum FormSizes {
-  small= "min-w-[600px] min-h-[300px]",
-  medium= "min-w-[800px] min-h-[300px]",
-  large= "min-w-[1000px] min-h-[300px]",
-};  
-
 function FormDialogTeam(props:FormDialogProps){
-  const [open, setOpen] = useState(false);
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
+  const [errorList, setErrorList] = useState<string[]>([]);
 
   useEffect(()=>{
-    if (!open)
+    if (!props.formOpen)
       setPrefillValues({});
-  },[open]);
+  },[props.formOpen]);
 
   const teamMembersRenamingWhileSubmitting = () => {
     const data:FieldValues={};
@@ -77,6 +71,8 @@ function FormDialogTeam(props:FormDialogProps){
   const validateRequiredFields=()=>{
     const requiredList = findMissingFields();
     let data;
+    const arr=[];
+
     for (let i=0;i<Object.keys(requiredList).length;i++){
       let key = Object.keys(requiredList)[i];
       let value = requiredList[key];
@@ -86,16 +82,28 @@ function FormDialogTeam(props:FormDialogProps){
         continue;
       
       //console.log("RECENTLY ASSIGEND DATA",data);
-      if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1)){
+      if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1))
+        arr.push(key);
+
+      if (arr.length>0){
+        setErrorList(arr);
         setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
         return false;
       }
+      else{
+        setErrorMessage(<></>);
+        if (props.edit)
+          return data;
+        return true;
+      }
     }
+  }
 
-    setErrorMessage(<></>);
-    if (props.edit)
-      return data;
-    return true;
+  const closeDialog = () => {
+    props.setFormOpen((curr:boolean[])=>{
+      curr[props.index]=false; 
+      return [...curr];
+    });
   }
 
   const submitFunction = async () => {
@@ -110,7 +118,7 @@ function FormDialogTeam(props:FormDialogProps){
       //console.log("prefillValues",prefillValues)
       const res = await props.formSubmit(submittedData==false?{...prefillValues}:submittedData,props.index);
       if (res==200)
-        setOpen(false);
+        closeDialog();
       else if (res==422)
         setErrorMessage(<p className="text-red-600">Already exists.</p>);
       else 
@@ -118,35 +126,34 @@ function FormDialogTeam(props:FormDialogProps){
       return res;
     }
   }
+
   return (
-    <Dialog open={open} onOpenChange={setOpen} key={props.index}>
-      <DialogTrigger className={props.triggerClassName||""}>{props.triggerText}</DialogTrigger>
-      {open
-        ?<DialogContent className={`bg-white overflow-y-scroll max-h-screen ${FormSizes[props.formSize]} `}>
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-normal">{props.formTitle}</DialogTitle>
-            <hr/>
-          </DialogHeader>
-            <RequiredFieldsNote />
-            <RenderForm key={"f0"} edit={props.edit||false} teamId={props.currentFields["_id"]} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} />
-            {errorMessage}
-            <br/>
-            <div className="flex flex-row">
-              <div className="flex-auto"></div>
-              <DialogClose className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle">Cancel</DialogClose>
-              <SubmitButton className={`float-right ${SubmitButtonStyling}`} submitFunction={submitFunction} submitButtonText={props.submitButton} />
-            </div>
-        </DialogContent>
-        :<></>
-      }
+    <Dialog open={props.formOpen} onClose={closeDialog} key={props.index} maxWidth={props.formSize} fullWidth>
+      <DialogTitle>
+        <div className="flex flex-row">
+          <div className="flex-auto"><p className="text-2xl font-normal">{props.formTitle}</p></div>
+          <div><button onClick={closeDialog}><CloseIcon/></button></div>
+        </div>
+      </DialogTitle>
+      <hr/>
+      <div className="p-5">
+        <RequiredFieldsNote />
+          <RenderForm key={"f0"} edit={props.edit||false} teamId={props.currentFields["_id"]} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} errorList={errorList} />
+        {errorMessage}
+        <br/>
+        <div className="flex flex-row">
+          <div className="flex-auto"></div>
+          <button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle" onClick={closeDialog}>Cancel</button>
+          <SubmitButton submitFunction={submitFunction} submitButtonText={props.submitButton} />
+        </div>
+      </div>
     </Dialog>
   )
 }
 
-function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function}){
+function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, errorList:string[]}){
   const [leaderSuggestions, setLeaderSuggestions] = useState<UserSuggestionsList>([]);
   const [memberSuggestions, setMemberSuggestions] = useState<UserSuggestionsList>([]);
-  const [leaderSelected, setLeaderSelected] = useState(false);
   const [teamMembers, setTeamMembers] = useState<FieldValues>({});
 
   const {getUserSuggestions, getSingleTeam} = useGlobalContext();
@@ -184,7 +191,6 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
   const getTeamData = async () => {
     const res = await getSingleTeam(props.teamId);
     if (res.status==200){
-      console.log("RES>obj",res.obj)
       res.obj["_id"]=props.teamId;
       props.setPrefillValues({...res.obj});
       getLeaderSuggestions();
@@ -220,20 +226,22 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
     if (props.edit && Object.keys(props.prefillValues).length!=0)
       teamMembersCombinedToSeparate();
 
-    if (props.prefillValues && props.prefillValues["L"]){
-      setLeaderSelected(true);
-      getMemberSuggestions();
-    }
+    if (props.prefillValues && props.prefillValues["L"] && props.prefillValues["L"]!="" && props.prefillValues["L"].length!=0){
+      console.log("TEAM LEADER",props.prefillValues["L"])
+      getMemberSuggestions();}
     //console.log("new prefillvalues",props.prefillValues)
   },[props.prefillValues]);
 
-  return <FormFieldsRender form={props.form} formType="team" prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} edit={props.edit} />
-/* 
-  return (
+  return <FormFieldsRender form={props.form} formType="team" errorList={props.errorList}
+    prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
+    edit={props.edit} 
+    filteredSuggestions={memberSuggestions} leaderSuggestions={leaderSuggestions} teamMembers={teamMembers} 
+  />
+
+  /* return (
     props.form.map((field,index)=>{
       if (field.category=="label"){
         return <div key={"label"}>
-        {leaderSelected?<></>:<div>Please select a team lead before selecting members</div>}
         <div key={index} className={field.sectionClassName}>{field.name}</div>
         </div> 
       }
@@ -244,23 +252,18 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
             <div key={index+"gridz"} className={`grid grid-cols-${field.row}`}>
               {field.fields.map((item, itemIndex)=>{
                 if (item.type=="combobox"){
-                  let disableTeam = false;
-                  if ((item.id!="L" && !leaderSelected))
-                    disableTeam=true;
-
-                  const immutable = item.immutable==undefined?false:item.immutable
+                  const immutable = item.immutable==undefined?false:(props.edit &&item.immutable)
                   const disabled = item.disabled==undefined?false:item.disabled;
                   return <span key={index+"_"+itemIndex} className="mr-3">
-                    <ComboboxField key={index} index={index} id={item.id} name={item.name} edit={props.edit}
-                      required={item.required} disabled={disabled||immutable&&disableTeam} 
-                      prefillValue={teamMembers[item.id]} setPrefillValues={props.setPrefillValues} multiple={item.multiple} suggestions={item.id=="L"?leaderSuggestions:memberSuggestions}
+                    <ComboboxField key={index} index={index} fieldData={item} disabled={disabled||immutable} 
+                      prefillValue={teamMembers[item.id]} setPrefillValues={props.setPrefillValues} suggestions={item.id=="L"?leaderSuggestions:memberSuggestions}
                     />
                   </span>
                 }
                 else
                   return <span key={index+"_"+itemIndex} className="mr-3">
-                    <TextField key={index} index={index} id={item["id"]} name={item["name"]} type={item["type"]} size="large"
-                      required={item["required"]} disabled={item["disabled"]||(item["immutable"]&&props.edit)} 
+                    <TextField key={index} index={index}  size="large" fieldData={item}
+                      disabled={(item["disabled"]||false)||((item["immutable"]||false)&&props.edit)} 
                       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
                     />
                   </span>

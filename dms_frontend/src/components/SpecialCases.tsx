@@ -1,28 +1,29 @@
 import { useContext, useEffect, useState } from "react";
-import { DocumentStatusList, sectionNames } from "../../Constants";
+import { DocumentStatusList, getDocSecList, getDocSecName, sectionNames } from "../../Constants";
 import useGlobalContext from "../../GlobalContext";
 import { FieldValues } from "../../DataTypes";
 
-import Search from "./BasicComponents/Search";
 import { DataTable } from "./BasicComponents/Table";
 
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 
-import UploadFileButton from "./BasicComponents/UploadFileButton";
-import ViewFileButton from "./BasicComponents/ViewFileButton";
+import UploadFileButton from "./Buttons/UploadFileButton";
+import ViewFileButton from "./Buttons/ViewFileButton";
 import { PermissionContext } from "@/MenuRouter";
 import { Pagination } from "./BasicComponents/Pagination";
+import Filter from "./BasicComponents/Filter";
 
 function SpecialCases(props:{label:string}) {
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
   
-  const [defaultData, setDefaultData] = useState<FieldValues[]>();
-  const [type] = useState<"def"|"crit">(props.label=="Default Cases"?"def":"crit");
+  const [allData, setAllData] = useState<FieldValues[]>();
+  const admin = sectionNames[props.label].split("/").length>1?true:false;
+  const type = sectionNames[props.label].split("/")[0]=="default"?"def":"crit";
+	const [currentSection, setCurrentSection] = useState<string>(getDocSecName("TD","keyname","fullname"));
 
-  const [searchString, setSearchString] = useState("");
   const [added, setAdded] = useState(true);
   const [documentLinks,setDocumentLinks] = useState<{section:string,index:string|number}[]>([]);
 
@@ -33,28 +34,29 @@ function SpecialCases(props:{label:string}) {
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const [startIndex, setStartIndex] = useState(0);
-  const [endIndex, setEndIndex] = useState(10);
-
-  const sectionNameBeautify:{[key:string]:string} = {
+  /* const sectionNameBeautify:{[key:string]:string} = {
     "transactions": "Transaction Documents",
     "compliance": "Compliance Documents",
     "covenants": "Covenants",
     "precedents": "Condition Precedent",
     "subsequents": "Condition Subsequent",
     "payment": "Payment"
-  }
+  } */
 
-  const sectionNameToAbbreviation:{[key:string]:string} = {
+  /* const sectionNameToAbbreviation:{[key:string]:string} = {
     "transactions":"TD",
     "compliance":"CD",
     "covenants":"C",
     "precedents":"CP",
     "subsequents":"CS",
     "payment": "PD"
-  }
+  } */
 
-  const getDocsLoanData = (docList:FieldValues[],loanDetails:FieldValues[],teamName:string,section:string,arr:FieldValues[],links:{section:string,index:string|number}[]) => {
+  useEffect(()=>{
+    setAdded(true);
+  },[currentSection]);
+
+  /* const getDocsLoanData = (docList:FieldValues[],loanDetails:FieldValues[],teamName:string,section:string,arr:FieldValues[],links:{section:string,index:string|number}[]) => {
     for (let j=0; j<docList.length; j++){
       const singleDoc = docList[j];
       const loanId = singleDoc["_loanId"];
@@ -114,20 +116,53 @@ function SpecialCases(props:{label:string}) {
       else
         links.push({section:"../"+section,index:obj["AID"]});
     }
-  }
+  } */
+
+  useEffect(()=>{
+    setAdded(true);
+  },[currentPage,rowsPerPage])
 
   useEffect(()=>{
     if (added){
-      getSpecialList({type, currentPage, rowsPerPage}).then(res=>{
+      getSpecialList({type, admin, sectionName:getDocSecName(currentSection,"fullname","keyname"), currentPage, rowsPerPage}).then(res=>{
         console.log("response",res);
         if (res.status==200){
-          const arr:any = [];
           const data = res.obj[0]["data"];
+          if (data && data.length==0){
+            setAllData([]);
+            return;
+          }
+
           const links:{section:string,index:string|number}[] = [];
+          setAllData(data);
+          setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+          setDocumentLinks(links);
+
           for (let i=0; i<data.length; i++){
+            const deal = data[i];
+            
+            deal["link"] = <div>
+              <p className="text-blue-500 text-base">{deal["DN"]}</p>
+              <p className="font-light text-sm">{deal["DC"]}</p>
+              <p className="text-xs">{currentSection}</p>
+            </div>;
+
+            links.push({section:"../"+getDocSecName(currentSection,"fullname","shortname"),index:deal["AID"]});
+/*             
+            if (currentSection=="payment")
+              links.push({section:"../schedule", index:deal["AID"]});
+            else if (currentSection=="covenants")
+              links.push({section:"../"+getDocSecName(currentSection,"fullname","shortname"), index:deal["AID"]});
+            else if (currentSection.charAt(currentSection.length-1)=="s")
+              links.push({section:"../"+currentSection.slice(0,currentSection.length-1), index:deal["AID"]});
+            else
+              links.push({section:"../"+currentSection,index:deal["AID"]}); */
+          }
+
+          /* for (let i=0; i<data.length; i++){
             const teamName = data[i]["N"];
             const loanDetails = data[i]["loanDetails"];
-            const sections = ["transactions","compliance","covenants","precedents","subsequents","payment"]
+            const sections = getDocSecList("shortname");
             for (let j=0; j<sections.length; j++){
               const section = sections[j];
               let docs = data[i][section];
@@ -138,51 +173,49 @@ function SpecialCases(props:{label:string}) {
                 getDocsLoanData(docs,loanDetails,teamName,section,arr,links)
             }   
           }
-          setDefaultData(arr);
-          setDocumentLinks(links);
+          setAllData(arr);
+          setTotalPages(Math.ceil(arr.length/Number(rowsPerPage)));
+          setStartIndex((currentPage-1)*rowsPerPage);
+          setEndIndex(currentPage*rowsPerPage); */
         }
         else
-          setDefaultData([]);
+          setAllData([]);
       })
       setAdded(false);
     }
   },[added]);
 
-  useEffect(()=>{
-    setAdded(true);
-    if (defaultData){
-      setTotalPages(Math.ceil(defaultData.length/Number(rowsPerPage)));
-      setStartIndex((currentPage-1)*rowsPerPage);
-      setEndIndex(currentPage*rowsPerPage);
-    }
-  },[currentPage,rowsPerPage]);
+  /* useEffect(()=>{
+    if (!allData)
+      return;
+    const arr = allData.slice(startIndex,endIndex);
+    setPageData(arr);
+  },[allData]); */
 
-  useEffect(()=>console.log("default data",defaultData),[defaultData])
-  
   return(
     <div>
 			<p className="text-3xl font-bold m-7">{props.label}</p>
 
       <div className='flex flex-row relative'>
-        <div className=''>
-          <Search setter={setSearchString} label="Search" className="mx-7"/>
+        <div className="mx-7">
+          <Filter value={currentSection} setValue={setCurrentSection} options={getDocSecList("fullname")} />
         </div>
       </div>
 
       <div className="m-7">
-        {defaultData
-          ?defaultData.length==0
-            ?<EmptyPageMessage sectionName="default cases" />
+        {allData
+          ?allData.length==0
+            ?<EmptyPageMessage sectionName={props.label} />
             :<DataTable className="rounded-xl bg-white"
               headingRows={["Sr. No.", "Document Name", "Team Name", "Agreement ID","Status", type=="def"?"Default Date":"Priority", "Action"]}
               cellClassName={["w-[50px]","w-[300px]","","","","mr-10","w-[200px]"]}
-              tableData={defaultData} dataTypes={["index","doc-link","text","text","doc-status",type=="def"?"date":"priority","action"]} columnIDs={["link","TN","AID","S",type=="def"?"DD":"P"]}
-              searchRows={searchString==""?[]:[searchString,0]} filterRows={[]} 
+              tableData={allData} dataTypes={["index","doc-link","text","text","doc-status",type=="def"?"date":"priority","action"]} columnIDs={["link","N","AID","DS",type=="def"?"DD":"DP"]}
+              indexStartsAt={(currentPage-1)*rowsPerPage}
               documentLinks={documentLinks}
               action={
-                defaultData.map((doc:any,index:number)=>{
+                allData.map((doc:any,index:number)=>{
                   if (!doc["S"] || doc["S"]==DocumentStatusList[1])
-                    return <UploadFileButton key={index} index={index}  disabled={!userPermissions[sectionNames[props.label]].includes("add")}
+                    return <UploadFileButton key={index} index={index} disabled={!admin && !userPermissions[sectionNames[props.label]].includes("add")}
                       AID={doc["AID"]} sectionName={doc["SN"]}
                       setAdded={setAdded}
                       isPayment={doc["SN"]=="PD"}
@@ -190,7 +223,7 @@ function SpecialCases(props:{label:string}) {
                       _id={doc["SN"]=="PD"?doc._id:undefined}
                   />
                   else
-                    return <ViewFileButton key={index} type="doc" disabled={!userPermissions[sectionNames[props.label]].includes("view")}
+                    return <ViewFileButton key={index} type="doc" disabled={!admin && !userPermissions[sectionNames[props.label]].includes("view")}
                       AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={doc["SN"]} 
                       status={doc["S"]} rejectionReason={doc["R"]} 
                       setAdded={setAdded} 
@@ -214,7 +247,7 @@ function SpecialCases(props:{label:string}) {
         }
       </div>
 
-      {defaultData && defaultData.length>0
+      {allData && allData.length>0
         ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
         :<></>
       }

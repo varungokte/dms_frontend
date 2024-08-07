@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
-import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "../../../Constants";
+import { RatingAgencyList, RatingOutlookList, RatingTypeList, sectionNames } from "../../../Constants";
 import { FieldValues, FieldAttributesList, LoanCommonProps, ToastOptionsAttributes } from "DataTypes";
 
 import { DataTable } from "../BasicComponents/Table";
 import FormDialog from "../FormComponents/FormDialog";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
-import LoadingMessage from "../BasicComponents/LoadingMessage";
+import EmptyPageMessage from "../BasicMessages/EmptyPageMessage";
+import LoadingMessage from "../BasicMessages/LoadingMessage";
 
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
 import Toast from "../BasicComponents/Toast";
 import { Pagination } from "../BasicComponents/Pagination";
+import { PermissionContext } from "@/MenuRouter";
+import AddButton from "../Buttons/AddButton";
 //import Search from "../BasicComponents/Search";
 
 function LoanRatings(props:LoanCommonProps) {
@@ -28,6 +29,10 @@ function LoanRatings(props:LoanCommonProps) {
   ];
 
   const {addRating, getRatingsList} = useGlobalContext();
+  
+  const {userPermissions} = useContext(PermissionContext);
+
+  const [addOpen, setAddOpen] = useState([false]);
 
   const [ratingsList, setRatingsList] = useState<FieldValues[]>();
   const [added, setAdded] = useState(true);
@@ -101,13 +106,19 @@ function LoanRatings(props:LoanCommonProps) {
           {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
         <div>
-          {props.actionType=="VIEW"
+          {props.actionType=="VIEW" && userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add")
             ?<></>
-            :<FormDialog index={-1} type="rate"
-              triggerText="+ Add Rating" triggerClassName={CreateButtonStyling} formSize="medium"
-              formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
-              form={fieldList} currentFields={{}}
-            />
+            :<div>
+              <AddButton sectionName="rating" onClick={()=>setAddOpen([true])} />
+              {addOpen[0]
+                ?<FormDialog index={0} type="rate"
+                  formOpen={addOpen[0]} setFormOpen={setAddOpen} formSize="md"
+                  formTitle="Add New Rating"  formSubmit={createRating} submitButton="Add Rating"
+                  form={fieldList} currentFields={{}}
+                />
+                :<></>
+              }
+            </div>
           }
         </div>
       </div>
@@ -120,7 +131,7 @@ function LoanRatings(props:LoanCommonProps) {
             :<DataTable className="border"
               headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Rating Value", "Link"]} 
               tableData={ratingsList} columnIDs={["A","T","DT","O","V","L"]} dataTypes={["text", "text", "date", "text", "text", "text"]}
-              searchRows={[]} filterRows={[]} cellClassName={["","","","","","text-blue-500"]} 
+              cellClassName={["","","","","","text-blue-500"]} 
             />
           :<LoadingMessage sectionName="ratings" />
         }

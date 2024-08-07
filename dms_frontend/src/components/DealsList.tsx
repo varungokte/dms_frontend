@@ -7,12 +7,12 @@ import SingleDealDocuments from "./SingleDealDocuments";
 import SingleDealPayments from "./SingleDealPayments";
 
 import TableCollapsible from "./BasicComponents/TableCollapsible";
-import Search from "./BasicComponents/Search";
 import ProgressBar from "./BasicComponents/ProgressBar";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
 import { useLocation } from "react-router-dom";
 import { Pagination } from "./BasicComponents/Pagination";
+import { sectionNames } from "./../../Constants";
 
 type DocumentDetails= {
   _id:string,
@@ -29,30 +29,30 @@ function DealsList(props:{label:string}) {
 
   const {state} = useLocation();
   const dealRefs = useRef<any>([]);
-
-  useEffect(()=>console.log("state",state),[state])
+  const admin = sectionNames[props.label].split("/").length>1;
 
   const setSection = (): DocumentSectionDetails => {
-    if (props.label=="Transaction Documents")
-      return { sectionName: "TD", sectionType:"doc" }
-    else if (props.label=="Compliance Documents")
-      return { sectionName: "CD", sectionType:"doc" }
-    else if (props.label=="Covenants")
-      return { sectionName: "C", sectionType:"cov" }
-    else if (props.label=="Condition Precedent")
-      return { sectionName: "CP", sectionType:"con" }
-    else if (props.label=="Condition Subsequent")
-      return { sectionName: "CS", sectionType:"con" }
+    const label = sectionNames[props.label].split("/")[0];
+    if (label=="transaction")
+      return { sectionName: "TD", sectionType:"document" }
+    else if (label=="compliance")
+      return { sectionName: "CD", sectionType:"document" }
+    else if (label=="covenants")
+      return { sectionName: "C", sectionType:"covenant" }
+    else if (label=="precedent")
+      return { sectionName: "CP", sectionType:"condition" }
+    else if (label=="subsequent")
+      return { sectionName: "CS", sectionType:"condition" }
     else
-      return { sectionName:"PD", sectionType:"pay" }
+      return { sectionName:"PD", sectionType:"payment" }
   }
 
-  const [sectionDetails] = useState(setSection());
+  const sectionDetails = setSection();
 
   const [dealData, setDealData] = useState<DocumentDetails[]>();
 
   const [calculate, setCalculate] = useState(true);
-  const [searchString, setSearchString] = useState("");
+  const [searchString, _] = useState("");
   const [showDeals, setShowDeals] = useState<boolean[]>();
   const [fromRedirect, setFromRedirect] = useState(true);
   const [currentTab, setCurrentTab] = useState(-1);
@@ -69,7 +69,7 @@ function DealsList(props:{label:string}) {
 
   useEffect(()=>{
     if (calculate){
-      getDealList({sectionName:sectionDetails.sectionName, currentPage, rowsPerPage}).then(res=>{
+      getDealList({ admin,sectionName:sectionDetails.sectionName, currentPage, rowsPerPage}).then(res=>{
         try{
           setDealData(res.obj[0]["data"]);
           const arr = new Array(res.obj.length).fill(false);
@@ -113,12 +113,11 @@ function DealsList(props:{label:string}) {
     <div>
 			<p className="text-3xl font-bold m-7">{props.label}</p>
 			<div className="flex flex-row">
-        <div className='mx-10'>
-          <Search setter={setSearchString} label="Search"/>
+        <div className='mx-7'>
         </div>
       </div>
 
-      <div className="bg-white m-10 rounded-xl">
+      <div className="bg-white m-7 rounded-xl">
         <br/>
         {dealData==undefined
           ?<LoadingMessage sectionName="data" />
@@ -126,7 +125,7 @@ function DealsList(props:{label:string}) {
             ?<EmptyPageMessage sectionName="deals"/>
             :dealData.map((deal,index)=>{
                 return <div ref={el=>dealRefs.current[index]=el} key={index}>
-                  <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} />
+                  <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} admin={admin} />
                 </div>
             })
         }
@@ -140,7 +139,7 @@ function DealsList(props:{label:string}) {
   )
 }
 
-function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, searchString:string, showDeals:boolean[],setShowDeals:Function, calculate:boolean, setCalculate:Function, linkSource?:string,setCurrentTab:Function}) {
+function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, searchString:string, showDeals:boolean[],setShowDeals:Function, calculate:boolean, setCalculate:Function, linkSource?:string,setCurrentTab:Function, admin:boolean}) {
   const [added,setAdded] = useState(true);
   const [progressValue, setProgressValue] = useState(0);
 
@@ -175,7 +174,7 @@ function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetai
     ["Sanction Date", "font-light"],
   ];
 
-  if (props.sectionDetails.sectionType!="pay"){
+  if (props.sectionDetails.sectionType!="payment"){
     tableTopRow.push(["Verified Documents", "w-[26.70%] font-medium text-base text-justify"])
     tableBottomRow.push([<ProgressBar value={progressValue} />, "content-center"])
   }
@@ -185,9 +184,9 @@ function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetai
       topRow={tableTopRow}
       bottomRow={tableBottomRow}
       showTabs={props.showDeals} setShowTabs={props.setShowDeals}
-      content={props.sectionDetails.sectionType=="pay"
-        ?<SingleDealPayments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} />
-        :<SingleDealDocuments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded} open={props.showDeals[props.index]}/>
+      content={props.sectionDetails.sectionType=="payment"
+        ?<SingleDealPayments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} admin={props.admin} />
+        :<SingleDealDocuments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded} open={props.showDeals[props.index]} admin={props.admin} />
       }
       searchString={props.searchString}
     />

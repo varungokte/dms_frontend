@@ -6,7 +6,7 @@ import { sectionNames } from "./../../../Constants";
 import { Link } from "react-router-dom";
 import PasswordField from "../FormFieldComponents/PasswordField";
 import TextField from "../FormFieldComponents/TextField";
-import SubmitButton from "../BasicComponents/SubmitButton";
+import SubmitButton from "../Buttons/SubmitButton";
 
 function RegistrationPage(){
   useEffect(()=>{
@@ -93,9 +93,9 @@ function RegistrationPage(){
 			<form>
 				{fieldList.map((field,index)=>{
 					if (field.type=="password")
-						return <PasswordField key={index} index={index} fieldData={field} size="small" prefillValues={fieldValues} setPrefillValues={setFieldValues} edit={false} />
+						return <PasswordField key={index} index={index} fieldData={field} size="small" prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
 					else
-						return <TextField key={index} index={index} fieldData={field} size="small" padding={2} prefillValues={fieldValues} setPrefillValues={setFieldValues} edit={false} />
+						return <TextField key={index} index={index} fieldData={field} size="small" padding={2} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
 				})}
 				<br />
 				<SubmitButton className="bg-custom-1 p-2 rounded-if text-white w-full" submitFunction={handleRegister} submitButtonText="Register" />

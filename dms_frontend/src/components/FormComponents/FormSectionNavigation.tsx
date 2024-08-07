@@ -1,12 +1,15 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
+import { Button, Typography } from "@mui/material";
+import CancelButton from '../Buttons/CancelButton';
 
 function FormSectionNavigation(props: { currentSection:number, setCurrentSection:Function, sectionCount:number, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean, actionType?:"CREATE"|"EDIT"|"VIEW"}) {
   const navigate = useNavigate();
 
-  const [nextButtonValue, setNextButtonValue] = useState(<div className="flex flex-row place-content-center"><div>Next</div><ChevronRight/></div>);
+  const [nextButtonValue, setNextButtonValue] = useState(<><Typography textTransform="capitalize">Next</Typography><ChevronRightIcon/></>);
   
   useEffect(()=>{
     if (props.enableLoadingSign)
@@ -25,23 +28,23 @@ function FormSectionNavigation(props: { currentSection:number, setCurrentSection
   return (
     <div className="flex flex-row">
       <div className="flex-auto">
-        <button className="text-red-600 border border-red-600 rounded-xl h-12 w-36 mx-3" onClick={()=>navigate("/loan")}>Cancel</button>
+        <CancelButton onClick={()=>navigate("/loan")} />
       </div>
 
       <div>
         {props.currentSection==1
           ?<></>
-          :<button className="text-custom-1 border border-custom-1 rounded-xl h-12 w-36 mx-2 align-middle	" onClick={previousSection}>
-            <div className="flex flex-row place-content-center">
-              <ChevronLeft/>
-              <div>Previous</div>
-            </div>
-          </button>
+          :<Button color="secondary" variant="outlined" size="large" sx={{borderRadius:"10px", height:"50px", width:"150px", marginX:"10px"}} onClick={previousSection}>
+            <ChevronLeftIcon/>
+            <Typography textTransform="capitalize">Previous</Typography>
+          </Button>
         }
         {props.currentSection<props.sectionCount
-        ?<button className="text-white bg-custom-1 rounded-xl h-12 w-36" type={props.isForm&&props.actionType!="VIEW"?"submit":"button"} onClick={()=>{props.isForm&&props.actionType!="VIEW"?{}:props.goToNextSection()}}>
+        ?<Button color="secondary" variant="contained" size="large" sx={{borderRadius:"10px", height:"50px", width:"150px", marginX:"10px"}} type={props.isForm&&props.actionType!="VIEW"?"submit":"button"} onClick={()=>{props.isForm&&props.actionType!="VIEW"?{}:props.goToNextSection()}}>
+        <div className="flex flex-row place-content-center">
           {nextButtonValue}
-        </button>
+        </div>
+      </Button>
         :<></>
         }
       </div>

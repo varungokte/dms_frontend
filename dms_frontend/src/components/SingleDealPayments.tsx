@@ -4,14 +4,14 @@ import { DocumentSectionDetails } from "DataTypes";
 import { DocumentStatusList, sectionNames } from "../../Constants";
 
 import { DataTable } from "./BasicComponents/Table";
-import UploadFileButton from "./BasicComponents/UploadFileButton";
-import ViewFileButton from "./BasicComponents/ViewFileButton";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
+import UploadFileButton from "./Buttons/UploadFileButton";
+import ViewFileButton from "./Buttons/ViewFileButton";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
 import { PermissionContext } from "@/MenuRouter";
 import { Pagination } from "./BasicComponents/Pagination";
 
-function SingleDealPayments(props:{label:string, loanId:string, AID:string, sectionDetails:DocumentSectionDetails}){
+function SingleDealPayments(props:{label:string, loanId:string, AID:string, sectionDetails:DocumentSectionDetails, admin:boolean}){
   const [paymentData, setPaymentData] = useState<any>();
   const [added, setAdded] = useState(true);
   const [scheduleId, setScheduleId] = useState("");
@@ -56,7 +56,6 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
             headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Action"]} headingClassNames={["w-[100px]","",""," w-[200px]"]}
             tableData={paymentData} columnIDs={["D","I"]} dataTypes={["index","date","text","action"]}
             cellClassName={["w-[100px]","","","w-[200px]"]} 
-            searchRows={[]} filterRows={[]}
             action={
               paymentData.map((inst:any,index:number)=>{
                 if (inst==null)

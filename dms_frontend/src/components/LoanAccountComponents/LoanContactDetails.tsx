@@ -11,15 +11,17 @@ import DialogTitle from '@mui/material/DialogTitle';
 
 import Filter from "../BasicComponents/Filter";
 import FormDialog from "../FormComponents/FormDialog";
-import Search from "../BasicComponents/Search";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
-import LoadingMessage from "../BasicComponents/LoadingMessage";
+import EmptyPageMessage from "../BasicMessages/EmptyPageMessage";
+import LoadingMessage from "../BasicMessages/LoadingMessage";
 
 import ProfileIcon from "../BasicComponents/ProfileIcon";
-import { CreateButtonStyling } from "../BasicComponents/PurpleButtonStyling";
-import { CircleUserIcon, Edit2Icon, Plus } from "lucide-react";
+import { CircleUserIcon, Edit2Icon } from "lucide-react";
 import Toast from "../BasicComponents/Toast";
+import SearchByType from "../BasicComponents/SearchByType";
+import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import DeleteConfirmation from "../BasicComponents/DeleteConfirmation";
+import AddButton from "../Buttons/AddButton";
 
 function LoanContactDetails(props:LoanCommonProps) {
   const allContacts = "All Contacts";
@@ -48,7 +50,7 @@ function LoanContactDetails(props:LoanCommonProps) {
       { id: "BC", type:"text", name: "City" },
     ]}, 
     /* { category:"single", id:"add-same", name:"Billing and Registered Addresses are the same", type:"checkbox"}, */
-    { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
+    { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_30%]', fields:[
       { id: "RA", type:"text", name: "Bulding/Street/Locality Name" },
       { id: "RP", type:"integer", name: "Pincode" },
     ]},
@@ -59,22 +61,32 @@ function LoanContactDetails(props:LoanCommonProps) {
     ]},
   ];
 
+  const [addOpen, setAddOpen] = useState([false]);
+  const [editOpen, setEditOpen] = useState<boolean[]>([]);
+
   const [searchString, setSearchString] = useState("");
+  const [searchType, setSearchType] = useState("");
+  const searchOptions = [{label:"Name", value:"PN"}, {label:"Email", value:"E"},{label:"Company Name", value:"CN"}];
+
   const [role, setRole] = useState(allContacts);
   const [added, setAdded] = useState(true);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
  
-  const {addContact, getContactsList} = useGlobalContext();
+  const {addContact, getContactsList, deleteContact} = useGlobalContext();
+
+  useEffect(()=>{
+    setAdded(true);
+  },[searchString,searchType]);
 
   useEffect(()=>{
     if (added)
-      getContactsList(props.loanId).then(res=>{
+      getContactsList({loanId:props.loanId, searchString, searchType}).then(res=>{
         if (res.status!=200)
           return;
         console.log("contacts reponse",res)
         const obj:any={};
         res.data[0]["data"].map((contact:any)=>{
-          console.log("contact",contact)
+          //console.log("contact",contact)
           if (contact.CT=="-")
             return;
           if (obj[contact.CT])
@@ -82,7 +94,7 @@ function LoanContactDetails(props:LoanCommonProps) {
           else
             obj[contact.CT] = [contact];
         });
-        //console.log("OBJ",obj)
+        console.log("OBJ",obj)
         setContacts(obj);
         setAdded(false);
       })
@@ -162,24 +174,41 @@ function LoanContactDetails(props:LoanCommonProps) {
     return res;
   }
 
+  const obliterateContact = async(id:string) => {
+    const res = await deleteContact(id);
+    //console.log("delete",res);
+    if (res==200){
+      setAdded(true);
+      setToastOptions({open:true, type:"success", action:"delete", section:"Contact"});
+    }
+    else
+      setToastOptions({open:true, type:"error", action:"delete", section:"Contact"});
+  }
+
   return(
     <div className="mt-8">
       <div className="flex flex-row">
-        <div className=''>
-          <Search setter={setSearchString} label="Search" className="mx-5" />
+        <div className="m-auto">
+        <SearchByType className="mx-5" searchString={searchString} setSearchString={setSearchString} searchType={searchType} setSearchType={setSearchType} typeOptions={searchOptions}  />
         </div>
 
-        <div className="flex-auto">
+        <div className="m-auto flex-auto">
           <Filter value={role} setValue={setRole} options={[allContacts].concat(ContactTypeList)}/>
         </div>
       
         <div className="mr-3">
           {props.actionType!="VIEW" && userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add")
-            ?<FormDialog key={-5} index={-5} edit={false} type="cont"
-              triggerText={<div className="flex flex-row"><Plus className="mt-1"/> <p className="">Add Contact</p></div>} triggerClassName={CreateButtonStyling} formSize="large"
-              formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
-              form={fieldList} currentFields={{}}
-            />
+            ?<div>
+              <AddButton sectionName="contact" onClick={()=>setAddOpen([true])} />
+              {addOpen[0]
+                ?<FormDialog key={0} index={0} edit={false} type="cont"
+                  formOpen={addOpen[0]} setFormOpen={setAddOpen} formSize="lg"
+                  formTitle="Add New Contact" formSubmit={createContact} submitButton="Add Contact"
+                  form={fieldList} currentFields={{}}
+                />
+                :<></>
+              }
+            </div>
             :<></>
           }
         </div>  
@@ -189,17 +218,13 @@ function LoanContactDetails(props:LoanCommonProps) {
           ?role==allContacts && Object.keys(contacts).length!=0
             ?Object.keys(contacts).map((category,categoryIndex)=>{
               return contacts[category].map((person:FieldValues,index:number)=>{
-                const regEx = new RegExp(searchString, "i");
-                if (searchString=="" || (person.PN+"").search(regEx)!==-1)
-                return <ContactCard key={categoryIndex+"_"+index} index={index} person={person} editFunction={editContact} formFields={fieldList} actionType={props.actionType} userPermissions={userPermissions} />
+                return <ContactCard key={categoryIndex+"_"+index} index={index} person={person} editFunction={editContact} formFields={fieldList} actionType={props.actionType} userPermissions={userPermissions} deleteFunction={obliterateContact} editOpen={editOpen} setEditOpen={setEditOpen} />
               })
             })
             :(contacts[role] && contacts[role].length>0)
               ?contacts[role].map((person:any,index:number)=>{
-                const regEx = new RegExp(searchString, "i");
-                if (searchString=="" || (person.PN+"").search(regEx)!==-1)
-                  return <ContactCard key={index} index={index} person={person} editFunction={editContact} formFields={fieldList} actionType={props.actionType} userPermissions={userPermissions} />
-                })
+                return <ContactCard key={index} index={index} person={person} editFunction={editContact} formFields={fieldList} actionType={props.actionType} userPermissions={userPermissions} deleteFunction={obliterateContact} editOpen={editOpen} setEditOpen={setEditOpen} />
+              })
               :<EmptyPageMessage sectionName={role!=allContacts?role.toLowerCase()+"s":"contacts"} />
           :<LoadingMessage sectionName="contacts" />
         }
@@ -211,8 +236,8 @@ function LoanContactDetails(props:LoanCommonProps) {
   )
 }
 
-function ContactCard(props:{index:number, person:FieldValues, editFunction:Function, formFields:FieldAttributesList, actionType:"CREATE"|"EDIT"|"VIEW", userPermissions:any }){
-  const [open, setOpen] = useState(false);
+function ContactCard(props:{index:number, person:FieldValues, editFunction:Function, formFields:FieldAttributesList, actionType:"CREATE"|"EDIT"|"VIEW", userPermissions:any, deleteFunction:Function, editOpen:boolean[], setEditOpen:Function }){
+  const [editOpen, setEditOpen] = useState(false);  
   
   return (
     <Card key={props.index+props.person.CT} className="m-5 w-72 rounded-xl" style={{borderRadius:"10px"}} variant="outlined">
@@ -224,16 +249,25 @@ function ContactCard(props:{index:number, person:FieldValues, editFunction:Funct
           <div className="">
             <div className="flex flex-row">
               {props.actionType!="VIEW" && props.userPermissions && props.userPermissions["loan"].includes("edit") && props.userPermissions["contact"].includes("edit")
-                ?<FormDialog key={props.index} index={props.index} edit={true} type="cont"
-                  triggerText={<Edit2Icon size={"20px"}/>} formSize="large"
-                  formTitle="Edit Contact" formSubmit={props.editFunction} submitButton="Edit Contact"
-                  form={props.formFields} currentFields={props.person}
-                />
+                ?<div>
+                  <button onClick={()=>props.setEditOpen((curr:boolean[])=>{curr[props.index]=true;return [...curr]})}><Edit2Icon size={"20px"}/></button>
+                  {props.editOpen[props.index]
+                    ?<FormDialog key={props.index} index={props.index} edit={true} type="cont"
+                      formOpen={props.editOpen[props.index]} setFormOpen={props.setEditOpen} formSize="lg"
+                      formTitle="Edit Contact" formSubmit={props.editFunction} submitButton="Edit Contact"
+                      form={props.formFields} currentFields={props.person}
+                    />
+                    :<></>
+                  }
+                </div>
                 :<></>
               }
               <div className="ml-2">
-                <button onClick={()=>setOpen(true)}><CircleUserIcon/></button>
-                {open?<ViewContact personId={props.person["_id"]} open={open} setOpen={setOpen} />:<></>}
+                <button onClick={()=>setEditOpen(true)}><CircleUserIcon/></button>
+                {editOpen?<ViewContact personId={props.person["_id"]} open={editOpen} setOpen={setEditOpen} />:<></>}
+              </div>
+              <div className="ml-2">
+                <DeleteConfirmation thing="contact" deleteFunction={props.deleteFunction} currIndex={props.person["_id"]} icon={<DeleteOutlineOutlinedIcon/>} />
               </div>
             </div>
           </div>
@@ -256,7 +290,7 @@ function ViewContact(props:{personId:string, open:boolean, setOpen:Function}){
   
   useEffect(()=>{
     getSingleContact(props.personId).then(res=>{
-      console.log("SINGLE PERSON DATA",res);
+      //console.log("SINGLE PERSON DATA",res);
       if (res.status==200)
         setPersonDetails(res.data);
       else

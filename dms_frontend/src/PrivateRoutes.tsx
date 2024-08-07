@@ -1,17 +1,10 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import useGlobalContext from "../GlobalContext";
-import { MenuRouter } from "./MenuRouter";
+import  MenuRouter from "./MenuRouter";
 import { useEffect, useState } from "react";
 import VerificationPage from "./components/AuthPages/VerificationPage";
 import { UserStatusList } from "./../Constants";
 
-<<<<<<< HEAD
-function PrivateRoutes(){
-  const [token, setToken] = useState<any>(null);  
-  const {getDecryptedToken} = useGlobalContext();
-  useEffect(()=>{
-    getDecryptedToken().then((resToken:any)=>{
-=======
 function PrivateRoutes() {
   const [token, setToken] = useState<any>(null);
   const { getDecryptedToken } = useGlobalContext();
@@ -22,7 +15,6 @@ function PrivateRoutes() {
       /* if (JSON.stringify(token)===JSON.stringify(resToken) && Object.keys(resToken).length>0)
         return;
        */
->>>>>>> eb11b0781c0e48c547d57e902855326f49a9ef4d
       if (resToken)
         setToken(resToken);
       else
@@ -30,18 +22,10 @@ function PrivateRoutes() {
     }).catch(() => {
       setToken("INVALID");
     })
-<<<<<<< HEAD
-  },[]);
-  //console.log("private routes token",token);
-  
-  if (token=="INVALID")
-    return <Navigate to="/login"/>
-=======
   }, []);
 
   if (token == "INVALID")
     return <Navigate to="/login" />
->>>>>>> eb11b0781c0e48c547d57e902855326f49a9ef4d
   else if (token)
     return <EmailVerification token={token} />
   else

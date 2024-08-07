@@ -4,6 +4,8 @@ function Filter(props:{value:string[]|string, setValue:Function, options:string[
   return(
     <Select
       multiple={props.multiple}
+      size="small"
+      color="secondary"
       displayEmpty
       value={props.value}
       onChange={(e)=>props.setValue(e.target.value)}

@@ -98,7 +98,7 @@ function RenderForm(props:RenderFormProps) {
     else if (item.type=="date")
       return <DateField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} />
     else
-      return <TextField key={index} index={index} fieldData={item} disabled={props.disabled||false} size="large" prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} /> 
+      return <TextField key={index} index={index} fieldData={item} disabled={props.disabled||false} size="medium" prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} /> 
   })
 }
 

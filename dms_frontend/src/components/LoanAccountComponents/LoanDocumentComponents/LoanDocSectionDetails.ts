@@ -4,15 +4,15 @@ import { PriorityList } from "../../../../Constants";
 
 const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAttributesList}) =>{
   if (label=="Transaction Documents")
-    return {sectionName: "TD", sectionType:"doc", fieldList: documentFieldList(TransactionCategoryList) }
+    return {sectionName: "TD", sectionType:"document", fieldList: documentFieldList(TransactionCategoryList) }
   else if (label=="Compliance Documents")
-    return { sectionName: "CD", sectionType:"doc", fieldList: documentFieldList(ComplianceCategoryList) }
+    return { sectionName: "CD", sectionType:"document", fieldList: documentFieldList(ComplianceCategoryList) }
   else if (label=="Covenants")
-    return { sectionName: "C", sectionType:"cov", fieldList: covenantFieldList() }
+    return { sectionName: "C", sectionType:"covenant", fieldList: covenantFieldList() }
   else if (label=="Condition Precedent")
-    return { sectionName: "CP", sectionType:"con", fieldList: conditionsFieldList(ConditionPrecedentCategoryList) };
+    return { sectionName: "CP", sectionType:"condition", fieldList: conditionsFieldList(ConditionPrecedentCategoryList) };
   else
-    return { sectionName: "CS", sectionType:"con",fieldList: conditionsFieldList(ConditionSubsequentCategoryList) };
+    return { sectionName: "CS", sectionType:"condition",fieldList: conditionsFieldList(ConditionSubsequentCategoryList) };
 }
 
 const documentFieldList= (documentOptions:string[]):FieldAttributesList =>{

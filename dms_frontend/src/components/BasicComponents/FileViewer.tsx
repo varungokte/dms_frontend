@@ -3,10 +3,9 @@ import useGlobalContext from "../../../GlobalContext";
 import { DocumentRejectionReasonList } from "./../../../Constants";
 import { CommonFileViewerProps, DocumentFileViewerProps, DocumentStatus, FieldValues, PaymentFileViewerProps } from "./../../../DataTypes";
 
-import { Dialog,DialogContent,DialogTitle } from "@mui/material";
-import LoadingMessage from "./LoadingMessage";
+import { Button, Dialog,DialogContent,DialogTitle, Typography } from "@mui/material";
+import LoadingMessage from "../BasicMessages/LoadingMessage";
 
-import { SubmitButtonStyling } from "./PurpleButtonStyling";
 import CloseIcon from '@mui/icons-material/Close';
  
 //IMPORTANT
@@ -168,8 +167,8 @@ function RejectionDialog(props: {openDialog:boolean, setOpenDialog:Function, rej
       </div>
 
       {props.rejectionReason==otherReasons?<textarea className="border rounded-if w-full h-full p-4 mx-3  my-1" value={props.rejectionText} onChange={(e)=>props.setRejectionText(e.target.value)}/>:<></>}
-      <button 
-        className={`float-right ${SubmitButtonStyling} mt-5 h-[40px]`}
+      <Button color="secondary" variant="contained" size="large" sx={{borderRadius:"10px"}}
+        className={`float-right mt-5 h-[40px]`}
         onClick={()=>{
           if (props.rejectionReason)
             props.changeStatus("Rejected"); 
@@ -177,8 +176,8 @@ function RejectionDialog(props: {openDialog:boolean, setOpenDialog:Function, rej
             setRejectionError(<p className="text-red-500 mx-2">A reason or comment must be provided.</p>)
         }} 
       >
-        Submit
-      </button>
+        <Typography textTransform="capitalize">Submit</Typography>
+      </Button>
       {rejectionError}
     </DialogContent>
   </Dialog>

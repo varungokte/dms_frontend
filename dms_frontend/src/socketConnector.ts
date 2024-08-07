@@ -1,11 +1,9 @@
 import {socket} from "./socket";
 
-
 const onConnect = (setSocketIsConnected:Function) => {
   try{
     setSocketIsConnected(true);
     socket.emit("sendMessage", {message:"Connection established"})
-    //console.log("CONNECTED");
     socket.emit("subscribe", "BusinessChannel");
   }
   catch(err){}

@@ -1,25 +1,36 @@
 import { useEffect, useState } from "react";
 import { LoanCommonProps } from "./../../../DataTypes";
-import { Card, CardContent, CardHeader, CardTitle, } from "@/components/ui/card";
-import ProfileIcon from "../BasicComponents/ProfileIcon";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "../../../GlobalContext";
-import EmptyPageMessage from "../BasicComponents/EmptyPageMessage";
-import LoadingMessage from "../BasicComponents/LoadingMessage";
+import EmptyPageMessage from "../BasicMessages/EmptyPageMessage";
+import LoadingMessage from "../BasicMessages/LoadingMessage";
+import SearchByType from "../BasicComponents/SearchByType";
+import { DataTable } from "../BasicComponents/Table";
+import { Pagination } from "../BasicComponents/Pagination";
 
 function LoanTeamSelection(props:LoanCommonProps){
-  const [teamsList, setTeamList] = useState<any>();
+  const [teamList, setTeamList] = useState<any>();
 
   const { getTeamsList, selectTeam } = useGlobalContext();
 
   const [selectedTeam, setSelectedTeam] = useState("");
+  const [errorMessage, setErrorMessage] = useState(<div className="text-lg mx-3 text-blue-600">Select one of the following teams</div>);
+  
+  const [searchString, setSearchString] = useState("");
+  const [searchType, setSearchType] = useState("");
+  const searchOptions = [{label:"Team Name", value:"N"}, {label:"Team Lead's Email", value:"L"}];
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(()=>{
-    getTeamsList({loanId:props.loanId}).then(res=>{
+    getTeamsList({loanId:props.loanId, currentPage, rowsPerPage, searchString, searchType}).then(res=>{
       if (res.status==200){ 
         console.log("response",res.obj)
+        setTotalPages(Math.ceil(Number(res.obj["list"][0]["metadata"][0]["total"])/Number(rowsPerPage)));
         if (res.obj["currentTeam"])
-          setSelectedTeam(res.obj.currentTeam._teamId);
+          setSelectedTeam(res.obj["currentTeam"]["_teamId"]);
         //console.log("teams list",res.obj.list[0]["data"])
         setTeamList(res.obj.list[0]["data"]);
       }
@@ -28,62 +39,58 @@ function LoanTeamSelection(props:LoanCommonProps){
     }).catch(()=>{
       setTeamList([]);
     })
-  },[]);
+  },[currentPage, rowsPerPage, searchString, searchType]);
 
-  const sendTeam = (e:any) =>{
+  //useEffect(()=>console.log("selected team",selectedTeam),[selectedTeam])
+
+  const sendTeam = async (e:any) =>{
     e.preventDefault();
+    if (selectedTeam==""){
+      setErrorMessage(<div className="text-lg mx-3 text-red-600">You must select one of the following teams.</div>);
+      return;
+    }
     const data = {
       "_loanId":props.loanId,
-      "_teamId": selectedTeam
+      "_teamId": selectedTeam //teamList[selectedTeam]["_id"]
     }
-    console.log("data",data)
-    selectTeam(data).then(res=>{
-      console.log("res",res);
-      if (res==200){
-        props.goToNextSection();
-        props.setEnableDocumentSections(true);
-      }
-    }).catch(err=>{
-      console.log("err",err);
-    })
+
+    const res = await selectTeam(data)
+    console.log("res",res);
+    if (res==200){
+      props.goToNextSection();
+      props.setEnableDocumentSections(true);
+    }
   };  
 
   return (
     <div className="mt-8">
       <div className="flex flex-row">
+        <SearchByType className="mx-3" searchString={searchString} setSearchString={setSearchString} searchType={searchType} setSearchType={setSearchType} typeOptions={searchOptions} />
       </div>
-
+      <br />
       <form onSubmit={sendTeam}>
-        <div className="text-lg mx-3 text-blue-600">Select one of the following teams</div>
-        <div className="flex flex-row flex-wrap">
-          {teamsList
-            ?teamsList.length==0
+        {errorMessage}
+        <div className="flex flex-row flex-wrap mx-3">
+          {teamList
+            ?teamList.length==0
               ?<EmptyPageMessage sectionName="teams" />
-              :teamsList.map((team:any,index:number)=>{
-                return (
-                  <Card key={index} 
-                    className={`mr-5 my-5 w-72 rounded-xl hover: ${selectedTeam===team["_id"]?"border-2 border-double border-violet-800	":""}`} 
-                    onClick={()=>{if (props.actionType!=="VIEW")setSelectedTeam(team["_id"])}}
-                  >
-                    <CardHeader>
-                      <CardTitle>	
-                        <div className="flex flex-row">
-                          <div className="flex-auto">
-                            <ProfileIcon name={team["N"]} size="small" />
-                          </div>
-                        </div>
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-left">
-                      <p className="font-medium">{team["N"]}</p>
-                      <p className="font-light">{team["L"]["N"]}</p>
-                    </CardContent>
-                  </Card>
-                )
-              })  
+              :<DataTable 
+                selectable selectedEntity={selectedTeam} setSelectedEntity={setSelectedTeam} 
+                headingRows={["","Team Name", "Team Lead", "Created On", "Status"]}
+                dataTypes={["checkbox","text", "text","date", "team-status"]}
+                tableData={teamList} columnIDs={["N","L","createdAt","S"]}
+                indexStartsAt={(currentPage-1)*rowsPerPage}
+              />
             :<LoadingMessage sectionName="a list of teams" />
           }
         </div>
+        <br />
+
+        {teamList && teamList.length>0
+          ?<Pagination className="mx-3" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+          :<></>
+        }
+        <br />
         <FormSectionNavigation isForm={true} currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} actionType={props.actionType} />
       </form>
     </div>

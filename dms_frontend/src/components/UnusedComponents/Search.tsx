@@ -1,4 +1,4 @@
-function Search(props:{label:string, setter:Function, className?:string}){
+/* function Search(props:{label:string, setter:Function, className?:string}){
   return(
     <input 
       type="text" 
@@ -9,4 +9,4 @@ function Search(props:{label:string, setter:Function, className?:string}){
   )
 }
 
-export default Search;
+export default Search; */

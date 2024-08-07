@@ -3,16 +3,16 @@ import useGlobalContext from "./../../GlobalContext";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible";
 import FormDialog from "./FormComponents/FormDialog";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 
 import { FieldValues, FieldAttributesList, ToastOptionsAttributes } from "DataTypes";
-import { CreateButtonStyling } from "./BasicComponents/PurpleButtonStyling";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import PermissionsField from "./FormFieldComponents/PermissionsField";
 import Toast from "./BasicComponents/Toast";
 import { PermissionContext } from "@/MenuRouter";
-import SubmitButton from "./BasicComponents/SubmitButton";
+import SubmitButton from "./Buttons/SubmitButton";
+import AddButton from "./Buttons/AddButton";
 
 function RoleManagement(props:{label:string}){
   useEffect(()=>{
@@ -21,12 +21,14 @@ function RoleManagement(props:{label:string}){
 
   const [roleList, setRoleList] = useState<any[]>();
 
-  const [fieldList] = useState<FieldAttributesList>([
+  const fieldList:FieldAttributesList = [
     { category: "single", id: "N", name:"Role Name", type: "text" },
     { category: "single", id: "P", name: "Permissions", type: "permissions", newRole:true }
-  ]);
+  ];
 
-  const [open, setOpen] = useState<boolean[]>([]);
+  const [addOpen, setAddOpen] = useState([false]);
+  const [editOpen, setEditOpen] = useState<boolean[]>([]);
+
   const [added, setAdded] = useState(true);
   const [names, setNames] = useState<string[]>([]);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
@@ -108,18 +110,23 @@ function RoleManagement(props:{label:string}){
     <div>
       {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
 			<p className="text-3xl font-bold m-7">{props.label}</p>
-      <br/>
       <div className="flex flex-row">
         <div className="flex-auto">
           {/* <Search label="Search Role" setter={setSearchString} /> */}
         </div>
         <div>
         {userPermissions["role"].includes("add")
-          ?<FormDialog key={-10} index={-10} edit={false} type="user"
-            triggerText="+ Add Role" triggerClassName={`${CreateButtonStyling} mx-5`} formSize="medium"
-            formTitle="Add Role" formSubmit={createRole} submitButton="Add Role"
-            form={fieldList} currentFields={{}}
-          />
+          ?<div>
+            <AddButton sectionName="role" onClick={()=>setAddOpen([true])} />
+            {addOpen[0]
+              ?<FormDialog key={0} index={0} edit={false} type="user"
+                formOpen={addOpen[0]} setFormOpen={setAddOpen} formSize="md"
+                formTitle="Add Role" formSubmit={createRole} submitButton="Add Role"
+                form={fieldList} currentFields={{}}
+              />
+              :<></>
+            }
+          </div>
           :<></>
         }
         </div>
@@ -134,10 +141,10 @@ function RoleManagement(props:{label:string}){
               {roleList.map((singleRole:any,index:number)=>{
                 return(
                   <Collapsible key={index} className="mx-7 my-3">
-                    <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...open]; arr[index]=!open[index]; setOpen(arr)}} disabled={!userPermissions["role"].includes("view")}>
+                    <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...editOpen]; arr[index]=!editOpen[index]; setEditOpen(arr)}} disabled={!userPermissions["role"].includes("view")}>
                       <div className="flex flex-row ">
                         <div>{singleRole.N}</div>
-                        {userPermissions["role"].includes("view")?<div>{open[index]?<ChevronDown className="mt-[1px]"/>:<ChevronRight className="mt-[2px]"/>}</div>:<></>}
+                        {userPermissions["role"].includes("view")?<div>{editOpen[index]?<ChevronDown className="mt-[1px]"/>:<ChevronRight className="mt-[2px]"/>}</div>:<></>}
                       </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>

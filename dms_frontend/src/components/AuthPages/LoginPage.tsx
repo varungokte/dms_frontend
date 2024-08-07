@@ -7,7 +7,7 @@ import useGlobalContext from "../../../GlobalContext";
 import login_img from "./../static/login_img.png";
 import TextField from "../FormFieldComponents/TextField";
 import PasswordField from "../FormFieldComponents/PasswordField";
-import SubmitButton from "../BasicComponents/SubmitButton";
+import SubmitButton from "../Buttons/SubmitButton";
 
 function LoginPage() {
   useEffect(()=>{
@@ -61,8 +61,8 @@ function LoginPage() {
       <div className="m-3" style={{marginTop:"7%", marginLeft:"5%", width:"35%"}}>
         <p className="text-4xl font-bold mb-7 mx-12" style={{color:"slateblue"}}>Welcome Back!</p>
         <form>
-          <TextField index={0} fieldData={fieldList[0]} size="large" prefillValues={fieldValues} setPrefillValues={setFieldValues} edit={false} />
-          <PasswordField index={1} fieldData={fieldList[1]} prefillValues={fieldValues} size="large" setPrefillValues={setFieldValues} edit={false} />
+          <TextField index={0} fieldData={fieldList[0]} size="medium" prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
+          <PasswordField index={1} fieldData={fieldList[1]} prefillValues={fieldValues} size="medium" setPrefillValues={setFieldValues} disabled={false} />
           {errorMessage}
           <br/>
           <SubmitButton className="bg-custom-1 text-white rounded-if w-full h-[50px] self-center" submitFunction={submitData} submitButtonText={"Log in"} />

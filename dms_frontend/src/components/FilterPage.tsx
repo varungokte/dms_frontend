@@ -6,8 +6,8 @@ import { Link } from "react-router-dom";
 
 import { DataTable } from "./BasicComponents/Table";
 import Filter from "./BasicComponents/Filter";
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 
 import edit_icon from "./static/edit_icon.svg";
@@ -15,8 +15,13 @@ import view_icon from "./static/view_icon.svg";
 import Toast from "./BasicComponents/Toast";
 import { PermissionContext } from "@/MenuRouter";
 import { Pagination } from "./BasicComponents/Pagination";
+import SearchByType from "./BasicComponents/SearchByType";
 
 function FilterPage(props:{label:string}){
+  useEffect(()=>{
+		document.title=props.label+" | Beacon DMS"
+	},[]);
+  
   const filterTypes:{[key:string]:{label:"Z"|"P",options:string[]}} = {
     "Zones":{
       label:"Z",
@@ -28,57 +33,45 @@ function FilterPage(props:{label:string}){
     }
   };
 
-  useEffect(()=>{
-		document.title=props.label+" | Beacon DMS"
-	},[]);
+	const { getLoanList,deleteLoan} = useGlobalContext();
+
+  const {userPermissions} = useContext(PermissionContext);
 
   const [filterCategory] = useState(filterTypes[props.label]);
 	const [loanList, setLoanList] = useState<FieldValues[]>();
 	const [filtersList, setFiltersList] = useState<string[]>([]);
 
-  const [tableHeadings, setTableHeadings] = useState(["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount"]);
-  const [tableDataTypes, setTableDataTypes] = useState<TableDataTypes[]>(["index","text","text","text","text"]);
+  const editPermission = userPermissions["loan"].includes("edit");
+  const viewPermission = userPermissions["loan"].includes("view");
+  const deletePermission = userPermissions["loan"].includes("delete");
+
+  const tableHeadings =["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount", "Loan Status"];
+  const tableDataTypes:TableDataTypes[] = ["index","text","text","text","text","loan-status"];
 
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
-	const { getLoanList,deleteLoan} = useGlobalContext();
-
-  const {userPermissions} = useContext(PermissionContext);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  useEffect(()=>{
-    const editPermission = userPermissions["loan"].includes("edit");
-    const viewPermission = userPermissions["loan"].includes("view");
-    const deletePermission = userPermissions["loan"].includes("delete");
-
-    if (editPermission || viewPermission || deletePermission){
-      setTableHeadings(curr=>{
-        curr.push("Action");
-        return [...curr];
-      });
-      setTableDataTypes(curr=>{
-        curr.push("action");
-        return [...curr];
-      });
-    }
-  },[userPermissions]);
-
+  const [searchString, setSearchString] = useState("");
+  const [searchType, setSearchType] = useState("");
+  const searchOptions = [{label:"Agreement ID", value:"AID"}, {label:"Company Name", value:"CN"}];
 
 	useEffect(()=>{
 		setLoanList(undefined);
-		getLoanList({filterType:filterCategory.label,filterCategory:filtersList.length==0?[]:filtersList, currentPage,rowsPerPage}).then(res=>{
+		getLoanList({filterType:filterCategory.label,filterCategory:filtersList.length==0?[]:filtersList, currentPage,rowsPerPage, searchString, searchType}).then(res=>{
       //console.log("Response",res)
 			if (res.status==200){
-				setLoanList(res.arr[0]["data"]);
+        if (res.arr && res.arr[0] && res.arr[0]["data"])
+          setLoanList(res.arr[0]["data"]);
+        if (res.arr && res.arr[0] && res.arr[0]["metadata"] && res.arr[0]["metadata"][0] && res.arr[0]["metadata"][0])
         setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
       }
 			else
 				setLoanList([])
 		})
-	},[filtersList,currentPage,rowsPerPage]);
+	},[filtersList,currentPage,rowsPerPage, searchString]);
 
 	const deleteLoanAccount = async (currIndex:number) => {
     if (!loanList)
@@ -93,21 +86,25 @@ function FilterPage(props:{label:string}){
   }
 	
 	return(
-		<div className="m-5">
-			<p className="text-3xl font-bold my-7">{props.label}</p>
+		<div className="">
+			<p className="text-3xl font-bold m-7">{props.label}</p>
 			<div className="flex flex-row ">
-				<div className="flex-auto">
+				<div className="m-auto">
+          <SearchByType className="mx-7" searchString={searchString} setSearchString={setSearchString} searchType={searchType} setSearchType={setSearchType} typeOptions={searchOptions} />
+        </div>
+        <div className="m-auto flex-auto">
           <Filter value={filtersList} setValue={setFiltersList} options={filterCategory.options} placeholderValue={props.label} multiple /> 
         </div>
 			</div>
 			<br />
-			<div>
+			<div className="mx-7">
 				{loanList
 					?loanList.length==0
 						?<span><br/><EmptyPageMessage sectionName="loans"/></span>
-						:<DataTable className="bg-white" 
-							headingRows={tableHeadings} 
-							tableData={loanList} columnIDs={["AID", "CN", "Z", "SA"]} dataTypes={tableDataTypes}
+						:<DataTable className="bg-white"
+              headingRows={editPermission||viewPermission||deletePermission?tableHeadings.concat("Action"):tableHeadings}
+							tableData={loanList} columnIDs={["AID", "CN", "Z", "SA"]}
+              dataTypes={editPermission||viewPermission||deletePermission?tableDataTypes.concat("action"):tableDataTypes} 
               indexStartsAt={(currentPage-1)*rowsPerPage}
 							action = {loanList.map((item,index)=>{
 								return(

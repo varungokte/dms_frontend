@@ -1,8 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useGlobalContext from "../../../GlobalContext";
+import { LoanCommonProps } from "DataTypes";
+import Button from '@mui/material/Button';
+import { Typography } from "@mui/material";
+import CancelButton from "../Buttons/CancelButton";
 
-function LoanIDAssignment(props:any){
+function LoanIDAssignment(props:LoanCommonProps){
   const navigate = useNavigate();
   const {createAID} = useGlobalContext();
 
@@ -50,24 +54,21 @@ function LoanIDAssignment(props:any){
         <form onSubmit={userSubmittedId}>
           <div className="my-5">
             <p className="mx-5 my-2">Agreement ID</p>
-            <input required className="mx-6 p-3 border h-12 w-11/12" style={{borderRadius: "5px"}} placeholder="Enter Your Agreement ID" onChange={(e)=>setAgreementId(e.target.value)} />
+            <input required className="mx-6 p-3 border h-12 w-11/12" style={{borderRadius:"5px"}} placeholder="Enter Your Agreement ID" onChange={(e)=>setAgreementId(e.target.value)} />
           </div>
-          
-          <div className="w-1/2 m-auto flex flex-row">
-            <div className="">
-              <button className="text-red-600 border border-red-600 rounded-xl h-12 w-36 my-1 mx-3" onClick={()=>navigate("/loan")}>Cancel</button>
+            <div className="text-center">
+              <CancelButton onClick={()=>navigate("/loan")} />
+              <Button variant="contained" color="secondary" size="large" sx={{marginX:"20px", borderRadius:"10px"}} type="submit">
+                <Typography textTransform="capitalize">Submit</Typography>
+              </Button>
             </div>
-            <div>
-              <button className="text-white bg-custom-1 rounded-xl h-12 w-36 my-1" type="submit">Submit</button>
-            </div>
-          </div>
           </form>
         
         <p className="text-center">OR</p>
         <hr className="w-7/12 m-auto" />
         <br/>
         <div className="text-center">
-          <button className="text-white bg-green-600 rounded-xl h-12 p-2 my-1" onClick={systemGeneratedId}>Generate Random ID</button>
+          <Button color="success" variant="contained" sx={{height:"50px"}} className=" h-12 p-2 my-1" onClick={systemGeneratedId}>Generate Random ID</Button>
         </div>
         {errorMessage}
       </div>

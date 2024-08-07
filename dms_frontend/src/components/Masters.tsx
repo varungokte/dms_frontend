@@ -6,14 +6,14 @@ import { MastersMapping } from './../../Constants';
 import { HeaderRows } from './BasicComponents/Table';
 import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table";
 import FormDialog from './FormComponents/FormDialog';
-import LoadingMessage from "./BasicComponents/LoadingMessage";
-import EmptyPageMessage from "./BasicComponents/EmptyPageMessage";
+import LoadingMessage from "./BasicMessages/LoadingMessage";
+import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 
-import { CreateButtonStyling } from './BasicComponents/PurpleButtonStyling';
-import AddIcon from '@mui/icons-material/Add';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import { PermissionContext } from "@/MenuRouter";
+import TableSelect from './BasicComponents/TableSelect';
+import AddButton from './Buttons/AddButton';
 
 function Masters(props:{label:string, masterLists: FieldValues, idList:string[], callMasterLists:Function}){
   useEffect(()=>{
@@ -25,6 +25,7 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
     { category: "single", id:"V", name: "Values", type:"multitext", required:true},
   ]);
 
+  const [addOpen, setAddOpen] = useState([false]);
   const [selected, setSelected] = useState(0);
   const [added,setAdded] = useState(true);
   const [newValues, setNewValues] = useState<{N:string, V:string[]}>();
@@ -57,10 +58,6 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
       setAdded(false);
     }
   },[added]);
-
-  const changeSection = (index:number) => {
-    setSelected(index);
-  }
 
   useEffect(()=>{
     if (!props.masterLists)
@@ -157,33 +154,24 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
       <div className="flex flex-row">
         <div className="flex-auto"></div>
         {userPermissions["masters"].includes("add")
-          ?<FormDialog key={-1} index={-1} type="mast"
-            triggerText={<div className="flex flex-row"><AddIcon/><span className="m-auto"> Add</span></div>} triggerClassName={`${CreateButtonStyling} `} formSize="medium"
-            formTitle="Add To Masters" formSubmit={createMaster} submitButton="Add" 
-            form={fieldList} currentFields={{}}
-          />
+          ?<div>
+            <AddButton sectionName="" onClick={()=>setAddOpen([true])} />
+            {addOpen[0]
+              ?<FormDialog key={0} index={0} type="mast"
+                formOpen={addOpen[0]} setFormOpen={setAddOpen} formSize="md"
+                formTitle="Add To Masters" formSubmit={createMaster} submitButton="Add" 
+                form={fieldList} currentFields={{}}
+              />
+              :<></>
+            }
+          </div>
           :<></>
         }
-        
       </div>
       {props.masterLists
         ?Object.keys(props.masterLists).length!=0
           ?<div className="flex flex-row relative m-10">
-            <div className="mr-9 w-[25%]">
-              <Table className="rounded-2xl bg-white">
-                <HeaderRows headingRows={["Category"]} headingClassNames={["text-2xl"]} />
-                <TableBody className="border-none">
-                  {Object.keys(props.masterLists).map((category, index)=>{
-                    return (
-                      <TableRow key={index} className="border-none">
-                        <TableCell className={`text-xl tableCell ${selected===index?"text-blue-600 bg-slate-200":""}`} onClick={()=>{changeSection(index)}}>
-                          {category}
-                        </TableCell>
-                      </TableRow>
-                  )})}
-                </TableBody>
-              </Table>
-            </div>
+            <TableSelect tableHeading="Category" tableValues={Object.keys(props.masterLists)} selected={selected} setSelected={setSelected} className={"w-[30%]"} textSize="large" />
 
             <div className="mx-20"></div>
             {newValues && newValues["V"]

@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
 import { getDocSecList, sectionNames } from "./../../../Constants";
 import { FieldValues, FormFieldAttributes } from "./../../../DataTypes";
-import Box from "@mui/material/Box/Box";
 import Tabs from "@mui/material/Tabs/Tabs";
 import Tab from "@mui/material/Tab/Tab";
 import Button from "@mui/material/Button/Button";
+import { Box } from "@mui/material";
 
 function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, permissionPreset:any,  setPermissionSet:Function, disabled:boolean}){
   try{
@@ -26,7 +26,7 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
 
       const reorganized:{[key:string]:string[]} = {
         "admin":["masters","role","user","team"],
-        "loan":["loan","contact"],
+        "loan":["loan","contact","rating"],
         "documents":["transaction","compliance","covenants","precedent","subsequent","payment"],
         "reminders":["reminders","default","critical"],
       };
