@@ -28,11 +28,12 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
       getPaymentSchedule(props.loanId).then(res=>{
         setAdded(false);
         if (res.status==200){
-          const data = res.obj[0]["data"];
+          console.log("response",res)
+          const data = res.obj[0]["data"][0];
           setScheduleId(data["_id"]);
           if (data["T"]=="Fixed")
-            res.obj["GS"].map((inst:any)=>{inst["I"]=data["I"]});
-          setPaymentData(res.obj["GS"]);
+            data["GS"].map((inst:any)=>{inst["I"]=data["I"]});
+          setPaymentData(data["GS"]);
           setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
         }
         else
@@ -58,15 +59,16 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
             cellClassName={["w-[100px]","","","w-[200px]"]} 
             action={
               paymentData.map((inst:any,index:number)=>{
+                console.log("label",props.label,sectionNames[props.label], userPermissions)
                 if (inst==null)
                   return <></>;
                 else if (!inst["S"] || inst["S"]==DocumentStatusList[1])
-                  return <UploadFileButton key={props.AID+index} index={index} disabled={!userPermissions[sectionNames[props.label]].includes("add")}
-                    AID={props.AID} sectionName={props.sectionDetails.sectionName} docId={index} _id={scheduleId}
+                  return <UploadFileButton key={props.AID+index} index={index} disabled={!userPermissions[sectionNames[props.label]]["file"].includes("add")}
+                    AID={props.AID} sectionKeyName={props.sectionDetails.sectionName} docId={index} _id={scheduleId}
                     setAdded={setAdded} isPayment
                   />
                 else
-                  return <ViewFileButton key={props.AID+index} type="pay" disabled={!userPermissions[sectionNames[props.label]].includes("add")}
+                  return <ViewFileButton key={props.AID+index} type="pay" disabled={!userPermissions[sectionNames[props.label]]["file"].includes("add")}
                     AID={props.AID} _id={scheduleId} sectionName={props.sectionDetails.sectionName} index={index}
                     setAdded={setAdded} schedule={paymentData}
                     status={inst["S"]} rejectionReason={inst["R"]} 

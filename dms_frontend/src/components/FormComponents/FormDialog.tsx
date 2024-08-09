@@ -24,7 +24,7 @@ function FormDialog(props:FormDialogProps){
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [errorList, setErrorList] = useState<string[]>([]);
 
-  useEffect(()=>console.log("FORM DIALOG LOADED"),[])
+  //useEffect(()=>console.log("FORM DIALOG LOADED"),[])
 
   useEffect(()=>{
     if (!props.formOpen)
@@ -106,7 +106,7 @@ function FormDialog(props:FormDialogProps){
       <DialogTitle className="text-2xl font-normal">{props.formTitle}</DialogTitle>
       <hr/>
       <div className="p-5">
-        <RequiredFieldsNote error={errorList.length>0} />
+        <RequiredFieldsNote />
         <RenderForm key={"f0"} edit={props.edit||false} formType={props.type} currentFields={props.currentFields} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} errorList={errorList} suggestions={props.suggestions} getRoles={props.getRoles} formSubmit={props.formSubmit} />
         {errorMessage}
         <br/>
@@ -131,7 +131,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
   //useEffect(()=>console.log("form dialog props",props),[props])
 
-  useEffect(()=>console.log("error list",props.errorList));
+  //useEffect(()=>console.log("error list",props.errorList));
 
   const listRoles = async () => {
     const res = await getRolesList();

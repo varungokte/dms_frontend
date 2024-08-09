@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { LoanCommonProps } from "./../../../DataTypes";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import useGlobalContext from "../../../GlobalContext";
@@ -7,11 +7,14 @@ import LoadingMessage from "../BasicMessages/LoadingMessage";
 import SearchByType from "../BasicComponents/SearchByType";
 import { DataTable } from "../BasicComponents/Table";
 import { Pagination } from "../BasicComponents/Pagination";
+import { PermissionContext } from "@/MenuRouter";
 
 function LoanTeamSelection(props:LoanCommonProps){
   const [teamList, setTeamList] = useState<any>();
 
   const { getTeamsList, selectTeam } = useGlobalContext();
+  
+  const {userPermissions} = useContext(PermissionContext);
 
   const [selectedTeam, setSelectedTeam] = useState("");
   const [errorMessage, setErrorMessage] = useState(<div className="text-lg mx-3 text-blue-600">Select one of the following teams</div>);
@@ -75,9 +78,9 @@ function LoanTeamSelection(props:LoanCommonProps){
             ?teamList.length==0
               ?<EmptyPageMessage sectionName="teams" />
               :<DataTable 
-                selectable selectedEntity={selectedTeam} setSelectedEntity={setSelectedTeam} 
-                headingRows={["","Team Name", "Team Lead", "Created On", "Status"]}
-                dataTypes={["checkbox","text", "text","date", "team-status"]}
+                selectable={userPermissions["team"].includes("select")} selectedEntity={selectedTeam} setSelectedEntity={setSelectedTeam} 
+                headingRows={["Team Name", "Team Lead", "Created On", "Status"]}
+                dataTypes={["text", "text","date", "team-status"]}
                 tableData={teamList} columnIDs={["N","L","createdAt","S"]}
                 indexStartsAt={(currentPage-1)*rowsPerPage}
               />

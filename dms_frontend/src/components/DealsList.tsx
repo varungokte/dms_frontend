@@ -1,7 +1,7 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import useGlobalContext from "../../GlobalContext";
 import moment from "moment";
-import { DocumentStatus, DocumentSectionDetails } from "DataTypes";
+import { DocumentStatus, DocumentSectionDetails, FieldValues } from "DataTypes";
 
 import SingleDealDocuments from "./SingleDealDocuments";
 import SingleDealPayments from "./SingleDealPayments";
@@ -22,9 +22,10 @@ type DocumentDetails= {
   details: {S:DocumentStatus}[]
 }
 
-function DealsList(props:{label:string}) {
+function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues}) {
   useEffect(()=>{
-		document.title=props.label+" | Beacon DMS"
+    if (!props.masters)
+		  document.title=props.label+" | Beacon DMS"
 	},[]);
 
   const {state} = useLocation();
@@ -67,24 +68,35 @@ function DealsList(props:{label:string}) {
     setCalculate(true);
   },[currentPage,rowsPerPage]);
 
-  useEffect(()=>{
-    if (calculate){
-      getDealList({ admin,sectionName:sectionDetails.sectionName, currentPage, rowsPerPage}).then(res=>{
-        try{
-          setDealData(res.obj[0]["data"]);
-          const arr = new Array(res.obj.length).fill(false);
-          if (currentTab!=-1)
-            arr[currentTab] = true;
-          setShowDeals(arr);
-          setCurrentTab(-1);
-          setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
-        }
-        catch(e){
-          setDealData([]);
-        }
-      });
-      setCalculate(false);
+  const getDocData = async () => {
+    const res =props.masters?(props.docData):await getDealList({ admin,sectionName:sectionDetails.sectionName, currentPage, rowsPerPage});
+
+    if (!res)
+      return;
+
+    try{
+      setDealData(res.obj[0]["data"]);
+      const arr = new Array(res.obj.length).fill(false);
+      if (currentTab!=-1)
+        arr[currentTab] = true;
+      setShowDeals(arr);
+      setCurrentTab(-1);
+      setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
     }
+    catch(e){
+      setDealData([]);
+    }
+  setCalculate(false);
+    return  res;
+  }
+
+  useEffect(()=>{
+    setCalculate(true)
+  },[props.docData])
+
+  useEffect(()=>{
+    if (calculate)
+      getDocData();
   },[calculate]);
 
   useEffect(()=>{
@@ -111,7 +123,7 @@ function DealsList(props:{label:string}) {
 
   return(
     <div>
-			<p className="text-3xl font-bold m-7">{props.label}</p>
+      {props.masters?<></>:<p className="text-3xl font-bold m-7">{props.label}</p>}
 			<div className="flex flex-row">
         <div className='mx-7'>
         </div>
@@ -124,9 +136,9 @@ function DealsList(props:{label:string}) {
           :dealData.length==0
             ?<EmptyPageMessage sectionName="deals"/>
             :dealData.map((deal,index)=>{
-                return <div ref={el=>dealRefs.current[index]=el} key={index}>
-                  <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} admin={admin} />
-                </div>
+              return <div ref={el=>dealRefs.current[index]=el} key={index}>
+                <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} admin={admin} />
+              </div>
             })
         }
         <br/>

@@ -10,11 +10,10 @@ function SubmitButton(props:{className?:string, submitFunction:Function, submitB
     props.submitFunction(props.index).then(()=>{
       setSubmitted(false);
     })
-      
   }
 
   return(
-    <Button color="secondary" variant="contained" sx={{borderRadius:"10px", height:"50px", width:"150px", marginX:"10px"}} type="button" onClick={callSubmitFunction} disabled={submitted} >
+    <Button color="secondary" variant="contained" sx={{borderRadius:"10px", height:"50px", width:"150px", marginX:"10px"}} type="button" onClick={callSubmitFunction} disabled={submitted} className={props.className} >
       {submitted
         ?<CircularProgress className="mt-1" sx={{color:"white"}} />
         :<Typography textTransform="capitalize">{props.submitButtonText}</Typography>

@@ -33,7 +33,7 @@ function DateField (props:{index:number|string, fieldData:FormFieldAttributes, p
         type="date" 
         disabled={props.disabled} 
         required={props.fieldData.required}
-        className={`border ${props.error?"border-red-600":""} rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
+        className={`border ${props.error?"border-red-600":"focus:border-custom-1"} rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
         value={props.prefillValues[props.fieldData.id]
           ?moment(props.prefillValues[props.fieldData.id]).format("yyyy-MM-DD")
           :""

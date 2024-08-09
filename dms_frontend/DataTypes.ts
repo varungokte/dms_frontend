@@ -5,9 +5,8 @@ type FieldValues = {[key:string]: any | any[]};
 
 //Data Types for table
 type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link" | "checkbox";
-
 //Form Field data types 
-type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break";
+type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break" | "number";
 
 //Form Fields
 type FormFieldAttributes = {
@@ -17,6 +16,7 @@ type FormFieldAttributes = {
   required?: boolean,
   disabled?:boolean,
   immutable?: boolean,
+  suppressCommas?:boolean, //for integer
   options?:string[] | readonly string[], //for select
   multiple?:boolean, //for combobox 
   newRole?:boolean //for permissions/role
@@ -59,8 +59,8 @@ type TeamStatus = typeof TeamStatusList[number];
 type LoanStatus = typeof LoanStatusList[number];
 type Priority = typeof PriorityList[number];
 
-type CommonFileViewerProps = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:Function,sectionName:string, disabled?:boolean };
-type DocumentFileViewerProps = {type:"doc", loanId:string, docId:string, };
+type CommonFileViewerProps = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:Function,sectionName:string, disabled?:boolean, setIsDeleted?:Function };
+type DocumentFileViewerProps = {type:"doc", loanId:string, docId:string };
 type PaymentFileViewerProps = {type:"pay", _id:string, index:number, schedule:FieldValues[] };
 
 type LoanCommonProps = {

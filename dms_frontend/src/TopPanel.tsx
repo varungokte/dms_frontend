@@ -6,8 +6,6 @@ import ProfileIcon from './components/BasicComponents/ProfileIcon';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
-
-
 type TopPanelProps = {
   token: FieldValues|undefined,
   socketIsConnected:boolean
@@ -35,11 +33,9 @@ function TopPanel(props:TopPanelProps){
 
   return (
     <div className='relative h-20 w-100 bg-white'>
-      {/* <p className="py-5 mx-2">{props.socketIsConnected?<p className="text-green-600">Connected</p>:<p className="text-red-600">Not Connected</p>}</p> */}
       <div className=' absolute inset-y-5 right-0 w-50'>
         {props.token
-          ?<div>
-            {/* <NotificationsNoneIcon fontSize="large" sx={{color:"rgba(80, 65, 188, 1)"}}/> */}
+          ?<div className="float-right">
             <button className="flex flex-row" onClick={handleClick} id="info">
               <div><ProfileIcon name={props.token["N"]||"User"} size="small" showStatus={props.socketIsConnected}/></div>
               <div className="text-left mx-3">

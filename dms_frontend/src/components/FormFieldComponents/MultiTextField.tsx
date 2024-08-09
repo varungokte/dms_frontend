@@ -13,7 +13,8 @@ const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, pref
   },[results])
 
   return (
-    <Autocomplete 
+    <div className="mb-5 mx-2">
+      <Autocomplete 
       disabled={props.disabled}
       multiple 
       freeSolo
@@ -26,8 +27,10 @@ const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, pref
           {...vals} 
           label={<p>{props.fieldData.name}{props.fieldData.required?<span className="text-red-600">*</span>:""}</p>} 
           placeholder={`Add ${props.fieldData.name.toLowerCase()}`} 
-        />} 
+        />
+      } 
     />
+    </div>
   )
 }
 

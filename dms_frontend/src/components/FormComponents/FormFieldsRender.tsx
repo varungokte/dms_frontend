@@ -24,6 +24,7 @@ type FormFieldsProps= {
 }
 
 function FormFieldsRender(props:FormFieldsProps){
+  //console.log("render props",props)
   return (
     props.form.map((field,index)=>{
       if (field.category=="label")
@@ -39,12 +40,8 @@ function FormFieldsRender(props:FormFieldsProps){
       }
 
       else if (field.category=="grid"){
-        let gridStyle = "grid grid-cols-"; 
+        const gridStyle = field.customWidth?"grid grid-cols-[70%_30%]":"grid grid-cols-" + field.row; 
         //console.log("FIELD",field.customWidth)
-        if (field.customWidth)
-          gridStyle = "grid grid-cols-"+field.customWidth
-        else
-          gridStyle = "grid grid-cols-" + field.row;
         return(
           <div key={index+"grid"}>
             <div className={field.sectionClassName||""}>{field.sectionName}</div>
@@ -75,6 +72,7 @@ function RenderFields (props:{index:number, field:FormFieldAttributes, error?:bo
       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
       disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
       roleList={props.roles||[]} 
+      error={props.error}
     />
   else if (props.field["type"]=="permissions")
     return <PermissionsField key={props.index} index={props.index} fieldData={props.field} 
@@ -89,17 +87,20 @@ function RenderFields (props:{index:number, field:FormFieldAttributes, error?:bo
   else if (props.field["type"]=="date")
     return <DateField key={props.index} index={props.index} fieldData={props.field} 
       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
-      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} error={props.error}
+      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
+      error={props.error}
     />
   else if (props.field["type"]=="integer")
     return <IntegerField key={props.index} index={props.index} fieldData={props.field} 
       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues}
-      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))}
+      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
+      error={props.error}
     />
   else if (props.field["type"]=="float")
     return <FloatNumberField key={props.index} index={props.index} fieldData={props.field}
       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
-      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
+      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))}  
+      error={props.error}
     />
   else if (props.field["type"]=="multitext")
     return <MultiTextField key={props.index} index={props.index} fieldData={props.field} 
@@ -115,7 +116,8 @@ function RenderFields (props:{index:number, field:FormFieldAttributes, error?:bo
     return <PasswordField key={props.index} index={props.index} fieldData={props.field} 
       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
       disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
-      size="medium"
+      size="medium" 
+      error={props.error}
     />
   else if (props.field["type"]=="select") 
     return <SelectField key={props.index} index={props.index} fieldData={props.field}

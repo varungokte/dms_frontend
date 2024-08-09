@@ -48,7 +48,6 @@ function UserManagements(props:{label:string}){
   const tableHeadings = ["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status"];
   const tableDataTypes:TableDataTypes[] = ["text", "text", "text", "text","text", "user-status"];
 
-
   //const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
   const [searchType, setSearchType] = useState("");

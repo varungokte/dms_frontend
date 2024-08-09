@@ -1,7 +1,7 @@
 import { createElement } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import PageNotFound from './components/PageNotFound';
+import PageNotFound from './components/BasicMessages/PageNotFound';
 import CreateLoanAccount from './components/CreateLoanAccount';
 import { ComponentList, FieldValues } from 'DataTypes';
 import UserProfile from './UserProfile';

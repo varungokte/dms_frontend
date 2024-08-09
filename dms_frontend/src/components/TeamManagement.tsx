@@ -127,7 +127,7 @@ function TeamManagement(props:{label:string}){
 
   const createTeam = async (userValues:any) => {
     const data = teamMembersSeparateToCombined(userValues);    
-    //console.log("SUBMITTED",data);
+    console.log("SUBMITTED",data);
 
     const res = await addTeam(data);
     if (res==200){
@@ -139,12 +139,13 @@ function TeamManagement(props:{label:string}){
     return res;
   }
 
-  const changeTeam = async (userValues:any,index?:number) => {
+  const changeTeam = async (userValues:any,index:number,status?:boolean) => {
+    console.log("CHANGE")
     if (selectedTeam==-1 && index==-1 || !userValues)
       return;
 
     let data:FieldValues={};
-    if (index && index!){
+    if (status){
       data["_id"] = teamList[index]["_id"];
       data["S"] = userValues["S"]
     }
@@ -156,6 +157,7 @@ function TeamManagement(props:{label:string}){
     console.log("SUBMITTED", data);
 
     const res = await editTeam(data);
+    console.log("response",res)
 
     if (res==200){
       setAdded(true);
@@ -167,7 +169,7 @@ function TeamManagement(props:{label:string}){
   }
 
   useEffect(()=>{
-    changeTeam({"S":teamStatus}, selectedTeam).then(()=>{
+    changeTeam({"S":teamStatus}, selectedTeam,true).then(()=>{
     }).catch(err=>{console.log(err)});
   },[teamStatus]);
 
@@ -211,7 +213,7 @@ function TeamManagement(props:{label:string}){
                         <button onClick={()=>setEditOpen(curr=>{curr[index]=true;return [...curr]})}>{<img src={edit_icon} className="mr-5"/>}</button>
                         {editOpen[index]
                           ?<FormDialogTeam key={index} index={index} edit formOpen={editOpen[index]} setFormOpen={setEditOpen}
-                            formTitle="Edit Team" formSubmit={editTeam} submitButton="Edit Team" formSize="md"
+                            formTitle="Edit Team" formSubmit={changeTeam} submitButton="Edit Team" formSize="md"
                             form={fieldList} currentFields={teamList[index]}
                           />
                           :<></>

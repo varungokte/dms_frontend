@@ -761,6 +761,37 @@ const deleteDocument = async (AID:string, docId:string, section_name:string, fil
 	}
 }
 
+const getUserAssignments =async (data:{userEmail:string, sectionName:string, currentPage?:number, rowsPerPage?:number}) =>  {
+	try {
+		const token = getEncryptedToken();
+
+		const obj:FieldValues = {};
+		obj["E"] = data.userEmail
+		obj["SN"]=data.sectionName;
+		obj["page"] = data.currentPage || 1;
+		obj["limit"] = data.rowsPerPage || 10;
+
+		console.log("Data",data)
+
+		const response = await axios.get(`${Base_Url}/mst/assignlistDocsDetail`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params:obj
+		});
+		const decryptedObject = await handleDecryption(response.data);
+		
+		if (response.status==200)
+			return {status: response.status, obj:decryptedObject}; 
+		else
+			return {status: response.status, obj:null};
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status: 0, obj:null};
+		else 
+			return {status: error.response.status, obj:null};
+	}
+};
+
 const getDealList = async (data:{admin?:boolean, sectionName:string, currentPage?:number, rowsPerPage?:number}) =>  {
 	try {
 		const token = getEncryptedToken();
@@ -944,6 +975,7 @@ const useGlobalContext = () => {
 		getDealList,
 		addPaymentSchedule, getPaymentSchedule,
 		getSpecialList,
+		getUserAssignments,
 	}
 }
 

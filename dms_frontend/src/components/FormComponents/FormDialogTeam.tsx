@@ -115,8 +115,9 @@ function FormDialogTeam(props:FormDialogProps){
       okToSubmit=true;
     }
     if(okToSubmit){
-      //console.log("prefillValues",prefillValues)
+      console.log("prefillValues",prefillValues)
       const res = await props.formSubmit(submittedData==false?{...prefillValues}:submittedData,props.index);
+      console.log("Response",res)
       if (res==200)
         closeDialog();
       else if (res==422)
@@ -227,7 +228,7 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
       teamMembersCombinedToSeparate();
 
     if (props.prefillValues && props.prefillValues["L"] && props.prefillValues["L"]!="" && props.prefillValues["L"].length!=0){
-      console.log("TEAM LEADER",props.prefillValues["L"])
+      //console.log("TEAM LEADER",props.prefillValues["L"])
       getMemberSuggestions();}
     //console.log("new prefillvalues",props.prefillValues)
   },[props.prefillValues]);

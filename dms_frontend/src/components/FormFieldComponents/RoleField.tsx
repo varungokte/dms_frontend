@@ -4,7 +4,7 @@ import { FieldValues, FormFieldAttributes } from "DataTypes";
 import SelectField from "./SelectField";
 import PermissionsField from "./PermissionsField";
 
-function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList:FieldValues[], prefillValues:any, setPrefillValues:Function, disabled:boolean}){
+function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList:FieldValues[], prefillValues:any, error?:boolean, setPrefillValues:Function, disabled:boolean}){
   try{
     const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
     const [currentRole, setCurrentRole] = useState<string>();
@@ -57,7 +57,7 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
   
     return (
       <div>
-        <SelectField index={props.index} fieldData={{id:props.fieldData.id, name:props.fieldData.name, type:"select", options:["-"].concat(Object.keys(allRolesPermissionsList)),required:props.fieldData.required}}  prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} disabled={props.disabled} />
+        <SelectField index={props.index} fieldData={{id:props.fieldData.id, name:props.fieldData.name, type:"select", options:["-"].concat(Object.keys(allRolesPermissionsList)),required:props.fieldData.required}}  prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} disabled={props.disabled} error={props.error} />
         {currentRole
           ?<PermissionsField index={props.index} fieldData={{id:"UP", name:"Permissions", type:"permissions", required:props.fieldData.required, disabled:props.fieldData.disabled}}  permissionPreset={props.prefillValues["UP"]} setPermissionSet={props.setPrefillValues}disabled={props.disabled} />
           :<></>

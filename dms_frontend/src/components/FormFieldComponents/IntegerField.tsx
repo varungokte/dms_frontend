@@ -3,13 +3,21 @@ import FieldLabel from "./FieldLabel";
 import { FieldValues, FormFieldAttributes } from "DataTypes";
 import { TextField } from "@mui/material";
 
-function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
+function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, error?:boolean, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
+  const [error, setError] = useState(props.error);
+
+  useEffect(()=>console.log("props",props),[props])
 
   const numberFormatter = (num:number) => {
-    return separateByCommas(num.toString());
-  } 
+    if (props.fieldData.suppressCommas)
+      return num;
+    else
+      return separateByCommas(num.toString());
+  };
+  
+  useEffect(()=>setError(props.error),[props.error]);
 
   const [amountFields] = useState(["SA", "HA", "DA", "OA","P","V"]);
   useEffect(()=>{
@@ -36,7 +44,7 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
   return(
     <div key={props.index} className="mb-5 mx-2">
       <FieldLabel key={props.index+"t_1"} index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
-      <TextField key={props.index+props.fieldData.id+"t_2"} id={props.fieldData.id} type="text"
+      <TextField key={props.index+props.fieldData.id+"t_2"} id={props.fieldData.id} type="text" error={error}
         size="medium" color="secondary"
         className={props.className || `border rounded-if w-full p-3 ${props.fieldData.name==""?"mt-7":""}`}
         disabled={props.disabled} required={props.fieldData.required}
@@ -50,6 +58,7 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
 
         onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{
+            setError(false);
             const val_w_commas = e.target.value;
             let val="";
             for (let i=0; i<val_w_commas.length; i++)
@@ -65,6 +74,7 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
             })
           }
           :(e)=>{
+            setError(false);
             const val_w_commas = e.target.value;
             let val="";
             for (let i=0; i<val_w_commas.length; i++){

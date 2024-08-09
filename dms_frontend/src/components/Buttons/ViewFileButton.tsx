@@ -21,7 +21,7 @@ function ViewFileButton(props:CommonFileViewerProps & (DocumentFileViewerProps|P
       </button>
       {openDialog
         ?<Dialog open={openDialog} onClose={()=>setOpenDialog(false)} fullScreen>
-          <FileViewer {...props} setOpenDialog={setOpenDialog} status={props.status} setAdded={props.setAdded} rejectionReason={props.rejectionReason} />
+          <FileViewer {...props} setOpenDialog={setOpenDialog} status={props.status} setAdded={props.setAdded} rejectionReason={props.rejectionReason} setIsDeleted={props.setIsDeleted} />
         </Dialog>
         :<></>
       }

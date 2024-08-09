@@ -103,7 +103,7 @@ function FilterPage(props:{label:string}){
 						?<span><br/><EmptyPageMessage sectionName="loans"/></span>
 						:<DataTable className="bg-white"
               headingRows={editPermission||viewPermission||deletePermission?tableHeadings.concat("Action"):tableHeadings}
-							tableData={loanList} columnIDs={["AID", "CN", "Z", "SA"]}
+							tableData={loanList} columnIDs={["AID", "CN", "Z", "SA","S"]}
               dataTypes={editPermission||viewPermission||deletePermission?tableDataTypes.concat("action"):tableDataTypes} 
               indexStartsAt={(currentPage-1)*rowsPerPage}
 							action = {loanList.map((item,index)=>{
@@ -137,4 +137,4 @@ function FilterPage(props:{label:string}){
 	)
 }
 
-export default FilterPage
+export default FilterPage;

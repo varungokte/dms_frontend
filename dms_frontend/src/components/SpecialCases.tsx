@@ -209,31 +209,32 @@ function SpecialCases(props:{label:string}) {
             :<DataTable className="rounded-xl bg-white"
               headingRows={["Sr. No.", "Document Name", "Team Name", "Agreement ID","Status", type=="def"?"Default Date":"Priority", "Action"]}
               cellClassName={["w-[50px]","w-[300px]","","","","mr-10","w-[200px]"]}
-              tableData={allData} dataTypes={["index","doc-link","text","text","doc-status",type=="def"?"date":"priority","action"]} columnIDs={["link","N","AID","DS",type=="def"?"DD":"DP"]}
+              tableData={allData} dataTypes={["index","doc-link","text","text","doc-status",type=="def"?"date":"priority","action"]} columnIDs={["link","DN","AID","DS",type=="def"?"DD":"DP"]}
               indexStartsAt={(currentPage-1)*rowsPerPage}
               documentLinks={documentLinks}
               action={
                 allData.map((doc:any,index:number)=>{
-                  if (!doc["S"] || doc["S"]==DocumentStatusList[1])
+                  const sn = getDocSecName(currentSection,"fullname","keyname");
+                  if (!doc["DS"] || !doc["FD"] || doc["DS"]==DocumentStatusList[1])
                     return <UploadFileButton key={index} index={index} disabled={!admin && !userPermissions[sectionNames[props.label]].includes("add")}
-                      AID={doc["AID"]} sectionName={doc["SN"]}
+                      AID={doc["AID"]} sectionKeyName={sn}
                       setAdded={setAdded}
-                      isPayment={doc["SN"]=="PD"}
-                      docId={doc["SN"]=="PD"?doc["index"]:doc._id} 
-                      _id={doc["SN"]=="PD"?doc._id:undefined}
+                      isPayment={sn=="PD"}
+                      docId={sn=="PD"?doc["index"]:doc._id} 
+                      _id={sn=="PD"?doc._id:undefined}
                   />
                   else
                     return <ViewFileButton key={index} type="doc" disabled={!admin && !userPermissions[sectionNames[props.label]].includes("view")}
-                      AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={doc["SN"]} 
-                      status={doc["S"]} rejectionReason={doc["R"]} 
+                      AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={sn} 
+                      status={doc["DS"]} rejectionReason={doc["R"]} 
                       setAdded={setAdded} 
-                      actualName={doc["SN"]=="PD"
+                      actualName={sn=="PD"
                         ?(doc.FD && doc.FD[0] && doc.FD[0].originalname)
                           ?doc.FD[0].originalname
                           :""
                         :doc.FD[0].originalname||""
                       } 
-                      fileName={doc["SN"]=="PD"
+                      fileName={sn=="PD"
                         ?(doc.FD && doc.FD[0] && doc.FD[0].filename)
                           ?doc.FD[0].filename
                           :""

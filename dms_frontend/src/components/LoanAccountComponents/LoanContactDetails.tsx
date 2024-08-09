@@ -42,7 +42,7 @@ function LoanContactDetails(props:LoanCommonProps) {
     ]}, 
     { category: "grid", row: 2, sectionName:"Billing Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_auto]', fields:[
       { id: "BA", type:"text", name: "Bulding/Street/Locality Name" },
-      { id: "BP", type:"integer", name: "Pincode" },
+      { id: "BP", type:"integer", name: "Pincode", suppressCommas:true },
     ]},
     { category:"grid", row: 3, fields:[
       { id: "BCC", type:"text", name: "Country" },
@@ -52,7 +52,7 @@ function LoanContactDetails(props:LoanCommonProps) {
     /* { category:"single", id:"add-same", name:"Billing and Registered Addresses are the same", type:"checkbox"}, */
     { category: "grid", row: 2, sectionName:"Registered Address", sectionClassName:"text-2xl font-medium my-2", customWidth:'[70%_30%]', fields:[
       { id: "RA", type:"text", name: "Bulding/Street/Locality Name" },
-      { id: "RP", type:"integer", name: "Pincode" },
+      { id: "RP", type:"integer", name: "Pincode", suppressCommas:true },
     ]},
     { category: "grid", row: 3, fields:[
       { id: "RCC", type:"text", name: "Country" },
@@ -237,7 +237,9 @@ function LoanContactDetails(props:LoanCommonProps) {
 }
 
 function ContactCard(props:{index:number, person:FieldValues, editFunction:Function, formFields:FieldAttributesList, actionType:"CREATE"|"EDIT"|"VIEW", userPermissions:any, deleteFunction:Function, editOpen:boolean[], setEditOpen:Function }){
-  const [editOpen, setEditOpen] = useState(false);  
+  const [viewOpen, setViewOpen] = useState(false);  
+
+  useEffect(()=>console.log('permissions',))
   
   return (
     <Card key={props.index+props.person.CT} className="m-5 w-72 rounded-xl" style={{borderRadius:"10px"}} variant="outlined">
@@ -262,13 +264,19 @@ function ContactCard(props:{index:number, person:FieldValues, editFunction:Funct
                 </div>
                 :<></>
               }
-              <div className="ml-2">
-                <button onClick={()=>setEditOpen(true)}><CircleUserIcon/></button>
-                {editOpen?<ViewContact personId={props.person["_id"]} open={editOpen} setOpen={setEditOpen} />:<></>}
-              </div>
-              <div className="ml-2">
-                <DeleteConfirmation thing="contact" deleteFunction={props.deleteFunction} currIndex={props.person["_id"]} icon={<DeleteOutlineOutlinedIcon/>} />
-              </div>
+              {props.userPermissions && (props.userPermissions["loan"].includes("edit")||props.userPermissions["loan"].includes("view")) && props.userPermissions["contact"].includes("view")
+                ?<div className="ml-2">
+                  <button onClick={()=>setViewOpen(true)}><CircleUserIcon/></button>
+                  {viewOpen?<ViewContact personId={props.person["_id"]} open={viewOpen} setOpen={setViewOpen} />:<></>}
+                </div>
+                :<></>
+              }
+              {props.actionType!="VIEW" && props.userPermissions && props.userPermissions["loan"].includes("edit") && props.userPermissions["contact"].includes("delete")
+                ?<div className="ml-2">
+                  <DeleteConfirmation thing="contact" deleteFunction={props.deleteFunction} currIndex={props.person["_id"]} icon={<DeleteOutlineOutlinedIcon/>} />
+                </div>
+                :<></>
+              }
             </div>
           </div>
         </div>

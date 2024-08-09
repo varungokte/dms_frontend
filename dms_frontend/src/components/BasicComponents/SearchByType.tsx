@@ -21,18 +21,16 @@ function SearchByType(props:{searchType:string, setSearchType:Function, searchSt
     <div className={props.className}>
       <FormGroup row>
         <OutlinedInput 
-          size="small" 
-          color="secondary"
+          size="small" color="secondary" placeholder="Search"
           sx={{padding:"0px 0px 0px 0px", height:"47px", backgroundColor:"white"}}
+          
           value={searchString||""}
           onChange={(e)=>setSearchString(e.target.value)}
-          placeholder="Search"
+          
           startAdornment={
             <Select
-              color="secondary"
-              value={props.searchType}
-              onChange={(e)=>props.setSearchType(e.target.value)} size="small"
-              displayEmpty
+              size="small" color="secondary" displayEmpty
+              value={props.searchType} onChange={(e)=>props.setSearchType(e.target.value)} 
               className="mr-2 bg-slate-200"
               sx={{borderRadius:"5px", height:"47px"}}
               inputProps={{ 'aria-label': 'Without label' }}
@@ -52,6 +50,5 @@ function SearchByType(props:{searchType:string, setSearchType:Function, searchSt
     </div>
   )
 }
-
 
 export default SearchByType;

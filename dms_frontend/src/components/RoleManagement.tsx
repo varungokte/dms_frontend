@@ -22,7 +22,7 @@ function RoleManagement(props:{label:string}){
   const [roleList, setRoleList] = useState<any[]>();
 
   const fieldList:FieldAttributesList = [
-    { category: "single", id: "N", name:"Role Name", type: "text" },
+    { category: "single", id: "N", name:"Role Name", type: "text", required:true },
     { category: "single", id: "P", name: "Permissions", type: "permissions", newRole:true }
   ];
 
@@ -153,7 +153,7 @@ function RoleManagement(props:{label:string}){
                       </div>
                       <div className="m-auto"><PermissionsField key={index} index={index} fieldData={{id:"P", name:"", type:"permissions", required:false, multiple:true}} permissionPreset={singleRole.P}  disabled={!userPermissions["role"].includes("edit")} setPermissionSet={setRoleList} />  </div>
                       {userPermissions["role"].includes("edit")
-                        ?<SubmitButton className="rounded-xl p-2 text-white text-lg align-middle bg-custom-1 my-3" submitFunction={editRoles} index={index} submitButtonText={`Save Changes for ${singleRole.N}`} />
+                        ?<SubmitButton submitFunction={editRoles} index={index} submitButtonText={`Save Changes for ${singleRole.N}`} />
                         :<></>
                       }
                     </CollapsibleContent>

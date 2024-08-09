@@ -1,7 +1,21 @@
 import { useEffect, useState, FunctionComponent, createContext } from 'react';
 import './styling.css';
 import useGlobalContext from './../GlobalContext';
-import { allComponents, getDocSecList, sectionNames } from './../Constants';
+import {  getDocSecList, sectionNames } from './../Constants';
+import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, CriticalIcon, ReminderIcon } from "./../src/components/static/PanelIcons"
+
+import Dashboard from './../src/components/Dashboard';
+import LoanAccount from './../src/components/LoanAccount';
+import DealsList from './../src/components/DealsList';
+import UserManagement from './../src/components/UserManagement';
+import RoleManagement from './../src/components/RoleManagement';
+import FilterPage from './../src/components/FilterPage';
+import TeamManagement from './../src/components/TeamManagement';
+import Masters from './../src/components/Masters';
+import SpecialCases from './../src/components/SpecialCases';
+import Reminders from './../src/components/Reminders';
+import Reports from './../src/components/Reports';
+import _TestComponent from './../src/components/_TestComponent';
 import { FieldValues } from './../DataTypes';
 import {socket} from "./socket";
 
@@ -12,12 +26,44 @@ import { customColor } from './MUIPalette';
 import SidePanel from './SidePanel';
 import TopPanel from './TopPanel';
 import Content from './Content';
+import UserAssignments from './UserAssignments';
 //import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-
 
 export const PermissionContext = createContext<any>(null);
 
 function MenuRouter(){
+	const allComponents = [
+		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },//0
+		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },//1
+		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },//2
+		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },//3
+		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },//4
+		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },//5
+		{ name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },//6
+		{ name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },//7
+		{ name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },//8
+		{ name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },//9
+		{ name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },//10
+		{ name: "Payment Schedule", path:"/schedule", component: DealsList, icon: ScheduleIcon},//11
+		{ name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },//12
+		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },//13
+		{ name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },//14
+		{ name: "Default Cases", path:"/default", component: SpecialCases, icon: DefaultIcon },//15
+		{ name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },//16
+		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },//17
+	
+		{ name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransIcon },//19
+		{ name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: CompIcon },//19
+		{ name: "Master Covenants", path:"/admin/covenants", component: DealsList, icon: CovenantIcon },//20
+		{ name: "Master Condition Precedent", path:"/admin/precedent", component: DealsList, icon: ConditionsIcon },//21
+		{ name: "Master Condition Subsequent", path:"/admin/subsequent", component: DealsList, icon: ConditionsIcon },//22
+		{ name: "Master Payment Schedule", path:"/admin/schedule", component: DealsList, icon: ScheduleIcon},//23
+		{ name: "Master Default Cases", path:"/admin/default", component:SpecialCases, icon:DefaultIcon,},//24
+		{ name: "Master Critical Cases", path:"/admin/critical", component:SpecialCases, icon:CriticalIcon,},//25
+		{ name: "User Assignments", path:"/assign", component:UserAssignments},//26
+	
+		{ name: "Test", path:"/test", component: _TestComponent },//27
+	];
 
 	const {getDecryptedToken, getSingleUser} = useGlobalContext();
 
@@ -73,8 +119,13 @@ function MenuRouter(){
 	const [componentList, setComponentList] = useState<{name:string,path:string, component:FunctionComponent<any>, icon?:Function}[]>();
 
 	useEffect(()=>{
-		if (!userPermissions)
+		if (!userPermissions){
+			const arr = [];
+			arr.push(allComponents[26]);
+			arr.push(allComponents[14]);
+			setComponentList(arr);
 			return;
+		}
 		const arr = [];
 		arr.push(allComponents[0]);
 		

@@ -1,18 +1,5 @@
 import { FieldValues } from "DataTypes";
-import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, CriticalIcon, ReminderIcon } from "./src/components/static/PanelIcons"
 
-import Dashboard from './src/components/Dashboard';
-import LoanAccount from './src//components/LoanAccount';
-import DealsList from './src//components/DealsList';
-import UserManagement from './src//components/UserManagement';
-import RoleManagement from './src//components/RoleManagement';
-import FilterPage from './src//components/FilterPage';
-import TeamManagement from './src//components/TeamManagement';
-import Masters from './src//components/Masters';
-import SpecialCases from './src//components/SpecialCases';
-import Reminders from './src//components/Reminders';
-import Reports from './src//components/Reports';
-import _TestComponent from './src//components/_TestComponent';
 //import { useState } from "react";
 
 const sectionNames:FieldValues = {
@@ -42,38 +29,6 @@ const sectionNames:FieldValues = {
   "Master Condition Subsequent":"subsequent/mst",
   "Master Payment Schedule":"payment/mst",
 }
-
-const allComponents = [
-  { name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },
-  { name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },
-  { name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },
-  { name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },
-  { name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },
-  { name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },
-  { name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },
-  { name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },
-  { name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },
-  { name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },
-  { name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },
-  { name: "Payment Schedule", path:"/schedule", component: DealsList, icon: ScheduleIcon},
-  { name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },
-  { name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },
-  { name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },
-  { name: "Default Cases", path:"/default", component: SpecialCases, icon: DefaultIcon },
-  { name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },
-  { name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },
-
-  { name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransIcon },
-  { name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: CompIcon },
-  { name: "Master Covenants", path:"/admin/covenants", component: DealsList, icon: CovenantIcon },
-  { name: "Master Condition Precedent", path:"/admin/precedent", component: DealsList, icon: ConditionsIcon },
-  { name: "Master Condition Subsequent", path:"/admin/subsequent", component: DealsList, icon: ConditionsIcon },
-  { name: "Master Payment Schedule", path:"/admin/schedule", component: DealsList, icon: ScheduleIcon},
-  { name: "Master Default Cases", path:"/admin/default", component:SpecialCases, icon:DefaultIcon,},
-  { name: "Master Critical Cases", path:"/admin/critical", component:SpecialCases, icon:CriticalIcon,},
-
-  { name: "Test", path:"/test", component: _TestComponent },
-];
 
 const documentSectionNames = [
   { fullname: "Transaction Documents", shortname: "transaction", keyname:"TD", type: "doc" },
@@ -176,7 +131,7 @@ const MastersMapping:FieldValues = {
 }
 
 export { 
-  MastersMapping, sectionNames, allComponents, getDocSecList,getDocSecName, checkObjectsAreEqual,
+  MastersMapping, sectionNames, getDocSecList,getDocSecName, checkObjectsAreEqual,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList, LoanStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,

@@ -3,12 +3,15 @@ import { Autocomplete, TextField as MUITextField } from "@mui/material";
 import FieldLabel from "./FieldLabel";
 import { FormFieldAttributes } from "DataTypes";
 
-function ComboboxField (props:{index:number|string, fieldData:FormFieldAttributes, suggestions:any, prefillValue:any, setPrefillValues:Function, error?:boolean, disabled:boolean}){
+function ComboboxField (props:{index:number|string, fieldData:FormFieldAttributes, suggestions:any, prefillValue:any, setPrefillValues:Function, error?:boolean, disabled:boolean, placeholder?:string}){
   const [value, setValue] = useState("");
 	const [results, setResults] = useState<any>([]);
   const [defaultValue,setDefaultValue] = useState<any>();
+  const [error, setError] = useState(props.error);
 
   const [parameterToBeSent] = useState("E"); //Later this will be a prop
+
+  useEffect(()=>setError(props.error),[props.error]);
 
   //useEffect(()=>console.log("combobox props",props),[props]);
   useEffect(()=>{
@@ -46,11 +49,9 @@ function ComboboxField (props:{index:number|string, fieldData:FormFieldAttribute
         setValue(props.suggestions[i].label);
   },[props.prefillValue]);
 
-  console.log('error',props.error)
-
   return (
-    <div key={props.index}>
-      <FieldLabel index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={false} disabled={props.disabled} />
+    <div key={props.index} className="mb-5 mx-2">
+      <FieldLabel index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
       <Autocomplete key={props.index+defaultValue} id={props.fieldData.id} disablePortal
         multiple={props.fieldData.multiple}
         disabled={props.disabled}
@@ -63,6 +64,7 @@ function ComboboxField (props:{index:number|string, fieldData:FormFieldAttribute
         getOptionLabel={(option:any)=>option.label}
 
         onChange={(_,temp)=>{
+          setError(false);
           setResults(temp);
           if (!props.fieldData.multiple && results)
             setDefaultValue(results[0])}
@@ -93,10 +95,11 @@ function ComboboxField (props:{index:number|string, fieldData:FormFieldAttribute
           return <MUITextField 
             {...vals} 
             color="secondary"
-            error={props.error}
+            className="bg-white"
+            error={error}
             value={value} 
             onChange={(e)=>setValue(e.target.value)}  
-            placeholder={`Add ${props.fieldData.name.toLowerCase()}${(props.fieldData.multiple?"s":"")}`} />}} 
+            placeholder={props.placeholder||`Add ${props.fieldData.name.toLowerCase()}${(props.fieldData.multiple?"s":"")}`} />}} 
         />
     </div>
   )

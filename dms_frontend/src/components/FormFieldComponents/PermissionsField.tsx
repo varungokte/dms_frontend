@@ -7,7 +7,7 @@ import Tab from "@mui/material/Tab/Tab";
 import Button from "@mui/material/Button/Button";
 import { Box } from "@mui/material";
 
-function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, permissionPreset:any,  setPermissionSet:Function, disabled:boolean}){
+function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, permissionPreset:any, setPermissionSet:Function, disabled:boolean}){
   try{
     const [value, setValue] = useState("admin");
     const [permissionSections, setPermissionSections] = useState<FieldValues>();
@@ -45,7 +45,6 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
             obj[category][section] = props.permissionPreset[section];
         }
       }
-      //console.log("OBJ",obj)
       setPermissionSections(obj);
     }
 
@@ -79,19 +78,6 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
       emptyPermisionSet();
     },[props.permissionPreset]);
 
-    //useEffect(()=>{if (permissionSections)console.log("value",permissionSections["documents"])},[permissionSections])
-    
-  /* 
-    useEffect(()=>{
-      props.setPermissionSet((curr:any)=>{
-        console.log("old curr",curr);
-        curr["UP"]=permissions;
-        console.log("new curr",curr);
-      });
-    },[permissions]); */
-
-    //useEffect(()=>console.log("PROPS.PERMISSIONPRESET",props.permissionPreset),[props.permissionPreset]);
-
     return (
       <div>
         <FieldLabel index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
@@ -113,16 +99,18 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
           <div className="mx-5">
             {permissionSections && props.permissionPreset && Object.keys(props.permissionPreset).length!=0
               ?Object.keys(permissionSections[value]).map((section:string,index:number)=>{
-                //console.log("Single section data",permissionSections, permissionSections[value],section)
                 try{
-                  //console.log("props.permissionPreset",props.permissionPreset)
-                  const permissionSet = (documentSections.includes(value)?props.permissionPreset[value][section]:props.permissionPreset[section])
-                  //console.log("sectionName", section, permissionSet);
+                  console.log("includes",props.permissionPreset[section])
+                  //const permissionSet = (documentSections.includes(value)?props.permissionPreset[value][section]:props.permissionPreset[section]);
+                  //console.log(props.permissionPreset[section]["docs"].concat(props.permissionPreset[section]["file"]))
+                  //const permissionSet = value=="documents"?props.permissionPreset[section]["docs"].concat(props.permissionPreset[section]["file"]):props.permissionPreset[section];
+                  const permissionSet = props.permissionPreset[section];
                   return(
                     <div key={index}>
                       <p className="text-xl">{Object.keys(sectionNames)[Object.values(sectionNames).indexOf(section)]}</p>
                       {value=="documents"
                         ?Object.keys(permissionSet).map((subsection,subindex)=>{
+                          console.log("set",permissionSet)
                           return <div key={index+"_"+subindex}>
                             <p>{docSubTypes[subsection]}</p>
                             <RenderPermissions index={index+"_"+subindex} id={props.fieldData.id} sectionName={subsection} permissionSet={permissionSet[subsection]} setPermissionSet={props.setPermissionSet} category={section} disabled={props.disabled} multiple={props.fieldData.multiple} />
@@ -151,16 +139,55 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
   }
 };
 
+/* 
+  team : access, add, edit, select
+  user: access, add, edit, 
+  role: access, add, edit
+  masters: access, add, edit, delete
+
+  loan: access, add, view, edit, delete
+  contact: access, add, view, edit, delete
+  rating: access, add
+
+  documents:
+  doc: access, add, edit
+  file: add, view, edit, delete
+
+  default: access, edit
+  critical: access, edit
+*/
+
 
 function RenderPermissions(props:{index:number|string, id:string, sectionName:string, category:string, permissionSet:any, setPermissionSet:Function,disabled?:boolean, multiple?:boolean}){
-  const permissionTypes = ["access","view","add","edit","delete","select"];
+  const permissionLabels:FieldValues = {
+    "access":"page access",
+    "view":"view",
+    "add":"add",
+    "edit":"edit",
+    "delete":"delete",
+    "select":"select",
+    "view files":"view",
+  };
+
   const documentSections = getDocSecList("shortname");
+
+  const permissionMapping:FieldValues = {
+    team: ["access", "add", "edit", "select"],
+    user: ["access","add","edit"],
+    role: ["access","add","edit"],
+    masters: ["access","add","edit"],
+    loan: ["access", "view", "add", "edit", "delete"],
+    contact: ["access","add","view","edit","delete"],
+    rating: ["access","add"],
+    docs:["access","add","edit"],
+    file:["view","add","edit","delete"],
+    default:["access","edit"],
+    critical:["access","edit"],
+  }
   
   return (
     <div>
-      {permissionTypes.map(perm=>{
-        if (perm=="select" && props.sectionName!="team")
-          return ""
+      {(permissionMapping[props.sectionName]||[]).map((perm:string)=>{
         return <Button key={props.index+perm}
           disableRipple={props.disabled} className={`${props.disabled?"hover:cursor-default	":""}`} disableFocusRipple={props.disabled}
           variant={props.permissionSet.includes(perm)?"contained":"outlined"} color="secondary"
@@ -170,7 +197,6 @@ function RenderPermissions(props:{index:number|string, id:string, sectionName:st
                 return;
               props.setPermissionSet((curr:any)=>{
                 if (!curr) return;
-                //console.log("curr[section].includes(perm)", curr, section, curr[section],/*  curr[section].includes(perm),curr[section].filter((name:string)=> name!=perm) */)
                 let singleSectionPermission;
                 if (props.multiple)
                   singleSectionPermission = documentSections.includes(props.category)
@@ -200,7 +226,7 @@ function RenderPermissions(props:{index:number|string, id:string, sectionName:st
           }} 
           sx={{borderRadius:20, marginRight:"7px"}}
         >
-          {perm}
+          {permissionLabels[perm]}
         </Button>
       })}
     </div>

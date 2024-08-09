@@ -7,11 +7,12 @@ import { Button, Dialog,DialogContent,DialogTitle, Typography } from "@mui/mater
 import LoadingMessage from "../BasicMessages/LoadingMessage";
 
 import CloseIcon from '@mui/icons-material/Close';
+import DeleteConfirmation from "./DeleteConfirmation";
  
 //IMPORTANT
 //docId is only present when !isPayment
 
-function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps) & {setOpenDialog:Function}){
+function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps) & {setOpenDialog:Function, setIsDeleted?:Function}){
   const [showDoc, setShowDoc] = useState<ReactElement>(<LoadingMessage sectionName="file"/>);
   const [verified, setVerified] = useState(false);
   const [rejected, setRejected] = useState(false);
@@ -19,7 +20,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
   const [rejectionText, setRejectionText] = useState("");
   const [errorMessage, setErrorMessage] = useState(<></>);
 
-  const {fetchDocument,editDocument, addPaymentSchedule}=useGlobalContext();
+  const {fetchDocument,editDocument, addPaymentSchedule, deleteDocument}=useGlobalContext();
 
   const [openRejectionDialog, setOpenRejectionDialog] = useState(false);
   
@@ -71,8 +72,8 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
       console.log("Data",data)
       res = await editDocument(data);
       console.log("res",res);
-
     }
+
     if (res.status==200){
       if (status=="Verified")
         setVerified(true);
@@ -82,48 +83,57 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
       props.setAdded(true);
     }
     else
-      setErrorMessage(<p className="text-yellow-700">Something went wrong</p>)
+      setErrorMessage(<p className="text-yellow-700">Something went wrong</p>);
   }
 
-  return (<>
-    <div className="flex flex-row p-2 bg-black">
-      <p className="flex-auto text-white m-auto mx-2 ">{props.actualName}</p>
-      
-      {/* <button className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600">Delete</button> */}
-      
-      {rejected
-        ?<span className="text-red-500 flex-auto my-auto">Document Rejected: {props.rejectionReason}</span>
-        :<div>
-          <button 
-          className={`border-2 mx-5 w-28 p-2 m-auto rounded-if text-white hover:bg-gray-800 click:bg-gray-800`} 
-          onClick={()=>setOpenRejectionDialog(true)}
-          >
-            Reject
-          </button>
-          <button 
-            className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-lime-700":"border-lime-500"} ${verified?"bg-lime-700":"bg-lime-500"} text-white`}
-            onClick={()=>changeStatus("Verified")}
-            disabled={verified}
-          >
-            {verified?"Verified":"Verify"}
-          </button>
-        </div>
+  const deleteFile = async () => {
+    if (props.type=="doc" && props.setIsDeleted){
+      const res = await deleteDocument(props.AID,props.docId,props.sectionName,props.fileName);
+      if (res==200){
+        props.setIsDeleted(res);
+        props.setAdded(true);
       }
+    }
+  }
 
-      <RejectionDialog openDialog={openRejectionDialog} setOpenDialog={setOpenRejectionDialog} 
-        rejectionReason={rejectionReason} setRejectionReason={setRejectionReason}
-        rejectionText={rejectionText} setRejectionText={setRejectionText}
-        changeStatus={changeStatus}
-      />
+  return (
+    <>
+      <div className="flex flex-row p-2 bg-black">
+        <p className="flex-auto text-white m-auto mx-2 ">{props.actualName}</p>
+        <DeleteConfirmation thing="file" deleteFunction={deleteFile} currIndex={0} icon={<div className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600 hover:bg-gray-800 click:bg-gray-800">Delete File</div>} />
+        
+        {rejected
+          ?<span className="text-red-500 flex-auto my-auto">Document Rejected: {props.rejectionReason}</span>
+          :<div>
+            <button 
+              className={`border-2 mx-5 w-28 p-2 m-auto rounded-if text-white hover:bg-gray-800 click:bg-gray-800`} 
+              onClick={()=>setOpenRejectionDialog(true)}
+            >
+              Reject File
+            </button>
+            <button 
+              className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-orange-700":"border-lime-600"} ${verified?"bg-orange-700":"bg-orange-600"} text-white`}
+              onClick={()=>changeStatus(verified?"In progress":"Verified")}
+            >
+              {verified?"Un-Verify":"Verify"}
+            </button>
+          </div>
+        }
 
-      <button className="mx-5 p-2 text-white m-auto mx-2" onClick={()=>props.setOpenDialog(false)}>{<CloseIcon/>}</button>
-    </div>
-    
-    <DialogContent>
-      {errorMessage}
-      {showDoc}
-    </DialogContent>
-  </>
+        <RejectionDialog openDialog={openRejectionDialog} setOpenDialog={setOpenRejectionDialog} 
+          rejectionReason={rejectionReason} setRejectionReason={setRejectionReason}
+          rejectionText={rejectionText} setRejectionText={setRejectionText}
+          changeStatus={changeStatus}
+        />
+
+        <button className="mx-5 p-2 text-white m-auto mx-2" onClick={()=>props.setOpenDialog(false)}>{<CloseIcon/>}</button>
+      </div>
+      
+      <DialogContent>
+        {errorMessage}
+        {showDoc}
+      </DialogContent>
+    </>
   )
 }
 

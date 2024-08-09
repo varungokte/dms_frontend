@@ -26,9 +26,12 @@ function LoanPaymentSchedule(props:LoanCommonProps){
 
   const [fieldValues,setFieldValues] = useState<FieldValues>({T:InterestTypeList[1]});
   const [schedule, setSchedule] = useState<{D:string,I?:number|string}[]>([]);
+
   const [dialogOpen, setDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [installmentError, setInstallmentError] = useState(<></>);
+  const [errorList, setErrorList] = useState<string[]>();
+  
   const [editMode, setEditMode] = useState(false);
   const [added, setAdded] = useState(true);
 
@@ -37,10 +40,11 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   useEffect(()=>{
     if (added)
       getPaymentSchedule(props.loanId).then(res=>{
-        //console.log("response",res);
+        console.log("response",res);
         setAdded(false);
         if (res.status==200 && res.obj && res.obj[0] && res.obj[0]["data"] && Object.keys(res.obj[0]["data"]).length!=0){
-          setFieldValues(res.obj[0]["data"]);
+          setFieldValues(res.obj[0]["data"][0]);
+          console.log("values",res.obj[0]["data"][0])
           setEditMode(true);
           if (res.obj[0]["data"]["GS"])
             setSchedule(res.obj[0]["data"]["GS"]);
@@ -51,21 +55,23 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   //useEffect(()=>console.log("SCHEDULE",schedule),[schedule]);
 
   const validateFields = () => {
+    const arr = [];
     for (let i=0; i<fieldList.fields.length; i++){
       const field = fieldList.fields[i];
-
-      if (field.required && !fieldValues[field.id]){
-        setErrorMessage(<p className="text-red-600 mx-3">Please fill all required fields.</p>);
-        return;
-      }
+      if (field.required && !fieldValues[field.id])
+        arr.push(field.id);
     }
 
-    if (fieldValues["T"]==InterestTypeList[1] && !fieldValues["I"]){
+    if (fieldValues["T"]==InterestTypeList[1] && !fieldValues["I"])
+      arr.push("I");
+
+    if (arr.length>0){
       setErrorMessage(<p className="text-red-600 mx-3">Please fill all required fields.</p>);
+      setErrorList(arr);
       return;
     }
-
-    setErrorMessage(<></>);
+    else
+      setErrorMessage(<></>);
 
     if (fieldValues["T"]==InterestTypeList[1])
       fixedInterestSchedule();
@@ -160,16 +166,16 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="integer")
-            return <IntegerField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))}/>
+            return <IntegerField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
           else if (field.type=="date")
-            return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
+            return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
           else if (field.type=="select")
-            return <SelectField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
+            return <SelectField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
           else if (field.type=="radio")
             return <RadioGroupField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
         })}
         {fieldValues["T"]!=InterestTypeList[2]
-          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&true)}/>
+          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&true)}  error={errorList?.includes("I")} />
           :""
         }
         <div className="my-10">
