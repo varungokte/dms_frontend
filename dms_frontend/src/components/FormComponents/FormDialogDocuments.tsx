@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { DocumentSectionTypes, FieldAttributesList, FieldValues} from "./../../../DataTypes";
+import { FieldAttributesList, FieldValues} from "./../../../DataTypes";
+import { DocumentSectionTypes } from "../../DocumentSectionAttributes";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -166,7 +167,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
       setErrorMessage(<p className="text-yellow-600">Something went wrong. Please try again later.</p>)
       return false;
     }
-  }
+  } 
 
   const submitFile = async () => {
     if (!fileList || fileList.length==0){
@@ -174,7 +175,6 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
       props.setAdded(true);
       return;
     }
-
     const changesHaveBeenMade = checkForChanges();
     if (!changesHaveBeenMade){
       closeDialog()
@@ -185,7 +185,6 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
     
     if (res==200){
       setErrorMessage(<></>);
-      console.log("have submitted",fileList);
       props.setAdded(true);
       closeDialog();
     }
@@ -210,8 +209,8 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
           </TabsList>
           <TabsContent value="details" className="h-full border-0" style={{overflowY:"auto"}}>
             <Card className="border-0">
-              <CardContent className="mt-5"  style={{borderWidth:"0px", borderColor:"white"}}>
-                <form onSubmit={(e)=>{props.detailSubmit(e);}}>
+              <CardContent className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
+                <form >
                   <FormFieldsRender form={props.formFields} formType="docs" prefillValues={prefillValues} setPrefillValues={setPrefillValues} edit={props.edit} covType={covType} setCovType={setCovType} sectionType={props.type} errorList={errorList} />
                   {errorMessage}
                 </form>

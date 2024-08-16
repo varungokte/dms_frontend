@@ -3,7 +3,7 @@ import FieldLabel from "./FieldLabel";
 import { TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 
-function FloatNumberField(props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, className?:string, error?:boolean, repeatFields?:boolean, formIndex?:number, disabled:boolean }){ 
+function FloatNumberField(props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, className?:string, error?:boolean, repeatFields?:boolean, formIndex?:number, disabled:boolean, readonly?:boolean }){ 
   const [error, setError] = useState(props.error);
   
   useEffect(()=>setError(props.error),[props.error]);
@@ -15,12 +15,15 @@ function FloatNumberField(props:{index:number|string, fieldData:FormFieldAttribu
         size="medium" color="secondary"
         className={props.className || `border rounded-if w-full p-3 ${props.fieldData.name==""?"mt-7":""}`}
         required={props.fieldData.required} disabled={props.disabled} 
+        sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
+        
         value={props.repeatFields && props.formIndex!=undefined
           ?props.prefillValues[props.formIndex]&&props.prefillValues[props.formIndex||0][props.fieldData.id]
             ?Number(props.prefillValues[props.formIndex||0][props.fieldData.id])
             :""
           :props.prefillValues[props.fieldData.id]?Number(props.prefillValues[props.fieldData.id]):""
         }
+
         onChange={props.repeatFields && props.formIndex!=null
           ?e=>{
             setError(false);

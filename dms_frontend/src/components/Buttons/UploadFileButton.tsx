@@ -17,8 +17,9 @@ function UploadFileButton(props:{index:number, AID:string, sectionKeyName:string
     const formData = new FormData();
     for (let i=0; i<userFiles.length; i++)
       formData.append("file", userFiles[i]);
-
-    const res = await uploadFile(formData, `${props.AID}/${props.sectionKeyName}`,props.docId, props._id, props.isPayment);
+    console.log("file data",props);
+    const res = await uploadFile({data:formData,AID:props.AID,sectionKeyName:props.sectionKeyName,docId:props.docId, loanId:props._id, isPayment:props.isPayment});
+    console.log("file response",res);
     return res;
   }
 

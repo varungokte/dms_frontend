@@ -12,6 +12,8 @@ function Content(props:{componentList:ComponentList|undefined, masterLists:Field
       {props.componentList
         ?props.componentList.map((item,index)=>{
           const componentProps:any = { key:index, label: item.name}
+          if (item.panopticPage)
+            componentProps["panopticPage"] = item.panopticPage;
           if (item.name=="Masters"){
             componentProps["masterLists"] = props.masterLists;
             componentProps["idList"] = props.mastersIdList;

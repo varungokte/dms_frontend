@@ -48,6 +48,12 @@ function LoanTeamSelection(props:LoanCommonProps){
 
   const sendTeam = async (e:any) =>{
     e.preventDefault();
+    if (!userPermissions["team"].includes("select")){
+      if (selectedTeam && selectedTeam!="")
+        props.goToNextSection();
+      return;
+    }
+
     if (selectedTeam==""){
       setErrorMessage(<div className="text-lg mx-3 text-red-600">You must select one of the following teams.</div>);
       return;
@@ -72,7 +78,7 @@ function LoanTeamSelection(props:LoanCommonProps){
       </div>
       <br />
       <form onSubmit={sendTeam}>
-        {errorMessage}
+        {userPermissions["team"].includes("select")?errorMessage:<></>}
         <div className="flex flex-row flex-wrap mx-3">
           {teamList
             ?teamList.length==0

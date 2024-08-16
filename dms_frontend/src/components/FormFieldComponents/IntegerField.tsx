@@ -3,12 +3,12 @@ import FieldLabel from "./FieldLabel";
 import { FieldValues, FormFieldAttributes } from "DataTypes";
 import { TextField } from "@mui/material";
 
-function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, error?:boolean, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
+function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, error?:boolean, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean, readonly?:boolean }) {
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
   const [error, setError] = useState(props.error);
 
-  useEffect(()=>console.log("props",props),[props])
+  //useEffect(()=>console.log("props",props),[props])
 
   const numberFormatter = (num:number) => {
     if (props.fieldData.suppressCommas)
@@ -55,6 +55,8 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
             :""
           :props.prefillValues[props.fieldData.id]?numberFormatter(Number(props.prefillValues[props.fieldData.id])):""
         }
+
+        sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
 
         onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{

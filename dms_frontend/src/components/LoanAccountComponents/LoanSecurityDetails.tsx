@@ -143,12 +143,12 @@ function LoanSecurityDetails(props:LoanCommonProps){
           <div className="grid grid-cols-2">
             {fieldListFixed.fields.map((field,index)=>{
               if (field.type=="date")
-                return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} repeatFields={false} formIndex={-1}/>
+                return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} readonly={props.actionType=="VIEW"} repeatFields={false} formIndex={-1}/>
               else if (field.type=="float")
-                return <FloatNumberField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields}  repeatFields={false} formIndex={-1}/>
+                return <FloatNumberField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} readonly={props.actionType=="VIEW"} repeatFields={false} formIndex={-1}/>
             })}
           </div>
-          <FormRepeatableGrid key={2} fieldList={fieldListRepeatable.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} disabled={props.actionType=="VIEW"} />
+          <FormRepeatableGrid key={2} fieldList={fieldListRepeatable.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} disabled={props.actionType=="VIEW"} readonly={props.actionType=="VIEW"} />
           <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} goToNextSection={props.goToNextSection} sectionCount={props.sectionCount} isForm enableLoadingSign={enableLoadingSign} actionType={props.actionType} />
           <br/>
         </form>

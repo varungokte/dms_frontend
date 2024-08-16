@@ -1,7 +1,8 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
 import useGlobalContext from "../../GlobalContext";
 import moment from "moment";
-import { DocumentStatus, DocumentSectionDetails, FieldValues } from "DataTypes";
+import { DocumentStatus, FieldValues } from "DataTypes";
+import {DocumentSectionDetails, DocumentSectionKeys, DocumentSectionTypes, getDocSecName} from "./../DocumentSectionAttributes";
 
 import SingleDealDocuments from "./SingleDealDocuments";
 import SingleDealPayments from "./SingleDealPayments";
@@ -12,7 +13,8 @@ import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import { useLocation } from "react-router-dom";
 import { Pagination } from "./BasicComponents/Pagination";
-import { sectionNames } from "./../../Constants";
+import { panopticSectionNames, sectionNames } from "./../../Constants";
+//import Filter from "./BasicComponents/Filter";
 
 type DocumentDetails= {
   _id:string,
@@ -22,30 +24,23 @@ type DocumentDetails= {
   details: {S:DocumentStatus}[]
 }
 
-function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues}) {
+function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:FieldValues, panopticPage?:boolean}) {
   useEffect(()=>{
-    if (!props.masters)
+    if (!props.specType || props.specType=="masters")
 		  document.title=props.label+" | Beacon DMS"
 	},[]);
 
   const {state} = useLocation();
   const dealRefs = useRef<any>([]);
-  const admin = sectionNames[props.label].split("/").length>1;
+
+  const admin = props.panopticPage||false;
 
   const setSection = (): DocumentSectionDetails => {
-    const label = sectionNames[props.label].split("/")[0];
-    if (label=="transaction")
-      return { sectionName: "TD", sectionType:"document" }
-    else if (label=="compliance")
-      return { sectionName: "CD", sectionType:"document" }
-    else if (label=="covenants")
-      return { sectionName: "C", sectionType:"covenant" }
-    else if (label=="precedent")
-      return { sectionName: "CP", sectionType:"condition" }
-    else if (label=="subsequent")
-      return { sectionName: "CS", sectionType:"condition" }
-    else
-      return { sectionName:"PD", sectionType:"payment" }
+    const label = props.panopticPage?panopticSectionNames[props.label]:sectionNames[props.label];
+    return {
+      sectionKeyName:getDocSecName(label,"shortname","keyname") as DocumentSectionKeys, 
+      sectionType:getDocSecName(label,"shortname","type") as DocumentSectionTypes
+    };
   }
 
   const sectionDetails = setSection();
@@ -53,7 +48,6 @@ function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues})
   const [dealData, setDealData] = useState<DocumentDetails[]>();
 
   const [calculate, setCalculate] = useState(true);
-  const [searchString, _] = useState("");
   const [showDeals, setShowDeals] = useState<boolean[]>();
   const [fromRedirect, setFromRedirect] = useState(true);
   const [currentTab, setCurrentTab] = useState(-1);
@@ -63,19 +57,20 @@ function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues})
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  //const [makerOrChecker, setMakerOrChecker] = useState("Maker");
 
   useEffect(()=>{
     setCalculate(true);
   },[currentPage,rowsPerPage]);
 
   const getDocData = async () => {
-    const res =props.masters?(props.docData):await getDealList({ admin,sectionName:sectionDetails.sectionName, currentPage, rowsPerPage});
-
+    const res =props.specType&&props.specType=="assign"?(props.docData):await getDealList({ admin,sectionName:sectionDetails.sectionKeyName, currentPage, rowsPerPage});
     if (!res)
       return;
 
     try{
       setDealData(res.obj[0]["data"]);
+      //console.log("response data",res.obj[0]["data"])
       const arr = new Array(res.obj.length).fill(false);
       if (currentTab!=-1)
         arr[currentTab] = true;
@@ -123,9 +118,10 @@ function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues})
 
   return(
     <div>
-      {props.masters?<></>:<p className="text-3xl font-bold m-7">{props.label}</p>}
-			<div className="flex flex-row">
-        <div className='mx-7'>
+      {props.specType=="assign"?<></>:<p className="text-3xl font-bold m-7">{props.label}</p>}
+			<div className="flex flex-row mx-7">
+        <div>
+          {/* <Filter value={makerOrChecker} setValue={setMakerOrChecker} options={["Maker","Checker"]}   /> */}
         </div>
       </div>
 
@@ -137,7 +133,7 @@ function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues})
             ?<EmptyPageMessage sectionName="deals"/>
             :dealData.map((deal,index)=>{
               return <div ref={el=>dealRefs.current[index]=el} key={index}>
-                <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} searchString={searchString} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} admin={admin} />
+                <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} showDeals={showDeals||[]} setShowDeals={setShowDeals} calculate={calculate} setCalculate={setCalculate} linkSource={state} setCurrentTab={setCurrentTab} admin={admin} />
               </div>
             })
         }
@@ -151,7 +147,7 @@ function DealsList(props:{label:string, masters?:boolean, docData?:FieldValues})
   )
 }
 
-function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, searchString:string, showDeals:boolean[],setShowDeals:Function, calculate:boolean, setCalculate:Function, linkSource?:string,setCurrentTab:Function, admin:boolean}) {
+function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, showDeals:boolean[],setShowDeals:Function, calculate:boolean, setCalculate:Function, linkSource?:string,setCurrentTab:Function, admin:boolean}) {
   const [added,setAdded] = useState(true);
   const [progressValue, setProgressValue] = useState(0);
 
@@ -200,7 +196,6 @@ function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetai
         ?<SingleDealPayments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} admin={props.admin} />
         :<SingleDealDocuments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded} open={props.showDeals[props.index]} admin={props.admin} />
       }
-      searchString={props.searchString}
     />
   )
 }

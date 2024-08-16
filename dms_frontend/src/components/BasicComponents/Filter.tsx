@@ -4,20 +4,29 @@ function Filter(props:{value:string[]|string, setValue:Function, options:string[
   return(
     <Select
       multiple={props.multiple}
-      size="small"
-      color="secondary"
+      size="small" color="secondary"
+      
       displayEmpty
+      inputProps={{ 'aria-label': 'Without label' }}
+
       value={props.value}
       onChange={(e)=>props.setValue(e.target.value)}
+      
       input={<OutlinedInput sx={{backgroundColor:"white", borderRadius:"10px", height:"50px"}}/>}
       renderValue={(selected) => {
-        if (typeof selected==="string")
-          return selected;
-        if (props.placeholderValue && selected.length==0) 
-          return <em>Select {props.placeholderValue}</em>;
-        return selected.join(', ');
+        if (props.multiple && typeof selected!="string")
+          return props.placeholderValue && selected.length==0?<em>Select {props.placeholderValue}</em>:selected.join(', ');
+        else{
+          if (selected==""){
+            if (props.placeholderValue)
+              return <em>Select {props.placeholderValue}</em>
+            else
+              return props.options[0];
+          }
+          else
+            return selected;
+        }
       }}
-      inputProps={{ 'aria-label': 'Without label' }}
     >
       {props.options.map(option => {
         if (option!="-")

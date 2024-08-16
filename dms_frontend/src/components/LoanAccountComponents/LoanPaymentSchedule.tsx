@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import moment from "moment";
 import { FrequencyList, HolidayConventionList, InterestTypeList } from "./../../../Constants";
-import { FieldValues, GridFieldAttributes, LoanCommonProps } from "./../../../DataTypes";
+import { FieldValues, GridFieldAttributes, LoanCommonProps, ToastOptionsAttributes } from "./../../../DataTypes";
 import useGlobalContext from "./../../../GlobalContext";
 
 import {Dialog,DialogTitle,DialogContent} from '@mui/material';
@@ -13,6 +13,7 @@ import RadioGroupField from "../FormFieldComponents/RadioGroupField";
 import SelectField from "../FormFieldComponents/SelectField";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
+import Toast from "./../BasicComponents/Toast";
 
 function LoanPaymentSchedule(props:LoanCommonProps){
   const fieldList:GridFieldAttributes = {category:"grid", row:2, fields:[
@@ -29,11 +30,12 @@ function LoanPaymentSchedule(props:LoanCommonProps){
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState(<></>);
-  const [installmentError, setInstallmentError] = useState(<></>);
   const [errorList, setErrorList] = useState<string[]>();
   
   const [editMode, setEditMode] = useState(false);
   const [added, setAdded] = useState(true);
+
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
   const {addPaymentSchedule, getPaymentSchedule} = useGlobalContext();
 
@@ -42,18 +44,16 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       getPaymentSchedule(props.loanId).then(res=>{
         console.log("response",res);
         setAdded(false);
-        if (res.status==200 && res.obj && res.obj[0] && res.obj[0]["data"] && Object.keys(res.obj[0]["data"]).length!=0){
+        if (res.status==200 && res.obj && res.obj[0] && res.obj[0]["data"] && res.obj[0]["data"][0]){
           setFieldValues(res.obj[0]["data"][0]);
           console.log("values",res.obj[0]["data"][0])
           setEditMode(true);
-          if (res.obj[0]["data"]["GS"])
-            setSchedule(res.obj[0]["data"]["GS"]);
+          if (res.obj[0]["data"][0]["GS"])
+            setSchedule(res.obj[0]["data"][0]["GS"]);
         }
       })
   },[added]);
-
-  //useEffect(()=>console.log("SCHEDULE",schedule),[schedule]);
-
+  
   const validateFields = () => {
     const arr = [];
     for (let i=0; i<fieldList.fields.length; i++){
@@ -77,17 +77,6 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       fixedInterestSchedule();
     else if (fieldValues["T"]==InterestTypeList[2])
       manualInterestSchedule();
-  }
-
-  const validateInstallmentAmounts = () =>{
-    for (let i=0; i<schedule.length; i++){
-      if (schedule[i].I==""){
-        setInstallmentError(<p className="text-red-600 mx-3">Please fill all required fields.</p>);
-        return;
-      }
-    }
-    setInstallmentError(<></>)
-    submitSchedule(schedule);
   }
 
   const manualInterestSchedule = () =>{
@@ -148,17 +137,12 @@ function LoanPaymentSchedule(props:LoanCommonProps){
     const res = await addPaymentSchedule(fieldValues);
     //console.log("response",res)
     if (res==200){
-      setDialogOpen(false);
-      setFieldValues({});
-      setErrorMessage(<p className="text-green-600">Schedule successfully generated.</p>);
+      setDialogOpen(false); 
+      setToastOptions({open:true, type:"success", action:"save", section:"Payment schedule"});
       setAdded(true);
     }
-    else{
-      if (fieldValues["T"]==InterestTypeList[1])
-        setInstallmentError(<p className="text-yellow-600">Something went wrong</p>)
-      else
-        setErrorMessage(<p className="text-yellow-600">Something went wrong</p>)
-    }
+    else
+      setToastOptions({open:true, type:"error", action:"save", section:"Payment schedule"});
   }
 
   return(
@@ -166,22 +150,22 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="integer")
-            return <IntegerField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
+            return <IntegerField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
           else if (field.type=="date")
-            return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
+            return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
           else if (field.type=="select")
-            return <SelectField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
+            return <SelectField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
           else if (field.type=="radio")
             return <RadioGroupField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
         })}
         {fieldValues["T"]!=InterestTypeList[2]
-          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&true)}  error={errorList?.includes("I")} />
-          :""
+          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||editMode}  error={errorList?.includes("I")} readonly={props.actionType=="VIEW"||(editMode)} />
+          :<></>
         }
         <div className="my-10">
-          {props.actionType=="VIEW"
+          {props.actionType=="VIEW" || (fieldValues["T"]==InterestTypeList[1] && editMode)
             ?<></>
-            :<button className={`${fieldValues["T"]!=InterestTypeList[2]?"float-right":"float-left"} h-[45px] w-[180px] rounded-xl text-white text-lg bg-custom-1`} onClick={validateFields}>
+            :<button className={`${fieldValues["T"]!=InterestTypeList[2]?"float-right":"float-left"} h-[45px] w-[180px] rounded-xl text-white text-lg bg-custom-1 mx-2`} onClick={validateFields}>
               {fieldValues["T"]!=InterestTypeList[2]?"Generate Schedule":`${editMode?"Edit":"Enter"} Interest Rates`} 
             </button>
           }
@@ -193,17 +177,17 @@ function LoanPaymentSchedule(props:LoanCommonProps){
             <DialogTitle>Enter Interest Rates</DialogTitle>
             <DialogContent>
               <DataTable 
-                headingRows={["Installment Number","Installment Date", "Installment Interest Rate(%)"]} headingClassNames={["w-[30%]","w-[30%]",""]}
+                headingRows={["Installment Number","Installment Date", "Installment Interest Rate(%)"]} headingClassNames={["w-[30%]","w-[30%]","mx-7"]}
                 tableData={schedule} columnIDs={["D","I"]} dataTypes={["index","date","text-field"]} cellClassName={["","",""]}
                 setValues={setSchedule} 
               />
-              {installmentError}
-              <button className="float-right my-9 h-[50px] w-[150px] rounded-xl text-white text-md bg-custom-1" onClick={()=>validateInstallmentAmounts()}>Generate Schedule</button>
+              <button className="float-right my-9 h-[50px] w-[150px] rounded-xl text-white text-md bg-custom-1" onClick={()=>submitSchedule(schedule)}>Generate Schedule</button>
             </DialogContent>
           </>
           :<></>
         }
       </Dialog>
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}  
       {errorMessage}
       <br />
       <FormSectionNavigation currentSection={props.currentSection} setCurrentSection={props.setCurrentSection} sectionCount={props.sectionCount} goToNextSection={props.goToNextSection} isForm={false} />

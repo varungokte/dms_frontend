@@ -216,13 +216,13 @@ function LoanBasicDetails(props:LoanCommonProps) {
               disabled=true;
             
             if (field.type=="select")
-              return <SelectField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
+              return <SelectField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} />
             else if (field.type=="integer")
-              return <IntegerField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
+              return <IntegerField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} />
             else if (field.type=="date")
-              return <DateField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} />
+              return <DateField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} />
             else
-              return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} size="medium" disabled={props.actionType=="VIEW"||disabled} errorMessage={errorMessage} />
+              return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} size="medium" disabled={props.actionType=="VIEW"||disabled} errorMessage={errorMessage} readonly={props.actionType=="VIEW"} />
           })}
         </div>
         <br/>

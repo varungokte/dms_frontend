@@ -1,5 +1,5 @@
 import Snackbar from '@mui/material/Snackbar';
-import { Alert } from "@mui/material";
+import { Alert, Typography } from "@mui/material";
 import { ToastOptionsAttributes } from "./../../../DataTypes";
 
 function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Function}){
@@ -7,6 +7,7 @@ function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Funct
     add:"added",
     delete:"deleted",
     edit:"edited",
+    save:"saved"
   };
 
   const handleClose = () => {
@@ -23,8 +24,11 @@ function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Funct
       autoHideDuration={5000}
     >
       <Alert onClose={handleClose} 
-        severity={props.toastOptions.type} variant="filled" sx={{ width: '100%' }} >
-        {props.toastOptions.section} {props.toastOptions.type=="error"?"could not be":""} {actions[props.toastOptions.action]}
+        severity={props.toastOptions.type} variant="filled" sx={{ width: '100%' }} 
+      >
+        <Typography textTransform={"capitalize"}>
+          {props.toastOptions.section} {props.toastOptions.type=="error"?"could not be":""} {actions[props.toastOptions.action]}
+        </Typography>
       </Alert>
     </Snackbar>
   )

@@ -23,7 +23,6 @@ function LoginPage() {
 
   const [errorMessage, setErrorMessage] = useState(<></>);
 
-  useEffect(()=>console.log("fieldValues",fieldValues),[fieldValues])
 	const navigate = useNavigate();
 	const { loginUser } = useGlobalContext();
 
@@ -59,13 +58,13 @@ function LoginPage() {
         <img src={login_img} width={"80%"} style={{float:"right", paddingRight:"5%"}}/>
       </div>
       <div className="m-3" style={{marginTop:"7%", marginLeft:"5%", width:"35%"}}>
-        <p className="text-4xl font-bold mb-7 mx-12" style={{color:"slateblue"}}>Welcome Back!</p>
+        <p className="text-4xl font-bold mb-7 mx-12" style={{color:"slateblue"}}>Welcome!</p>
         <form>
           <TextField index={0} fieldData={fieldList[0]} size="medium" prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
           <PasswordField index={1} fieldData={fieldList[1]} prefillValues={fieldValues} size="medium" setPrefillValues={setFieldValues} disabled={false} />
           {errorMessage}
           <br/>
-          <SubmitButton className="bg-custom-1 text-white rounded-if w-full h-[50px] self-center" submitFunction={submitData} submitButtonText={"Log in"} />
+          <SubmitButton width="100%" submitFunction={submitData} submitButtonText={"Log in"} />
         </form>
       </div>
     </div>

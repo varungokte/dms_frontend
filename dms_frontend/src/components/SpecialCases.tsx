@@ -1,27 +1,32 @@
 import { useContext, useEffect, useState } from "react";
-import { DocumentStatusList, getDocSecList, getDocSecName, sectionNames } from "../../Constants";
+import { DocumentStatusList, sectionNames } from "../../Constants";
+import { getDocSecList, getDocSecName } from "../DocumentSectionAttributes";
 import useGlobalContext from "../../GlobalContext";
-import { FieldValues } from "../../DataTypes";
+import { FieldValues, ToastOptionsAttributes } from "../../DataTypes";
 
 import { DataTable } from "./BasicComponents/Table";
 
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
 
 import UploadFileButton from "./Buttons/UploadFileButton";
 import ViewFileButton from "./Buttons/ViewFileButton";
 import { PermissionContext } from "@/MenuRouter";
 import { Pagination } from "./BasicComponents/Pagination";
 import Filter from "./BasicComponents/Filter";
+import Toast from "./BasicComponents/Toast";
 
-function SpecialCases(props:{label:string}) {
+function SpecialCases(props:{label:string, panopticPage?:boolean}) {
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
   
   const [allData, setAllData] = useState<FieldValues[]>();
-  const admin = sectionNames[props.label].split("/").length>1?true:false;
-  const type = sectionNames[props.label].split("/")[0]=="default"?"def":"crit";
+
+  const admin = props.panopticPage||false;
+  const type = sectionNames[props.label]=="default"?"def":"crit";
 	const [currentSection, setCurrentSection] = useState<string>(getDocSecName("TD","keyname","fullname"));
 
   const [added, setAdded] = useState(true);
@@ -30,33 +35,142 @@ function SpecialCases(props:{label:string}) {
   const {getSpecialList} = useGlobalContext();
   const {userPermissions} = useContext(PermissionContext);
 
+  const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-
-  /* const sectionNameBeautify:{[key:string]:string} = {
-    "transactions": "Transaction Documents",
-    "compliance": "Compliance Documents",
-    "covenants": "Covenants",
-    "precedents": "Condition Precedent",
-    "subsequents": "Condition Subsequent",
-    "payment": "Payment"
-  } */
-
-  /* const sectionNameToAbbreviation:{[key:string]:string} = {
-    "transactions":"TD",
-    "compliance":"CD",
-    "covenants":"C",
-    "precedents":"CP",
-    "subsequents":"CS",
-    "payment": "PD"
-  } */
+  const [isDeleted, setIsDeleted] = useState<number>();
 
   useEffect(()=>{
     setAdded(true);
   },[currentSection]);
 
-  /* const getDocsLoanData = (docList:FieldValues[],loanDetails:FieldValues[],teamName:string,section:string,arr:FieldValues[],links:{section:string,index:string|number}[]) => {
+  useEffect(()=>{
+    setAdded(true);
+  },[currentPage,rowsPerPage]);
+
+  useEffect(()=>{
+    if (!isDeleted)
+      return;
+
+    if (isDeleted==200)
+      setToastOptions({open:true, type:"success", action:"delete", section:"File"});
+    else
+      setToastOptions({open:true, type:"error", action:"delete", section:"File"});
+
+    setIsDeleted(undefined);
+  },[isDeleted]);
+
+  useEffect(()=>{
+    if (added){
+      getSpecialList({type, admin, sectionName:getDocSecName(currentSection,"fullname","keyname"), currentPage, rowsPerPage}).then(res=>{
+        console.log("response status",res.status);
+        if (res.status==200 && res.obj[0]){
+          const data = res.obj[0]["data"];
+          console.log("response data",res.obj[0]["data"]);
+          if (data && data.length==0){
+            setAllData([]);
+            return;
+          }
+
+          const links:{section:string,index:string|number}[] = [];
+          setAllData(data);
+          setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+          setDocumentLinks(links);
+
+          for (let i=0; i<data.length; i++){
+            const deal = data[i];
+            
+            deal["link"] = <div>
+              <p className="text-blue-500 text-base">{deal["DN"]}</p>
+              <p className="font-light text-sm">{deal["DC"]}</p>
+              <p className="text-xs">{currentSection}</p>
+            </div>;
+
+            links.push({section:"../"+getDocSecName(currentSection,"fullname","shortname"),index:deal["AID"]});
+          }
+        }
+        else
+          setAllData([]);
+      })
+      setAdded(false);
+    }
+  },[added]);
+
+  return(
+    <div>
+			<p className="text-3xl font-bold m-7">{props.label}</p>
+
+      <div className='flex flex-row relative'>
+        {/* <div className="mx-7">
+          <Filter value={currentSection} setValue={setCurrentSection} options={getDocSecList("fullname")} />
+        </div> */}
+      </div>
+
+      <Tabs value={currentSection} scrollButtons allowScrollButtonsMobile onChange={(_,val)=>setCurrentSection(val)} variant="scrollable" textColor="secondary" indicatorColor="secondary">
+        {getDocSecList("fullname").map(name=><Tab key={name} label={name} value={name/* getDocSecName(name,"fullname","keyname") */} />)}
+      </Tabs>
+
+      <div className="m-7">
+        {allData
+          ?allData.length==0
+            ?<EmptyPageMessage sectionName={`${props.label}`} />
+            :<DataTable className="rounded-xl bg-white"
+              headingRows={["Sr. No.", "Document Name", "Team Name", "Agreement ID", type=="def"?"Default Date":"Priority","Status", "Action"]}
+              cellClassName={["w-[50px]","w-[300px]","","","mr-10","","w-[200px]"]}
+              tableData={allData} dataTypes={["index","doc-link","text","text",type=="def"?"date":"priority","doc-status","action"]} columnIDs={["link","N","AID",type=="def"?"DD":"DP","DS"]}
+              indexStartsAt={(currentPage-1)*rowsPerPage}
+              documentLinks={documentLinks}
+              action={
+                allData.map((doc:any,index:number)=>{
+                  const sn = getDocSecName(currentSection,"fullname","keyname");
+                  if (!doc["DS"] || !doc["FD"] || doc["DS"]==DocumentStatusList[1])
+                    return <UploadFileButton key={index} index={index} disabled={!admin && !userPermissions[sectionNames[props.label]].includes("add")}
+                      AID={doc["AID"]} sectionKeyName={sn}
+                      setAdded={setAdded}
+                      isPayment={sn=="PD"}
+                      docId={sn=="PD"?doc["index"]:doc._fileId} 
+                      _id={sn=="PD"?doc._fileId:undefined}
+                  />
+                  else
+                    return <ViewFileButton key={index} type="doc" disabled={!admin && !userPermissions[sectionNames[props.label]].includes("view")}
+                      AID={doc["AID"]} loanId={doc._loanId} docId={doc._fileId} sectionKeyName={sn} 
+                      status={doc["DS"]} rejectionReason={doc["R"]} 
+                      setAdded={setAdded} 
+                      setIsDeleted={setIsDeleted}
+                      actualName={sn=="PD"
+                        ?(doc.FD && doc.FD[0] && doc.FD[0].originalname)
+                          ?doc.FD[0].originalname
+                          :""
+                        :doc.FD[0].originalname||""
+                      } 
+                      fileName={sn=="PD"
+                        ?(doc.FD && doc.FD[0] && doc.FD[0].filename)
+                          ?doc.FD[0].filename
+                          :""
+                        :doc.FD[0].filename||""
+                      }
+                    />
+                })
+              }
+              />
+          :<LoadingMessage sectionName="data" />
+        }
+      </div>
+
+      {allData && allData.length>0
+        ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        :<></>
+      }
+      {toastOptions?<Toast toastOptions={toastOptions} setToastOptions={setToastOptions} />:<></>}
+    </div>
+  )
+}
+ 
+export default SpecialCases;
+
+
+/* const getDocsLoanData = (docList:FieldValues[],loanDetails:FieldValues[],teamName:string,section:string,arr:FieldValues[],links:{section:string,index:string|number}[]) => {
     for (let j=0; j<docList.length; j++){
       const singleDoc = docList[j];
       const loanId = singleDoc["_loanId"];
@@ -117,143 +231,3 @@ function SpecialCases(props:{label:string}) {
         links.push({section:"../"+section,index:obj["AID"]});
     }
   } */
-
-  useEffect(()=>{
-    setAdded(true);
-  },[currentPage,rowsPerPage])
-
-  useEffect(()=>{
-    if (added){
-      getSpecialList({type, admin, sectionName:getDocSecName(currentSection,"fullname","keyname"), currentPage, rowsPerPage}).then(res=>{
-        console.log("response",res);
-        if (res.status==200){
-          const data = res.obj[0]["data"];
-          if (data && data.length==0){
-            setAllData([]);
-            return;
-          }
-
-          const links:{section:string,index:string|number}[] = [];
-          setAllData(data);
-          setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
-          setDocumentLinks(links);
-
-          for (let i=0; i<data.length; i++){
-            const deal = data[i];
-            
-            deal["link"] = <div>
-              <p className="text-blue-500 text-base">{deal["DN"]}</p>
-              <p className="font-light text-sm">{deal["DC"]}</p>
-              <p className="text-xs">{currentSection}</p>
-            </div>;
-
-            links.push({section:"../"+getDocSecName(currentSection,"fullname","shortname"),index:deal["AID"]});
-/*             
-            if (currentSection=="payment")
-              links.push({section:"../schedule", index:deal["AID"]});
-            else if (currentSection=="covenants")
-              links.push({section:"../"+getDocSecName(currentSection,"fullname","shortname"), index:deal["AID"]});
-            else if (currentSection.charAt(currentSection.length-1)=="s")
-              links.push({section:"../"+currentSection.slice(0,currentSection.length-1), index:deal["AID"]});
-            else
-              links.push({section:"../"+currentSection,index:deal["AID"]}); */
-          }
-
-          /* for (let i=0; i<data.length; i++){
-            const teamName = data[i]["N"];
-            const loanDetails = data[i]["loanDetails"];
-            const sections = getDocSecList("shortname");
-            for (let j=0; j<sections.length; j++){
-              const section = sections[j];
-              let docs = data[i][section];
-              if (section=="payment" && docs)
-                docs = [data[i][section]];
-              
-              if (docs)
-                getDocsLoanData(docs,loanDetails,teamName,section,arr,links)
-            }   
-          }
-          setAllData(arr);
-          setTotalPages(Math.ceil(arr.length/Number(rowsPerPage)));
-          setStartIndex((currentPage-1)*rowsPerPage);
-          setEndIndex(currentPage*rowsPerPage); */
-        }
-        else
-          setAllData([]);
-      })
-      setAdded(false);
-    }
-  },[added]);
-
-  /* useEffect(()=>{
-    if (!allData)
-      return;
-    const arr = allData.slice(startIndex,endIndex);
-    setPageData(arr);
-  },[allData]); */
-
-  return(
-    <div>
-			<p className="text-3xl font-bold m-7">{props.label}</p>
-
-      <div className='flex flex-row relative'>
-        <div className="mx-7">
-          <Filter value={currentSection} setValue={setCurrentSection} options={getDocSecList("fullname")} />
-        </div>
-      </div>
-
-      <div className="m-7">
-        {allData
-          ?allData.length==0
-            ?<EmptyPageMessage sectionName={props.label} />
-            :<DataTable className="rounded-xl bg-white"
-              headingRows={["Sr. No.", "Document Name", "Team Name", "Agreement ID","Status", type=="def"?"Default Date":"Priority", "Action"]}
-              cellClassName={["w-[50px]","w-[300px]","","","","mr-10","w-[200px]"]}
-              tableData={allData} dataTypes={["index","doc-link","text","text","doc-status",type=="def"?"date":"priority","action"]} columnIDs={["link","DN","AID","DS",type=="def"?"DD":"DP"]}
-              indexStartsAt={(currentPage-1)*rowsPerPage}
-              documentLinks={documentLinks}
-              action={
-                allData.map((doc:any,index:number)=>{
-                  const sn = getDocSecName(currentSection,"fullname","keyname");
-                  if (!doc["DS"] || !doc["FD"] || doc["DS"]==DocumentStatusList[1])
-                    return <UploadFileButton key={index} index={index} disabled={!admin && !userPermissions[sectionNames[props.label]].includes("add")}
-                      AID={doc["AID"]} sectionKeyName={sn}
-                      setAdded={setAdded}
-                      isPayment={sn=="PD"}
-                      docId={sn=="PD"?doc["index"]:doc._id} 
-                      _id={sn=="PD"?doc._id:undefined}
-                  />
-                  else
-                    return <ViewFileButton key={index} type="doc" disabled={!admin && !userPermissions[sectionNames[props.label]].includes("view")}
-                      AID={doc["AID"]} loanId={doc._loanId} docId={doc._id} sectionName={sn} 
-                      status={doc["DS"]} rejectionReason={doc["R"]} 
-                      setAdded={setAdded} 
-                      actualName={sn=="PD"
-                        ?(doc.FD && doc.FD[0] && doc.FD[0].originalname)
-                          ?doc.FD[0].originalname
-                          :""
-                        :doc.FD[0].originalname||""
-                      } 
-                      fileName={sn=="PD"
-                        ?(doc.FD && doc.FD[0] && doc.FD[0].filename)
-                          ?doc.FD[0].filename
-                          :""
-                        :doc.FD[0].filename||""
-                      }
-                    />
-                })
-              }
-              />
-          :<LoadingMessage sectionName="data" />
-        }
-      </div>
-
-      {allData && allData.length>0
-        ?<Pagination className="mx-5" currentPage={currentPage} setCurrentPage={setCurrentPage} totalPages={totalPages} rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
-        :<></>
-      }
-    </div>
-  )
-}
- 
-export default SpecialCases;

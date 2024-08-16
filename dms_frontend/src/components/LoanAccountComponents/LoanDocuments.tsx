@@ -40,6 +40,8 @@ function LoanDocuments(props:LoanCommonProps) {
   const [searchType, setSearchType] = useState("");
   const searchOptions = [{label:"Document Name", value:"N"}, {label:"Document Category", value:"C"}/* , {label:"Status", value:"C"} */];
 
+  //useEffect(()=>console.log("editOpen",editOpen),[editOpen])
+
   useEffect(()=>{
     setAdded(true);
   },[currentPage,rowsPerPage,searchString,searchType]);
@@ -47,7 +49,7 @@ function LoanDocuments(props:LoanCommonProps) {
   useEffect(()=>{
     if (added){
       getDocumentsList().then(res=>{
-        console.log("response",res);
+        //console.log("response",res);
         setDocData(res);
       })
       setAdded(false);
@@ -57,12 +59,14 @@ function LoanDocuments(props:LoanCommonProps) {
   const getDocumentsList = async () =>{
     const { getDocumentsList } = useGlobalContext();
 
-    const res = await getDocumentsList({loanId:props.loanId,sectionName:sectionDetails.sectionName, currentPage, rowsPerPage, searchString, searchType});
+    const res = await getDocumentsList({loanId:props.loanId,sectionName:sectionDetails.sectionKeyName, currentPage, rowsPerPage, searchString, searchType});
     
     if (res.status==200){
       if (!res.obj || !res.obj[0] || !res.obj[0]["data"])
         return [];
-      setEditOpen(new Array(res.obj[0]["data"].length).fill(false));
+      
+      if (editOpen.length==0)
+        setEditOpen(new Array(res.obj[0]["data"].length).fill(false));
       if (res.obj[0] && res.obj["metadata"] && res.obj["metadata"][0] && res.obj["metadata"][0]["total"])
         setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
       return await res.obj[0]["data"];
@@ -75,7 +79,7 @@ function LoanDocuments(props:LoanCommonProps) {
     const { addDocument } = useGlobalContext();
 
     userValues["_loanId"] = props.loanId;
-    userValues["SN"] = sectionDetails.sectionName;
+    userValues["SN"] = sectionDetails.sectionKeyName;
     //console.log("userValues",userValues)
     const res = await addDocument(userValues);
 
@@ -90,11 +94,9 @@ function LoanDocuments(props:LoanCommonProps) {
     const { editDocument } = useGlobalContext();
     if (!docData)
       return;
-    console.log("userValues",userValues);
-    console.log("fieldValues",docData[index]);
 
     const data:FieldValues = {};
-    data["SN"] = sectionDetails.sectionName;  
+    data["SN"] = sectionDetails.sectionKeyName;  
     data["_loanId"] = userValues["_loanId"];
     data["_id"] = userValues["_id"];
 
@@ -106,8 +108,6 @@ function LoanDocuments(props:LoanCommonProps) {
       if (oldValue!=newValue)
         data[key] = newValue;
     }
-
-    console.log("data",data)
 
     //console.log("USER VALUES",userValues);
     
@@ -129,9 +129,9 @@ function LoanDocuments(props:LoanCommonProps) {
     for (let i=0; i<userFiles.length; i++)
       formData.append("file", userFiles[i]);
     
-    const res = await uploadFile(formData, `${props.AID}/${sectionDetails.sectionName}`,docId);
+    const res = await uploadFile({data:formData,AID:props.AID,sectionKeyName:sectionDetails.sectionKeyName,docId:docId});
     if (res==200)
-      setToastOptions({open:true, type:"success", action:"add", section:"file"});
+      setToastOptions({open:true, type:"success", action:"add", section:"File"});
     
     return res;
   }
@@ -141,7 +141,7 @@ function LoanDocuments(props:LoanCommonProps) {
 
     //console.log("DELETE",props.AID,docId, fileName,sectionDetails.sectionName)
 
-    const res = await deleteDocument(props.AID, docId, sectionDetails.sectionName, fileName);
+    const res = await deleteDocument({AID:props.AID, docId:docId, sectionKeyName:sectionDetails.sectionKeyName, fileName:fileName});
 
     if (res==200)
       setToastOptions({open:true, type:"success", action:"delete", section:"file"});

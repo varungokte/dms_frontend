@@ -2,16 +2,20 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import RegistrationPage from './components/AuthPages/RegistrationPage';
 import LoginPage  from './components/AuthPages/LoginPage';
 import PrivateRoutes from './PrivateRoutes';
+import { ThemeProvider, } from '@mui/material/styles';
+import { customColor } from './MUIPalette';
 
 function App() {
 	return (
-		<BrowserRouter>
-      <Routes>
-      <Route path="/register" element={<RegistrationPage />} />
-      <Route path='/login' element={<LoginPage />} />
-      <Route path='/*' element={<PrivateRoutes />} />
-      </Routes>
-		</BrowserRouter>
+		<ThemeProvider theme={customColor}>
+			<BrowserRouter>
+				<Routes>
+				<Route path="/register" element={<RegistrationPage />} />
+				<Route path='/login' element={<LoginPage />} />
+				<Route path='/*' element={<PrivateRoutes />} />
+				</Routes>
+			</BrowserRouter>
+		</ThemeProvider>
   )
 }
 
@@ -23,25 +27,25 @@ export default App;
   
    AID-Agreement Id
    Z-Zone
-        1:West
-        2:South 
-        3:East 
-        4:North
+	   1:West
+	   2:South 
+	   3:East 
+	   4:North
    
    CN- Company Name
    I- Industry
-        1:Real Estate
-        2:NBFC 
-        3:NBFC-MFI 
-        4:Bank 
-        5:Diversified Conglomerate 
-        6:Education 
-        7:Healthcare & Pharma 
-        8:Hospitality Manufacturing 
-        9:Renewable Energy 
-        10:Roads 
-        11:Commercial Space 
-        12:Others
+	   1:Real Estate
+	   2:NBFC 
+	   3:NBFC-MFI 
+	   4:Bank 
+	   5:Diversified Conglomerate 
+	   6:Education 
+	   7:Healthcare & Pharma 
+	   8:Hospitality Manufacturing 
+	   9:Renewable Energy 
+	   10:Roads 
+	   11:Commercial Space 
+	   12:Others
    
    SA-Sanctioned Amount
    HA-Hold Amount
@@ -51,33 +55,33 @@ export default App;
    
    OA-Outstanding Amount
    T-Loan Type
-        1:Long Term
-        2:Short Term
+	   1:Long Term
+	   2:Short Term
    
    P- Loan Product
-        1:Term Loan
-        2:Drop-line LOC
-        3:WCDL
-        4:Debentures
+	   1:Term Loan
+	   2:Drop-line LOC
+	   3:WCDL
+	   4:Debentures
    
    ST- Security Types
-        1:Secured
-        2:Unsecured
-        3:Deemed Secured
+	   1:Secured
+	   2:Unsecured
+	   3:Deemed Secured
    
    SD-Sanctioned Date
    CD-Closure Date
    RED- Repayment End Date
    
    DSRA-Debt Service Reserve Account {A,F,S,V}
-        A- Applicability DSRA
-            1:yes
-            2:no
-        F- Form DSRA
-        S- Status DSRA
-            1:yes
-            2:no
-        V- Value DSRA
+	   A- Applicability DSRA
+		  1:yes
+		  2:no
+	   F- Form DSRA
+	   S- Status DSRA
+		  1:yes
+		  2:no
+	   V- Value DSRA
    
   
   |2|**Security Details**||
@@ -85,16 +89,16 @@ export default App;
    S-Share(%)
    DV-Date of Valuation
    STV:Security Type and Value [{T1,V1},{T2,V2}]
-       T Type
-            1:Security creation 
-            2:MIS 
-            3:Financials 
-            4:Put/Call Option 
-            5:Financial Covenants 
-            6:End Use
-            7:Others
-       
-       V- Value
+	  T Type
+		  1:Security creation 
+		  2:MIS 
+		  3:Financials 
+		  4:Put/Call Option 
+		  5:Financial Covenants 
+		  6:End Use
+		  7:Others
+	  
+	  V- Value
   
   |3|**Bank Details**||
    AN-Account Name
@@ -110,9 +114,9 @@ export default App;
   AID-Agreement Id
   CT-Contact Type
   RT-Recipient Type
-      1-to
-      2-cc
-      3-bcc
+	 1-to
+	 2-cc
+	 3-bcc
   CE-Contant Email
   CN-Company Name
   PN-Person Name

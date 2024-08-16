@@ -1,4 +1,5 @@
-import { DocumentSectionTypes, FieldAttributesList, FieldValues, FormDialogTypes, FormFieldAttributes, UserSuggestionsList } from "DataTypes";
+import { FieldAttributesList, FieldValues, FormDialogTypes, FormFieldAttributes, UserSuggestionsList } from "DataTypes";
+import { DocumentSectionTypes } from "../../DocumentSectionAttributes";
 import TextField from "../FormFieldComponents/TextField";
 import CheckboxField from "../FormFieldComponents/CheckboxField";
 import ComboboxField from "../FormFieldComponents/ComboboxField";

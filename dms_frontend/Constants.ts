@@ -1,7 +1,5 @@
 import { FieldValues } from "DataTypes";
 
-//import { useState } from "react";
-
 const sectionNames:FieldValues = {
   "Masters":"masters",
   "Role Management":"role",
@@ -20,50 +18,16 @@ const sectionNames:FieldValues = {
   "Default Cases":"default",
   "Critical Cases":"critical",
   "Reports":"reports",
-  "Master Default Cases":"default/mst",
-  "Master Critical Cases":"critical/mst",
-  "Master Transaction Documents":"transaction/mst",
-  "Master Compliance Documents":"compliance/mst",
-  "Master Covenants":"covenants/mst",
-  "Master Condition Precedent":"precedent/mst",
-  "Master Condition Subsequent":"subsequent/mst",
-  "Master Payment Schedule":"payment/mst",
 }
-
-const documentSectionNames = [
-  { fullname: "Transaction Documents", shortname: "transaction", keyname:"TD", type: "doc" },
-  { fullname: "Compliance Documents", shortname: "compliance", keyname:"CD", type: "doc" },
-  { fullname: "Covenants", shortname: "covenants", keyname:"C", type: "cov" },
-  { fullname: "Condition Precedent", shortname: "precedent", keyname:"CP", type: "con" },
-  { fullname: "Condition Subsequent", shortname: "subsequent", keyname:"CS", type: "con" },
-  { fullname: "Payment Schedule", shortname: "payment", keyname:"PD", type: "pay" }
-];
-
-const getDocSecName = (inputName:string, inputType:"fullname"|"keyname"|"shortname"|"type", outputType:"fullname"|"keyname"|"shortname"|"type") => {
-  for (let i=0; i<documentSectionNames.length; i++){
-    const doc = documentSectionNames[i];
-    if (doc[inputType]==inputName)
-      return doc[outputType];
-  }
-  return "";
-};
-const getDocSecList = (outputType:"fullname"|"keyname"|"shortname"|"type") =>{
-  return documentSectionNames.map(doc=>doc[outputType]);
-} 
-
-const checkObjectsAreEqual = (obj1:FieldValues, obj2:FieldValues) => {
-  for (let i=0; i<Object.keys(obj1).length; i++){
-    const key = Object.keys(obj1)[i];
-    const val1 = obj1[key];
-    const val2 = obj2[key];
-    console.log("key",key,"val1",val1, "val2",val2);
-    if (typeof val1 == "function" && typeof val2 == "function")
-      continue;
-    else if (Array.isArray(val1) && Array.isArray(val2)){}
-    else if (val1!==val2){console.log("UNEQUAL",val1,val2);
-      return false;}
-  }
-  return true;
+const panopticSectionNames:FieldValues = {
+  "Master Default Cases":"default",
+  "Master Critical Cases":"critical",
+  "Master Transaction Documents":"transaction",
+  "Master Compliance Documents":"compliance",
+  "Master Covenants":"covenants",
+  "Master Condition Precedent":"precedent",
+  "Master Condition Subsequent":"subsequent",
+  "Master Payment Schedule":"payment",
 }
 
 //Masters
@@ -131,7 +95,7 @@ const MastersMapping:FieldValues = {
 }
 
 export { 
-  MastersMapping, sectionNames, getDocSecList,getDocSecName, checkObjectsAreEqual,
+  MastersMapping, sectionNames,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList, LoanStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,
@@ -141,4 +105,5 @@ export {
   TransactionCategoryList,ComplianceCategoryList,
   CovenantCategoryList,CovenantTypeList,
   ConditionPrecedentCategoryList,ConditionSubsequentCategoryList,
+  panopticSectionNames,
 };

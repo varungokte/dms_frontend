@@ -2,8 +2,9 @@ import { useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { Button, Typography } from "@mui/material";
 
-function SubmitButton(props:{className?:string, submitFunction:Function, submitButtonText:string, index?:number}){
+function SubmitButton(props:{width?:string, submitFunction:Function, submitButtonText:string, index?:number}){
   const [submitted, setSubmitted] = useState(false);
+  const defaultWidth = "150px";
 
   const callSubmitFunction = () => {
     setSubmitted(true);
@@ -13,7 +14,7 @@ function SubmitButton(props:{className?:string, submitFunction:Function, submitB
   }
 
   return(
-    <Button color="secondary" variant="contained" sx={{borderRadius:"10px", height:"50px", width:"150px", marginX:"10px"}} type="button" onClick={callSubmitFunction} disabled={submitted} className={props.className} >
+    <Button color="secondary" variant="contained" sx={{borderRadius:"10px", height:"50px", width:props.width||defaultWidth, marginX:"10px"}} type="button" onClick={callSubmitFunction} disabled={submitted} >
       {submitted
         ?<CircularProgress className="mt-1" sx={{color:"white"}} />
         :<Typography textTransform="capitalize">{props.submitButtonText}</Typography>

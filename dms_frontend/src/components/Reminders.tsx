@@ -66,8 +66,8 @@ function Reminders(props:{label:string}) {
         </div>
       </div>
       <div className="flex flex-row ">
-        <div className=" p-10 flex flex-row">
-          <div className="h-[300px] min-w-[200px] align-middle">
+        <div className=" p-2 flex flex-row">
+          <div className="h-[300px] min-w-[150px] align-middle">
             <Slider
               value={selectedDate} 
               onChange={(_,num)=>setSelectedDate(num as number)}

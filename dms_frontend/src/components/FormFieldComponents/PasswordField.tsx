@@ -7,7 +7,7 @@ import { FormControl, IconButton, InputAdornment, OutlinedInput } from "@mui/mat
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-function PasswordField(props:{index:number|string, fieldData:FormFieldAttributes, size:"small"|"medium", prefillValues:any, setPrefillValues:Function, error?:boolean, disabled:boolean}){
+function PasswordField(props:{index:number|string, fieldData:FormFieldAttributes, size:"small"|"medium", prefillValues:any, setPrefillValues:Function, error?:boolean, disabled:boolean, readonly?:boolean}){
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(props.error);
   
@@ -25,6 +25,8 @@ function PasswordField(props:{index:number|string, fieldData:FormFieldAttributes
             error={error}
             value={props.prefillValues[props.fieldData.id]|| ""}
             className="h-[90%]"
+            sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
+
             onChange={(e)=>{
               setError(false);
               props.setPrefillValues((curr:any)=>{

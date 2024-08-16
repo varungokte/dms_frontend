@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
-import { getDocSecList, sectionNames } from "./../../../Constants";
+import { sectionNames } from "./../../../Constants";
+import { getDocSecList } from "./../../DocumentSectionAttributes";
 import { FieldValues, FormFieldAttributes } from "./../../../DataTypes";
 import Tabs from "@mui/material/Tabs/Tabs";
 import Tab from "@mui/material/Tab/Tab";
@@ -17,7 +18,7 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
       file: "File"
     }
 
-    //useEffect(()=>console.log("permission props",props),[props])
+    useEffect(()=>console.log("permission props",props),[props])
 
     const sortByCategory = () => {
       if (!props.permissionPreset)
@@ -100,7 +101,8 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
             {permissionSections && props.permissionPreset && Object.keys(props.permissionPreset).length!=0
               ?Object.keys(permissionSections[value]).map((section:string,index:number)=>{
                 try{
-                  console.log("includes",props.permissionPreset[section])
+                  console.log("PERMISSION SECtIONS",section)
+                  //console.log("includes",props.permissionPreset[section])
                   //const permissionSet = (documentSections.includes(value)?props.permissionPreset[value][section]:props.permissionPreset[section]);
                   //console.log(props.permissionPreset[section]["docs"].concat(props.permissionPreset[section]["file"]))
                   //const permissionSet = value=="documents"?props.permissionPreset[section]["docs"].concat(props.permissionPreset[section]["file"]):props.permissionPreset[section];
@@ -110,14 +112,14 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
                       <p className="text-xl">{Object.keys(sectionNames)[Object.values(sectionNames).indexOf(section)]}</p>
                       {value=="documents"
                         ?Object.keys(permissionSet).map((subsection,subindex)=>{
-                          console.log("set",permissionSet)
+                          //console.log("set",permissionSet)
                           return <div key={index+"_"+subindex}>
                             <p>{docSubTypes[subsection]}</p>
                             <RenderPermissions index={index+"_"+subindex} id={props.fieldData.id} sectionName={subsection} permissionSet={permissionSet[subsection]} setPermissionSet={props.setPermissionSet} category={section} disabled={props.disabled} multiple={props.fieldData.multiple} />
                             <br />
                           </div>
                         })
-                        :<RenderPermissions index={index} id={props.fieldData.id} sectionName={section} permissionSet={permissionSet} setPermissionSet={props.setPermissionSet} category={value} disabled={props.disabled} multiple={props.fieldData.multiple} />}
+                        :<RenderPermissions index={props.index} id={props.fieldData.id} sectionName={section} permissionSet={permissionSet} setPermissionSet={props.setPermissionSet} category={value} disabled={props.disabled} multiple={props.fieldData.multiple} />}
                       <br />
                     </div>
                   )
@@ -173,7 +175,7 @@ function RenderPermissions(props:{index:number|string, id:string, sectionName:st
 
   const permissionMapping:FieldValues = {
     team: ["access", "add", "edit", "select"],
-    user: ["access","add","edit"],
+    user: ["access","add","view","edit"],
     role: ["access","add","edit"],
     masters: ["access","add","edit"],
     loan: ["access", "view", "add", "edit", "delete"],
@@ -181,8 +183,8 @@ function RenderPermissions(props:{index:number|string, id:string, sectionName:st
     rating: ["access","add"],
     docs:["access","add","edit"],
     file:["view","add","edit","delete"],
-    default:["access","edit"],
-    critical:["access","edit"],
+    default:["access","view","edit"],
+    critical:["access","view","edit"],
   }
   
   return (
@@ -198,15 +200,17 @@ function RenderPermissions(props:{index:number|string, id:string, sectionName:st
               props.setPermissionSet((curr:any)=>{
                 if (!curr) return;
                 let singleSectionPermission;
-                if (props.multiple)
+                if (props.multiple){
                   singleSectionPermission = documentSections.includes(props.category)
                     ?curr[props.index][props.id][props.category][props.sectionName]
                     :curr[props.index][props.id][props.sectionName]
+                }
                   
-                else
+                else{
                   singleSectionPermission = documentSections.includes(props.category)
                     ?curr[props.id][props.category][props.sectionName]
                     :curr[props.id][props.sectionName]
+                }
 
                 if (singleSectionPermission.includes(perm)){
                   const num = singleSectionPermission.indexOf(perm);

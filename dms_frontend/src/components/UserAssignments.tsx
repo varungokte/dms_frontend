@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "./../GlobalContext";
-import ComboboxField from "./components/FormFieldComponents/ComboboxField";
+import useGlobalContext from "./../../GlobalContext";
+import ComboboxField from "./../components/FormFieldComponents/ComboboxField";
 import { FieldValues, UserSuggestionsList } from "DataTypes";
 import SendIcon from '@mui/icons-material/Send';
 import Button from "@mui/material/Button";
-import SelectField from "./components/FormFieldComponents/SelectField";
-import { getDocSecList } from "./../Constants";
-import DealsList from "./components/DealsList";
+import SelectField from "./../components/FormFieldComponents/SelectField";
+import { getDocSecList } from "../DocumentSectionAttributes";
+import DealsList from "./../components/DealsList";
 
 function UserAssignments(props:{label:string}){
   useEffect(()=>{
@@ -80,7 +80,7 @@ function UserAssignments(props:{label:string}){
       </div>
       <br />
       <div className="">
-        {docData?<DealsList label={sectionName||"Transaction Documents"} docData={docData} masters />:<></>}
+        {docData?<DealsList label={sectionName||"Transaction Documents"} docData={docData} specType="assign" />:<></>}
       </div>
     </div>
   )

@@ -113,7 +113,7 @@ function FormDialog(props:FormDialogProps){
         <div className="flex flex-row">
           <div className="flex-auto"></div>
           <CancelButton onClick={closeDialog} />
-          <SubmitButton  submitFunction={submitFunction} submitButtonText={props.submitButton} />
+          <SubmitButton submitFunction={submitFunction} submitButtonText={props.submitButton} />
         </div>
       </div>
     </Dialog>

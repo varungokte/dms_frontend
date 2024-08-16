@@ -15,25 +15,24 @@ type RenderFormProps = {
   formIndex:number, 
   repeatFields:boolean,
   disabled?:boolean,
+  readonly?:boolean,
 }
 
-function FormRepeatableGrid(props:{fieldList:FormFieldAttributes[], fieldValues:FieldValues, setFieldValues:Function, submitForm:FormEventHandler, fieldsInRow:number, disabled?:boolean}) {
+function FormRepeatableGrid(props:{fieldList:FormFieldAttributes[], fieldValues:FieldValues, setFieldValues:Function, submitForm:FormEventHandler, fieldsInRow:number, disabled?:boolean, readonly?:boolean}) {
   const [currentForm, setCurrentForm] = useState(0);
   const [propsList, setPropsList] = useState<RenderFormProps[]>([]);
   const [renderedComponentList, setRenderedComponentList] = useState<ReactElement[]>([]);
-
-  //useEffect(()=>console.log(props),[props])
   
   useEffect(()=>{
     if (props.fieldValues && props.fieldValues.length!=0){
       setCurrentForm(props.fieldValues.length-1);
       const arr =  (props.fieldValues.map((_:any,index:number)=>{
-        return { key:"f"+index, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:index, repeatFields:true, disabled:props.disabled }
+        return { key:"f"+index, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:index, repeatFields:true, disabled:props.disabled, readonly:props.readonly }
       }));
       setPropsList(arr);
     }
     else {
-      setPropsList ([{ key:"f0", grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm, repeatFields:true, disabled:props.disabled }]);
+      setPropsList ([{ key:"f0", grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm, repeatFields:true, disabled:props.disabled, readonly:props.readonly }]);
       props.setFieldValues([{}])
     }
   },[props.fieldValues]);
@@ -58,7 +57,7 @@ function FormRepeatableGrid(props:{fieldList:FormFieldAttributes[], fieldValues:
         })}
       </div>
       <div>
-        {propsList.length>1 
+        {propsList.length>1 && !props.disabled
           ?<button className="h-[50px] w-1/12 rounded-xl text-white text-lg bg-red-600 mr-5" type="button"
             onClick={()=>{
               setCurrentForm(curr=>curr-1);
@@ -77,7 +76,7 @@ function FormRepeatableGrid(props:{fieldList:FormFieldAttributes[], fieldValues:
             onClick={()=>{
               setCurrentForm(curr=> {return curr+1});
               props.setFieldValues((curr:any)=>{ curr=[...curr,{}]; return curr})
-              setPropsList((curr:any)=>{return [...curr,{key:"f"+currentForm+1, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm+1, repeatFields:true, disabled:props.disabled }]}); 
+              setPropsList((curr:any)=>{return [...curr,{key:"f"+currentForm+1, grid:props.fieldList, fieldValues:props.fieldValues, setter:props.setFieldValues, formIndex:currentForm+1, repeatFields:true, disabled:props.disabled, readonly:props.readonly }]}); 
             }}
           >+</button>
         }
@@ -88,17 +87,18 @@ function FormRepeatableGrid(props:{fieldList:FormFieldAttributes[], fieldValues:
 }
 
 function RenderForm(props:RenderFormProps) {
+  useEffect(()=>console.log(props),[props])
   return props.grid.map((item:any,index:number)=>{
     if (item.type=="select")
-      return <SelectField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+      return <SelectField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} readonly={props.readonly} />
     else if (item.type=="integer")
-      return <IntegerField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+      return <IntegerField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} readonly={props.readonly} />
     else if (item.type=="float")
-      return <FloatNumberField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+      return <FloatNumberField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} readonly={props.readonly} />
     else if (item.type=="date")
-      return <DateField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} />
+      return <DateField key={index} index={index} fieldData={item} disabled={props.disabled||false} prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} readonly={props.readonly} />
     else
-      return <TextField key={index} index={index} fieldData={item} disabled={props.disabled||false} size="medium" prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} /> 
+      return <TextField key={index} index={index} fieldData={item} disabled={props.disabled||false} size="medium" prefillValues={props.fieldValues} setPrefillValues={props.setter} repeatFields={props.repeatFields} formIndex={props.formIndex} readonly={props.readonly} /> 
   })
 }
 

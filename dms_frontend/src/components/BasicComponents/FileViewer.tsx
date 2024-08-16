@@ -1,10 +1,14 @@
-import { ReactElement, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useGlobalContext from "../../../GlobalContext";
 import { DocumentRejectionReasonList } from "./../../../Constants";
 import { CommonFileViewerProps, DocumentFileViewerProps, DocumentStatus, FieldValues, PaymentFileViewerProps } from "./../../../DataTypes";
 
 import { Button, Dialog,DialogContent,DialogTitle, Typography } from "@mui/material";
-import LoadingMessage from "../BasicMessages/LoadingMessage";
+import { pdfjs,Document,Page } from "react-pdf";
+import 'react-pdf/dist/Page/TextLayer.css';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteConfirmation from "./DeleteConfirmation";
@@ -12,28 +16,47 @@ import DeleteConfirmation from "./DeleteConfirmation";
 //IMPORTANT
 //docId is only present when !isPayment
 
-function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps) & {setOpenDialog:Function, setIsDeleted?:Function}){
-  const [showDoc, setShowDoc] = useState<ReactElement>(<LoadingMessage sectionName="file"/>);
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).toString();
+
+function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps) & {setOpenDialog:Function, setIsDeleted:Function}){
   const [verified, setVerified] = useState(false);
   const [rejected, setRejected] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   const [rejectionText, setRejectionText] = useState("");
   const [errorMessage, setErrorMessage] = useState(<></>);
+  const [zoom, setZoom] = useState(1);
 
-  const {fetchDocument,editDocument, addPaymentSchedule, deleteDocument}=useGlobalContext();
+  const [pdfPageCount, setPdfPageCount] = useState(1);
+
+  const {fetchDocument, editDocument, addPaymentSchedule, deleteDocument} = useGlobalContext();
 
   const [openRejectionDialog, setOpenRejectionDialog] = useState(false);
-  
-  useEffect(()=>{
-    fetchDocument(props.AID, props.sectionName,props.fileName).then(res=>{
-      if (res.status==200)
-      setShowDoc(<iframe src={res.url+"#toolbar=0"} width="97%" height="95%" title="Document Viewer"></iframe>)
+
+  const [file, setFile] = useState<Blob>();
+  const [fileType, setFileType] = useState<"pdf"|"image"|"other"|"error">();
+
+  //useEffect(()=>console.log("file viewer props",props),[props])
+
+  const getData = async ()=> {
+    const res = await fetchDocument(props.AID,props.sectionKeyName,props.fileName)
+    //console.log("type",res.type,"split",res.type.split("/"));
+    if (res.status==200){
+      setFile(res.file);
+      if (res.type=="application/pdf")
+        setFileType("pdf");
+      else if (res.type.split("/")[0]=="image")
+        setFileType("image");
       else
-        setShowDoc(<p className="text-center m-auto text-red-600">There was an error getting this file.</p>)
-    }).catch(()=>{
-      setShowDoc(<p className="text-center m-auto text-red-600">There was an error getting this file.</p>)
-    })
-  },[]);
+        setFileType("other");
+    }
+    else
+      setFileType("error");
+  }
+  
+  const fileData = useMemo(getData,[]);
 
   useEffect(()=>{
     if (props.status=="Rejected")
@@ -41,13 +64,13 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
     if (props.status=="Verified")
       setVerified(true);
   },[props.status]);
-  
+
   const changeStatus = async (status:DocumentStatus) => {
-    const data:FieldValues= {};
+    const data:FieldValues = {};
     let res;
 
     if (props.type=="pay"){
-      data["_id"]=props._id;
+      data["_id"]=props.scheduleId;
       data["POS"]=props.index;
 
       props.schedule[props.index]["S"]=status;
@@ -56,29 +79,29 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
       else if (props.schedule[props.index]["R"])
         delete props.schedule[props.index]["R"];
       data["GS"] = props.schedule;
-      
       res = await addPaymentSchedule(data);
     }
     else{
       data["_loanId"]=props.loanId;
       data["_id"]=props.docId;
-      data["SN"]=props.sectionName;
+      data["SN"]=props.sectionKeyName;
       data["S"]=status;
       
       if (status=="Rejected")
         data["R"]=rejectionReason=="Other"?rejectionText:rejectionReason;
       else if (status=="Verified" && data["R"])
         delete data["R"];
-      console.log("Data",data)
-      res = await editDocument(data);
-      console.log("res",res);
+      res = (await editDocument(data)).status;
     }
-
-    if (res.status==200){
+    console.log("edit response",res);
+    
+    if (res==200){
       if (status=="Verified")
         setVerified(true);
-      else
+      else if (status=="Rejected")
         setRejected(true);
+      else
+        setVerified(false);
       setOpenRejectionDialog(false);
       props.setAdded(true);
     }
@@ -86,13 +109,20 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
       setErrorMessage(<p className="text-yellow-700">Something went wrong</p>);
   }
 
-  const deleteFile = async () => {
-    if (props.type=="doc" && props.setIsDeleted){
-      const res = await deleteDocument(props.AID,props.docId,props.sectionName,props.fileName);
-      if (res==200){
-        props.setIsDeleted(res);
-        props.setAdded(true);
-      }
+  const deleteFile = async (currIndex:number|"") => {
+    //console.log("deleting",props.AID,props.docId,props.sectionKeyName,props.fileName)
+    const args:FieldValues = {AID:props.AID,sectionKeyName:props.sectionKeyName,fileName:props.fileName};
+    if (props.type=="doc")
+      args["docId"] = props.docId;
+    else{
+      args["docId"] = props.scheduleId;
+      args["index"] = currIndex;
+    }
+
+    const res = await deleteDocument(args as any);
+    if (res==200){
+      props.setIsDeleted(res);
+      props.setAdded(true);
     }
   }
 
@@ -100,25 +130,26 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
     <>
       <div className="flex flex-row p-2 bg-black">
         <p className="flex-auto text-white m-auto mx-2 ">{props.actualName}</p>
-        <DeleteConfirmation thing="file" deleteFunction={deleteFile} currIndex={0} icon={<div className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600 hover:bg-gray-800 click:bg-gray-800">Delete File</div>} />
         
         {rejected
           ?<span className="text-red-500 flex-auto my-auto">Document Rejected: {props.rejectionReason}</span>
           :<div>
+            <button 
+              className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-blue-700":"border-lime-600"} ${verified?"bg-blue-700":"bg-lime-600"} text-white`}
+              onClick={()=>changeStatus(verified?"In progress":"Verified")}
+            >
+              {verified?"Un-Verify":"Verify"}
+            </button>
             <button 
               className={`border-2 mx-5 w-28 p-2 m-auto rounded-if text-white hover:bg-gray-800 click:bg-gray-800`} 
               onClick={()=>setOpenRejectionDialog(true)}
             >
               Reject File
             </button>
-            <button 
-              className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-orange-700":"border-lime-600"} ${verified?"bg-orange-700":"bg-orange-600"} text-white`}
-              onClick={()=>changeStatus(verified?"In progress":"Verified")}
-            >
-              {verified?"Un-Verify":"Verify"}
-            </button>
           </div>
         }
+
+        <DeleteConfirmation thing="file" deleteFunction={deleteFile} currIndex={props.type=="pay"?props.index:""} icon={<div className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600 hover:bg-gray-800 click:bg-gray-800">Delete File</div>} />
 
         <RejectionDialog openDialog={openRejectionDialog} setOpenDialog={setOpenRejectionDialog} 
           rejectionReason={rejectionReason} setRejectionReason={setRejectionReason}
@@ -128,10 +159,52 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
 
         <button className="mx-5 p-2 text-white m-auto mx-2" onClick={()=>props.setOpenDialog(false)}>{<CloseIcon/>}</button>
       </div>
+      <DialogContent className={`${fileType=="pdf"?"m-auto bg-slate-200":""}`} >
+        {fileType=="pdf"
+          ?<div>
+            <button onClick={()=>setZoom(curr=>curr-0.25)}><ZoomOutIcon/></button>
+            <button onClick={()=>setZoom(curr=>curr+0.25)}><ZoomInIcon/></button>
+          </div>
+          :<></>
+        }
       
-      <DialogContent>
         {errorMessage}
-        {showDoc}
+        <div className="">
+          {(()=>{
+            if (!fileType)
+              return;
+            if (fileType=="error")
+              return(<p className="text-center m-auto text-red-600">There was an error getting this file.</p>);
+            if (!file || !fileData)
+              return;
+            
+            if (fileType=="pdf"){
+              return (
+                <Document file={file} onLoadSuccess={(doc)=>setPdfPageCount(doc.numPages)} className="border border-black" onContextMenu={(e)=>e.preventDefault()}>
+                  {(new Array(pdfPageCount||1).fill(1)).map((_,index)=>{
+                    return(
+                      <div key={index+1}>
+                        <Page pageNumber={index+1} scale={zoom} />
+                        <p className="mx-2 ">Page {index+1}</p>
+                        <hr style={{border:"solid", color:"gray"}}/>
+                      </div>
+                    )
+                  })}
+                </Document>
+              )
+            }
+            else if (fileType=="image"){
+              const src = URL.createObjectURL(file);
+              return (
+                <div onContextMenu={(e)=>e.preventDefault()}>
+                  <img className="m-auto" width="50%" src={src} onLoad={()=>URL.revokeObjectURL(src)}/>
+                </div>
+              )
+            }
+            else
+              return <iframe src={URL.createObjectURL(file)+"#toolbar=0"} width="97%" height="95%" title="Document Viewer"></iframe>
+          })()}
+        </div>
       </DialogContent>
     </>
   )

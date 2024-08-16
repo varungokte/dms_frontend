@@ -3,8 +3,8 @@ import { decodeToken, isExpired } from "react-jwt";
 import CryptoJS from "crypto-js";
 import { FieldValues, UserSuggestionTypes } from 'DataTypes';
 
-const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
 //const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
+const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
 //const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
 
 const encryption_key = "JAIBAJRANGBALI";
@@ -179,7 +179,6 @@ const addUser = async (data:object) => {
 		return response.status;
 	}
 	catch(error:any) {
-		console.log("error",error.response.status)
 		if (!error.response)
 			return 0;
 		else
@@ -618,7 +617,7 @@ const addDocument =  async (data:any) => {
 	}
 };
 
-const editDocument =  async (data:any) => {
+const editDocument =  async (data:FieldValues) => {
 	try {
 		const token = getEncryptedToken();
 		//console.log("edit data",data)
@@ -639,20 +638,20 @@ const editDocument =  async (data:any) => {
 	}
 };
 
-const uploadFile = async (data:any,loc:string, docId:string|number, loanId?:string, isPayment?:boolean) => {
+const uploadFile = async (args:{data:FieldValues,AID:string, sectionKeyName:string, docId:string|number, loanId?:string, isPayment?:boolean}) => {
 	try {
 		const token = getEncryptedToken();
 		
-		const query:FieldValues = { "LOC":loc};
+		const query:FieldValues = { "LOC":`${args.AID}/${args.sectionKeyName}`};
 		
-		if (isPayment) query["POS"]=docId;
+		if (args.isPayment) query["POS"]=args.docId;
 
-		if (loanId)
-			query["_id"]=loanId;
+		if (args.loanId)
+			query["_id"]=args.loanId;
 		else
-			query["_id"]=docId;
-		//console.log("DATA",data)
-		const response = await axios.post(`${Base_Url}/uploadDocs`, data, {
+			query["_id"]=args.docId;
+		
+		const response = await axios.post(`${Base_Url}/uploadDocs`, args.data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 			params: query
 		});
@@ -680,7 +679,7 @@ const getDocumentsList = async (data:{loanId:string, sectionName:string, current
 			obj["value"] = data.searchString;
 		if (data.searchType!="")
 			obj["type"] = data.searchType;
-
+		
 		const response = await axios.get(`${Base_Url}/listDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
@@ -722,32 +721,41 @@ const getDocumentsList = async (data:{loanId:string, sectionName:string, current
 const fetchDocument = async (AID:string,section_name:string, file_name:string) => {
 	try {
 		const token = getEncryptedToken();
+		//console.log(`${AID}/${section_name}/${file_name}`)
 		const response = await axios.get(`${Base_Url}/viewDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { LOC: `${AID}/${section_name}/${file_name}` },
 			responseType: 'blob',
 		});
-
 		const blob = new Blob([response.data], {type:response.data.type});
-		let url = URL.createObjectURL(blob);
+		return {status:response.status, file:blob, type:response.data.type};
+
+		/* let url = URL.createObjectURL(blob);
 		//URL.revokeObjectURL(url);
 		
-		return {status:response.status, url:url};
+		return {status:response.status, url:url, type:response.data.type}; */
 	} 
 	catch(error:any) {
 		if (!error.response)
-			return{status:0, url:""};
+			return{status:0, file:undefined, type:""};
 		else
-			return {status:error.response.status, url:""}
+			return {status:error.response.status, file:undefined, type:""}
 	}
 };
 
-const deleteDocument = async (AID:string, docId:string, section_name:string, file_name:string) => {
+const deleteDocument = async (args:{AID:string, docId?:string|number, index?:number|string, sectionKeyName:string, fileName:string}) => {
+	const params:FieldValues = {LOC:`${args.AID}/${args.sectionKeyName}/${args.fileName}`};
+	if (args.docId!=undefined)
+		params["_id"] = args.docId;
+	if (args.index!=undefined)
+		params["POS"] = args.index;
+	console.log("parameters",params);
+
 	try {
 		const token = getEncryptedToken()
 		const response = await axios.delete(`${Base_Url}/deleteDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
-			params: { LOC: `${AID}/${section_name}/${file_name}`, _id:docId },
+			params
 		});
 
 		return response.status;
@@ -770,8 +778,6 @@ const getUserAssignments =async (data:{userEmail:string, sectionName:string, cur
 		obj["SN"]=data.sectionName;
 		obj["page"] = data.currentPage || 1;
 		obj["limit"] = data.rowsPerPage || 10;
-
-		console.log("Data",data)
 
 		const response = await axios.get(`${Base_Url}/mst/assignlistDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
@@ -940,6 +946,7 @@ const getSpecialList = async (data:{admin?:boolean, type:"def"|"crit", sectionNa
 			route = data.type=="def"?"mst/listDefault":"mst/listCriticalCases";
 		else
 			route = data.type=="def"?"assignlistDefault":"assignlistCriticalCases";
+		
 		const response = await axios.get(`${Base_Url}/${route}`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj,

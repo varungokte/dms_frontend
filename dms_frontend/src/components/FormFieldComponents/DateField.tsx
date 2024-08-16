@@ -17,13 +17,16 @@ const getValidMinDate = (id:string, prefillValues:FieldValues):string => {
   return date;
 } */
 
-function DateField (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, error?:boolean, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, disabled:boolean }) {
+function DateField (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, error?:boolean, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, disabled:boolean, readonly?:boolean }) {
   const [prefillValue, setPrefillValue] = useState<string>();
+  const [error,setError] = useState(props.error);
 
   useEffect(()=>{
     if (props.prefillValues && props.prefillValues[props.fieldData.id] && !prefillValue)
       setPrefillValue(props.prefillValues[props.fieldData.id]);
   },[props.prefillValues]);
+
+  useEffect(()=>setError(props.error),[props.error]);
 
   return(
     <div key={props.index} className="mb-5 mx-2">
@@ -33,7 +36,7 @@ function DateField (props:{index:number|string, fieldData:FormFieldAttributes, p
         type="date" 
         disabled={props.disabled} 
         required={props.fieldData.required}
-        className={`border ${props.error?"border-red-600":"focus:border-custom-1"} rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
+        className={`border bg-white ${error?"border-red-600":"border-neutral-300"} rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
         value={props.prefillValues[props.fieldData.id]
           ?moment(props.prefillValues[props.fieldData.id]).format("yyyy-MM-DD")
           :""
@@ -47,8 +50,20 @@ function DateField (props:{index:number|string, fieldData:FormFieldAttributes, p
           :getValidMaxDate(props.id,props.prefillValues)
         } */
         onChange={props.repeatFields && props.formIndex!=null
-          ?(e)=>{props.setPrefillValues((curr:any)=>{curr[props.formIndex||0][props.fieldData.id]=e.target.value; return [...curr];})}
-          :(e)=>{props.setPrefillValues((curr:any)=>{curr[props.fieldData.id]=e.target.value; return {...curr};})}
+          ?(e)=>{
+            setError(false);
+            props.setPrefillValues((curr:any)=>{
+              curr[props.formIndex||0][props.fieldData.id]=e.target.value; 
+              return [...curr];
+            });
+          }
+          :(e)=>{
+            setError(false);
+            props.setPrefillValues((curr:any)=>{
+              curr[props.fieldData.id]=e.target.value; 
+              return {...curr};
+            });
+          }
         }
       />
     </div>

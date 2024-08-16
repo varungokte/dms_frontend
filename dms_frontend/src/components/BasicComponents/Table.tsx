@@ -149,7 +149,7 @@ const handlePriority = (priority:Priority, cellClassName:string) => {
 }
 
 const handleDocStatus = (status:DocumentStatus, cellClassName:string) => {
-  return <div className={`${DocumentStatusStyling[DocumentStatusList.indexOf(status)]} ${cellClassName}`}>{status}</div>
+  return <div className={`${DocumentStatusStyling[DocumentStatusList.indexOf(status||"Pending")]} ${cellClassName}`}>{status||"Pending"}</div>
 }
 
 

@@ -1,9 +1,31 @@
 import { CovenantTypeList, CovenantCategoryList, FrequencyList, TransactionCategoryList, ComplianceCategoryList, ConditionPrecedentCategoryList, ConditionSubsequentCategoryList } from "../../../../Constants";
-import { DocumentSectionDetails, FieldAttributesList } from "../../../../DataTypes";
+import { FieldAttributesList } from "../../../../DataTypes";
+import { DocumentSectionDetails, DocumentSectionKeys, DocumentSectionTypes, getDocSecName } from "./../../../DocumentSectionAttributes";
 import { PriorityList } from "../../../../Constants";
 
 const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAttributesList}) =>{
-  if (label=="Transaction Documents")
+  let fieldList;
+  const sectionKey = getDocSecName(label,"fullname","keyname");
+  const sectionType = getDocSecName(label, "fullname","type");
+
+  if (sectionKey=="TD")
+    fieldList = documentFieldList(TransactionCategoryList);
+  else if (sectionKey=="CD")
+    fieldList = documentFieldList(ComplianceCategoryList)
+  else if (sectionKey=="C")
+    fieldList = covenantFieldList();
+  else if (sectionKey=="CP")
+    fieldList = conditionsFieldList(ConditionPrecedentCategoryList);
+  else
+    fieldList = conditionsFieldList(ConditionSubsequentCategoryList);
+
+  return {
+    sectionKeyName: sectionKey as DocumentSectionKeys,
+    sectionType: sectionType as DocumentSectionTypes,
+    fieldList: fieldList as FieldAttributesList,
+  }
+
+  /* if (label=="Transaction Documents")
     return {sectionName: "TD", sectionType:"document", fieldList: documentFieldList(TransactionCategoryList) }
   else if (label=="Compliance Documents")
     return { sectionName: "CD", sectionType:"document", fieldList: documentFieldList(ComplianceCategoryList) }
@@ -12,7 +34,7 @@ const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAtt
   else if (label=="Condition Precedent")
     return { sectionName: "CP", sectionType:"condition", fieldList: conditionsFieldList(ConditionPrecedentCategoryList) };
   else
-    return { sectionName: "CS", sectionType:"condition",fieldList: conditionsFieldList(ConditionSubsequentCategoryList) };
+    return { sectionName: "CS", sectionType:"condition",fieldList: conditionsFieldList(ConditionSubsequentCategoryList) }; */
 }
 
 const documentFieldList= (documentOptions:string[]):FieldAttributesList =>{
@@ -33,8 +55,8 @@ const covenantFieldList = ():FieldAttributesList => {
   return [
     { category:"grid", row:2, fields:[
       { id:"N", name:"Covenant Name", type:"text", required:true },
-      { id:"T", name:"Covenant Type", type:"select", options:CovenantTypeList, required:true },
       { id:"C", name:"Category Type", type:"select", options:CovenantCategoryList, required:true},
+      { id:"T", name:"Covenant Type", type:"select", options:CovenantTypeList, required:true },
       { id:"P", name:"Priority", type:"select", options:PriorityList, required:true},
     ]},
     { category:"single", id:"F", name:"Frequency", type:"select", options:FrequencyList },

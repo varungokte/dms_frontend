@@ -57,7 +57,8 @@ function LoanRatings(props:LoanCommonProps) {
         console.log("ratings response",res.arr)
         if (res.status==200){
           setRatingsList(res.arr[0]["data"]);
-          setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
+          if (res.arr && res.arr[0] && res.arr[0]["metadata"] && res.arr[0]["metadata"][0])
+            setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
         }
         else
           setRatingsList([]);
@@ -106,7 +107,7 @@ function LoanRatings(props:LoanCommonProps) {
           {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
         <div>
-          {props.actionType=="VIEW" && userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add")
+          {props.actionType=="VIEW" || !(userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add"))
             ?<></>
             :<div>
               <AddButton sectionName="rating" onClick={()=>setAddOpen([true])} />

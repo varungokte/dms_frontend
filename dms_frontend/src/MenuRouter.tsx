@@ -1,7 +1,8 @@
 import { useEffect, useState, FunctionComponent, createContext } from 'react';
 import './styling.css';
 import useGlobalContext from './../GlobalContext';
-import {  getDocSecList, sectionNames } from './../Constants';
+import { sectionNames } from './../Constants';
+import { getDocSecList } from './DocumentSectionAttributes';
 import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, ReportsIcon, CriticalIcon, ReminderIcon } from "./../src/components/static/PanelIcons"
 
 import Dashboard from './../src/components/Dashboard';
@@ -16,23 +17,21 @@ import SpecialCases from './../src/components/SpecialCases';
 import Reminders from './../src/components/Reminders';
 import Reports from './../src/components/Reports';
 import _TestComponent from './../src/components/_TestComponent';
-import { FieldValues } from './../DataTypes';
+import { ComponentList, FieldValues } from './../DataTypes';
 import {socket} from "./socket";
 
-import { ThemeProvider, } from '@mui/material/styles';
 import socketConnector from './socketConnector';
 import getMasters from './getMasters';
-import { customColor } from './MUIPalette';
 import SidePanel from './SidePanel';
 import TopPanel from './TopPanel';
 import Content from './Content';
-import UserAssignments from './UserAssignments';
+import UserAssignments from './../src/components/UserAssignments';
 //import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
 export const PermissionContext = createContext<any>(null);
 
 function MenuRouter(){
-	const allComponents = [
+	const allComponents:ComponentList = [
 		{ name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },//0
 		{ name: "Masters", path:"/masters", component: Masters, icon:MastersIcon },//1
 		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },//2
@@ -52,14 +51,15 @@ function MenuRouter(){
 		{ name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },//16
 		{ name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },//17
 	
-		{ name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransIcon },//19
-		{ name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: CompIcon },//19
-		{ name: "Master Covenants", path:"/admin/covenants", component: DealsList, icon: CovenantIcon },//20
-		{ name: "Master Condition Precedent", path:"/admin/precedent", component: DealsList, icon: ConditionsIcon },//21
-		{ name: "Master Condition Subsequent", path:"/admin/subsequent", component: DealsList, icon: ConditionsIcon },//22
-		{ name: "Master Payment Schedule", path:"/admin/schedule", component: DealsList, icon: ScheduleIcon},//23
-		{ name: "Master Default Cases", path:"/admin/default", component:SpecialCases, icon:DefaultIcon,},//24
-		{ name: "Master Critical Cases", path:"/admin/critical", component:SpecialCases, icon:CriticalIcon,},//25
+		{ name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransIcon, panopticPage:true },//19
+		{ name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: CompIcon, panopticPage:true },//19
+		{ name: "Master Covenants", path:"/admin/covenants", component: DealsList, icon: CovenantIcon, panopticPage:true },//20
+		{ name: "Master Condition Precedent", path:"/admin/precedent", component: DealsList, icon: ConditionsIcon, panopticPage:true },//21
+		{ name: "Master Condition Subsequent", path:"/admin/subsequent", component: DealsList, icon: ConditionsIcon, panopticPage:true },//22
+		{ name: "Master Payment Schedule", path:"/admin/schedule", component: DealsList, icon: ScheduleIcon, panopticPage:true },//23
+		{ name: "Master Default Cases", path:"/admin/default", component:SpecialCases, icon:DefaultIcon, panopticPage:true },//24
+		{ name: "Master Critical Cases", path:"/admin/critical", component:SpecialCases, icon:CriticalIcon, panopticPage:true },//25
+
 		{ name: "User Assignments", path:"/assign", component:UserAssignments},//26
 	
 		{ name: "Test", path:"/test", component: _TestComponent },//27
@@ -154,6 +154,7 @@ function MenuRouter(){
 		arr.push(allComponents[24]);
 		arr.push(allComponents[25]);
 		arr.push(allComponents[26]);
+		//arr.push(allComponents[27]);
 		setComponentList(arr);
 	},[userPermissions]);
 
@@ -162,23 +163,19 @@ function MenuRouter(){
 	//useEffect(()=>console.log("menu router",socketIsConnected),[socketIsConnected])
 	
 	return (
-		<ThemeProvider theme={customColor}>
-			<PermissionContext.Provider value={{userPermissions, setUserPermissions}}>
-				<div className='relative'>
-					<div  style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1">
-						<SidePanel componentList={componentList} token={token} />
-						
-					</div>
-					
-					<div style={{marginLeft:"280px"}}>
-						<TopPanel token={token} socketIsConnected={socketIsConnected} />
-						<hr />
-						<Content componentList={componentList} masterLists={masterLists} mastersIdList={mastersIdList} setChangeInMasters={setChangeInMasters} />
-						
-					</div>
+		<PermissionContext.Provider value={{userPermissions, setUserPermissions}}>
+			<div className='relative'>
+				<div  style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1">
+					<SidePanel componentList={componentList} token={token} />
 				</div>
-			</PermissionContext.Provider>
-		</ThemeProvider>
+				
+				<div style={{marginLeft:"280px"}}>
+					<TopPanel token={token} socketIsConnected={socketIsConnected} />
+					<hr />
+					<Content componentList={componentList} masterLists={masterLists} mastersIdList={mastersIdList} setChangeInMasters={setChangeInMasters} />
+				</div>
+			</div>
+		</PermissionContext.Provider>
 	)
 }
 
