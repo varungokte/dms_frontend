@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { LoanSecurityTypeList, sectionNames } from "@/functions/Constants";
+import { LoanSecurityTypeList } from "@/functions/Constants";
 import Tooltip from '@mui/material/Tooltip';
-import { PermissionContext } from "@/MenuRouter";
+import { PermissionContext } from "@/functions/Contexts";
 
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 
@@ -20,7 +19,8 @@ import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 import { Tab, Tabs, Typography } from "@mui/material";
 import { FieldValues } from "@/types/DataTypes";
 import { LoanFormMetaData } from "@/types/ComponentProps";
-import { getDocSecList } from "@/functions/DocumentSectionAttributes";
+import { getDocSecList, getModSecName } from "@/functions/sectionNameAttributes";
+import { getLoanDetails } from "@/apiFunctions/loanAPIs";
 
 function CreateLoanAccount() {
   const {state} = useLocation();
@@ -38,9 +38,7 @@ function CreateLoanAccount() {
   useEffect(()=>{
     if (!state)
       navigate("../loan");
-  },[state])
-
-  const {getLoanFields} = useGlobalContext();
+  },[state]);
   
   const actionType:"CREATE"|"EDIT"|"VIEW" =state.linkSource;
 
@@ -77,7 +75,7 @@ function CreateLoanAccount() {
   ];
 
   const getOldData = async () => {
-    const res = await getLoanFields(loanId);
+    const res = await getLoanDetails(loanId);
     console.log("preexisting data",res)
     if (res.status==200){
       if (res.obj["STV"] && res.obj["STV"].length==0)
@@ -149,7 +147,7 @@ function CreateLoanAccount() {
   const tabIsDisabled =(index:number,conditions?:LoanFormMetaData) => {
     if (userPermissions){
       const sectionName = formSections[index].name;
-      const sectionPermissions = userPermissions[sectionNames[sectionName]];
+      const sectionPermissions = userPermissions[getModSecName({inputName:sectionName, inputType:"fullname", outputType:"shortname"})];
       const documentSections = getDocSecList("fullname");
       if (documentSections.includes(sectionName) && sectionPermissions && sectionPermissions["docs"] && !sectionPermissions["docs"].includes("access"))
         return {disabled:true, reason:""}

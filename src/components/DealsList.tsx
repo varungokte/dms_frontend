@@ -1,8 +1,9 @@
 import { ReactElement, useEffect, useRef, useState } from "react";
-import useGlobalContext from "../functions/GlobalContext";
 import moment from "moment";
-import { DocumentStatus, FieldValues, SetStateBoolean } from "@/types/DataTypes";
-import {DocumentSectionDetails, DocumentSectionKeys, DocumentSectionTypes, getDocSecName} from "@/functions/DocumentSectionAttributes";
+import { DocumentSectionKeys, DocumentSectionTypes, DocumentStatus, FieldValues, SetStateBoolean } from "@/types/DataTypes";
+import { getDocSecName, getModSecName, getPanSecName} from "@/functions/sectionNameAttributes";
+import { DocumentSectionDetails } from "@/types/DataTypes";
+import { getDealList } from "@/apiFunctions/dealsListAPIs";
 
 import SingleDealDocuments from "./SingleDealDocuments";
 import SingleDealPayments from "./SingleDealPayments";
@@ -13,7 +14,6 @@ import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import { useLocation } from "react-router-dom";
 import { Pagination } from "./BasicComponents/Pagination";
-import { panopticSectionNames, sectionNames } from "../functions/Constants";
 //import Filter from "./BasicComponents/Filter";
 
 type DocumentDetails= {
@@ -36,10 +36,10 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
   const admin = props.panopticPage||false;
 
   const setSection = (): DocumentSectionDetails => {
-    const label = props.panopticPage?panopticSectionNames[props.label]:sectionNames[props.label];
+    const label = props.panopticPage?getPanSecName({inputName:props.label, inputType:"fullname",outputType:"shortname"}):getModSecName({inputName:props.label, inputType:"fullname",outputType:"shortname"});
     return {
-      sectionKeyName:getDocSecName(label,"shortname","keyname") as DocumentSectionKeys, 
-      sectionType:getDocSecName(label,"shortname","type") as DocumentSectionTypes
+      sectionKeyName:getDocSecName({inputName:label,inputType:"shortname",outputType:"keyname"}) as DocumentSectionKeys, 
+      sectionType:getDocSecName({inputName:label,inputType:"shortname",outputType:"type"}) as DocumentSectionTypes
     };
   }
 
@@ -52,8 +52,6 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
   const [showDeals, setShowDeals] = useState<boolean[]>();
   const [fromRedirect, setFromRedirect] = useState(true);
   const [currentTab, setCurrentTab] = useState(-1);
-
-  const { getDealList} = useGlobalContext();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);

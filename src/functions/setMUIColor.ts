@@ -1,4 +1,4 @@
-
+//This defines the secondary color of MUI to be the site's color 
 import { createTheme } from '@mui/material/styles';
 
 const {palette} = createTheme();

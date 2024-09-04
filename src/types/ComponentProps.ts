@@ -5,10 +5,12 @@ import { FieldAttributesList } from "./FormAttributes";
 
 type LoanFormMetaData = {okToFrolic?:boolean, AID?:string, loanId?:string, changesHaveBeenMade?:boolean, enableDocumentSections?:boolean};
 
+//FileViewer.tsx
 type CommonFileViewerProps = {AID:string, fileName:string, actualName:string, status:DocumentStatus, rejectionReason?:string, setAdded:SetStateBoolean, sectionKeyName:string, setIsDeleted:React.Dispatch<React.SetStateAction<number | undefined>> };
 type DocumentFileViewerProps = {type:"doc", loanId:string, docId:string };
 type PaymentFileViewerProps = {type:"pay", scheduleId:string, index:number, schedule:FieldValues[] };
 
+//All LoanAccountComponents
 type LoanCommonProps = {
   actionType:"CREATE"|"EDIT"|"VIEW", label:string, 
   AID:string, loanId:string,
@@ -20,8 +22,10 @@ type LoanCommonProps = {
   preexistingValues:FieldValues,
 }
 
+//Outside Components
 type ComponentList = {name:string,path:string, component:FunctionComponent<any>, icon?:(props:{fill:string})=>JSX.Element, panopticPage?:boolean}[];
 
+//LoanDocumentComponents
 type LoanDocSecProps = {
   data:FieldValues[], label:string, 
   formOpen:boolean[], setFormOpen:React.Dispatch<React.SetStateAction<boolean[]>>, 

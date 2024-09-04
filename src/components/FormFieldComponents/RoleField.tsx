@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { FieldValues } from "@/types/DataTypes";
 import { FormFieldAttributes } from "@/types/FormAttributes";
+import reorganizePermissions from "@/functions/reorganizePermissions";
 
 import SelectField from "./SelectField";
 import PermissionsField from "./PermissionsField";
+import { Skeleton } from "@mui/material";
 
 function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList:FieldValues[], prefillValues:any, error?:boolean, setPrefillValues:Function, disabled:boolean}){
   try{
@@ -12,9 +14,7 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
     const [firstTime, setFirstTime] = useState(true);
     const [permissionsExist, setPermissionsExist] = useState(false);
   
-    useEffect(()=>console.log("role props",props),[props])
-
-    useEffect(()=>console.log("permissions exisit",permissionsExist),[permissionsExist])
+    //useEffect(()=>console.log("permissions exisit",permissionsExist),[permissionsExist])
   
     useEffect(()=>{
       //console.log("props.prefillValues",props.prefillValues)
@@ -22,7 +22,7 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
         return;
       else if (firstTime){
         setFirstTime(false);
-        if (Object.keys(props.prefillValues).length!=0)
+        if (props.prefillValues && props.prefillValues[props.fieldData.id] && Object.keys(props.prefillValues[props.fieldData.id]).length!=0)
           setPermissionsExist(true);
         else
           setPermissionsExist(false);
@@ -51,20 +51,35 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
     useEffect(()=>{
       if (!currentRole)
         return;
-      //console.log("permissions exisit",permissionsExist)
       if (!permissionsExist){
         props.setPrefillValues((curr:any)=>{
-          curr["UP"]= allRolesPermissionsList[currentRole];
+          curr["UP"]= reorganizePermissions.incoming(allRolesPermissionsList[currentRole]);
           return {...curr};
         })
       }
-    },[allRolesPermissionsList,currentRole,permissionsExist])
-  
+    },[allRolesPermissionsList,currentRole,permissionsExist]);
+
+    if (currentRole && (!allRolesPermissionsList || Object.keys(allRolesPermissionsList).length==0)){
+      return (
+        <div>
+          <Skeleton variant="rectangular" width={"100%"} height={50} />
+          <br />
+        <div className="flex flex-row">
+          <div className="mx-3">
+            <Skeleton variant="rectangular" width={150} height={200} />
+          </div>
+          <div className="mx-3">
+            <Skeleton variant="rectangular" width={300} height={200} />
+          </div>
+        </div>
+        </div>
+      )
+    }
     return (
       <div>
         <SelectField index={props.index} fieldData={{id:props.fieldData.id, name:props.fieldData.name, type:"select", options:["-"].concat(Object.keys(allRolesPermissionsList)),required:props.fieldData.required}}  prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} disabled={props.disabled} error={props.error} />
         {currentRole
-          ?<PermissionsField index={props.index} fieldData={{id:"UP", name:"Permissions", type:"permissions", required:props.fieldData.required, disabled:props.fieldData.disabled}}  permissionPreset={props.prefillValues["UP"]} setPermissionSet={props.setPrefillValues}disabled={props.disabled} />
+          ?<PermissionsField index={props.index} fieldData={{id:props.fieldData.permissionId||"UP", name:"Permissions", type:"permissions", required:props.fieldData.required, disabled:props.fieldData.disabled}}  permissionSet={props.prefillValues["UP"]} setPermissionSet={props.setPrefillValues}disabled={props.disabled} />
           :<></>
         }
       </div>
@@ -76,3 +91,18 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
 };
 
 export default RoleField;
+
+/* 
+    console.log("la forge",props.prefillValues)
+    if (currentRole && (!allRolesPermissionsList || Object.keys(allRolesPermissionsList).length==0)){
+      return (
+        <div className="flex flex-row">
+          <div className="mx-3">
+            <Skeleton variant="rectangular" width={150} height={200} />
+          </div>
+          <div className="mx-3">
+            <Skeleton variant="rectangular" width={300} height={200} />
+          </div>
+        </div>
+      )}
+    else */

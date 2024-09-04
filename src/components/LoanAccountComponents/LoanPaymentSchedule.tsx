@@ -4,7 +4,7 @@ import { FrequencyList, HolidayConventionList, InterestTypeList } from "@/functi
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
-import useGlobalContext from "@/functions/GlobalContext";
+import { addPaymentSchedule, getPaymentSchedule } from "@/apiFunctions/paymentAPIs";
 
 import {Dialog,DialogTitle,DialogContent} from '@mui/material';
 import { DataTable } from "../BasicTables/Table";
@@ -38,8 +38,6 @@ function LoanPaymentSchedule(props:LoanCommonProps){
   const [added, setAdded] = useState(true);
 
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
-
-  const {addPaymentSchedule, getPaymentSchedule} = useGlobalContext();
 
   useEffect(()=>{
     if (added)

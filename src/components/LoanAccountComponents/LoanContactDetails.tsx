@@ -1,11 +1,12 @@
 import { ReactElement, useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { FieldAttributesList } from "@/types/FormAttributes";
 
-import { PermissionContext } from "@/MenuRouter";
-import { ContactTypeList, EmailRecipientList, sectionNames } from "../../functions/Constants";
+import { PermissionContext } from "@/functions/Contexts";
+import { ContactTypeList, EmailRecipientList } from "@/functions/Constants";
+import { addContact, deleteContact, getContactsList, getSingleContact } from "@/apiFunctions/contactAPIs";
+import { getModSecName } from "@/functions/sectionNameAttributes";
 
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -78,8 +79,6 @@ function LoanContactDetails(props:LoanCommonProps) {
   const [added, setAdded] = useState(true);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
  
-  const {addContact, getContactsList, deleteContact} = useGlobalContext();
-
   useEffect(()=>{
     setAdded(true);
   },[searchString,searchType]);
@@ -203,7 +202,7 @@ function LoanContactDetails(props:LoanCommonProps) {
         </div>
       
         <div className="mr-3">
-          {props.actionType!="VIEW" && userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add")
+          {props.actionType!="VIEW" && userPermissions["loan"].includes("add") && userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("add")
             ?<div>
               <AddButton sectionName="contact" onClick={()=>setAddOpen([true])} />
               {addOpen[0]
@@ -286,14 +285,14 @@ function ContactActions(props:{index:number, person:FieldValues, editFunction:Fu
       {openMenu &&<Menu open={openMenu} onClose={handleClose} anchorEl={anchorEl}>
         {props.userPermissions && (props.userPermissions["loan"].includes("edit")||props.userPermissions["loan"].includes("view")) && props.userPermissions["contact"].includes("view")
           ?<div>
-            <Button variant="text" color="info" startIcon={<AccountCircleIcon/>} onClick={()=>setOpenView(true)}>View</Button>
+            <Button sx={{width:"100%", justifyContent:"flex-start"}} variant="text" color="info" startIcon={<AccountCircleIcon/>} onClick={()=>setOpenView(true)}>View</Button>
             {openView?<ViewContact personId={props.person["_id"]} open={openView} setOpen={setOpenView} />:<></>}
           </div>
           :<></>
         }
         {props.actionType!="VIEW" && props.userPermissions && props.userPermissions["loan"].includes("edit") && props.userPermissions["contact"].includes("edit")
           ?<div>
-            <Button color="success" startIcon={<EditIcon/>} variant="text" onClick={()=>setOpenEdit([true])}>Edit</Button>
+            <Button sx={{width:"100%", justifyContent:"flex-start"}} color="success" startIcon={<EditIcon/>} variant="text" onClick={()=>setOpenEdit([true])}>Edit</Button>
               {openEdit[0]
                 ?<FormDialog key={props.index} index={0} edit type="cont"
                   formOpen={openEdit[0]} setFormOpen={setOpenEdit} formSize="lg"
@@ -307,7 +306,7 @@ function ContactActions(props:{index:number, person:FieldValues, editFunction:Fu
         }
         {props.actionType!="VIEW" && props.userPermissions && props.userPermissions["loan"].includes("edit") && props.userPermissions["contact"].includes("delete")
           ?<div>
-            <Button color="error" variant="text" onClick={()=>setOpenDelete([true])} startIcon={<DeleteOutlineOutlinedIcon/>}>Delete</Button>
+            <Button sx={{width:"100%", justifyContent:"flex-start"}} color="error" variant="text" onClick={()=>setOpenDelete([true])} startIcon={<DeleteOutlineOutlinedIcon/>}>Delete</Button>
             {openDelete[0]?<DeleteConfirmation thing="contact" deleteFunction={props.deleteFunction} open={openDelete[0]} setOpen={setOpenDelete} currIndex={0} id={props.person["_id"]} />:<></>}
           </div>
           :<></>
@@ -354,8 +353,6 @@ function ViewContact(props:{personId:string, open:boolean, setOpen:Function}){
   const [registeredAddress, setRegisteredAddress] = useState<ReactElement>();
   const [personDetails, setPersonDetails] = useState<FieldValues>();
 
-  const {getSingleContact} = useGlobalContext();
-  
   useEffect(()=>{
     getSingleContact(props.personId).then(res=>{
       //console.log("SINGLE PERSON DATA",res);

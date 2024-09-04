@@ -1,19 +1,20 @@
-import { useEffect, useState, createContext } from 'react';
+import { useEffect, useState } from 'react';
 import '@/styling.css';
-import useGlobalContext from '@/functions/GlobalContext';
-import { sectionNames } from '@/functions/Constants';
-import { getDocSecList } from '@/functions/DocumentSectionAttributes';
+import { getDocSecList, getModSecName } from '@/functions/sectionNameAttributes';
 import { FieldValues } from '@/types/DataTypes';
 import { ComponentList } from '@/types/ComponentProps';
+import { PermissionContext } from '@/functions/Contexts';
+import { getDecryptedToken } from './functions/getToken';
+import { getSingleUser } from './apiFunctions/userAPIs';
 
 import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, CriticalIcon, /* ReportsIcon,  ReminderIcon */ } from "@/static/PanelIcons";
 
 import {socket} from "@/functions/socket";
 import socketConnector from '@/functions/socketConnector';
 import getMasters from '@/functions/getMasters';
-import SidePanel from '@/SiteComponents/SidePanel';
-import TopPanel from '@/SiteComponents/TopPanel';
-import Content from '@/SiteComponents/Content';
+import SidePanel from '@/components/SiteComponents/SidePanel';
+import TopPanel from '@/components/SiteComponents/TopPanel';
+import Content from '@/components/SiteComponents/Content';
 
 import Dashboard from '@/components/Dashboard';
 import LoanAccount from '@/components/LoanAccount';
@@ -30,8 +31,6 @@ import _TestComponent from '@/components/_TestComponent';
 import UserAssignments from '@/components/UserAssignments';
 
 //import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-
-export const PermissionContext = createContext<any>(null);
 
 function MenuRouter(){
 	const allComponents:ComponentList = [
@@ -67,9 +66,6 @@ function MenuRouter(){
 	
 		{ name: "Test", path:"/test", component: _TestComponent },//27
 	];
-
-	const {getDecryptedToken, getSingleUser} = useGlobalContext();
-
 	const [socketIsConnected, setSocketIsConnected] = useState(false);
 	
   const [masterLists, setMasterLists] = useState<FieldValues>();
@@ -99,7 +95,6 @@ function MenuRouter(){
 		getUserInfo().then(res=>{
 			const id = res["_userId"];
 			getSingleUser(id).then(res=>{
-				//console.log("A",res)
 				if (res.status==200)
 					setUserPermissions(res.obj["UP"])
 			})
@@ -115,9 +110,7 @@ function MenuRouter(){
   }
   },[changeInMasters]);
 
-	useEffect(()=>{
-		socketConnector(setSocketIsConnected);
-	},[]);
+	useEffect(()=>socketConnector(setSocketIsConnected),[]);
 
 	const [componentList, setComponentList] = useState<ComponentList>();
 
@@ -126,6 +119,7 @@ function MenuRouter(){
 			const arr = [];
 			arr.push(allComponents[0]);
 			arr.push(allComponents[1]);
+			arr.push(allComponents[25]);
 			//arr.push(allComponents[27]);
 			setComponentList(arr);
 			return;
@@ -135,7 +129,7 @@ function MenuRouter(){
 		
 		for (let i=0; i<allComponents.length; i++){
 			const singleComponent = allComponents[i];
-			const componentPermissions = userPermissions[sectionNames[singleComponent.name]];
+			const componentPermissions = userPermissions[getModSecName({inputName:singleComponent.name, inputType:"fullname",outputType:"shortname"})];
 			if ((singleComponent.name=="Products" || singleComponent.name=="Zones") && userPermissions["loan"].includes("access"))
 				arr.push(singleComponent);
 			
@@ -158,7 +152,7 @@ function MenuRouter(){
 		arr.push(allComponents[22]);
 		arr.push(allComponents[23]);
 		arr.push(allComponents[24]);
-		//arr.push(allComponents[26]);
+		arr.push(allComponents[25]);
 		//arr.push(allComponents[27]);
 		setComponentList(arr);
 	},[userPermissions]);
@@ -168,7 +162,7 @@ function MenuRouter(){
 	//useEffect(()=>console.log("menu router",socketIsConnected),[socketIsConnected])
 	
 	return (
-		<PermissionContext.Provider value={{userPermissions, setUserPermissions}}>
+		<PermissionContext.Provider value={{userPermissions:userPermissions||{}, setUserPermissions}}>
 			<div className='relative'>
 				<div style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1">
 					<SidePanel componentList={componentList} token={token} />

@@ -5,6 +5,7 @@ function Filter(props:{value:string[]|string, setValue:Function, options:string[
     <Select
       multiple={props.multiple}
       size="small" color="secondary"
+      id="filter"
       
       displayEmpty
       inputProps={{ 'aria-label': 'Without label' }}

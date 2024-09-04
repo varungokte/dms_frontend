@@ -1,5 +1,5 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import useGlobalContext from "./functions/GlobalContext";
+import { getDecryptedToken } from "./functions/getToken";
 import  MenuRouter from "./MenuRouter";
 import { useEffect, useState } from "react";
 import VerificationPage from "./components/AuthPages/VerificationPage";
@@ -9,7 +9,6 @@ import { FieldValues } from "@/types/DataTypes";
 function PrivateRoutes() {
   const [token, setToken] = useState<any>(null);
   const [check, setCheck] = useState(false);
-  const { getDecryptedToken } = useGlobalContext();
 
   useEffect(() => {
     if (!check){

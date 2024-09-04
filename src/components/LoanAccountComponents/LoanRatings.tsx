@@ -1,9 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
-import { RatingAgencyList, RatingOutlookList, RatingTypeList, sectionNames } from "@/functions/Constants";
+import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "@/functions/Constants";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
+import { getModSecName } from "@/functions/sectionNameAttributes";
+import { addRating, getRatingsList } from "@/apiFunctions/ratingAPIs";
+import { PermissionContext } from "@/functions/Contexts";
 
 import { DataTable } from "../BasicTables/Table";
 import FormDialog from "../FormComponents/FormDialog";
@@ -13,7 +15,6 @@ import LoadingMessage from "../BasicMessages/LoadingMessage";
 
 import Toast from "../BasicComponents/Toast";
 import { Pagination } from "../BasicComponents/Pagination";
-import { PermissionContext } from "@/MenuRouter";
 import AddButton from "../BasicButtons/AddButton";
 //import Search from "../BasicComponents/Search";
 
@@ -29,8 +30,6 @@ function LoanRatings(props:LoanCommonProps) {
       { id: "L", type: "text", name: "Link", required:true },
     ]}
   ];
-
-  const {addRating, getRatingsList} = useGlobalContext();
   
   const {userPermissions} = useContext(PermissionContext);
 
@@ -109,7 +108,7 @@ function LoanRatings(props:LoanCommonProps) {
           {/* <Search setter={setSearchString} label="Search" /> */}
         </div>
         <div>
-          {props.actionType=="VIEW" || !(userPermissions["loan"].includes("add") && userPermissions[sectionNames[props.label]].includes("add"))
+          {props.actionType=="VIEW" || !(userPermissions["loan"].includes("add") && userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("add"))
             ?<></>
             :<div>
               <AddButton sectionName="rating" onClick={()=>setAddOpen([true])} />

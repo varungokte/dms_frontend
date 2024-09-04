@@ -1,18 +1,17 @@
 import { useContext, useEffect, useState } from "react";
 import { LoanCommonProps } from "@/types/ComponentProps";
+import { PermissionContext } from "@/functions/Contexts";
+import { getTeamsList, selectTeam } from "@/apiFunctions/teamAPIs";
+
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import useGlobalContext from "@/functions/GlobalContext";
 import EmptyPageMessage from "../BasicMessages/EmptyPageMessage";
 import LoadingMessage from "../BasicMessages/LoadingMessage";
 import SearchByType from "../BasicComponents/SearchByType";
 import { DataTable } from "../BasicTables/Table";
 import { Pagination } from "../BasicComponents/Pagination";
-import { PermissionContext } from "@/MenuRouter";
 
 function LoanTeamSelection(props:LoanCommonProps){
   const [teamList, setTeamList] = useState<any>();
-
-  const { getTeamsList, selectTeam } = useGlobalContext();
   
   const {userPermissions} = useContext(PermissionContext);
 
@@ -63,7 +62,7 @@ function LoanTeamSelection(props:LoanCommonProps){
       "_teamId": selectedTeam //teamList[selectedTeam]["_id"]
     }
 
-    const res = await selectTeam(data)
+    const res = await selectTeam(data);
     console.log("res",res);
     if (res==200)
       props.goToNextSection({enableDocumentSections:true});

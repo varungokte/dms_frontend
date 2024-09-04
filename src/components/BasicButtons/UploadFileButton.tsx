@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
+import { addFile } from "@/apiFunctions/fileAPIs";
+import { ToastOptionsAttributes } from "@/types/DataTypes";
 
 import upload_icon from "@/static/upload_icon.svg";
 import Toast from "./../BasicComponents/Toast";
-import { ToastOptionsAttributes } from "@/types/DataTypes";
 
 function UploadFileButton(props:{index:number, AID:string, sectionKeyName:string, docId:number|string, setAdded:Function, _id?:string, isPayment?:boolean, disabled?:boolean}){
   const [files, setFiles] = useState<any>([]);
@@ -12,13 +12,12 @@ function UploadFileButton(props:{index:number, AID:string, sectionKeyName:string
 
   //useEffect(()=>console.log("props",props),[props])
   const uploadFile = async (userFiles:any) => {
-    const { uploadFile } = useGlobalContext();
   
     const formData = new FormData();
     for (let i=0; i<userFiles.length; i++)
       formData.append("file", userFiles[i]);
     console.log("file data",props);
-    const res = await uploadFile({data:formData,AID:props.AID,sectionKeyName:props.sectionKeyName,docId:props.docId, loanId:props._id, isPayment:props.isPayment});
+    const res = await addFile({data:formData,AID:props.AID,sectionKeyName:props.sectionKeyName,docId:props.docId, loanId:props._id, isPayment:props.isPayment});
     console.log("file response",res);
     return res;
   }

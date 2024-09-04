@@ -1,12 +1,13 @@
 import { CovenantTypeList, CovenantCategoryList, FrequencyList, TransactionCategoryList, ComplianceCategoryList, ConditionPrecedentCategoryList, ConditionSubsequentCategoryList } from "../../../functions/Constants";
 import { FieldAttributesList } from "@/types/FormAttributes";
-import { DocumentSectionDetails, DocumentSectionKeys, DocumentSectionTypes, getDocSecName } from "@/functions/DocumentSectionAttributes";
+import { DocumentSectionDetails, DocumentSectionKeys, DocumentSectionTypes } from "@/types/DataTypes";
+import { getDocSecName } from "@/functions/sectionNameAttributes";
 import { PriorityList } from "@/functions/Constants";
 
 const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAttributesList}) =>{
   let fieldList;
-  const sectionKey = getDocSecName(label,"fullname","keyname");
-  const sectionType = getDocSecName(label, "fullname","type");
+  const sectionKey = getDocSecName({inputName:label,inputType:"fullname",outputType:"keyname"});
+  const sectionType = getDocSecName({inputName:label,inputType: "fullname",outputType:"type"});
 
   if (sectionKey=="TD")
     fieldList = documentFieldList(TransactionCategoryList);

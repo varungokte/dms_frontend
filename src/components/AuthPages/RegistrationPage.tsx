@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
+import { Link } from "react-router-dom";
 import { FieldValues } from "@/types/DataTypes";
 import { SingleFieldAttributes } from "@/types/FormAttributes";
-import { sectionNames } from "@/functions/Constants";
+import { getDocSecList, getModSecList } from "@/functions/sectionNameAttributes";
 
-import { Link } from "react-router-dom";
+import { registerAdmin } from "@/apiFunctions/authAPIs";
+
 import PasswordField from "../FormFieldComponents/PasswordField";
 import TextField from "../FormFieldComponents/TextField";
 import SubmitButton from "../BasicButtons/SubmitButton";
@@ -24,8 +25,6 @@ function RegistrationPage(){
 	
 	const [message, setMessage] = useState(<></>);
 
-	const {registerAdmin} = useGlobalContext();
-
 	const handleRegister = async () => {
 		for (let i=0; i<Object.keys(fieldValues).length; i++){
 			const field = Object.keys(fieldValues)[i]
@@ -36,33 +35,16 @@ function RegistrationPage(){
 		}
 
 		const defaultPermissions:FieldValues={}
-		Object.values(sectionNames).map(section=>defaultPermissions[section]=["access", "add", "edit","view","delete"]);
-		defaultPermissions["team"].push("select")
-		defaultPermissions["transaction"] = {
-			docs: ["access","view","add","edit", "delete"],
-			file: ["access","view","add","edit","delete"]
-		}
-		defaultPermissions["compliance"] = {
-			docs: ["access","view","add","edit", "delete"],
-			file: ["access","view","add","edit","delete"]
-		}
-		defaultPermissions["covenants"] = {
-			docs: ["access","view","add","edit", "delete"],
-			file: ["access","view","add","edit","delete"]
-		}
-		defaultPermissions["precedent"] = {
-			docs: ["access","view","add","edit", "delete"],
-			file: ["access","view","add","edit","delete"]
-		}
-		defaultPermissions["subsequent"] = {
-			docs: ["access","view","add","edit", "delete"],
-			file: ["access","view","add","edit","delete"]
-		}
-
-		defaultPermissions["payment"] = {
-			docs: ["access","view","add","edit", "delete"],
-			file: ["access","view","add","edit","delete"]
-		}
+		getModSecList("shortname").map(section=>{
+			if (getDocSecList("shortname").includes(section))
+				defaultPermissions[section] = {
+					docs: ["access","view","add","edit", "delete"],
+					file: ["access","view","add","edit","delete"]
+				}
+			else
+				defaultPermissions[section]=["access", "add", "edit","view","delete"]
+		});
+		defaultPermissions["team"].push("select");
 
 		console.log("SEND PERMISSIONS",defaultPermissions);
 		const data = {

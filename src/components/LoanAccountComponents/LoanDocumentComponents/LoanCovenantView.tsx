@@ -12,10 +12,6 @@ function LoanCovenantView(props:LoanDocSecProps& {type:string}){
   const [filteredCovData, setFilteredCovData] = useState<FieldValues[]>();
   const [indexToSend, setIndexToSend] = useState<number[]>([]);
 
-  /* const tableRows = ["Covenant Name","Frequency", "Physical Location", "Execution Location", "Start Date","End Date", "Priority"];
-  const tableDataTypes:TableDataTypes[] = ["text", "frequency", "text", "text", "date", "date", "priority"];
-  const tableColumnIDs = ["N", "F","PL","EL", "SD", "ED","P"]; */
-
   const tableRows = ["Covenant Name", "Physical Location", "Execution Location", "Start Date","End Date", "Priority"];
   const tableDataTypes:TableDataTypes[] = ["text", "text", "text", "date", "date", "priority"];
   const tableColumnIDs = ["N","PL","EL", "SD", "ED","P"];

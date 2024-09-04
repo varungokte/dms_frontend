@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import { BankAccountTypeList } from "@/functions/Constants";
 import { FieldValues,} from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
+import { createLoan } from "@/apiFunctions/loanAPIs";
 
 function LoanBankDetails(props:LoanCommonProps) {
-  const {createLoan} = useGlobalContext();
 
   const fieldList:GridFieldAttributes = {category:"grid", row:4, fields:[
     { id:"AN", name:"Account Name", type:"text", required:false },

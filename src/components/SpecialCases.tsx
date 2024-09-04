@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { DocumentStatusList, sectionNames } from "@/functions/Constants";
-import { getDocSecList, getDocSecName } from "@/functions/DocumentSectionAttributes";
-import useGlobalContext from "../functions/GlobalContext";
-import { FieldValues, ToastOptionsAttributes } from "../types/DataTypes";
+import { DocumentStatusList } from "@/functions/Constants";
+import { getDocSecList, getDocSecName, getModSecName } from "@/functions/sectionNameAttributes";
+import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 
 import { DataTable } from "./BasicTables/Table";
 
@@ -13,10 +12,11 @@ import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 
 import UploadFileButton from "./BasicButtons/UploadFileButton";
 import ViewFileButton from "./BasicButtons/ViewFileButton";
-import { PermissionContext } from "@/MenuRouter";
+import { PermissionContext } from "@/functions/Contexts";
 import { Pagination } from "./BasicComponents/Pagination";
 import Filter from "./BasicComponents/Filter";
 import Toast from "./BasicComponents/Toast";
+import { getSpecialList } from "@/apiFunctions/specialCaseAPIs";
 
 function SpecialCases(props:{label:string, panopticPage?:boolean}) {
   useEffect(()=>{
@@ -26,13 +26,12 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
   const [allData, setAllData] = useState<FieldValues[]>();
 
   const admin = props.panopticPage||false;
-  const type = sectionNames[props.label]=="default"?"def":"crit";
-	const [currentSection, setCurrentSection] = useState<string>(getDocSecName("TD","keyname","fullname"));
+  const type = getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})=="default"?"def":"crit";
+	const [currentSection, setCurrentSection] = useState<string>(getDocSecName({inputName:"TD",inputType:"keyname",outputType:"fullname"}));
 
   const [added, setAdded] = useState(true);
   const [documentLinks,setDocumentLinks] = useState<{section:string,index:string|number}[]>([]);
 
-  const {getSpecialList} = useGlobalContext();
   const {userPermissions} = useContext(PermissionContext);
 
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
@@ -63,7 +62,7 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
 
   useEffect(()=>{
     if (added){
-      getSpecialList({type, admin, sectionName:getDocSecName(currentSection,"fullname","keyname"), currentPage, rowsPerPage}).then(res=>{
+      getSpecialList({type, admin, sectionName:getDocSecName({inputName:currentSection,inputType:"fullname",outputType:"keyname"}), currentPage, rowsPerPage}).then(res=>{
         if (res.status==200 && res.obj[0]){
           const data = res.obj[0]["data"];
           console.log("response data",res.obj[0]["data"]);
@@ -86,7 +85,7 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
               <p className="text-xs">{currentSection}</p>
             </div>;
 
-            links.push({section:"../"+getDocSecName(currentSection,"fullname","shortname"),index:deal["AID"]});
+            links.push({section:"../"+getDocSecName({inputName:currentSection,inputType:"fullname",outputType:"shortname"}),index:deal["AID"]});
           }
         }
         else
@@ -122,9 +121,9 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
               documentLinks={documentLinks}
               action={
                 allData.map((doc:any,index:number)=>{
-                  const sn = getDocSecName(currentSection,"fullname","keyname");
+                  const sn = getDocSecName({inputName:currentSection,inputType:"fullname",outputType:"keyname"});
                   if (!doc["DS"] || !doc["FD"] || doc["DS"]==DocumentStatusList[1])
-                    return <UploadFileButton key={index} index={index} disabled={!admin && !userPermissions[sectionNames[props.label]].includes("add")}
+                    return <UploadFileButton key={index} index={index} disabled={!admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("add")}
                       AID={doc["AID"]} sectionKeyName={sn}
                       setAdded={setAdded}
                       isPayment={sn=="PD"}
@@ -132,7 +131,7 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
                       _id={sn=="PD"?doc._fileId:undefined}
                   />
                   else
-                    return <ViewFileButton key={index} type="doc" disabled={!admin && !userPermissions[sectionNames[props.label]].includes("view")}
+                    return <ViewFileButton key={index} type="doc" disabled={!admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("view")}
                       AID={doc["AID"]} loanId={doc._loanId} docId={doc._fileId} sectionKeyName={sn} 
                       status={doc["DS"]} rejectionReason={doc["R"]} 
                       setAdded={setAdded} 

@@ -10,7 +10,7 @@ function ProfileIcon(props:{size:"large"|"small", name:string, showStatus?:boole
       height:"50px",
       width:"50px",
       lineHeight:"50px",
-      fontSize:"15px",
+      fontSize:"19px",
     }
   }
   return (

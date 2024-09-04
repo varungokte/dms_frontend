@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { DocumentRejectionReasonList } from "@/functions/Constants";
 import { DocumentStatus, FieldValues } from "@/types/DataTypes";
 import { CommonFileViewerProps, DocumentFileViewerProps, PaymentFileViewerProps } from "@/types/ComponentProps";
+import { editDocument } from "@/apiFunctions/documentAPIs";
+import { addPaymentSchedule } from "@/apiFunctions/paymentAPIs";
+import { deleteFile, getSingleFile } from "@/apiFunctions/fileAPIs";
 
 import { Button, Dialog,DialogContent,DialogTitle, Typography } from "@mui/material";
 import { pdfjs,Document,Page } from "react-pdf";
@@ -32,8 +34,6 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
 
   const [pdfPageCount, setPdfPageCount] = useState(1);
 
-  const {fetchDocument, editDocument, addPaymentSchedule, deleteDocument} = useGlobalContext();
-
   const [openRejectionDialog, setOpenRejectionDialog] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState([false]);
 
@@ -43,7 +43,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
   //useEffect(()=>console.log("file viewer props",props),[props])
 
   const getData = async ()=> {
-    const res = await fetchDocument(props.AID,props.sectionKeyName,props.fileName)
+    const res = await getSingleFile(props.AID,props.sectionKeyName,props.fileName)
     //console.log("type",res.type,"split",res.type.split("/"));
     if (res.status==200){
       setFile(res.file);
@@ -93,6 +93,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
         data["R"]=rejectionReason=="Other"?rejectionText:rejectionReason;
       else if (status=="Verified" && data["R"])
         delete data["R"];
+      console.log("DATA",data)
       res = (await editDocument(data)).status;
     }
     console.log("edit response",res);
@@ -111,7 +112,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
       setErrorMessage(<p className="text-yellow-700">Something went wrong</p>);
   }
 
-  const deleteFile = async (currIndex:number) => {
+  const deleteDoc = async (currIndex:number) => {
     //console.log("deleting",props.AID,props.docId,props.sectionKeyName,props.fileName)
     const args:FieldValues = {AID:props.AID,sectionKeyName:props.sectionKeyName,fileName:props.fileName};
     if (props.type=="doc")
@@ -121,7 +122,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
       args["index"] = currIndex;
     }
 
-    const res = await deleteDocument(args as any);
+    const res = await deleteFile(args as any);
     if (res==200){
       props.setIsDeleted(res);
       props.setAdded(true);
@@ -137,7 +138,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
           ?<span className="text-red-500 flex-auto my-auto">Document Rejected: {props.rejectionReason}</span>
           :<div>
             <button 
-              className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-blue-700":"border-lime-600"} ${verified?"bg-blue-700":"bg-lime-600"} text-white`}
+              className={`border-2 mx-5 py-2 px-5  m-auto rounded-if ${verified?"border-red-700":"border-lime-600"} ${verified?"bg-red-700":"bg-lime-600"} text-white`}
               onClick={()=>changeStatus(verified?"In progress":"Verified")}
             >
               {verified?"Un-Verify":"Verify"}
@@ -151,7 +152,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
           </div>
         }
         <button onClick={()=>setOpenDeleteDialog([true])} className="border-2 m-auto mx-5 p-2 rounded-if border-red-600 text-red-600 hover:bg-gray-800 click:bg-gray-800">Delete File</button>
-        {openDeleteDialog[0]?<DeleteConfirmation thing="file" deleteFunction={deleteFile} currIndex={props.type=="pay"?props.index:-1} open={openDeleteDialog[0]} setOpen={setOpenDeleteDialog} />:<></>}
+        {openDeleteDialog[0]?<DeleteConfirmation thing="file" deleteFunction={deleteDoc} currIndex={props.type=="pay"?props.index:-1} open={openDeleteDialog[0]} setOpen={setOpenDeleteDialog} />:<></>}
 
         <RejectionDialog openDialog={openRejectionDialog} setOpenDialog={setOpenRejectionDialog} 
           rejectionReason={rejectionReason} setRejectionReason={setRejectionReason}

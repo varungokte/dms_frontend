@@ -1,6 +1,7 @@
 import { FieldValues, FormDialogTypes, UserSuggestionsList } from "@/types/DataTypes";
 import { FieldAttributesList, FormFieldAttributes } from "@/types/FormAttributes";
-import { DocumentSectionTypes } from "@/functions/DocumentSectionAttributes";
+import { DocumentSectionTypes } from "@/types/DataTypes";
+
 import TextField from "../FormFieldComponents/TextField";
 import CheckboxField from "../FormFieldComponents/CheckboxField";
 import ComboboxField from "../FormFieldComponents/ComboboxField";
@@ -14,11 +15,10 @@ import SelectField from "../FormFieldComponents/SelectField";
 import TextAreaField from "../FormFieldComponents/TextAreaField";
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 import { CovenantTypeList } from "../../functions/Constants";
-//import { useEffect } from "react";
 
 type FormFieldsProps= {
   form:FieldAttributesList, formType:FormDialogTypes | "docs", 
-  prefillValues:FieldValues, setPrefillValues:Function, 
+  prefillValues:FieldValues, setPrefillValues:React.Dispatch<React.SetStateAction<FieldValues>>, 
   edit?:boolean, 
   filteredSuggestions?:UserSuggestionsList, leaderSuggestions?:UserSuggestionsList, teamMembers?:FieldValues,
   roles?:FieldValues[], setOldZone?:Function, covType?:string, setCovType?:Function
@@ -79,11 +79,11 @@ function RenderFields (props:{index:number, field:FormFieldAttributes, error?:bo
       roleList={props.roles||[]} 
       error={props.error}
     />
-  else if (props.field["type"]=="permissions"){console.log("form render field permission set",props.prefillValues, props.prefillValues[props.field.id])
+  else if (props.field["type"]=="permissions")
     return <PermissionsField key={props.index} index={props.index} fieldData={props.field} 
-      permissionPreset={props.prefillValues[props.field.id]||{}} setPermissionSet={props.setPrefillValues} 
+      permissionSet={props.prefillValues[props.field.id]||{}} setPermissionSet={props.setPrefillValues} 
       disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
-    />}
+    />
   else if (props.field["type"]=="textarea")
     return <TextAreaField key={props.index} index={props.index} fieldData={props.field} 
       prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 

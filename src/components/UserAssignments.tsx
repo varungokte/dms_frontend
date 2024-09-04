@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "../functions/GlobalContext";
-import ComboboxField from "./../components/FormFieldComponents/ComboboxField";
+import ComboboxField from "@/components/FormFieldComponents/ComboboxField";
 import { FieldValues, UserSuggestionsList } from "@/types/DataTypes";
+import { getDocSecList } from "@/functions/sectionNameAttributes";
+import { getUserDealsList } from "@/apiFunctions/dealsListAPIs";
+import { getUserSuggestions } from "@/apiFunctions/suggestionAPIs";
+
 import SendIcon from '@mui/icons-material/Send';
 import Button from "@mui/material/Button";
-import SelectField from "./../components/FormFieldComponents/SelectField";
-import { getDocSecList } from "@/functions/DocumentSectionAttributes";
-import DealsList from "./../components/DealsList";
+import SelectField from "@/components/FormFieldComponents/SelectField";
+import DealsList from "@/components/DealsList";
 
 function UserAssignments(props:{label:string}){
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
-  const {getUserSuggestions, getUserAssignments} = useGlobalContext();
 
   const docSections = {
     labels: ["-"].concat(getDocSecList("fullname")),
@@ -29,7 +30,7 @@ function UserAssignments(props:{label:string}){
   
   const getData = async () => {
     console.log("useremail",userEmail, sectionName)
-    const res = await getUserAssignments({userEmail:userEmail||"", sectionName:docSections.values[docSections.labels.indexOf(sectionName||"")]});
+    const res = await getUserDealsList({userEmail:userEmail||"", sectionName:docSections.values[docSections.labels.indexOf(sectionName||"")]});
     console.log("Responses",res)
     setDocData(res);
   }

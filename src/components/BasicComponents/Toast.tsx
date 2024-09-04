@@ -1,6 +1,6 @@
 import Snackbar from '@mui/material/Snackbar';
 import { Alert, Typography } from "@mui/material";
-import { ToastOptionsAttributes } from "../../types/DataTypes";
+import { ToastOptionsAttributes } from "@/types/DataTypes";
 
 function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Function}){
   const actions = {

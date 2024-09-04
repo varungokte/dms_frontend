@@ -1,19 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
+import { FieldAttributesList } from "@/types/FormAttributes";
+import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
+import { PermissionContext } from "@/functions/Contexts";
+import reorganizePermissions from "@/functions/reorganizePermissions";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible";
 import FormDialog from "./FormComponents/FormDialog";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
-import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
-import { FieldAttributesList } from "@/types/FormAttributes";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import PermissionsField from "./FormFieldComponents/PermissionsField";
 import Toast from "./BasicComponents/Toast";
-import { PermissionContext } from "@/MenuRouter";
 import SubmitButton from "./BasicButtons/SubmitButton";
 import AddButton from "./BasicButtons/AddButton";
+import { addRole, getRolesList } from "@/apiFunctions/roleAPIs";
 
 function RoleManagement(props:{label:string}){
   useEffect(()=>{
@@ -35,8 +37,6 @@ function RoleManagement(props:{label:string}){
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
   const {userPermissions} = useContext(PermissionContext);
-
-	const { addRole, getRolesList} = useGlobalContext();
   
   useEffect(()=>{
     if (added){
@@ -62,6 +62,13 @@ function RoleManagement(props:{label:string}){
           setNames(nameArr);
           return obj;
         });
+        for (let i=0; i<arr.length; i++){
+          const values = arr[i];
+          if (values["P"]){
+            const obj = reorganizePermissions.incoming(values["P"]);
+            values ["P"] = {...obj}
+          }
+        }
         setRoleList(arr);
       }
       catch(e){
@@ -76,9 +83,10 @@ function RoleManagement(props:{label:string}){
   const createRole = async (userData:FieldValues) => {
     const data:FieldValues = {}
     data["N"] = userData["N"];
-    data["P"] = JSON.stringify(userData["P"]);
+    console.log("new role created",{...userData});
+
+    data["P"] = JSON.stringify(reorganizePermissions.outgoing(userData["P"]));
     
-    //console.log("new role created",userData);
 
     const res = await addRole(data);
 
@@ -93,9 +101,9 @@ function RoleManagement(props:{label:string}){
 
   const editRoles = async (roleIndex:number) =>{
     const roleData = {...roleList?.[roleIndex]};
-    roleData["P"] = JSON.stringify(roleData["P"]);
+    roleData["P"] = JSON.stringify(reorganizePermissions.outgoing(roleData["P"]));
     roleData["N"] = names[roleIndex];
-    //console.log("role edited",roleData);
+    console.log("role edited",roleData);
 
     const res = await addRole(roleData);
     
@@ -145,14 +153,14 @@ function RoleManagement(props:{label:string}){
                     <CollapsibleTrigger className="font-medium text-xl mx-3 my-2" onClick={()=>{ const arr=[...editOpen]; arr[index]=!editOpen[index]; setEditOpen(arr)}} disabled={!userPermissions["role"].includes("view")}>
                       <div className="flex flex-row ">
                         <div>{singleRole.N}</div>
-                        {userPermissions["role"].includes("view")?<div>{editOpen[index]?<ChevronDown className="mt-[1px]"/>:<ChevronRight className="mt-[2px]"/>}</div>:<></>}
+                        {userPermissions["role"].includes("view")?<div>{editOpen[index]?<ExpandMoreIcon fontSize="medium"/>:<ChevronRightIcon fontSize="medium" />}</div>:<></>}
                       </div>
                     </CollapsibleTrigger>
                     <CollapsibleContent>
                       <div className="mx-3">
                         <label className="mr-1">Change Role Name:</label> <input className="" value={names[index]||""} onChange={(e)=>setNames(curr=>{curr[index]=e.target.value; return [...curr];})}/>
                       </div>
-                      <div className="m-auto"><PermissionsField key={index} index={index} fieldData={{id:"P", name:"", type:"permissions", required:false, multiple:true}} permissionPreset={singleRole.P}  disabled={!userPermissions["role"].includes("edit")} setPermissionSet={setRoleList} />  </div>
+                      <div className="m-auto"><PermissionsField key={index} index={index} fieldData={{id:"P", name:"", type:"permissions", required:false, multiple:true}} permissionSet={singleRole.P}  disabled={!userPermissions["role"].includes("edit")} setPermissionSet={setRoleList} />  </div>
                       {userPermissions["role"].includes("edit")
                         ?<SubmitButton submitFunction={editRoles} index={index} submitButtonText={`Save Changes for ${singleRole.N}`} />
                         :<></>
@@ -162,9 +170,8 @@ function RoleManagement(props:{label:string}){
                 )
               })}
             </div>
-            
           </div>     
-      }
+        }
     </div>
   )
 }

@@ -1,4 +1,10 @@
-type FieldDataTypes = "text" | "email" | "password" | "integer" | "float" | "date" | "select" | "role" | "combobox" | "multitext" | "textarea" | "permissions" | "checkbox" | "radio" | "break" | "number";
+type FieldDataTypes = 
+  "text" | "email" | "password" | "textarea" | 
+  "integer" | "float" | "number" |
+  "date" | "select" | "radio" | "checkbox" | 
+  "permissions" | "role" | 
+  "combobox" | "multitext" | 
+  "break";
 
 //Form Fields
 type FormFieldAttributes = {
@@ -12,7 +18,8 @@ type FormFieldAttributes = {
   suppressCommas?:boolean, //for integer
   options?:string[] | readonly string[], //for select
   multiple?:boolean, //for combobox 
-  newRole?:boolean //for permissions/role
+  newRole?:boolean, //for permissions/role
+  permissionId?:string, //for role
 };
 
 type SingleFieldAttributes = {category:"single"} & FormFieldAttributes;

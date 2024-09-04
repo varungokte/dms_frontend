@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { FieldValues} from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
-import { DocumentSectionTypes } from "@/functions/DocumentSectionAttributes";
+import { DocumentSectionTypes } from "@/types/DataTypes";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -157,6 +157,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
       setEnableUpload(true);
       setCurrentTab("upload");
       setErrorMessage(<></>);
+      console.log("doc",res);
       if (res["id"]!="")
         setDocId(res["id"]);
       return true;
@@ -182,7 +183,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
       closeDialog()
       return;
     }
-
+    console.log("fileList",fileList, "docId",docId)
     const res = await props.fileSubmit(fileList,docId);
     
     if (res==200){
@@ -222,7 +223,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
           <TabsContent value="upload">
             <Card className="mt-5" style={{borderWidth:"0px", borderColor:"white"}}>
               <CardContent className="border-0">
-                <FileField key={100} index={100} fileList={fileList} fileSetter={setFileList} validateRequiredFields={validateRequiredFields} formSubmit={props.fileSubmit} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} receivedFilesFromServer={receivedFilesFromServer} setReceivedFilesFromServer={setReceivedFilesFromServer} />
+                <FileField key={100} index={100} fileList={fileList} fileSetter={setFileList} edit={props.edit} prefillValues={prefillValues} docId={docId} deleteFile={props.deleteFile} receivedFilesFromServer={receivedFilesFromServer} setReceivedFilesFromServer={setReceivedFilesFromServer} />
               </CardContent>
             </Card>
           </TabsContent>

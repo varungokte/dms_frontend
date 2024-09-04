@@ -100,9 +100,9 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
               else if (dataType=="doc-status")
                 return handleDocStatus(item, cellClassName);
               else if (dataType=="user-status")
-                return handleUserStatus(item, cellClassName, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
+                return handleUserStatus(props.rowIndex+"_"+index, item, cellClassName, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
               else if (dataType=="team-status")
-                return handleTeamStatus(item, cellClassName, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
+                return handleTeamStatus(props.rowIndex+"_"+index, item, cellClassName, props.rowIndex, props.setSelectedEntity||(()=>{}), props.setEntityStatus||(()=>{}));
               else if (dataType=="loan-status")
                 return handleLoanStatus(item, cellClassName);
               else if (dataType=="obj-name")
@@ -157,11 +157,11 @@ const handleLoanStatus = (status:LoanStatus, cellClassName:string) => {
   return <div className={`${LoanStatusStyling[LoanStatusList.indexOf(status)]} ${cellClassName}`}>{status}</div>
 }
 
-const handleUserStatus = (status:UserStatus, cellClassName:string, selectedUser:number, setSelectedUser:Function, setUserStatus:Function) => {
+const handleUserStatus = (index:string, status:UserStatus, cellClassName:string, selectedUser:number, setSelectedUser:Function, setUserStatus:Function) => {
   const editable = cellClassName.search("editable")!=-1;
   const className =`${UserStatusStyling[UserStatusList.indexOf(status)]} w-28 text-center rounded-xl ${cellClassName}`
   if (editable)
-    return <select className={`${className} h-10`} value={status} onChange={e=>{setSelectedUser(selectedUser); setUserStatus(e.target.value)}}>
+    return <select id={index} className={`${className} h-10`} value={status} onChange={e=>{setSelectedUser(selectedUser); setUserStatus(e.target.value)}}>
       {UserStatusList.map((status,index)=>{
         if (status!="-")
           return <option key={index} className={`${UserStatusStyling[index]}`}>{status}</option>
@@ -172,12 +172,12 @@ const handleUserStatus = (status:UserStatus, cellClassName:string, selectedUser:
   
 }
 
-const handleTeamStatus = (status:TeamStatus, cellClassName:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function) => {
+const handleTeamStatus = (index:string, status:TeamStatus, cellClassName:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function) => {
   const editable =cellClassName.search("editable")!=-1;
   const className = `${TeamStatusStyling[TeamStatusList.indexOf(status)]} w-28 text-center rounded-xl ${cellClassName}`
   
   if (editable)
-    return <select className={`${className} h-10`} 
+    return <select id={index} className={`${className} h-10`} 
       value={status} onChange={e=>{setSelectedTeam(selectedTeam); setTeamStatus(e.target.value)}}>
       {TeamStatusList.map((status,index)=>{
         if (status!="-")

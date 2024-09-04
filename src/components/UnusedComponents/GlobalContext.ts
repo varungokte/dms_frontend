@@ -1,70 +1,17 @@
-import axios from 'axios';
-import { decodeToken, isExpired } from "react-jwt";
-import CryptoJS from "crypto-js";
-import { FieldValues, UserSuggestionTypes } from '@/types/DataTypes';
-
-//const Base_Url = "http://139.5.190.208:9000/api/v1/allAPI";
-const Base_Url = "http://192.168.1.9:9000/api/v1/allAPI";
-//const Base_Url="https://dms-pbe2.onrender.com/api/v1/allAPI";
-
-const encryption_key = "JAIBAJRANGBALI";
-
-//HELPERS
-
-const handleEncryption = async (data:object) => {
-	try{
-		const encryptedText = await CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
-		return encryptedText;
-	}
-	catch(err){
-		console.log(err);
-	}
-}
-
-const handleDecryption = async (text:string) => {
-	let decryptedString="";
-	try{
-		decryptedString = await CryptoJS.AES.decrypt(text, encryption_key).toString(CryptoJS.enc.Utf8);
-		const obj = await JSON.parse(decryptedString);
-		return await obj;
-	}
-	catch (err){
-		return decryptedString;
-	}
-};
-
-const getEncryptedToken = () => {
-	const token = localStorage.getItem('Beacon-DMS-token');
-	return token;
-}
-
-const getDecryptedToken = async () => {
-	const token = getEncryptedToken();
-	//console.log("Encrypted token",token);
-	if (token==null)
-		return null;
-	const decryptedToken = await handleDecryption(token);
-	//console.log("Decrypted token", decryptedToken)
-	let decodedToken;
-	if (decryptedToken["TKN"])
-		decodedToken = await decodeToken(decryptedToken["TKN"]);
-	else
-		decodedToken = await decodeToken(decryptedToken);
-	//console.log("Decoded token", decodedToken)
-	const valid = isExpired(decryptedToken);
-	if (!valid)
-		return null;
-	return await decodedToken;
-}
+/* import axios from 'axios';
+import { FieldValues } from '@/types/DataTypes';
+import { apiEndpoint } from './Constants';
+import { getEncryptedToken } from './getToken';
+import { handleDecryption, handleEncryption } from './handleCryptogaphy'; */
 
 //SUGGESTIONS
-const getUserSuggestions = async (type:UserSuggestionTypes, teamLead?:string) => {
+/* const getUserSuggestions = async (type:UserSuggestionTypes, teamLead?:string) => {
 	try {
 		const query:FieldValues = {type:type};
 		if (teamLead)
 			query["RM"]=teamLead;
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/suggestion`, {
+		const response = await axios.get(`${apiEndpoint}/suggestion`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: query
 		});
@@ -76,17 +23,17 @@ const getUserSuggestions = async (type:UserSuggestionTypes, teamLead?:string) =>
 	}
 	catch(error:any) {
 		if (!error.response)
-		return {status:0, obj:null}
+			return {status:0, obj:null}
 		else
-		return {status:error.response.status, obj:null}
+			return {status:error.response.status, obj:null}
 	}
-};
+}; */
 
 //AUTH
-const registerAdmin = async (data:object) => {
+/* const registerAdmin = async (data:object) => {
 	try {
 		const req_body = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addAdmin`, {data:req_body});
+		const response = await axios.post(`${apiEndpoint}/addAdmin`, {data:req_body});
 		//console.log("register response",response);
 		return response.status;
 	} 
@@ -104,7 +51,7 @@ const loginUser = async (data: object) => {
 	//Unauthorized 401 -> Incorrect Username
 	try {
 		const req_body = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/login`, {data:req_body}, {
+		const response = await axios.post(`${apiEndpoint}/login`, {data:req_body}, {
 			headers:{ "Content-type": "application/json" }
 		});
 		if (response.status == 200){
@@ -127,7 +74,7 @@ const sendOTP = async () => {
 	//Error 409 -> 
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/sendOTP`, {
+		const response = await axios.get(`${apiEndpoint}/sendOTP`, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
 		return response.status;
@@ -145,7 +92,7 @@ const verifyOTP = async (otp:any) => {
 	try {
 		const token = await getEncryptedToken();
 		const enc_otp = await handleEncryption({otp});
-		const response = await axios.post(`${Base_Url}/verifyOTP`,{data: enc_otp},{
+		const response = await axios.post(`${apiEndpoint}/verifyOTP`,{data: enc_otp},{
 			headers:{	"Authorization": `Bearer ${token}` }
 		});
 
@@ -161,10 +108,10 @@ const verifyOTP = async (otp:any) => {
 		else	
 			return {status:0, data:null}
 	}
-}
+} */
 
 //USER MANAGEMENT
-const addUser = async (data:object) => {
+/* const addUser = async (data:object) => {
 	//Conflict Error 409 -> Duplicate User
 	//Forbidden 403 -> User is not admin
 	try {
@@ -172,7 +119,7 @@ const addUser = async (data:object) => {
 		
 		const token = getEncryptedToken();
 		
-		const response = await axios.post(`${Base_Url}/addUser`,{data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/addUser`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
 		
@@ -190,7 +137,7 @@ const editUser = async (data:object) => {
 	try {
 		const token = await getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/editUser`,{data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/editUser`,{data:enc_data}, {
 			headers:{
 				"Authorization": `Bearer ${token}`
 			}
@@ -216,7 +163,7 @@ const getUsers = async (data:{currentPage:number, rowsPerPage:number,searchStrin
 		if (data.searchType!="")
 			obj["type"] = data.searchType;
 		const token = await getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listUser`, {
+		const response = await axios.get(`${apiEndpoint}/listUser`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
 		});
@@ -234,7 +181,7 @@ const getUsers = async (data:{currentPage:number, rowsPerPage:number,searchStrin
 const getSingleUser = async (id:string) => {
 	try {
 		const token = await getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/getUser`, {
+		const response = await axios.get(`${apiEndpoint}/getUser`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:{"_id":id}
 		});
@@ -248,9 +195,9 @@ const getSingleUser = async (id:string) => {
 		else
 			return {status:error.response.status, obj:{}}
 	}
-}
+} */
 
-//LOAN ACCOUNT
+/* //LOAN ACCOUNT
 const getLoanList = async (data:{currentPage:number, rowsPerPage:number, filterType?:"Z"|	"P", filterCategory?:string|string[], searchString:string, searchType:string}) => {
 	try {
 		const obj:FieldValues = {}
@@ -267,7 +214,7 @@ const getLoanList = async (data:{currentPage:number, rowsPerPage:number, filterT
 		obj["limit"] = data.rowsPerPage;
 	
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listLoan`, {
+		const response = await axios.get(`${apiEndpoint}/listLoan`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
 		});
@@ -286,7 +233,7 @@ const getLoanList = async (data:{currentPage:number, rowsPerPage:number, filterT
 const getLoanFields = async (loanId:string) => {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/getLoan`, {
+		const response = await axios.get(`${apiEndpoint}/getLoan`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_loanId": loanId },
 		});
@@ -306,7 +253,7 @@ const createLoan = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/updateLoan`,{data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/updateLoan`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
 		return response.status;
@@ -322,7 +269,7 @@ const createLoan = async (data:object) => {
 const deleteLoan = async (loanId:string) => {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.delete(`${Base_Url}/deleteLoan`, {
+		const response = await axios.delete(`${apiEndpoint}/deleteLoan`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_id": loanId },
 		});
@@ -340,7 +287,7 @@ const createAID = async (data:object) =>{
 	try {
 		const token = await getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/createAID`,{data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/createAID`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` }
 		});
 		const decryptedObject = await handleDecryption(response.data);
@@ -352,14 +299,14 @@ const createAID = async (data:object) =>{
 		else
 			return {status:Number(error.response.status), obj:{}};
 	}
-}
-
+} */
+/* 
 //CONTACT DETAILS
 const addContact = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/updateContact`,{data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/updateContact`,{data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -382,7 +329,7 @@ const getContactsList = async (data:{loanId:string,searchString:string, searchTy
 		if (data.searchType!="")
 			obj["type"] = data.searchType;
 
-		const response = await axios.get(`${Base_Url}/listContact`, {
+		const response = await axios.get(`${apiEndpoint}/listContact`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj,
 		});
@@ -400,7 +347,7 @@ const getContactsList = async (data:{loanId:string,searchString:string, searchTy
 const getSingleContact = async (id:string) =>{
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/getContact`, {
+		const response = await axios.get(`${apiEndpoint}/getContact`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_id": id },
 		});
@@ -418,7 +365,7 @@ const getSingleContact = async (id:string) =>{
 const deleteContact = async (id:string) => {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.delete(`${Base_Url}/deleteContact`, {
+		const response = await axios.delete(`${apiEndpoint}/deleteContact`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { "_id": id },
 		});
@@ -430,14 +377,14 @@ const deleteContact = async (id:string) => {
 		else
 			return error.response.status;
 	}	
-}
-
+} */
+/* 
 //RATINGS
 const addRating = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addRating`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/addRating`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -460,7 +407,7 @@ const getRatingsList = async (data:{loanId:string, currentPage:number, rowsPerPa
 		obj["page"] = data.currentPage;
 		obj["limit"] = data.rowsPerPage;
 
-		const response = await axios.get(`${Base_Url}/listRating`, {
+		const response = await axios.get(`${apiEndpoint}/listRating`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: obj
 		});
@@ -473,14 +420,14 @@ const getRatingsList = async (data:{loanId:string, currentPage:number, rowsPerPa
 		else
 			return{status: error.response.status, arr:[]};
 	}
-}
-
+} */
+/* 
 //ROLE MANAGEMENT
 const addRole = async (data:object) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addRole`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/addRole`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -496,7 +443,7 @@ const addRole = async (data:object) => {
 const getRolesList = async () => {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listRole`, {
+		const response = await axios.get(`${apiEndpoint}/listRole`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		const decryptedObject = await handleDecryption(response.data);
@@ -509,8 +456,8 @@ const getRolesList = async () => {
 		else
 			return {status:error.response.status, data:null};
 	}
-}
-
+} */
+/* 
 //TEAM MANAGEMENT
 const getTeamsList = async (data:{loanId?:string, currentPage:number, rowsPerPage:number, searchString:string,searchType:string}) => {
 	try {
@@ -526,7 +473,7 @@ const getTeamsList = async (data:{loanId?:string, currentPage:number, rowsPerPag
 		if (data.searchType!="")
 			obj["type"] = data.searchType;
 
-		const response = await axios.get(`${Base_Url}/listTeam`, {
+		const response = await axios.get(`${apiEndpoint}/listTeam`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
 		});
@@ -547,7 +494,7 @@ const addTeam = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/addTeam`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/addTeam`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -563,7 +510,7 @@ const editTeam = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/editTeam`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/editTeam`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -579,7 +526,7 @@ const editTeam = async (data:any) => {
 const getSingleTeam = async (teamId:string) => {
 	try {
 		const token = await getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/getTeam`, {
+		const response = await axios.get(`${apiEndpoint}/getTeam`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:{_id:teamId}
 		});
@@ -593,8 +540,8 @@ const getSingleTeam = async (teamId:string) => {
 		else
 			return {status:error.response.status,obj:null};
 	}
-};
-
+}; */
+/* 
 //DOCUMENTS
 const addDocument =  async (data:any) => {
 	try {
@@ -602,11 +549,12 @@ const addDocument =  async (data:any) => {
 
 		const enc_data = await handleEncryption(data);
 
-		const response = await axios.post(`${Base_Url}/addDocsDetails`, {data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/addDocsDetails`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}`}});
-
+		console.log("response",response);
 		const decryptedObject = await handleDecryption(response.data);
-		return {status:response.status, id:decryptedObject["_id"]||""};
+		console.log("add document","decrypted obj",decryptedObject,"id",decryptedObject["_id"])
+		return {status:response.status, id:decryptedObject||""};
 	}
 
 	catch(error:any) {
@@ -623,7 +571,7 @@ const editDocument =  async (data:FieldValues) => {
 		//console.log("edit data",data)
 		const enc_data = await handleEncryption(data);
 
-		const response = await axios.post(`${Base_Url}/editDocsDetails`, {data:enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/editDocsDetails`, {data:enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}`}});
 
 		const decryptedObject = await handleDecryption(response.data);
@@ -636,8 +584,8 @@ const editDocument =  async (data:FieldValues) => {
 		else
 			return {status:error.response.status as number, id:""};
 	}
-};
-
+}; */
+/* 
 const uploadFile = async (args:{data:FieldValues,AID:string, sectionKeyName:string, docId:string|number, loanId?:string, isPayment?:boolean}) => {
 	try {
 		const token = getEncryptedToken();
@@ -651,7 +599,7 @@ const uploadFile = async (args:{data:FieldValues,AID:string, sectionKeyName:stri
 		else
 			query["_id"]=args.docId;
 		
-		const response = await axios.post(`${Base_Url}/uploadDocs`, args.data, {
+		const response = await axios.post(`${apiEndpoint}/uploadDocs`, args.data, {
 			headers:{ "Authorization": `Bearer ${token}`, "Content-Type": 'multipart/form-data' },
 			params: query
 		});
@@ -665,8 +613,8 @@ const uploadFile = async (args:{data:FieldValues,AID:string, sectionKeyName:stri
 		else
 			return error.response.status as number;
 	}
-};
-
+}; */
+/* 
 const getDocumentsList = async (data:{loanId:string, sectionName:string, currentPage:number, rowsPerPage:number,searchString:string, searchType:string}) =>  {
 	try {
 		const token = getEncryptedToken();
@@ -680,7 +628,7 @@ const getDocumentsList = async (data:{loanId:string, sectionName:string, current
 		if (data.searchType!="")
 			obj["type"] = data.searchType;
 		
-		const response = await axios.get(`${Base_Url}/listDocsDetail`, {
+		const response = await axios.get(`${apiEndpoint}/listDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
 		});
@@ -694,13 +642,13 @@ const getDocumentsList = async (data:{loanId:string, sectionName:string, current
 		else
 			return {status: error.response.status, obj:null};;
 	}
-};
+}; */
 
 /* const getFileList = async (AID:string,section_name:string, document_category:string) => {
 	try {
 		const token = getEncryptedToken();
 
-		const response = await axios.get(`${Base_Url}/listDocs`, {
+		const response = await axios.get(`${apiEndpoint}/listDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { LOC: `${AID}/${section_name}/${document_category}` }
 		});
@@ -717,12 +665,12 @@ const getDocumentsList = async (data:{loanId:string, sectionName:string, current
 			return {status: error.status, obj:null};
 	}
 } */
-
+/* 
 const fetchDocument = async (AID:string,section_name:string, file_name:string) => {
 	try {
 		const token = getEncryptedToken();
 		//console.log(`${AID}/${section_name}/${file_name}`)
-		const response = await axios.get(`${Base_Url}/viewDocs`, {
+		const response = await axios.get(`${apiEndpoint}/viewDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params: { LOC: `${AID}/${section_name}/${file_name}` },
 			responseType: 'blob',
@@ -730,10 +678,6 @@ const fetchDocument = async (AID:string,section_name:string, file_name:string) =
 		const blob = new Blob([response.data], {type:response.data.type});
 		return {status:response.status, file:blob, type:response.data.type};
 
-		/* let url = URL.createObjectURL(blob);
-		//URL.revokeObjectURL(url);
-		
-		return {status:response.status, url:url, type:response.data.type}; */
 	} 
 	catch(error:any) {
 		if (!error.response)
@@ -753,7 +697,7 @@ const deleteDocument = async (args:{AID:string, docId?:string|number, index?:num
 
 	try {
 		const token = getEncryptedToken()
-		const response = await axios.delete(`${Base_Url}/deleteDocs`, {
+		const response = await axios.delete(`${apiEndpoint}/deleteDocs`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params
 		});
@@ -768,8 +712,8 @@ const deleteDocument = async (args:{AID:string, docId?:string|number, index?:num
 			return error.response.status as number || 0;
 	}
 }
-
-const getUserAssignments =async (data:{userEmail:string, sectionName:string, currentPage?:number, rowsPerPage?:number}) =>  {
+ */
+/* const getUserAssignments =async (data:{userEmail:string, sectionName:string, currentPage?:number, rowsPerPage?:number}) =>  {
 	try {
 		const token = getEncryptedToken();
 
@@ -779,7 +723,7 @@ const getUserAssignments =async (data:{userEmail:string, sectionName:string, cur
 		obj["page"] = data.currentPage || 1;
 		obj["limit"] = data.rowsPerPage || 10;
 
-		const response = await axios.get(`${Base_Url}/mst/assignlistDocsDetail`, {
+		const response = await axios.get(`${apiEndpoint}/mst/assignlistDocsDetail`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
 		});
@@ -811,7 +755,7 @@ const getDealList = async (data:{admin?:boolean, sectionName:string, teamRole:st
 
 		const route = data.admin?"mst/listDocsDetail":"assignlistDocsDetail"
 		
-		const response = await axios.get(`${Base_Url}/${route}`, {
+		const response = await axios.get(`${apiEndpoint}/${route}`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj
 		});
@@ -828,14 +772,14 @@ const getDealList = async (data:{admin?:boolean, sectionName:string, teamRole:st
 		else 
 			return {status: error.response.status, obj:null};
 	}
-};
-
+}; */
+/* 
 //RELATIONSHING MAPPING
 const selectTeam = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/selectTeam`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/selectTeam`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -846,14 +790,14 @@ const selectTeam = async (data:any) => {
 		else
 			return error.response.status;
 	}
-}
-
+} */
+/* 
 //MASTERS
 const addToMasters = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/updateMst`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/updateMst`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -869,7 +813,7 @@ const addToMasters = async (data:any) => {
 const getMastersList = async () =>  {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listMst`, {
+		const response = await axios.get(`${apiEndpoint}/listMst`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		const decryptedObject = await handleDecryption(response.data);
@@ -882,25 +826,25 @@ const getMastersList = async () =>  {
 		else
 			return {status: error.response.status, obj:null};;
 	}
-};
+}; */
 
 /* const decrypt = async (data:object) => {
-	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), encryption_key).toString();
+	const encryptedText = CryptoJS.AES.encrypt(JSON.stringify(data), EncryptionKey).toString();
 	console.log("ENCRYPTED TEXTZ", encryptedText);
 	const reqBody = {"data":encryptedText};
 
 	const obj = await handleDecryption("U2FsdGVkX18wPWv+D83d+QrLDMwoTIwTa3u74O3wG87AtCcHErX7iuHS6Ns48w3i");
 	console.log("RESULT", reqBody);
-	const response = await axios.post(`${Base_Url}/decrypt`,reqBody);
+	const response = await axios.post(`${apiEndpoint}/decrypt`,reqBody);
 	return obj;
 }
 */
-
+/* 
 const addPaymentSchedule = async (data:any) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${Base_Url}/updatePaymentDetails`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/updatePaymentDetails`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;
@@ -916,7 +860,7 @@ const addPaymentSchedule = async (data:any) => {
 const getPaymentSchedule = async (loanId:string) =>  {
 	try {
 		const token = getEncryptedToken();
-		const response = await axios.get(`${Base_Url}/listPaymentDetails`, {
+		const response = await axios.get(`${apiEndpoint}/listPaymentDetails`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:{_loanId:loanId}
 		});
@@ -930,9 +874,9 @@ const getPaymentSchedule = async (loanId:string) =>  {
 		else
 			return {status: error.response.status, obj:null};;
 	}
-};
+}; */
 
-const getSpecialList = async (data:{admin?:boolean, type:"def"|"crit", sectionName:string, currentPage?:number, rowsPerPage?:number}) =>  {
+/* const getSpecialList = async (data:{admin?:boolean, type:"def"|"crit", sectionName:string, currentPage?:number, rowsPerPage?:number}) =>  {
 	try {
 		const token = getEncryptedToken();
 		
@@ -947,7 +891,7 @@ const getSpecialList = async (data:{admin?:boolean, type:"def"|"crit", sectionNa
 		else
 			route = data.type=="def"?"assignlistDefault":"assignlistCriticalCases";
 		
-		const response = await axios.get(`${Base_Url}/${route}`, {
+		const response = await axios.get(`${apiEndpoint}/${route}`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:obj,
 		});
@@ -961,29 +905,11 @@ const getSpecialList = async (data:{admin?:boolean, type:"def"|"crit", sectionNa
 		else
 			return {status: error.response.status, obj:null};;
 	}
-};
-
+}; */
+/* 
 const useGlobalContext = () => {
 	return {
-		getEncryptedToken, getDecryptedToken, handleEncryption, handleDecryption,
-		registerAdmin, loginUser,
-		sendOTP, verifyOTP,
-		addUser, editUser, getUsers, getSingleUser,
-		createLoan, createAID,
-		addContact, getContactsList,getSingleContact, deleteContact,
-		getLoanList, getLoanFields, deleteLoan,
-		addRating, getRatingsList,
-		addRole, getRolesList,
-		getUserSuggestions,
-		getTeamsList, addTeam, editTeam, getSingleTeam,
-		addDocument, uploadFile, getDocumentsList, editDocument, /* getFileList, */ deleteDocument, fetchDocument,
-		selectTeam,
-		addToMasters,getMastersList,
-		getDealList,
-		addPaymentSchedule, getPaymentSchedule,
-		getSpecialList,
-		getUserAssignments,
 	}
 }
 
-export default useGlobalContext;
+export default useGlobalContext; */

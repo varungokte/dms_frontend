@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { useNavigate } from "react-router-dom";
+import { sendOTP,verifyOTP } from "@/apiFunctions/authAPIs";
+import { ToastOptionsAttributes } from "@/types/DataTypes";
+
 import SubmitButton from "../BasicButtons/SubmitButton";
 import Button from "@mui/material/Button";
 import CountdownTimer from "../BasicComponents/CountdownTimer";
 import Toast from "./../BasicComponents/Toast";
-import { ToastOptionsAttributes } from "@/types/DataTypes";
 
 function VerificationComponent(props:{setCheck:Function}){
   useEffect(()=>{
 		document.title="Verify Email | Beacon DMS"
 	},[]);
   
-  const {sendOTP, verifyOTP} = useGlobalContext();
 	const navigate = useNavigate();
 
   const [message, setMessage] = useState(<></>)
@@ -45,7 +45,8 @@ function VerificationComponent(props:{setCheck:Function}){
   const submitOTP = async () => {
     try{
       setMessage(<></>);
-      const res = await verifyOTP(otp)
+      const res = await verifyOTP(otp);
+      console.log("otp submitted response",res);
       if (res.status==412)
         navigate("/");
       else if (res.status==200){

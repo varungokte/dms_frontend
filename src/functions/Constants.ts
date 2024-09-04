@@ -1,34 +1,24 @@
 import { FieldValues } from "@/types/DataTypes";
 
-const sectionNames:FieldValues = {
-  "Masters":"masters",
-  "Role Management":"role",
-  "Team Management":"team",
-  "User Management":"user",
-  "Loan Account":"loan",
-  "Contact Details":"contact",
-  "Ratings":"rating",
-  "Transaction Documents":"transaction",
-  "Compliance Documents":"compliance",
-  "Covenants":"covenants",
-  "Condition Precedent":"precedent",
-  "Condition Subsequent":"subsequent",
-  "Payment Schedule":"payment",
-  "Reminders":"reminders",
-  "Default Cases":"default",
-  "Critical Cases":"critical",
-  "Reports":"reports",
-}
-const panopticSectionNames:FieldValues = {
-  "Master Default Cases":"default",
-  "Master Critical Cases":"critical",
-  "Master Transaction Documents":"transaction",
-  "Master Compliance Documents":"compliance",
-  "Master Covenants":"covenants",
-  "Master Condition Precedent":"precedent",
-  "Master Condition Subsequent":"subsequent",
-  "Master Payment Schedule":"payment",
-}
+const ServerUrl = import.meta.env.VITE_APP_SERVER_URL;
+//const ServerUrl = "http://139.5.190.208:9000";
+const apiEndpoint = `${ServerUrl}/api/v1/allAPI`;
+const EncryptionKey ="JAIBAJRANGBALI"// import.meta.env.VITE_APP_ENCRYPTION_KEY;
+
+//Status Values
+const PriorityList =["-", "Low", "Medium", "High"] as const;
+const UserStatusList = ["-", "Unverified", "Active", "Inactive"] as const;
+const TeamStatusList = ["-", "Active", "Inactive"] as const;
+const DocumentStatusList = ["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const;
+const FileStatusList = ["-", "Pending",  "Verified"] as const;
+const LoanStatusList = ["-","Preliminary", "Document", "Live", "Hold", "Cancel"] as const;
+
+//Constants
+const FrequencyList:string[] = ["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"];
+const LoanSecuredList:string[] = ["-","Secured","Unsecured"];
+const YesOrNoList:string[] = ["-", "Yes","No"];
+const HolidayConventionList:string[] = ["-","Precedent","Subsequent","None"];
+const InterestTypeList:string[] = ["-", "Fixed","Manual"];
 
 //Masters
 const LoanProductList:string[] = ["-"];
@@ -39,21 +29,6 @@ const IndustryList:string[] = ["-",""];/* , "Real Estate","NBFC", "NBFC-MFI", "B
 const LoanTypeList:string[] = ["-", "Long Term", "Short Term"];
 const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant"];
 const TableRowsPerPage:number[] = [-1,2,5,10];
-
-//Statuses
-const PriorityList =["-", "Low", "Medium", "High"] as const;
-const UserStatusList = ["-", "Unverified", "Active", "Inactive"] as const;
-const TeamStatusList = ["-", "Active", "Inactive"] as const;
-const DocumentStatusList = ["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const;
-const FileStatusList = ["-", "Pending",  "Verified"] as const;
-const LoanStatusList = ["-","Preliminary", "Document", "Live", "Hold", "Cancel"] as const;
-
-//Basics
-const FrequencyList:string[] = ["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"];
-const LoanSecuredList:string[] = ["-","Secured","Unsecured"];
-const YesOrNoList:string[] = ["-", "Yes","No"];
-const HolidayConventionList:string[] = ["-","Precedent","Subsequent","None"];
-const InterestTypeList:string[] = ["-", "Fixed","Manual"];
 
 //Loan Details
 const ProjectStatusList:string[] = ["-","Not Started","In Progress","Finished"];
@@ -95,7 +70,8 @@ const MastersMapping:FieldValues = {
 }
 
 export { 
-  MastersMapping, sectionNames,
+  ServerUrl, EncryptionKey, apiEndpoint,
+  MastersMapping,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList, LoanStatusList,
   InterestTypeList, FrequencyList, LoanSecuredList, YesOrNoList, HolidayConventionList,
@@ -105,5 +81,4 @@ export {
   TransactionCategoryList,ComplianceCategoryList,
   CovenantCategoryList,CovenantTypeList,
   ConditionPrecedentCategoryList,ConditionSubsequentCategoryList,
-  panopticSectionNames,
 };

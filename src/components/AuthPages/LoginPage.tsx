@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { FieldValues } from "@/types/DataTypes";
 import { SingleFieldAttributes } from "@/types/FormAttributes";
-import useGlobalContext from "@/functions/GlobalContext";
+import { loginUser } from "@/apiFunctions/authAPIs";
 
 import login_img from "@/static/login_img.png";
 import TextField from "../FormFieldComponents/TextField";
@@ -25,7 +25,6 @@ function LoginPage() {
   const [errorMessage, setErrorMessage] = useState(<></>);
 
 	const navigate = useNavigate();
-	const { loginUser } = useGlobalContext();
 
 	const submitData = async () => {
 

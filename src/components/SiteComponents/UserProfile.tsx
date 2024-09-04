@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
+import { getDecryptedToken } from "@/functions/getToken";
 import { FieldValues } from "@/types/DataTypes";
 import ProfileIcon from "@/components/BasicComponents/ProfileIcon";
 
 function UserProfile(){
-  const {getDecryptedToken} = useGlobalContext();
   const [token, setToken] = useState<FieldValues>();
 
   const UserStatusStyling:any = {

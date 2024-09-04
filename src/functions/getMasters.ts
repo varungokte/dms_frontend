@@ -1,10 +1,7 @@
+import { getMastersList } from '@/apiFunctions/masterAPIs';
 import { MastersMapping } from './Constants';
-import useGlobalContext from './GlobalContext';
 
 const getMasters = async (setMasterLists:Function, setMastersIdList:Function,) => {
-
-	const {getMastersList} = useGlobalContext();
-
   const res = await getMastersList();
   if (res.status==200){
     //console.log("masters response",res);

@@ -1,8 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { LoanCommonProps } from "@/types/ComponentProps";
+import { CovenantTypeList } from "@/functions/Constants";
+import { PermissionContext } from "@/functions/Contexts";
+import { addDocument, editDocument, getDocumentsList } from "@/apiFunctions/documentAPIs";
+import { addFile, deleteFile } from "@/apiFunctions/fileAPIs";
 
+import { getModSecName } from "@/functions/sectionNameAttributes";
 import FormDialogDocuments from "../FormComponents/FormDialogDocuments";
 import LoanDocumentView from "./LoanDocumentComponents/LoanDocumentView";
 import LoanCovenantView from "./LoanDocumentComponents/LoanCovenantView";
@@ -12,9 +16,7 @@ import LoadingMessage from "../BasicMessages/LoadingMessage";
 import Filter from "../BasicComponents/Filter";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import { CovenantTypeList, sectionNames } from "../../functions/Constants";
 import setSection from "./LoanDocumentComponents/LoanDocSectionDetails";
-import { PermissionContext } from "@/MenuRouter";
 import Toast from "../BasicComponents/Toast";
 import { Pagination } from "../BasicComponents/Pagination";
 import SearchByType from "../BasicComponents/SearchByType";
@@ -49,7 +51,7 @@ function LoanDocuments(props:LoanCommonProps) {
 
   useEffect(()=>{
     if (added){
-      getDocumentsList().then(res=>{
+      getList().then(res=>{
         //console.log("response",res);
         setDocData(res);
       })
@@ -57,8 +59,7 @@ function LoanDocuments(props:LoanCommonProps) {
     }
   },[added]);
 
-  const getDocumentsList = async () =>{
-    const { getDocumentsList } = useGlobalContext();
+  const getList = async () =>{
 
     const res = await getDocumentsList({loanId:props.loanId,sectionName:sectionDetails.sectionKeyName, currentPage, rowsPerPage, searchString, searchType});
     
@@ -76,9 +77,7 @@ function LoanDocuments(props:LoanCommonProps) {
       return [];
   }
 
-  const addDocument = async (userValues:any) =>{
-    const { addDocument } = useGlobalContext();
-
+  const addDoc = async (userValues:any) =>{
     userValues["_loanId"] = props.loanId;
     userValues["SN"] = sectionDetails.sectionKeyName;
     //console.log("userValues",userValues)
@@ -91,8 +90,7 @@ function LoanDocuments(props:LoanCommonProps) {
     return res;  
   }
 
-  const editDocument = async (userValues:FieldValues,index:number) => {
-    const { editDocument } = useGlobalContext();
+  const editDoc = async (userValues:FieldValues,index:number) => {
     if (!docData)
       return;
 
@@ -121,8 +119,7 @@ function LoanDocuments(props:LoanCommonProps) {
     return res;
   }
 
-  const addFile = async (userFiles:any, docId:string) => {
-    const { uploadFile } = useGlobalContext();
+  const uploadFile = async (userFiles:any, docId:string) => {
     const formData = new FormData();
 
     //console.log("userFiles",userFiles);
@@ -130,19 +127,18 @@ function LoanDocuments(props:LoanCommonProps) {
     for (let i=0; i<userFiles.length; i++)
       formData.append("file", userFiles[i]);
     
-    const res = await uploadFile({data:formData,AID:props.AID,sectionKeyName:sectionDetails.sectionKeyName,docId:docId});
+    const res = await addFile({data:formData,AID:props.AID,sectionKeyName:sectionDetails.sectionKeyName,docId:docId});
     if (res==200)
       setToastOptions({open:true, type:"success", action:"add", section:"File"});
     
     return res;
   }
 
-  const deleteFile = async (docId:string,fileName:string) => {
-    const { deleteDocument } = useGlobalContext();
+  const removeFile = async (docId:string,fileName:string) => {
 
     //console.log("DELETE",props.AID,docId, fileName,sectionDetails.sectionName)
 
-    const res = await deleteDocument({AID:props.AID, docId:docId, sectionKeyName:sectionDetails.sectionKeyName, fileName:fileName});
+    const res = await deleteFile({AID:props.AID, docId:docId, sectionKeyName:sectionDetails.sectionKeyName, fileName:fileName});
 
     if (res==200)
       setToastOptions({open:true, type:"success", action:"delete", section:"file"});
@@ -172,13 +168,13 @@ function LoanDocuments(props:LoanCommonProps) {
         </div>
       
         <div className="mr-3">
-          {props.actionType!="VIEW" && userPermissions[sectionNames[props.label]] && userPermissions[sectionNames[props.label]]["docs"] && userPermissions[sectionNames[props.label]]["docs"].includes("add")
+          {props.actionType!="VIEW" && userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})] && userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["docs"] && userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["docs"].includes("add")
             ?<div>
               <AddButton sectionName={sectionDetails.sectionType} onClick={()=>setAddOpen([true])} />
               {addOpen[0]
                 ?<FormDialogDocuments key={-5} index={0} edit={false} type={sectionDetails.sectionType}
                   formOpen={addOpen[0]} setFormOpen={setAddOpen} formTitle={props.label} formSize="md"
-                  detailSubmit={addDocument} fileSubmit={addFile} deleteFile={deleteFile} getFiles={getFileList}
+                  detailSubmit={addDoc} fileSubmit={uploadFile} deleteFile={removeFile} getFiles={getFileList}
                   formFields={sectionDetails.fieldList}currentFields={{}} setAdded={setAdded}
                 />
                 :<></>
@@ -194,18 +190,18 @@ function LoanDocuments(props:LoanCommonProps) {
           :sectionDetails.sectionType=="document"
             ?<LoanDocumentView data={docData} label={props.label} fieldList={sectionDetails.fieldList} 
               formOpen={editOpen} setFormOpen={setEditOpen}
-              editFunction={editDocument} deleteFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+              editFunction={editDoc} deleteFunction={deleteDocument} addFileFunction={uploadFile} deleteFileFunction={removeFile} getFileListFunction={getFileList}
               setAdded={setAdded} disableEdit={props.actionType=="VIEW"}
             />
             :sectionDetails.sectionType=="covenant"
               ?<LoanCovenantView data={docData} label={props.label} type={covenantType} fieldList={sectionDetails.fieldList}
                 formOpen={editOpen} setFormOpen={setEditOpen}
-                editFunction={editDocument} deleteFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+                editFunction={editDoc} deleteFunction={deleteDocument} addFileFunction={uploadFile} deleteFileFunction={removeFile} getFileListFunction={getFileList}
                 setAdded={setAdded} disableEdit={props.actionType=="VIEW"}
               />
               :<LoanConditionView data={docData} label={props.label} fieldList={sectionDetails.fieldList}
                 formOpen={editOpen} setFormOpen={setEditOpen}
-                editFunction={editDocument} deleteFunction={deleteDocument} addFileFunction={addFile} deleteFileFunction={deleteFile} getFileListFunction={getFileList}
+                editFunction={editDoc} deleteFunction={deleteDocument} addFileFunction={uploadFile} deleteFileFunction={removeFile} getFileListFunction={getFileList}
                 setAdded={setAdded} disableEdit={props.actionType=="VIEW"}
               />
           :<LoadingMessage sectionName="list" />

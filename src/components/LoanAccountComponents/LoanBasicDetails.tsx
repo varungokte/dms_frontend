@@ -1,5 +1,4 @@
 import { FormEvent, useEffect, useState } from "react";
-import useGlobalContext from "../../functions/GlobalContext";
 import moment from "moment";
 import { FieldValues,} from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
@@ -13,6 +12,7 @@ import SelectField from "../FormFieldComponents/SelectField";
 import DateField from "../FormFieldComponents/DateField";
 import TextField from "../FormFieldComponents/TextField";
 import IntegerField from "../FormFieldComponents/IntegerField";
+import { createLoan } from "@/apiFunctions/loanAPIs";
 
 function LoanBasicDetails(props:LoanCommonProps) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
@@ -97,9 +97,6 @@ function LoanBasicDetails(props:LoanCommonProps) {
       });
     }
   },[fieldValues["A"]])
-
-
-  const {createLoan} = useGlobalContext(); 
 
   const compareFieldsToPreexisting = () => {
     let no_changes = true;

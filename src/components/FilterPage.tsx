@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
 import { LoanProductList, ZoneList } from "../functions/Constants";
 import { Link } from "react-router-dom";
@@ -14,9 +13,10 @@ import delete_icon from "@/static/delete_icon.svg";
 import edit_icon from "@/static/edit_icon.svg";
 import view_icon from "@/static/view_icon.svg";
 import Toast from "./BasicComponents/Toast";
-import { PermissionContext } from "@/MenuRouter";
+import { PermissionContext } from "@/functions/Contexts";
 import { Pagination } from "./BasicComponents/Pagination";
 import SearchByType from "./BasicComponents/SearchByType";
+import { deleteLoan, getLoansList } from "@/apiFunctions/loanAPIs";
 
 function FilterPage(props:{label:string}){
   useEffect(()=>{
@@ -33,8 +33,6 @@ function FilterPage(props:{label:string}){
       options:LoanProductList
     }
   };
-
-	const { getLoanList,deleteLoan} = useGlobalContext();
 
   const {userPermissions} = useContext(PermissionContext);
 
@@ -61,7 +59,7 @@ function FilterPage(props:{label:string}){
 
 	useEffect(()=>{
 		setLoanList(undefined);
-		getLoanList({filterType:filterCategory.label,filterCategory:filtersList.length==0?[]:filtersList, currentPage,rowsPerPage, searchString, searchType}).then(res=>{
+		getLoansList({filterType:filterCategory.label,filterCategory:filtersList.length==0?[]:filtersList, currentPage,rowsPerPage, searchString, searchType}).then(res=>{
       //console.log("Response",res)
 			if (res.status==200){
         if (res.arr && res.arr[0] && res.arr[0]["data"]){

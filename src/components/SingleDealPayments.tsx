@@ -1,17 +1,18 @@
 import { useContext, useEffect, useState } from "react";
-import useGlobalContext from "../functions/GlobalContext";
-import { DocumentSectionDetails } from "@/functions/DocumentSectionAttributes";
-import { DocumentStatusList, panopticSectionNames, sectionNames } from "../functions/Constants";
+import { getModSecName, getPanSecName } from "@/functions/sectionNameAttributes";
+import { DocumentSectionDetails } from "@/types/DataTypes";
+import { DocumentStatusList } from "@/functions/Constants";
+import { getPaymentSchedule } from "@/apiFunctions/paymentAPIs";
+import { ToastOptionsAttributes } from "@/types/DataTypes";
+import { PermissionContext } from "@/functions/Contexts";
 
 import { DataTable } from "./BasicTables/Table";
 import UploadFileButton from "./BasicButtons/UploadFileButton";
 import ViewFileButton from "./BasicButtons/ViewFileButton";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
-import { PermissionContext } from "@/MenuRouter";
 import { Pagination } from "./BasicComponents/Pagination";
 import Toast from "./BasicComponents/Toast";
-import { ToastOptionsAttributes } from "@/types/DataTypes";
 
 function SingleDealPayments(props:{label:string, loanId:string, AID:string, sectionDetails:DocumentSectionDetails, admin:boolean}){
   const [paymentData, setPaymentData] = useState<any>();
@@ -20,7 +21,6 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
   const [isDeleted, setIsDeleted] = useState<number>();
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
   
-  const {getPaymentSchedule} = useGlobalContext();
   const {userPermissions} = useContext(PermissionContext);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -79,13 +79,13 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
                   return <></>;
                 else if (!inst["S"] || inst["S"]==DocumentStatusList[1])
                   return <UploadFileButton key={props.AID+index} index={index} 
-                    disabled={(!props.admin && !userPermissions[sectionNames[props.label]]["file"].includes("add")) || (props.admin && !userPermissions[panopticSectionNames[props.label]]["file"].includes("add"))}
+                    disabled={(!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add")) || (props.admin && !userPermissions[getPanSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add"))}
                     AID={props.AID} sectionKeyName={props.sectionDetails.sectionKeyName} docId={index} _id={scheduleId}
                     setAdded={setAdded} isPayment
                   />
                 else
                   return <ViewFileButton key={props.AID+index} type="pay" 
-                    disabled={(!props.admin && !userPermissions[sectionNames[props.label]]["file"].includes("view") || (props.admin && !userPermissions[panopticSectionNames[props.label]]["file"].includes("view")))}
+                    disabled={(!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view") || (props.admin && !userPermissions[getPanSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view")))}
                     AID={props.AID} scheduleId={scheduleId} sectionKeyName={props.sectionDetails.sectionKeyName} index={index}
                     setAdded={setAdded} schedule={paymentData} setIsDeleted={setIsDeleted}
                     status={inst["S"]} rejectionReason={inst["R"]} 

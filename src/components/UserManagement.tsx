@@ -1,25 +1,27 @@
 import {  useContext, useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
+import { getModSecName } from "@/functions/sectionNameAttributes";
+import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
+import { FieldAttributesList } from "@/types/FormAttributes";
+import reorganizePermissions from "@/functions/reorganizePermissions";
+import { addUser, editUser, getUsersList } from "@/apiFunctions/userAPIs";
 
 import { DataTable } from "@/components/BasicTables/Table";
-import { ZoneList, sectionNames } from "../functions/Constants";
+import { ZoneList } from "@/functions/Constants";
 import FormDialog from "./FormComponents/FormDialog";
 
 import edit_icon from "@/static/edit_icon.svg";
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import EmptyPageMessage from "@/components/BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
-import { FieldAttributesList } from "@/types/FormAttributes";
 
 import Toast from "./BasicComponents/Toast";
-import { PermissionContext } from "@/MenuRouter";
+import { PermissionContext } from "@/functions/Contexts";
 import { EntriesPerPage, Pagination } from "./BasicComponents/Pagination";
 import SearchByType from "./BasicComponents/SearchByType";
 import ForbiddenMessage from "./BasicMessages/FobiddenMessage";
 import AddButton from "./BasicButtons/AddButton";
 
-function UserManagements(props:{label:string}){
+function UserManagement(props:{label:string}){
   //useEffect(()=>console.log("user props",props),[props])
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
@@ -36,7 +38,7 @@ function UserManagements(props:{label:string}){
     ]},
     { category:"single", id: "RM", name: "Reporting Manager", type:"combobox", immutable: true, required:true },
     { category:"single", id: "M", name: "User is a Manager", type:"checkbox", required:false },
-    { category:"single", id: "R", name:"Role", type:"role", required:true },
+    { category:"single", id: "R", name:"Role", type:"role", permissionId:"UP", required:true },
   ];
 
   const {userPermissions} = useContext(PermissionContext);
@@ -46,7 +48,7 @@ function UserManagements(props:{label:string}){
 
   const [forbidden, setForbidden] = useState(<></>);
 
-  const editPermission = userPermissions[sectionNames[props.label]].includes("edit");
+  const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
   const tableHeadings = ["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status"];
   const tableDataTypes:TableDataTypes[] = ["text", "text", "text", "text","text", "user-status"];
 
@@ -74,8 +76,7 @@ function UserManagements(props:{label:string}){
     if (!added)
       return;
     
-    const {getUsers} = useGlobalContext();
-    const res = await getUsers({currentPage, rowsPerPage, searchString, searchType });
+    const res = await getUsersList({currentPage, rowsPerPage, searchString, searchType });
     //console.log("res",res)
     if (res.status==200){
       if (res.obj && res.obj[0] && res.obj[0]["data"]){
@@ -95,7 +96,6 @@ function UserManagements(props:{label:string}){
   },[added,searchString]);
 
   const createUser = async (userValues:any) => {
-    const {addUser} = useGlobalContext();
 
     const data:any={};
     for (let i=0; i<fieldList.length; i++){
@@ -119,7 +119,8 @@ function UserManagements(props:{label:string}){
     
     if (userValues["UP"]){
       const obj = userValues["UP"];
-      userValues["UP"] = JSON.stringify(obj);
+      //userValues["UP"] = JSON.stringify(obj);
+      userValues["UP"] = JSON.stringify(reorganizePermissions.outgoing(obj));
     }
 
     const res = await addUser(userValues);
@@ -135,8 +136,7 @@ function UserManagements(props:{label:string}){
     return res;
   }
 
-  const editUser = async (userValues:any, index:number) => {
-    const {editUser} = useGlobalContext();
+  const changeUser = async (userValues:any, index:number) => {
 
     if (selectedUser==-1 && index==undefined || !userData)
       return;
@@ -151,7 +151,6 @@ function UserManagements(props:{label:string}){
       if (userData[index][key]==userValues[key])
         delete userValues[key];
     }
-
     userValues["_id"] = userData[index]["_id"]
 
     if (userValues["RM"] && typeof userValues["RM"]!="string"){
@@ -161,10 +160,10 @@ function UserManagements(props:{label:string}){
     
     if (userValues["UP"]){
       const obj = userValues["UP"];
-      userValues["UP"] = JSON.stringify(obj);
+      userValues["UP"] = JSON.stringify(reorganizePermissions.outgoing(obj));
     }
 
-    //console.log("SUBMITTING", userValues);
+    console.log("SUBMITTING", userValues);
 
     const res = await editUser(userValues);
 
@@ -181,7 +180,7 @@ function UserManagements(props:{label:string}){
   }
 
   useEffect(()=>{
-    editUser({"S":userStatus}, selectedUser);
+    changeUser({"S":userStatus}, selectedUser);
   },[userStatus]);
 
   /* const deleteUser = (index:number) =>{
@@ -199,7 +198,7 @@ function UserManagements(props:{label:string}){
 
         <div className="flex-auto">
         </div>
-        {userPermissions[sectionNames[props.label]].includes("add")
+        {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("add")
           ?<div>
             <AddButton sectionName="user"  onClick={()=>setAddOpen([true])} />
             {addOpen[0]
@@ -208,34 +207,33 @@ function UserManagements(props:{label:string}){
                 formTitle="Add User" formSubmit={createUser} submitButton="Add User"
                 form={fieldList} currentFields={{}} suggestions="RM" getRoles
               />
-              :<></>
+              :<></> 
             }
           </div>
           :<></>
         }
       </div>
 
-
       <div className="mx-7">
-      <EntriesPerPage rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
+        <EntriesPerPage rowsPerPage={rowsPerPage} setRowsPerPage={setRowsPerPage} />
         {userData
           ?userData.length==0
             ?<EmptyPageMessage sectionName="users" emotion />
             :<DataTable className="bg-white rounded-xl" 
               headingRows={editPermission?tableHeadings.concat("Action"):tableHeadings}
               tableData={userData} columnIDs={["N","E", "RM", "Z", "R","S"]} dataTypes={editPermission?tableDataTypes.concat("action"):tableDataTypes}
-              cellClassName={["","","","","", userPermissions[sectionNames[props.label]].includes("edit")?"editable":"",""]}
+              cellClassName={["","","","","", userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit")?"editable":"",""]}
               setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
               action = {userData.map((_:any, index:number)=>{
                 return(
                   <div className="flex flex-row">
-                    {userPermissions[sectionNames[props.label]].includes("edit")
+                    {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit")
                       ?<div>
                         <button onClick={()=>setEditOpen(curr=>{curr[index]=true;return [...curr]})}><img src={edit_icon} className="mr-5"/></button>
                         {editOpen[index]
                           ?<FormDialog key={index} index={index} type="user" edit
                             formOpen={editOpen[index]} setFormOpen={setEditOpen}
-                            formTitle="Edit User" formSubmit={editUser} submitButton="Edit User" formSize="md"
+                            formTitle="Edit User" formSubmit={changeUser} submitButton="Edit User" formSize="md"
                             form={fieldList} currentFields={userData[index]} suggestions="RM" getRoles
                           />
                           :<></>
@@ -263,6 +261,6 @@ function UserManagements(props:{label:string}){
   )
 }
 
-const UserManagement =UserManagements // memo(UserManagements,(props,props2)=>{console.log("CHECKING"); console.log("old",props,"new",props2,"compare",props.label==props2.label);return props.label==props2.label;});
+//const UserManagement =UserManagements  memo(UserManagements,(props,props2)=>{console.log("CHECKING"); console.log("old",props,"new",props2,"compare",props.label==props2.label);return props.label==props2.label;});
 
 export default UserManagement;

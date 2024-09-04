@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "../../functions/GlobalContext";
 import { FieldValues, UserSuggestionsList } from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
+import { getUserSuggestions } from "@/apiFunctions/suggestionAPIs";
+import { getSingleTeam } from "@/apiFunctions/teamAPIs";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -11,7 +12,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import SubmitButton from "../BasicButtons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
 
-type FormDialogProps = {
+type FormDialogTeamProps = {
   index:number, edit?:boolean, 
   formOpen:boolean, setFormOpen:Function,
   formSize:"sm"|"md"|"lg", formTitle:string, 
@@ -20,7 +21,7 @@ type FormDialogProps = {
   currentFields:FieldValues, repeatFields?:boolean,
 }
 
-function FormDialogTeam(props:FormDialogProps){
+function FormDialogTeam(props:FormDialogTeamProps){
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [errorList, setErrorList] = useState<string[]>([]);
@@ -153,12 +154,10 @@ function FormDialogTeam(props:FormDialogProps){
   )
 }
 
-function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, errorList:string[]}){
+function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:React.Dispatch<React.SetStateAction<FieldValues>>, errorList:string[]}){
   const [leaderSuggestions, setLeaderSuggestions] = useState<UserSuggestionsList>([]);
   const [memberSuggestions, setMemberSuggestions] = useState<UserSuggestionsList>([]);
   const [teamMembers, setTeamMembers] = useState<FieldValues>({});
-
-  const {getUserSuggestions, getSingleTeam} = useGlobalContext();
 
   const filterSuggestions = (suggestionsList:FieldValues[]) => {
     const arr:UserSuggestionsList=[]

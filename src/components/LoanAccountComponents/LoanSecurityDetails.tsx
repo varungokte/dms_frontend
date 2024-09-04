@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import useGlobalContext from "@/functions/GlobalContext";
 import { LoanSecurityTypeList } from "@/functions/Constants";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { GridFieldAttributes } from "@/types/FormAttributes";
+import { createLoan } from "@/apiFunctions/loanAPIs";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import DateField from "../FormFieldComponents/DateField";
@@ -22,8 +22,6 @@ function LoanSecurityDetails(props:LoanCommonProps){
     { id:"T", name:"Security Type", type:"select", options:LoanSecurityTypeList,required:false },
     { id:"V", name:"Security Value", type:"integer",required:false },
   ]};
-  
-  const {createLoan} = useGlobalContext();
 
   //useEffect(()=>console.log("fieldvalues repeatable",fieldValuesRepeatable),[fieldValuesRepeatable])
   

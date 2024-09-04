@@ -5,7 +5,7 @@ import { FormFieldAttributes } from "@/types/FormAttributes";
 const CheckboxField = (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, disabled:boolean }) => {
   return (
     <div className="mb-5 mx-2">
-      <FormControlLabel 
+      <FormControlLabel id={props.fieldData.id}
         control={<Checkbox size="medium" color="secondary" />} 
         label={props.fieldData.name} 
         

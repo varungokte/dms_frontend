@@ -15,7 +15,7 @@ function RadioGroupField(props:{index:number, fieldData:FormFieldAttributes, pre
     <div key={props.index} className="mb-5 mx-2">
       <FieldLabel index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
       <br />
-      <RadioGroup key={props.index} 
+      <RadioGroup key={props.index}  id={props.fieldData.id}
         className="py-2 px-10"
         
         row={!props.makeVertical} 
@@ -30,7 +30,7 @@ function RadioGroupField(props:{index:number, fieldData:FormFieldAttributes, pre
       >
         {(props.fieldData.options||[]).map((option,index)=>{
           if (option!=="-")
-            return <FormControlLabel key={props.index+"_"+index} value={option} color="secondary" control={<Radio />} label={option} disabled={props.disabled} sx={props.readonly?{"& .Mui-disabled":{backgroundColor:"red",color:"blue"}}:{}} />
+            return <FormControlLabel key={props.index+"_"+index} id={props.fieldData.id+index} value={option} color="secondary" control={<Radio />} label={option} disabled={props.disabled} sx={props.readonly?{"& .Mui-disabled":{backgroundColor:"red",color:"blue"}}:{}} />
         })}
       </RadioGroup>
     </div>

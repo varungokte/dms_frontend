@@ -19,7 +19,7 @@ function PasswordField(props:{index:number|string, fieldData:FormFieldAttributes
         <FieldLabel key={props.index+"t_1"} index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
         <br />
         <FormControl variant="outlined" className={`bg-white w-[100%] ${props.fieldData.name==""?"mt-7":""}`} size={props.size} >
-          <OutlinedInput
+          <OutlinedInput id={props.fieldData.id}
             color="secondary"
             type={showPassword ? 'text' : 'password'}
             error={error}

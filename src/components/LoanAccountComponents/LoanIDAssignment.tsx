@@ -1,14 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useGlobalContext from "@/functions/GlobalContext";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import Button from '@mui/material/Button';
 import CancelButton from "../BasicButtons/CancelButton";
 import SubmitButton from "../BasicButtons/SubmitButton";
+import { createAID } from "@/apiFunctions/loanAPIs";
 
 function LoanIDAssignment(props:LoanCommonProps){
   const navigate = useNavigate();
-  const {createAID} = useGlobalContext();
 
   const [agreementId, setAgreementId] = useState("");
   const [errorMessage, setErrorMessage] = useState(<></>);
@@ -27,15 +26,12 @@ function LoanIDAssignment(props:LoanCommonProps){
     return res.status;
   };
 
-  const systemGeneratedId = () => {
-    createAID({}).then(res=>{
-      if (res.status!==200)
-        setErrorMessage(<p className="text-yellow-600">Please try again later.</p>)
-      else 
-        props.goToNextSection({AID:res.obj.AID, loanId:res.obj._loanId, okToFrolic:true});
-    }).catch(err=>{
-      console.log(err)
-    })
+  const systemGeneratedId = async () => {
+    const res = await createAID({});
+    if (res.status!==200)
+      setErrorMessage(<p className="text-yellow-600">Please try again later.</p>)
+    else 
+      props.goToNextSection({AID:res.obj.AID, loanId:res.obj._loanId, okToFrolic:true});
   }
 
   return (

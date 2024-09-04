@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
-import useGlobalContext from "@/functions/GlobalContext";
 import { FieldValues } from '@/types/DataTypes';
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { MastersMapping } from '@/functions/Constants';
+import { PermissionContext } from "@/functions/Contexts";
 
 import { HeaderRows } from './BasicTables/Table';
 import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table";
@@ -12,9 +12,9 @@ import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { PermissionContext } from "@/MenuRouter";
 import TableSelect from './BasicTables/TableSelect';
 import AddButton from './BasicButtons/AddButton';
+import { addToMasters } from '@/apiFunctions/masterAPIs';
 
 function Masters(props:{label:string, masterLists: FieldValues, idList:string[], callMasterLists:Function}){
   useEffect(()=>{
@@ -41,8 +41,6 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
     "ok":<></>,
   })
   const [information, setInformation] =useState<"duplicate"|"empty"|"ok"|"success"|"error">("ok");
-
-  const {addToMasters} = useGlobalContext();
 
   useEffect(()=>{
     if (props.masterLists){

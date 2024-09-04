@@ -20,7 +20,8 @@ function SearchByType(props:{searchType:string, setSearchType:Function, searchSt
   return (
     <div className={props.className}>
       <FormGroup row>
-        <OutlinedInput 
+        <OutlinedInput
+          id="search" 
           size="small" color="secondary" placeholder="Search"
           sx={{padding:"0px 0px 0px 0px", height:"47px", backgroundColor:"white"}}
           
@@ -29,14 +30,16 @@ function SearchByType(props:{searchType:string, setSearchType:Function, searchSt
           
           startAdornment={
             <Select
+              id="filter"
               size="small" color="secondary" displayEmpty
               value={props.searchType} onChange={(e)=>props.setSearchType(e.target.value)} 
               className="mr-2 bg-slate-200"
               sx={{borderRadius:"5px", height:"47px"}}
               inputProps={{ 'aria-label': 'Without label' }}
             >
-              <MenuItem value=""><em>Select Type</em></MenuItem>
-              {props.typeOptions.map((option,index)=><MenuItem key={index} value={option.value}>{option.label}</MenuItem>)}
+              <MenuItem value=""id={"filter"+"-1"}><em>Select Type</em></MenuItem>
+              {props.typeOptions.map((option,index)=><MenuItem key={index}
+              id={"filter"+index} value={option.value}>{option.label}</MenuItem>)}
             </Select>
           }
           endAdornment={

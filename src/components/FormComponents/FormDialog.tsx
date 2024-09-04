@@ -1,7 +1,7 @@
 import { memo, useEffect, useState } from "react";
-import useGlobalContext from "../../functions/GlobalContext";
 import { FieldValues, FormDialogTypes, UserSuggestionTypes, UserSuggestionsList } from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
+import { getUserSuggestions } from "@/apiFunctions/suggestionAPIs";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -11,11 +11,17 @@ import SubmitButton from "../BasicButtons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
 import CancelButton from "../BasicButtons/CancelButton";
 import CloseIcon from '@mui/icons-material/Close';
+import {getFormFieldByType} from "@/functions/getFormField";
+import reorganizePermissions from "@/functions/reorganizePermissions";
+import { getSingleUser } from "@/apiFunctions/userAPIs";
+import { getSingleContact } from "@/apiFunctions/contactAPIs";
+import { getRolesList } from "@/apiFunctions/roleAPIs";
 
 type FormDialogProps = {
   index:number, type:FormDialogTypes, edit?:boolean,  
   formOpen:boolean, setFormOpen:Function,
-  formSize:"sm"|"md"|"lg", formTitle:string, submitButton:string, formSubmit:Function, 
+  formSize:"sm"|"md"|"lg", formTitle:string, 
+  submitButton:string, formSubmit:Function, 
   form:FieldAttributesList, 
   currentFields:FieldValues, repeatFields?:boolean, 
   suggestions?:UserSuggestionTypes, getRoles?:boolean 
@@ -88,8 +94,10 @@ function FormDialog(props:FormDialogProps){
     if(okToSubmit){
       //console.log("prefillValues",prefillValues)
       //console.log("submitFunction data",prefillValues,props.index);
+
+      const obj = /* reorganizePermissions.outgoing */({...prefillValues});
       
-      const res = await props.formSubmit({...prefillValues},props.index);
+      const res = await props.formSubmit(obj,props.index);
 
       //console.log("submitFunction response",res,prefillValues);
 
@@ -124,20 +132,13 @@ function FormDialog(props:FormDialogProps){
   )
 }
 
-function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:Function, errorList:string[], suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
+function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentFields:FieldValues, form:FieldAttributesList, prefillValues:FieldValues, setPrefillValues:React.Dispatch<React.SetStateAction<FieldValues>>
+  , errorList:string[], suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
   const [roles, setRoles] = useState<FieldValues[]>();
 
   const [allSuggestions, setAllSuggestions] = useState<UserSuggestionsList>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<UserSuggestionsList>([]);
   const [oldZone, setOldZone] = useState("");
-
-  const {getUserSuggestions, getSingleUser, getSingleContact, getRolesList} = useGlobalContext();
-
-  //useEffect(()=>console.log("render form props",props),[props])
-
-  //useEffect(()=>console.log("error list",props.errorList));
-
-  useEffect(()=>console.log("rendered first time"),[])
 
   const listRoles = async () => {
     const res = await getRolesList();
@@ -183,7 +184,16 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   const getUserData = async () => {
     const res = await getSingleUser(props.currentFields["_id"]);
     if (res.status==200){
-      //console.log("single user data",res.obj)
+      console.log("single user data",res.obj);
+      let permissionsField = getFormFieldByType(props.form,"permissions");
+      if (!permissionsField)
+        permissionsField = getFormFieldByType(props.form,"role");
+      if (permissionsField){
+        const id = permissionsField.type=="role"?permissionsField.permissionId||"UP":permissionsField.id;
+        const permissions = res.obj[id];
+        const obj = reorganizePermissions.incoming(permissions);
+        res.obj[id] = {...obj};
+      }
       props.setPrefillValues({...res.obj});
       setOldZone("");
     }
@@ -212,7 +222,32 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
     if (props.suggestions)
       listSuggestions();
+
+    if (!props.edit){
+      console.log("CHECK PERMISSIONS")
+      callReorganizePermissions();
+    }
   },[]);
+
+  const callReorganizePermissions = () => {
+    let permissionsField = getFormFieldByType(props.form,"permissions");
+    if (!permissionsField)
+      permissionsField = getFormFieldByType(props.form,"role");
+    if (permissionsField){
+      const id = permissionsField.type=="role"?permissionsField.permissionId||"UP":permissionsField.id;
+      const permissions = props.prefillValues[id];
+      const obj = reorganizePermissions.incoming(permissions);
+      props.setPrefillValues((curr)=>{
+        curr[id] = {...obj};
+        return {...curr};
+      })
+    }
+  }
+
+  useEffect(()=>{
+    if (props.prefillValues["R"] && props.prefillValues["R"]!="")
+      callReorganizePermissions();
+  },[props.prefillValues["R"]])
 
   useEffect(()=>{
     if (props.formType=="cont" && props.prefillValues && props.prefillValues["add-same"]){

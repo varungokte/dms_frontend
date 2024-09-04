@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { FileTypeList } from "../../functions/Constants";
+import { FileTypeList } from "@/functions/Constants";
 import { useDropzone } from "react-dropzone";
 
 import { Upload } from "lucide-react";
@@ -7,7 +7,7 @@ import Close from "@mui/icons-material/Close";
 import FileViewer from "../BasicComponents/FileViewer";
 import { FieldValues } from "@/types/DataTypes";
 
-function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Function, validateRequiredFields:Function, formSubmit:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean, setReceivedFilesFromServer:Function }) {
+function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean, setReceivedFilesFromServer:Function }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone({multiple:false, useFsAccessApi:false});
   
   const [error, setError] = useState(<></>);
@@ -84,11 +84,11 @@ function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Func
 
   return (
     <div>
-      {props.fileList && props.fileList.length!=0?
-        <p className="text-orange-500 my-2 text-center">Note: If you upload a file now, you will have to first delete the existing file</p>
-        :<div>
+      {/* {props.fileList && props.fileList.length!=0
+        ?<p className="text-orange-500 my-2 text-center">Note: If you upload a file now, you will have to first delete the existing file</p>
+        : */}<div>
           <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
-            <input {...getInputProps()} multiple={false} />
+            <input {...getInputProps()} multiple={false} id={props.index.toString()} />
             <div className="my-2 text-center">
               <span className="inline-block align-middle text-custom-1"><Upload/></span>
               <p className="text-custom-1">Choose File to {props.fileList && props.fileList.length!=0?"Replace":"Upload"}</p>
@@ -99,7 +99,7 @@ function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Func
             <p className="flex-auto font-light text-sm flex-auto">Supported Formats:{FileTypeList.slice(1).map(ft=>" "+ft).toString()}</p>
           </div>
         </div>
-      }
+      {/* } */}
     
       <br/>
       {error}

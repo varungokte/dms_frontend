@@ -1,6 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import useGlobalContext from "@/functions/GlobalContext";
+import { getModSecName } from "@/functions/sectionNameAttributes";
+import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
 
 import { DataTable } from "./BasicTables/Table";
 import view_icon from "@/static/view_icon.svg";
@@ -10,13 +11,12 @@ import delete_icon from "@/static/delete_icon.svg";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
 import Toast from "./BasicComponents/Toast";
-import { sectionNames } from "@/functions/Constants";
 import { Pagination } from "./BasicComponents/Pagination";
-import { PermissionContext } from "@/MenuRouter";
+import { PermissionContext } from "@/functions/Contexts";
 import SearchByType from "./BasicComponents/SearchByType";
 import AddButton from "./BasicButtons/AddButton";
+import { deleteLoan, getLoansList } from "@/apiFunctions/loanAPIs";
 
 function LoanAccount(props:{label:string}) {
   useEffect(()=>{
@@ -24,16 +24,15 @@ function LoanAccount(props:{label:string}) {
 	},[]);
 
   const [accountList, setAccountList] = useState<FieldValues[]>();
-
-  const {getLoanList, deleteLoan} = useGlobalContext();
+  
   const {userPermissions} = useContext(PermissionContext);
 
   const [added,setAdded] = useState(true);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
-
-  const editPermission = userPermissions[sectionNames[props.label]].includes("edit");
-  const viewPermission = userPermissions[sectionNames[props.label]].includes("view");
-  const deletePermission = userPermissions[sectionNames[props.label]].includes("delete");
+  
+  const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
+  const viewPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("view");
+  const deletePermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("delete");
 
   const tableHeadings =["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount", "Loan Status"];
   const tableDataTypes:TableDataTypes[] = ["index","text","text","text","text","loan-status"];
@@ -49,7 +48,7 @@ function LoanAccount(props:{label:string}) {
   const getData = async () => {
     if (!added)
       return;
-    const res = await getLoanList({currentPage, rowsPerPage, searchString, searchType});
+    const res = await getLoansList({currentPage, rowsPerPage, searchString, searchType});
     if (res.status==200){
       if (res.arr && res.arr[0] && res.arr[0]["data"]){
         setAccountList(res.arr[0]["data"]);
@@ -100,7 +99,7 @@ function LoanAccount(props:{label:string}) {
             typeOptions={searchOptions} 
           />
         </div>
-        {userPermissions[sectionNames[props.label]].includes("add")
+        {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("add")
           ?<div className="">
             <Link to="create" state={{linkSource: "CREATE"}}>
               <AddButton sectionName="loan account" onClick={()=>{}} />
@@ -121,14 +120,14 @@ function LoanAccount(props:{label:string}) {
               action = {accountList.map((item,index)=>{
                 return(
                   <div className="flex flex-row">
-                    {userPermissions[sectionNames[props.label]].includes("edit")
+                    {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit")
                       ?<Link className="m-2" to="create" state={{linkSource: "EDIT", loanId: item["_id"], AID: item.AID}}><img src={edit_icon}/></Link>
-                      :userPermissions[sectionNames[props.label]].includes("view")
+                      :userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("view")
                         ?<Link className="m-2" to="create" state={{linkSource: "VIEW", loanId: item["_id"], AID: item.AID}}><img src={view_icon}/></Link>
                         :<></>
                     }
                     
-                    {userPermissions[sectionNames[props.label]].includes("delete")
+                    {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("delete")
                       ?<div>
                         <button onClick={()=>setOpenDelete(curr=>{curr[index]=true; return [...curr]})}><img className="m-2" src={delete_icon}/></button>
                         {openDelete[index]?<DeleteConfirmation thing="loan account" deleteFunction={deleteLoanAccount} open={openDelete[index]} setOpen={setOpenDelete} currIndex={index}/>:<></>}

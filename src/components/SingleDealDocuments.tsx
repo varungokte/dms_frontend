@@ -1,9 +1,10 @@
 import {  useContext, useEffect, useState } from "react";
-import { PermissionContext } from "@/MenuRouter";
-import useGlobalContext from "@/functions/GlobalContext";
-import { DocumentStatusList, panopticSectionNames, sectionNames } from "../functions/Constants";
-import { SetStateBoolean, ToastOptionsAttributes } from "../types/DataTypes";
-import { DocumentSectionDetails } from "@/functions/DocumentSectionAttributes";
+import { PermissionContext } from "@/functions/Contexts";
+import { DocumentStatusList } from "@/functions/Constants";
+import { SetStateBoolean, ToastOptionsAttributes } from "@/types/DataTypes";
+import { getModSecName, getPanSecName } from "@/functions/sectionNameAttributes";
+import { DocumentSectionDetails } from "@/types/DataTypes";
+import { getDocumentsList } from "@/apiFunctions/documentAPIs";
 
 import { DataTable } from "./BasicTables/Table";
 import UploadFileButton from "./BasicButtons/UploadFileButton";
@@ -17,7 +18,6 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
   const [docData, setDocData] = useState<any>();
   const [isDeleted, setIsDeleted] = useState<number>();
   
-  const {getDocumentsList} = useGlobalContext();
   const {userPermissions} = useContext(PermissionContext);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
@@ -68,13 +68,13 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
               docData.map((doc:any,index:number)=>{
                 if (doc["S"]==DocumentStatusList[1])
                   return <UploadFileButton key={index} index={index} 
-                    disabled={(!props.admin && !userPermissions[sectionNames[props.label]]["file"].includes("add")) || (props.admin && !userPermissions[panopticSectionNames[props.label]]["file"].includes("add"))}
+                    disabled={(!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add")) || (props.admin && !userPermissions[getPanSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add"))}
                     AID={props.AID} sectionKeyName={props.sectionDetails.sectionKeyName} docId={doc._id} 
                     setAdded={props.setAdded} 
                   />
                 else
                   return <ViewFileButton key={index} type="doc" 
-                    disabled={(!props.admin && !userPermissions[sectionNames[props.label]]["file"].includes("view") || (props.admin && !userPermissions[panopticSectionNames[props.label]]["file"].includes("view")))}
+                    disabled={(!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view") || (props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view")))}
                     AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionKeyName={props.sectionDetails.sectionKeyName} 
                     status={doc["S"]} rejectionReason={doc["R"]} 
                     setAdded={props.setAdded} 

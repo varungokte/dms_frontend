@@ -2,24 +2,17 @@ import { DocumentStatusList, FileStatusList, LoanStatusList, PriorityList, TeamS
 
 type FieldValues = {[key:string]: any | any[]};
 
-//Data Types for table
-type TableDataTypes = "index" | "text" | "date" | "priority" | "frequency" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link" | "checkbox";
+type TableDataTypes = "index" | "text" | "date" | "priority" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link" | "checkbox";
 
-//The sections which call Form Dialog component 
-type FormDialogTypes = "team"|"user"|"role"|"cont"|"rate"|"mast";
+type FormDialogTypes = "team" | "user" | "role" | "cont" | "rate" | "mast";
 
-//Period Type
-type IntervalType = "weekly"|"monthly"|"yearly";
+type FrequencyTypes = "weekly"|"monthly"|"yearly";
 
-//Types of User Suggestions
 type UserSuggestionTypes = "AU"|"TL"|"RM";
-
 type UserSuggestionsList = { label:string, values:FieldValues }[];
 
-//setState Types
 type SetStateBoolean = React.Dispatch<React.SetStateAction<boolean>>;
 
-//Status Types
 type UserStatus = typeof UserStatusList[number];
 type DocumentStatus = typeof DocumentStatusList[number];
 type FileStatus = typeof FileStatusList[number];
@@ -27,8 +20,11 @@ type TeamStatus = typeof TeamStatusList[number];
 type LoanStatus = typeof LoanStatusList[number];
 type Priority = typeof PriorityList[number];
 
-
 type ToastOptionsAttributes ={open:boolean, type:"error"|"success", action:"add"|"delete"|"edit"|"save"|"sent",section:string};
+
+type DocumentSectionTypes = "document"|"covenant"|"condition"|"payment"|"undefined";
+type DocumentSectionKeys = "TD"|"CD"|"C"|"CP"|"CS"|"PD";
+type DocumentSectionDetails = { sectionKeyName:DocumentSectionKeys, sectionType:DocumentSectionTypes };
 
 export {
   type FieldValues,
@@ -37,6 +33,7 @@ export {
   type UserSuggestionTypes, type UserSuggestionsList,
   type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority, type LoanStatus,
   type ToastOptionsAttributes,
-  type IntervalType,
+  type FrequencyTypes as IntervalType,
   type SetStateBoolean,
-}
+  type DocumentSectionTypes, type DocumentSectionKeys, type DocumentSectionDetails
+};

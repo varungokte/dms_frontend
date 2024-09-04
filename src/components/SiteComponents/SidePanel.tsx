@@ -3,21 +3,21 @@ import beacon_logo from "@/static/beacon_logo.png";
 import { NavLink } from "react-router-dom";
 import { FieldValues } from "@/types/DataTypes";
 import { ComponentList } from "@/types/ComponentProps";
-import useGlobalContext from "@/functions/GlobalContext";
-import { sectionNames } from "@/functions/Constants";
+import { editUser } from "@/apiFunctions/userAPIs";
 import { Tooltip, Typography } from "@mui/material";
+import { getModSecList } from "@/functions/sectionNameAttributes";
 
 function SidePanel(props:{componentList:ComponentList|undefined, token:FieldValues|undefined}){
 	const [hover,setHover] = useState(-1);
-	const {editUser} = useGlobalContext();
 
   const fixPermissions = async () => {
     if (!props.token)
       return;
     const allPermissions = ["access", "add", "edit", "view", "delete"];
 		const defaultPermissions:FieldValues={};
-		Object.values(sectionNames).map(section=>defaultPermissions[section]=allPermissions);
-		defaultPermissions["team"].push("select")
+		getModSecList("shortname").map(section=>defaultPermissions[section]=allPermissions);
+		
+    defaultPermissions["team"].push("select");
 		defaultPermissions["transaction"] = {
 			docs: allPermissions,
 			file: allPermissions
@@ -57,7 +57,7 @@ function SidePanel(props:{componentList:ComponentList|undefined, token:FieldValu
         <img src={beacon_logo} width={"250px"} className="m-auto p-3"/>
       </NavLink>
       <div className="mx-8 my-5">
-      <Tooltip placement="right" title={<Typography >Clicking this button will give this user all permissions. This is for testing purposes.</Typography>}><button onClick={fixPermissions}>Fix Permissions</button></Tooltip>
+        {/* <Tooltip placement="right" title={<Typography >Clicking this button will give this user all permissions. This is for testing purposes.</Typography>}><button onClick={fixPermissions}>Fix Permissions</button></Tooltip> */}
         {props.componentList
           ?props.componentList.map((item:any,index:number)=>{
             return (

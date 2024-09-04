@@ -1,20 +1,21 @@
 import { useContext, useEffect, useState } from "react";
-import useGlobalContext from "../functions/GlobalContext";
+import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
+import { getModSecName } from "@/functions/sectionNameAttributes";
+import { FieldAttributesList } from "@/types/FormAttributes";
+import { PermissionContext } from "@/functions/Contexts";
 
 import { DataTable } from "./BasicTables/Table";
-//import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
-import edit_icon from "@/static/edit_icon.svg";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
-import { FieldAttributesList } from "@/types/FormAttributes";
 import FormDialogTeam from "./FormComponents/FormDialogTeam";
-import Toast from "./BasicComponents/Toast";
-import { sectionNames } from "@/functions/Constants";
-import { PermissionContext } from "@/MenuRouter";
 import { Pagination } from "./BasicComponents/Pagination";
+import Toast from "./BasicComponents/Toast";
 import SearchByType from "./BasicComponents/SearchByType";
 import AddButton from "./BasicButtons/AddButton";
+
+//import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
+import edit_icon from "@/static/edit_icon.svg";
+import { addTeam, editTeam, getTeamsList } from "@/apiFunctions/teamAPIs";
 
 function TeamManagement(props:{label:string}){
   useEffect(()=>{
@@ -69,13 +70,11 @@ function TeamManagement(props:{label:string}){
   const [teamStatus, setTeamStatus] = useState(-1);
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
-  const { addTeam, editTeam, getTeamsList} = useGlobalContext();
-
   const [searchString, setSearchString] = useState("");
   const [searchType, setSearchType] = useState("");
   const searchOptions = [{label:"Team Name", value:"N"}, {label:"Team Lead's Email", value:"L"}];
 
-  const editPermission = userPermissions[sectionNames[props.label]].includes("edit");
+  const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
 
   const tableHeadings = ["Team Name", "Team Lead", "Created On", "Status"];
   const tableDataTypes:TableDataTypes[]=["text", "text","date", "team-status"];
@@ -181,7 +180,7 @@ function TeamManagement(props:{label:string}){
           <SearchByType className="mx-7" searchString={searchString} setSearchString={setSearchString} searchType={searchType} setSearchType={setSearchType} typeOptions={searchOptions} />
         </div>
         <div>
-          {userPermissions[sectionNames[props.label]].includes("add")
+          {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("add")
             ?<div>
               <AddButton sectionName="team" onClick={()=>setAddOpen([true])} />
               {addOpen[0]
