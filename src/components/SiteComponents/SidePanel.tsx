@@ -1,11 +1,13 @@
 import { createElement, useState } from "react";
-import beacon_logo from "@/static/beacon_logo.png";
 import { NavLink } from "react-router-dom";
+import giveAllPermissions from "@/functions/giveAllPermissions";
 import { FieldValues } from "@/types/DataTypes";
 import { ComponentList } from "@/types/ComponentProps";
+
 import { editUser } from "@/apiFunctions/userAPIs";
+
 import { Tooltip, Typography } from "@mui/material";
-import { getModSecList } from "@/functions/sectionNameAttributes";
+import beacon_logo from "@/static/beacon_logo.png";
 
 function SidePanel(props:{componentList:ComponentList|undefined, token:FieldValues|undefined}){
 	const [hover,setHover] = useState(-1);
@@ -13,43 +15,9 @@ function SidePanel(props:{componentList:ComponentList|undefined, token:FieldValu
   const fixPermissions = async () => {
     if (!props.token)
       return;
-    const allPermissions = ["access", "add", "edit", "view", "delete"];
-		const defaultPermissions:FieldValues={};
-		getModSecList("shortname").map(section=>defaultPermissions[section]=allPermissions);
-		
-    defaultPermissions["team"].push("select");
-		defaultPermissions["transaction"] = {
-			docs: allPermissions,
-			file: allPermissions
-		}
-		defaultPermissions["compliance"] = {
-			docs: allPermissions,
-			file: allPermissions
-		}
-		defaultPermissions["covenants"] = {
-			docs: allPermissions,
-			file: allPermissions
-		}
-		defaultPermissions["precedent"] = {
-			docs: allPermissions,
-			file: allPermissions
-		}
-		defaultPermissions["subsequent"] = {
-			docs: allPermissions,
-			file: allPermissions
-		}
-
-		defaultPermissions["payment"] = {
-			docs: allPermissions,
-			file: allPermissions
-		}
-
-		delete defaultPermissions["critical mst"];
-		delete defaultPermissions["default mst"];
-
-    const obj = {_id:props.token["_userId"], UP: defaultPermissions}
+    const obj = { _id:props.token["_userId"], UP: giveAllPermissions() };
 		const res = await editUser(obj);
-    console.log(res);
+    console.log("permissions have been set",res);
   }
   return (
     <div>
@@ -57,7 +25,7 @@ function SidePanel(props:{componentList:ComponentList|undefined, token:FieldValu
         <img src={beacon_logo} width={"250px"} className="m-auto p-3"/>
       </NavLink>
       <div className="mx-8 my-5">
-        {/* <Tooltip placement="right" title={<Typography >Clicking this button will give this user all permissions. This is for testing purposes.</Typography>}><button onClick={fixPermissions}>Fix Permissions</button></Tooltip> */}
+        <Tooltip placement="right" title={<Typography >Clicking this button will give this user all permissions. This is for testing purposes.</Typography>}><button onClick={fixPermissions}>Fix Permissions</button></Tooltip>
         {props.componentList
           ?props.componentList.map((item:any,index:number)=>{
             return (

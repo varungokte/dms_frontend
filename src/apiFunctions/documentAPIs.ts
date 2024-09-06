@@ -4,7 +4,7 @@ import { getEncryptedToken } from '@/functions/getToken';
 import { handleEncryption, handleDecryption } from '@/functions/handleCryptogaphy';
 import { FieldValues } from '@/types/DataTypes';
 
-const addDocument =  async (data:any) => {
+const addDocument =  async (data:FieldValues) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);

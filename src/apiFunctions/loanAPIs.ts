@@ -107,4 +107,4 @@ const createAID = async (data:object) =>{
 	}
 }
 
-export {getLoansList, getLoanDetails, createLoan, createAID, deleteLoan}
+export { getLoansList, getLoanDetails, createLoan, deleteLoan, createAID }

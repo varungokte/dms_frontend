@@ -96,7 +96,6 @@ function UserManagement(props:{label:string}){
   },[added,searchString]);
 
   const createUser = async (userValues:any) => {
-
     const data:any={};
     for (let i=0; i<fieldList.length; i++){
       const field = fieldList[i];
@@ -132,7 +131,7 @@ function UserManagement(props:{label:string}){
     else if (res==403)
       setForbidden(<ForbiddenMessage/>);
     else
-      setToastOptions({open:true, type:"error", action:"add", section:"User"});    
+      setToastOptions({open:true, type:"error", action:"add", section:"User"});
     return res;
   }
 

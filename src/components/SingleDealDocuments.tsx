@@ -25,6 +25,8 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
+  useEffect(()=>console.log("rendered single deal documents for the first time",props.added),[])
+
   useEffect(()=>{
     if (!isDeleted)
       return;
@@ -68,13 +70,19 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
               docData.map((doc:any,index:number)=>{
                 if (doc["S"]==DocumentStatusList[1])
                   return <UploadFileButton key={index} index={index} 
-                    disabled={(!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add")) || (props.admin && !userPermissions[getPanSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add"))}
+                    disabled={
+                      (!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add")) 
+                      || (props.admin && !userPermissions[getPanSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("add"))
+                    }
                     AID={props.AID} sectionKeyName={props.sectionDetails.sectionKeyName} docId={doc._id} 
                     setAdded={props.setAdded} 
                   />
                 else
                   return <ViewFileButton key={index} type="doc" 
-                    disabled={(!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view") || (props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view")))}
+                    disabled={
+                      (!props.admin && !userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view") 
+                      || (props.admin && !userPermissions[getPanSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})]["file"].includes("view")))
+                    }
                     AID={props.AID} loanId={doc._loanId} docId={doc._id} sectionKeyName={props.sectionDetails.sectionKeyName} 
                     status={doc["S"]} rejectionReason={doc["R"]} 
                     setAdded={props.setAdded} 

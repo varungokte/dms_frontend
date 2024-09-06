@@ -46,4 +46,4 @@ const getRatingsList = async (data:{loanId:string, currentPage:number, rowsPerPa
 	}
 }
 
-export {addRating, getRatingsList};
+export { addRating, getRatingsList };

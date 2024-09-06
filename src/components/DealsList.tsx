@@ -1,4 +1,4 @@
-import { ReactElement, useEffect, useRef, useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import moment from "moment";
 import { DocumentSectionKeys, DocumentSectionTypes, DocumentStatus, FieldValues, SetStateBoolean } from "@/types/DataTypes";
 import { getDocSecName, getModSecName, getPanSecName} from "@/functions/sectionNameAttributes";
@@ -31,7 +31,6 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
 	},[]);
 
   const {state} = useLocation();
-  const dealRefs = useRef<any>([]);
 
   const admin = props.panopticPage||false;
 
@@ -49,9 +48,8 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
 
   const [addedDeals, setAddedDeals] = useState(false);
 
-  const [showDeals, setShowDeals] = useState<boolean[]>();
   const [fromRedirect, setFromRedirect] = useState(true);
-  const [currentTab, setCurrentTab] = useState(-1);
+  const [selectedDeal, setSelectedDeal] = useState(-1);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -70,18 +68,12 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
 
   const getDocData = async () => {
     const res =props.specType&&props.specType=="assign"?(props.docData):await getDealList({ admin,sectionName:sectionDetails.sectionKeyName, teamRole:"teamRole", currentPage, rowsPerPage});
-    //console.log("response",res);
+    console.log("response",res);
     if (!res)
       return;
 
     try{
       setDealData(res.obj[0]["data"]);
-      //console.log("response data",res.obj[0]["data"])
-      const arr = new Array(res.obj.length).fill(false);
-      if (currentTab!=-1)
-        arr[currentTab] = true;
-      setShowDeals(arr);
-      setCurrentTab(-1);
       setTotalPages(Math.ceil(Number(res.obj[0]["metadata"][0]["total"])/Number(rowsPerPage)));
     }
     catch(e){
@@ -104,21 +96,13 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
   },[state,dealData]);
 
   const openDeal = () =>{
-    if (!dealData || !showDeals)
+    if (!dealData)
       return;
-
     let dealIndex = -1;
     dealData.map((deal,index)=>{if (deal.AID==state)dealIndex=index});
-    if (dealIndex)
-      setShowDeals((curr:boolean[]|undefined)=>{
-        if (!curr)
-          return;
-        curr[dealIndex] = true;
-        return [...curr];
-    })
+    if (dealIndex!=-1)
+      setSelectedDeal(dealIndex)
   }
-
-  //useEffect(()=>console.log("calculate",calculate),[calculate]);
 
   return(
     <div>
@@ -136,8 +120,8 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
           :dealData.length==0
             ?<EmptyPageMessage sectionName="deals"/>
             :dealData.map((deal,index)=>{
-              return <div ref={el=>dealRefs.current[index]=el} key={index}>
-                <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} showDeals={showDeals||[]} setShowDeals={setShowDeals} addedDeals={addedDeals} setAddedDeals={setAddedDeals} linkSource={state} setCurrentTab={setCurrentTab} admin={admin} teamRole={"teamRole"} />
+              return <div key={index}>
+                <SingleDealDetails key={index} label={props.label} index={index} deal={deal} sectionDetails={sectionDetails} addedDeals={addedDeals} setAddedDeals={setAddedDeals} linkSource={state} selectedDeal={selectedDeal} setSelectedDeal={setSelectedDeal} admin={admin} teamRole={"teamRole"} />
               </div>
             })
         }
@@ -151,16 +135,20 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
   )
 }
 
-function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, showDeals:boolean[],setShowDeals:React.Dispatch<React.SetStateAction<boolean[]|undefined>>, addedDeals:boolean, setAddedDeals:SetStateBoolean, linkSource?:string,setCurrentTab: React.Dispatch<React.SetStateAction<number>>, admin:boolean, teamRole:string}) {
+function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, addedDeals:boolean, setAddedDeals:SetStateBoolean, linkSource?:string, admin:boolean, teamRole:string, selectedDeal:number, setSelectedDeal:React.Dispatch<React.SetStateAction<number>>}) {
   const [added,setAdded] = useState(true);
   const [progressValue, setProgressValue] = useState(0);
 
   useEffect(()=>{
-    if (added && props.showDeals[props.index]){
+    setAdded(props.index==props.selectedDeal);
+  },[props.selectedDeal]);
+
+  useEffect(()=>{
+    if (added){
       console.log("ENTERED")
       props.setAddedDeals(true);
-      if (props.showDeals[props.index])
-        props.setCurrentTab(props.index);
+      /* if (props.showDeals[props.index])
+        props.setCurrentTab(props.index); */
     }
   },[added]);
 
@@ -193,10 +181,11 @@ function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetai
   }
 
   return(
-    <TableCollapsible key={props.index} index={props.index}
+    <TableCollapsible key={props.index} index={props.index} id={props.deal["_id"]}
       topRow={tableTopRow}
       bottomRow={tableBottomRow}
-      showTabs={props.showDeals} setShowTabs={props.setShowDeals}
+      selectedTab={props.selectedDeal} setSelectedTab={props.setSelectedDeal}
+      //showTabs={props.showDeals} setShowTabs={props.setShowDeals}
       content={props.sectionDetails.sectionType=="payment"
         ?<SingleDealPayments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} admin={props.admin} />
         :<SingleDealDocuments label={props.label} loanId={props.deal["_id"]} AID={props.deal.AID} sectionDetails={props.sectionDetails} added={added} setAdded={setAdded} admin={props.admin} teamRole={props.teamRole} />

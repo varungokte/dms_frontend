@@ -18,7 +18,7 @@ function LoanCovenantView(props:LoanDocSecProps& {type:string}){
 
   if(props.type==CovenantTypeList[1]){
     tableRows.splice(1,0,"Frequency");
-    tableDataTypes.splice(1,0,"frequency");
+    tableDataTypes.splice(1,0,"text");
     tableColumnIDs.splice(1,0,"F");
   }
   

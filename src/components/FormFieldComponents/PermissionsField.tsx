@@ -9,6 +9,7 @@ import Tab from "@mui/material/Tab/Tab";
 import Button from "@mui/material/Button/Button";
 import Box from "@mui/material/Box/Box";
 import reorganizePermissions from "@/functions/reorganizePermissions";
+import { allSectionPermissions } from "@/functions/Constants";
 
 function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, permissionSet:FieldValues, setPermissionSet:Function, disabled:boolean}){
   try{
@@ -120,24 +121,10 @@ function RenderPermissions(props:{index:number, id:string, category:string, sect
   };
   
   const documentSections = getDocSecList("shortname");
-
-  const permissionMapping:FieldValues = {
-    team: ["access", "add", "edit", "select"],
-    user: ["access","add" ,"edit"],
-    role: ["access","add","edit"],
-    masters: ["access","add","edit"],
-    loan: ["access", "view", "add", "edit", "delete"],
-    contact: ["access","add","view","edit","delete"],
-    rating: ["access","add"],
-    docs:["access","add","edit"],
-    file:["view","add","edit","delete"],
-    default:["access","view","edit"],
-    critical:["access","view","edit"],
-  }
-  
+    
   return (
     <div>
-      {(permissionMapping[props.sectionName]||[]).map((perm:string)=>{
+      {(allSectionPermissions[props.sectionName]||[]).map((perm:string)=>{
         return (
           <Button key={props.index+perm} id={props.sectionName+props.index}
             disableRipple={props.disabled} className={`${props.disabled?"hover:cursor-default	":""}`} disableFocusRipple={props.disabled}

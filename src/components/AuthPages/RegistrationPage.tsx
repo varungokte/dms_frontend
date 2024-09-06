@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { FieldValues } from "@/types/DataTypes";
 import { SingleFieldAttributes } from "@/types/FormAttributes";
-import { getDocSecList, getModSecList } from "@/functions/sectionNameAttributes";
+import giveAllPermissions from "@/functions/giveAllPermissions";
 
 import { registerAdmin } from "@/apiFunctions/authAPIs";
 
@@ -34,19 +34,6 @@ function RegistrationPage(){
 			}
 		}
 
-		const defaultPermissions:FieldValues={}
-		getModSecList("shortname").map(section=>{
-			if (getDocSecList("shortname").includes(section))
-				defaultPermissions[section] = {
-					docs: ["access","view","add","edit", "delete"],
-					file: ["access","view","add","edit","delete"]
-				}
-			else
-				defaultPermissions[section]=["access", "add", "edit","view","delete"]
-		});
-		defaultPermissions["team"].push("select");
-
-		console.log("SEND PERMISSIONS",defaultPermissions);
 		const data = {
 			...fieldValues,
 			MU: 1,
@@ -54,7 +41,7 @@ function RegistrationPage(){
 			Z: "West",
 			M: true,
 			RM: "root",
-			UP:defaultPermissions
+			UP: giveAllPermissions(),
 		}
 		//console.log("data",data)
 

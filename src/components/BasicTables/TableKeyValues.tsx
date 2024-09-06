@@ -10,7 +10,7 @@ import { TextField } from '@mui/material';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 
-function TableKeyValues(props:{prefillValues:FieldValues, setPrefillValues:Function}){
+function TableKeyValues(props:{prefillValues:FieldValues, setPrefillValues:React.Dispatch<React.SetStateAction<FieldValues>>}){
 
   const addNewValue = (index:number) => {
     const key = Object.keys(props.prefillValues)[index];

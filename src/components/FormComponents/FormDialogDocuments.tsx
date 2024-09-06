@@ -17,7 +17,7 @@ import CancelButton from "../BasicButtons/CancelButton";
 
 type FormDialogDocumentsProps = {
   index:number, type:DocumentSectionTypes, edit:boolean,
-  formOpen:boolean, setFormOpen:Function,
+  formOpen:boolean, setFormOpen:React.Dispatch<React.SetStateAction<boolean[]>>,
   formSize:"sm"|"md"|"lg", formTitle:string,
   currentFields:FieldValues,
   detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, 
@@ -133,7 +133,7 @@ function FormDialogDocuments(props:FormDialogDocumentsProps){
   }
 
   const closeDialog = () => {
-    props.setFormOpen((curr:boolean[])=>{
+    props.setFormOpen(curr=>{
       curr[props.index]=false; 
       return [...curr];
     });

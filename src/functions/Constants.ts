@@ -3,7 +3,7 @@ import { FieldValues } from "@/types/DataTypes";
 const ServerUrl = import.meta.env.VITE_APP_SERVER_URL;
 //const ServerUrl = "http://139.5.190.208:9000";
 const apiEndpoint = `${ServerUrl}/api/v1/allAPI`;
-const EncryptionKey ="JAIBAJRANGBALI"// import.meta.env.VITE_APP_ENCRYPTION_KEY;
+const EncryptionKey ="JAIBAJRANGBALI";
 
 //Status Values
 const PriorityList =["-", "Low", "Medium", "High"] as const;
@@ -12,6 +12,22 @@ const TeamStatusList = ["-", "Active", "Inactive"] as const;
 const DocumentStatusList = ["-", "Pending", "In progress", "Verified", "Rejected", "Overdue"] as const;
 const FileStatusList = ["-", "Pending",  "Verified"] as const;
 const LoanStatusList = ["-","Preliminary", "Document", "Live", "Hold", "Cancel"] as const;
+
+const allSectionPermissions:FieldValues = {
+  team: ["access", "add", "edit", "select"],
+  user: ["access","add" ,"edit"],
+  role: ["access","add","edit"],
+  masters: ["access","add","edit"],
+  loan: ["access", "view", "add", "edit", "delete"],
+  contact: ["access","add","view","edit","delete"],
+  rating: ["access","add"],
+  docs:["access","add","edit"],
+  file:["view","add","edit","delete"],
+  default:["access","view","edit"],
+  critical:["access","view","edit"],
+  reminders:["access"],
+  reports:["access"],
+}
 
 //Constants
 const FrequencyList:string[] = ["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"];
@@ -25,7 +41,7 @@ const LoanProductList:string[] = ["-"];
 const ZoneList:string[] = ["-"];
 const FileTypeList:string[] = ["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"];
 const UserRoleList:string[] = ["-"];
-const IndustryList:string[] = ["-",""];/* , "Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others" */
+const IndustryList:string[] = ["-",""];//"Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others"
 const LoanTypeList:string[] = ["-", "Long Term", "Short Term"];
 const DocumentRejectionReasonList:string[] = ["-","Document is expired", "Document is incomplete", "Document is irrelevant"];
 const TableRowsPerPage:number[] = [-1,2,5,10];
@@ -71,6 +87,7 @@ const MastersMapping:FieldValues = {
 
 export { 
   ServerUrl, EncryptionKey, apiEndpoint,
+  allSectionPermissions,
   MastersMapping,
   LoanProductList, ZoneList, FileTypeList, UserRoleList, IndustryList, LoanTypeList, DocumentRejectionReasonList, TableRowsPerPage,
   PriorityList,UserStatusList,TeamStatusList,DocumentStatusList,FileStatusList, LoanStatusList,

@@ -35,4 +35,4 @@ const getSpecialList = async (data:{admin?:boolean, type:"def"|"crit", sectionNa
 	}
 };
 
-export {getSpecialList};
+export { getSpecialList };

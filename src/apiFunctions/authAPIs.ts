@@ -60,7 +60,7 @@ const sendOTP = async () => {
 	}
 }
 
-const verifyOTP = async (otp:any) => {
+const verifyOTP = async (otp:number) => {
 	//Error 412 -> User already verified
 	try {
 		const token = await getEncryptedToken();

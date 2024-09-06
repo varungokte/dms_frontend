@@ -38,4 +38,4 @@ const getRolesList = async () => {
 	}
 }
 
-export {addRole, getRolesList};
+export { addRole, getRolesList };

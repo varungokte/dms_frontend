@@ -23,8 +23,6 @@ const incoming = (permissionPreset:FieldValues) => {
     delete: "Delete file"
   } */
 
-  //console.log("Start", permissionPreset);
-
   const categories = getModSecList("category");
 
   for (let i=0; i<moduleSectionNames.length; i++){
@@ -33,7 +31,6 @@ const incoming = (permissionPreset:FieldValues) => {
       obj[sectionDetails.category] = {};
     obj[sectionDetails.category][sectionDetails.shortname] = [];
   }
-  //console.log("OBJ",{...obj})
 
   for (let i=0; i<categories.length; i++){
     const sectionList = obj[categories[i]];
@@ -48,8 +45,6 @@ const incoming = (permissionPreset:FieldValues) => {
   //rename labels
   //reorganize documents
   //move team
-
-  //console.log("END",obj);
   
   return obj; 
 }
