@@ -1,14 +1,13 @@
-import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
-import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
-import FieldLabel from "./FieldLabel";
 import { useEffect, useState } from "react";
+import { FormFieldProps } from "@/types/FormComponentProps";
+import { FormControlLabel, Radio, RadioGroup } from "@mui/material";
+import FieldLabel from "./FieldLabel";
 
-function RadioGroupField(props:{index:number, fieldData:FormFieldAttributes, prefillValues:FieldValues, setPrefillValues:Function, disabled:boolean, readonly?:boolean, makeVertical?:boolean}){
+function RadioGroupField(props:FormFieldProps & {makeVertical?:boolean}){
   const [value,setValue] = useState("Fixed");
   
   useEffect(()=>{
-    setValue(props.prefillValues[props.fieldData.id])
+    setValue(props.fieldValue)
   },[props]);
 
   return(
@@ -22,7 +21,7 @@ function RadioGroupField(props:{index:number, fieldData:FormFieldAttributes, pre
         
         value={value||(props.fieldData.options||["",""])[1]}
         onChange={(e)=>{
-          props.setPrefillValues((curr:any)=>{
+          props.setFieldValues((curr:any)=>{
             curr[props.fieldData.id]=e.target.value;
             return {...curr};
           })

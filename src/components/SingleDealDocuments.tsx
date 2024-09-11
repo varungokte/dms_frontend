@@ -25,7 +25,7 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  useEffect(()=>console.log("rendered single deal documents for the first time",props.added),[])
+  //useEffect(()=>console.log("rendered single deal documents for the first time",props.added),[])
 
   useEffect(()=>{
     if (!isDeleted)

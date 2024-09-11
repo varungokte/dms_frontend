@@ -1,11 +1,14 @@
 import { createContext } from 'react';
 import { FieldValues } from '@/types/DataTypes';
+import socket from './socket';
 //import { ZoneList, LoanProductList, FileTypeList, IndustryList, LoanTypeList, LoanSecurityTypeList, TransactionCategoryList, ComplianceCategoryList, ConditionPrecedentCategoryList, ConditionSubsequentCategoryList } from './Constants';
 
 const PermissionContext = createContext<{userPermissions:FieldValues, setUserPermissions:React.Dispatch<React.SetStateAction<FieldValues|undefined>>}>({
   userPermissions:{},
   setUserPermissions:()=>{}
 });
+
+const SocketContext = createContext(socket);
 
 const LoanProductList:string[] = ["-"];
 const ZoneList:string[] = ["-"];
@@ -44,4 +47,4 @@ const Constants = createContext({
   InterestTypeList: ["-", "Fixed","Manual"],
 });
 
-export  { PermissionContext, MastersValues, Constants } 
+export  { PermissionContext, SocketContext, MastersValues, Constants } 

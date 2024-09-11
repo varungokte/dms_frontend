@@ -1,10 +1,14 @@
-import { Navigate, Route, Routes } from "react-router-dom";
-import { getDecryptedToken } from "./functions/getToken";
-import  MenuRouter from "./MenuRouter";
 import { useEffect, useState } from "react";
-import VerificationPage from "./components/AuthPages/VerificationPage";
+import { Navigate, Route, Routes } from "react-router-dom";
+
+import { getDecryptedToken } from "./functions/getToken";
 import { UserStatusList } from "./functions/Constants";
 import { FieldValues } from "@/types/DataTypes";
+import { SocketContext } from "./functions/Contexts";
+import socket from "./functions/socket";
+
+import VerificationPage from "./components/AuthPages/VerificationPage";
+import MenuRouter from "./MenuRouter";
 
 function PrivateRoutes() {
   const [token, setToken] = useState<any>(null);
@@ -40,18 +44,13 @@ function EmailVerification(props:{token:FieldValues, setCheck:Function}) {
    
   else
     return (
-      <>
+      <SocketContext.Provider value={socket}>
         <Routes>
           <Route path="/verify" element={<VerificationPage setCheck={props.setCheck} />} />
         </Routes>
         <Navigate to="/verify" />
-      </>
+      </SocketContext.Provider>
     )
 }
 
 export default PrivateRoutes;
-
-//User Status
-//1 - Unverified
-//2 - Active
-//3 - Inactive

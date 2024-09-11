@@ -1,13 +1,14 @@
-//import { Autocomplete, TextField as MUITextField } from "@mui/material";
-import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
 import { useEffect, useState } from "react";
+import { FieldValues } from "@/types/DataTypes";
+import { FormFieldProps } from "@/types/FormComponentProps";
+
 import FieldLabel from "./FieldLabel";
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import { TextField } from "@mui/material";
 
-const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, prefillValues:FieldValues, setPrefillValues:Function, disabled:boolean, error?:boolean}) => {
+import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
+
+const MultiTextField = (props:FormFieldProps) => {
   const [results,setResults] = useState<string[]>();
   const [error, setError] = useState(props.error);
 
@@ -16,7 +17,7 @@ const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, pref
   },[])
 
   useEffect(()=>{
-    props.setPrefillValues((curr:any)=>{
+    props.setFieldValues((curr:any)=>{
       curr[props.fieldData.id]=results;
       return {...curr};
     })
@@ -46,9 +47,9 @@ const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, pref
     <div className="mb-5 mx-2">
       <FieldLabel index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
       <div>
-        {props.prefillValues && props.prefillValues[props.fieldData.id] && props.prefillValues[props.fieldData.id].length>0
+        {props.fieldValue && props.fieldValue.length>0
           ?<div className="grid grid-cols-5">
-            {props.prefillValues[props.fieldData.id].map((val:string,index:number)=>{
+            {props.fieldValue.map((val:string,index:number)=>{
               return (
                 <div key={index} className="my-2 mr-2">
                   <TextField error={error}
@@ -57,7 +58,7 @@ const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, pref
                     value={val} 
                     onChange={(e)=>{
                       setError(false);
-                      props.setPrefillValues((curr:FieldValues)=>{
+                      props.setFieldValues((curr:FieldValues)=>{
                         curr[props.fieldData.id][index] = e.target.value;
                         return {...curr}; 
                       })
@@ -68,7 +69,7 @@ const MultiTextField = (props:{index:number, fieldData:FormFieldAttributes, pref
             })}
 
             <div className="my-3">
-              {props.prefillValues[props.fieldData.id].length>1?<button onClick={removeValue}><RemoveCircleIcon fontSize="medium" color="error" className="mx-2" /></button>:<></>}
+              {props.fieldValue.length>1?<button onClick={removeValue}><RemoveCircleIcon fontSize="medium" color="error" className="mx-2" /></button>:<></>}
               <button className="mx-2" onClick={addNewValue}><AddCircleIcon fontSize="medium" color="secondary" /></button>
             </div>
 

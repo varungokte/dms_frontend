@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
 import reorganizePermissions from "@/functions/reorganizePermissions";
+import { FormFieldProps } from "@/types/FormComponentProps";
 
+import { Skeleton } from "@mui/material";
 import SelectField from "./SelectField";
 import PermissionsField from "./PermissionsField";
-import { Skeleton } from "@mui/material";
 
-function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList:FieldValues[], prefillValues:any, error?:boolean, setPrefillValues:Function, disabled:boolean}){
+function RoleField (props:FormFieldProps & {roleList:FieldValues[], permissionSet:FieldValues}){
   try{
     const [allRolesPermissionsList, setAllRolesPermissionsList] = useState<any>({});
     const [currentRole, setCurrentRole] = useState<string>();
@@ -18,11 +18,11 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
   
     useEffect(()=>{
       //console.log("props.prefillValues",props.prefillValues)
-      if (!props.prefillValues)
+      if (!props.fieldValue)
         return;
       else if (firstTime){
         setFirstTime(false);
-        if (props.prefillValues && props.prefillValues[props.fieldData.id] && Object.keys(props.prefillValues[props.fieldData.id]).length!=0)
+        if (props.fieldValue && Object.keys(props.fieldValue).length!=0)
           setPermissionsExist(true);
         else
           setPermissionsExist(false);
@@ -30,12 +30,12 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
       else if (!props.prefillValues["UP"])
         setPermissionsExist(false); */
   
-      if (currentRole!=props.prefillValues["R"]){
-        setCurrentRole(props.prefillValues["R"]);
+      if (currentRole!=props.fieldValue){
+        setCurrentRole(props.fieldValue);
         if (currentRole)
           setPermissionsExist(false);
       }
-    },[props.prefillValues]);
+    },[props.fieldValue]);
   
     //useEffect(()=>console.log("permissionsExist has been changed",permissionsExist),[permissionsExist])
   
@@ -52,8 +52,8 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
       if (!currentRole)
         return;
       if (!permissionsExist){
-        props.setPrefillValues((curr:any)=>{
-          curr["UP"]= reorganizePermissions.incoming(allRolesPermissionsList[currentRole]);
+        props.setFieldValues((curr:any)=>{
+          curr[props.fieldData.permissionId||"UP"]= reorganizePermissions.incoming(allRolesPermissionsList[currentRole]);
           return {...curr};
         })
       }
@@ -77,9 +77,9 @@ function RoleField (props:{index:number, fieldData:FormFieldAttributes, roleList
     }
     return (
       <div>
-        <SelectField index={props.index} fieldData={{id:props.fieldData.id, name:props.fieldData.name, type:"select", options:["-"].concat(Object.keys(allRolesPermissionsList)),required:props.fieldData.required}}  prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} disabled={props.disabled} error={props.error} />
+        <SelectField index={props.index} fieldData={{id:props.fieldData.id, name:props.fieldData.name, type:"select", options:["-"].concat(Object.keys(allRolesPermissionsList)),required:props.fieldData.required}}  fieldValue={props.fieldValue} setFieldValues={props.setFieldValues} disabled={props.disabled} error={props.error} />
         {currentRole
-          ?<PermissionsField index={props.index} fieldData={{id:props.fieldData.permissionId||"UP", name:"Permissions", type:"permissions", required:props.fieldData.required, disabled:props.fieldData.disabled}}  permissionSet={props.prefillValues["UP"]} setPermissionSet={props.setPrefillValues}disabled={props.disabled} />
+          ?<PermissionsField index={props.index as number} fieldData={{id:props.fieldData.permissionId||"UP", name:"Permissions", type:"permissions", required:props.fieldData.required, disabled:props.fieldData.disabled}} fieldValue={props.permissionSet} setFieldValues={props.setFieldValues}disabled={props.disabled} />
           :<></>
         }
       </div>

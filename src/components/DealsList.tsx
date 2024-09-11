@@ -1,6 +1,6 @@
 import { ReactElement, useEffect, useState } from "react";
 import moment from "moment";
-import { DocumentSectionKeys, DocumentSectionTypes, DocumentStatus, FieldValues, SetStateBoolean } from "@/types/DataTypes";
+import { DealDetails, DocumentSectionKeys, DocumentSectionTypes, FieldValues, SetStateBoolean } from "@/types/DataTypes";
 import { getDocSecName, getModSecName, getPanSecName} from "@/functions/sectionNameAttributes";
 import { DocumentSectionDetails } from "@/types/DataTypes";
 import { getDealList } from "@/apiFunctions/dealsListAPIs";
@@ -15,14 +15,6 @@ import LoadingMessage from "./BasicMessages/LoadingMessage";
 import { useLocation } from "react-router-dom";
 import { Pagination } from "./BasicComponents/Pagination";
 //import Filter from "./BasicComponents/Filter";
-
-type DocumentDetails= {
-  _id:string,
-  AID:string, 
-  CN:string,
-  SD:Date|string,
-  details: {S:DocumentStatus}[]
-}
 
 function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:FieldValues, panopticPage?:boolean}) {
   useEffect(()=>{
@@ -44,7 +36,7 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
 
   const sectionDetails = setSection();
 
-  const [dealData, setDealData] = useState<DocumentDetails[]>();
+  const [dealData, setDealData] = useState<DealDetails[]>();
 
   const [addedDeals, setAddedDeals] = useState(false);
 
@@ -135,7 +127,7 @@ function DealsList(props:{label:string, specType?:"assign"|"masters", docData?:F
   )
 }
 
-function SingleDealDetails(props:{index:number, label:string, deal:DocumentDetails, sectionDetails:DocumentSectionDetails, addedDeals:boolean, setAddedDeals:SetStateBoolean, linkSource?:string, admin:boolean, teamRole:string, selectedDeal:number, setSelectedDeal:React.Dispatch<React.SetStateAction<number>>}) {
+function SingleDealDetails(props:{index:number, label:string, deal:DealDetails, sectionDetails:DocumentSectionDetails, addedDeals:boolean, setAddedDeals:SetStateBoolean, linkSource?:string, admin:boolean, teamRole:string, selectedDeal:number, setSelectedDeal:React.Dispatch<React.SetStateAction<number>>}) {
   const [added,setAdded] = useState(true);
   const [progressValue, setProgressValue] = useState(0);
 

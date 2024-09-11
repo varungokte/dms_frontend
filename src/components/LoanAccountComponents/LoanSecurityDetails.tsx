@@ -6,7 +6,7 @@ import { createLoan } from "@/apiFunctions/loanAPIs";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import DateField from "../FormFieldComponents/DateField";
-import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
+import FormRepeatableGrid from "../FormComponents/FormRepeatableGrid";
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 function LoanSecurityDetails(props:LoanCommonProps){

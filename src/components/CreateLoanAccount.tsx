@@ -1,10 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import { LoanSecurityTypeList } from "@/functions/Constants";
-import Tooltip from '@mui/material/Tooltip';
 import { PermissionContext } from "@/functions/Contexts";
 
+import { getDocSecList, getModSecName } from "@/functions/sectionNameAttributes";
+import { FieldValues } from "@/types/DataTypes";
+import { LoanFormMetaData } from "@/types/ComponentProps";
+import { getLoanDetails } from "@/apiFunctions/loanAPIs";
+
+import Tooltip from '@mui/material/Tooltip';
 import LoadingMessage from "./BasicMessages/LoadingMessage";
+import { Tab, Tabs, Typography } from "@mui/material";
 
 import LoanIDAssignment from "./LoanAccountComponents/LoanIDAssignment";
 import LoanBasicDetails from "./LoanAccountComponents/LoanBasicDetails";
@@ -16,11 +22,6 @@ import LoanContactDetails from "./LoanAccountComponents/LoanContactDetails";
 import LoanTeamSelection from "./LoanAccountComponents/LoanTeamSelection";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 
-import { Tab, Tabs, Typography } from "@mui/material";
-import { FieldValues } from "@/types/DataTypes";
-import { LoanFormMetaData } from "@/types/ComponentProps";
-import { getDocSecList, getModSecName } from "@/functions/sectionNameAttributes";
-import { getLoanDetails } from "@/apiFunctions/loanAPIs";
 
 function CreateLoanAccount() {
   const {state} = useLocation();

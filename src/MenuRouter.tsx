@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import '@/styling.css';
 import { getDocSecList, getModSecName } from '@/functions/sectionNameAttributes';
 import { FieldValues } from '@/types/DataTypes';
@@ -6,11 +6,11 @@ import { ComponentList } from '@/types/ComponentProps';
 import { PermissionContext } from '@/functions/Contexts';
 import { getDecryptedToken } from './functions/getToken';
 import { getSingleUser } from './apiFunctions/userAPIs';
+import { SocketContext } from './functions/Contexts';
 
 import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, CriticalIcon, /* ReportsIcon,  ReminderIcon */ } from "@/static/PanelIcons";
 
-import {socket} from "@/functions/socket";
-import socketConnector from '@/functions/socketConnector';
+import {socketConnector,/* checkSocketIsConnected */} from '@/functions/socketConnector';
 import getMasters from '@/functions/getMasters';
 import SidePanel from '@/components/SiteComponents/SidePanel';
 import TopPanel from '@/components/SiteComponents/TopPanel';
@@ -29,6 +29,7 @@ import SpecialCases from '@/components/SpecialCases';
 //import Reports from '@/components/Reports';
 import _TestComponent from '@/components/_TestComponent';
 import UserAssignments from '@/components/UserAssignments';
+import TeamTransfer from './components/TeamTransfer';
 
 //import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
 
@@ -39,16 +40,17 @@ function MenuRouter(){
 		{ name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },//2
 		{ name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },//3
 		{ name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },//4
-		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },//5
-		{ name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },//6
-		{ name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },//7
-		{ name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },//8
-		{ name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },//9
-		{ name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },//10
-		{ name: "Payment Schedule", path:"/schedule", component: DealsList, icon: ScheduleIcon},//11
-		{ name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },//12
-		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },//13
-		/* { name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },//14 */
+		{ name: "Team Transfer", path:"/transfer", component:TeamTransfer }, //5
+		{ name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },//6
+		{ name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },//7
+		{ name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },//8
+		{ name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },//9
+		{ name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },//10
+		{ name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },//11
+		{ name: "Payment Schedule", path:"/schedule", component: DealsList, icon: ScheduleIcon},//12
+		{ name: "Products", path:"/products", component: FilterPage, icon: ProductIcon },//13
+		{ name: "Zones", path:"/zones", component: FilterPage, icon: ZoneIcon },//14
+		/* { name: "Reminders", path:"/reminders", component: Reminders, icon: ReminderIcon },//15 */
 		{ name: "Default Cases", path:"/default", component: SpecialCases, icon: DefaultIcon },//15
 		{ name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },//16
 		/* { name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },//17 */
@@ -67,6 +69,8 @@ function MenuRouter(){
 		{ name: "Test", path:"/test", component: _TestComponent },//27
 	];
 	const [socketIsConnected, setSocketIsConnected] = useState(false);
+
+	const socket = useContext(SocketContext);
 	
   const [masterLists, setMasterLists] = useState<FieldValues>();
   const [mastersIdList, setMastersIdList] = useState<string[]>();
@@ -82,13 +86,6 @@ function MenuRouter(){
 			return decodedToken;
 		}
 	}
-
-	useEffect(()=>{
-		if (socket.connected)
-			setSocketIsConnected(true);
-		else if (socket.disconnected)
-			setSocketIsConnected(false);
-	},[socket])
 
 	useEffect(()=>{
 		//get user permissions
@@ -107,10 +104,13 @@ function MenuRouter(){
       getMasters(setMasterLists, setMastersIdList).then(()=>{
 				setChangeInMasters(false);
 			})
-  }
+  	}
   },[changeInMasters]);
 
-	useEffect(()=>socketConnector(setSocketIsConnected),[]);
+	useEffect(()=>{
+		//setSocketIsConnected(checkSocketIsConnected())
+		socketConnector(socket,setSocketIsConnected);
+	},[]);
 
 	const [componentList, setComponentList] = useState<ComponentList>();
 
@@ -126,7 +126,8 @@ function MenuRouter(){
 		}
 		const arr = [];
 		arr.push(allComponents[0]);
-		
+		arr.push(allComponents[5])
+	
 		for (let i=0; i<allComponents.length; i++){
 			const singleComponent = allComponents[i];
 			const componentPermissions = userPermissions[getModSecName({inputName:singleComponent.name, inputType:"fullname",outputType:"shortname"})];
@@ -156,10 +157,6 @@ function MenuRouter(){
 		//arr.push(allComponents[27]);
 		setComponentList(arr);
 	},[userPermissions]);
-
-	//useEffect(()=>console.log("USER PERMISSIONS",userPermissions),[userPermissions]);
-
-	//useEffect(()=>console.log("menu router",socketIsConnected),[socketIsConnected])
 	
 	return (
 		<PermissionContext.Provider value={{userPermissions:userPermissions||{}, setUserPermissions}}>

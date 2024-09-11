@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { FieldValues, UserSuggestionsList } from "@/types/DataTypes";
+import { FormDialogTeamProps } from "@/types/FormComponentProps";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { getUserSuggestions } from "@/apiFunctions/suggestionAPIs";
 import { getSingleTeam } from "@/apiFunctions/teamAPIs";
@@ -11,15 +12,6 @@ import RequiredFieldsNote from "../BasicMessages/RequiredFieldsNote";
 import CloseIcon from '@mui/icons-material/Close';
 import SubmitButton from "../BasicButtons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
-
-type FormDialogTeamProps = {
-  index:number, edit?:boolean, 
-  formOpen:boolean, setFormOpen:Function,
-  formSize:"sm"|"md"|"lg", formTitle:string, 
-  submitButton:string, formSubmit:Function, 
-  form:FieldAttributesList, 
-  currentFields:FieldValues, repeatFields?:boolean,
-}
 
 function FormDialogTeam(props:FormDialogTeamProps){
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});

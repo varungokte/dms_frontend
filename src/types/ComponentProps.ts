@@ -1,8 +1,11 @@
-
-import { DocumentStatus, SetStateBoolean, FieldValues } from "@/types/DataTypes";
 import { FunctionComponent } from "react";
+import { DocumentStatus, SetStateBoolean, FieldValues } from "./DataTypes";
 import { FieldAttributesList } from "./FormAttributes";
 
+//Outside Components
+type ComponentList = {name:string,path:string, component:FunctionComponent<any>, icon?:(props:{fill:string})=>JSX.Element, panopticPage?:boolean}[];
+
+//CreateLoanAccount.tsx
 type LoanFormMetaData = {okToFrolic?:boolean, AID?:string, loanId?:string, changesHaveBeenMade?:boolean, enableDocumentSections?:boolean};
 
 //FileViewer.tsx
@@ -22,10 +25,7 @@ type LoanCommonProps = {
   preexistingValues:FieldValues,
 }
 
-//Outside Components
-type ComponentList = {name:string,path:string, component:FunctionComponent<any>, icon?:(props:{fill:string})=>JSX.Element, panopticPage?:boolean}[];
-
-//LoanDocumentComponents
+//LoanDocumentView Components
 type LoanDocSecProps = {
   data:FieldValues[], label:string, 
   formOpen:boolean[], setFormOpen:React.Dispatch<React.SetStateAction<boolean[]>>, 
@@ -40,9 +40,9 @@ type LoanDocSecProps = {
 }
 
 export {
-  type LoanFormMetaData,
-  type CommonFileViewerProps,  type DocumentFileViewerProps,  type PaymentFileViewerProps,
-  type LoanCommonProps,
   type ComponentList,
+  type LoanFormMetaData,
+  type CommonFileViewerProps, type DocumentFileViewerProps, type PaymentFileViewerProps,
+  type LoanCommonProps,
   type LoanDocSecProps,
 }

@@ -1,8 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import RegistrationPage from './components/AuthPages/RegistrationPage';
-import LoginPage  from './components/AuthPages/LoginPage';
+import LoginPage from './components/AuthPages/LoginPage';
 import PrivateRoutes from './PrivateRoutes';
-import { ThemeProvider, } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { customColor } from './functions/setMUIColor';
 
 function App() {

@@ -1,9 +1,9 @@
-import { FormFieldAttributes } from "@/types/FormAttributes";
+import { useState, useEffect } from "react";
+import { FormFieldProps } from "@/types/FormComponentProps";
 import FieldLabel from "./FieldLabel";
 import { TextField } from "@mui/material";
-import { useState, useEffect } from "react";
 
-function FloatNumberField(props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, className?:string, error?:boolean, repeatFields?:boolean, formIndex?:number, disabled:boolean, readonly?:boolean }){ 
+function FloatNumberField(props:FormFieldProps & {className?:string, repeatFields?:boolean, formIndex?:number}){ 
   const [error, setError] = useState(props.error);
   
   useEffect(()=>setError(props.error),[props.error]);
@@ -17,18 +17,13 @@ function FloatNumberField(props:{index:number|string, fieldData:FormFieldAttribu
         required={props.fieldData.required} disabled={props.disabled} 
         sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
         
-        value={props.repeatFields && props.formIndex!=undefined
-          ?props.prefillValues[props.formIndex]&&props.prefillValues[props.formIndex||0][props.fieldData.id]
-            ?Number(props.prefillValues[props.formIndex||0][props.fieldData.id])
-            :""
-          :props.prefillValues[props.fieldData.id]?Number(props.prefillValues[props.fieldData.id]):""
-        }
+        value={props.fieldValue || ""}
 
         onChange={props.repeatFields && props.formIndex!=null
           ?e=>{
             setError(false);
             if (!isNaN(Number(e.target.value))){
-              props.setPrefillValues((curr:any)=>{
+              props.setFieldValues((curr:any)=>{
                 curr[props.formIndex||0][props.fieldData.id] = Number(e.target.value);
                 return [...curr];
               })
@@ -37,7 +32,7 @@ function FloatNumberField(props:{index:number|string, fieldData:FormFieldAttribu
           :e=>{
             setError(false);
             if (!isNaN(Number(e.target.value))){
-              props.setPrefillValues((curr:any)=>{
+              props.setFieldValues((curr:any)=>{
                 curr[props.fieldData.id] = Number(e.target.value);
                 return {...curr};
               })

@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import FieldLabel from "./FieldLabel";
-import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
 import { TextField as MUITextField } from "@mui/material";
+import { FormFieldProps } from "@/types/FormComponentProps";
 
-function TextField (props:{index:number|string, size:"small"|"medium", fieldData:FormFieldAttributes, prefillValues:FieldValues, setPrefillValues:Function, padding?:number, error?:boolean, errorMessage?:string, repeatFields?:boolean, formIndex?:number, readonly?:boolean, disabled:boolean,}) {
+function TextField(props:FormFieldProps & {size:"small"|"medium", padding?:number, errorMessage?:string, repeatFields?:boolean, formIndex?:number}) {
   try{
     const [message, setMessage] = useState(<></>);
 
@@ -26,22 +25,17 @@ function TextField (props:{index:number|string, size:"small"|"medium", fieldData
           type={props.fieldData.type} disabled={props.disabled} required={props.fieldData.required}
           className={`bg-white w-[100%] ${props.fieldData.name==""?"mt-7":""}`}
           sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
-          value={props.repeatFields && props.formIndex!=undefined
-            ?props.prefillValues[props.formIndex] && props.prefillValues[props.formIndex][props.fieldData.id]
-              ?props.prefillValues[props.formIndex][props.fieldData.id]
-              :""
-            :props.prefillValues[props.fieldData.id]|| ""
-          }
+          value={props.fieldValue || ""}
           
           onChange={props.repeatFields
             ?(e)=>{
               setError(false);
-              props.setPrefillValues((curr:any)=>{
+              props.setFieldValues((curr:any)=>{
                 curr[props.formIndex||0][props.fieldData.id]=e.target.value; 
                 return [...curr];})}
             :(e)=>{
               setError(false);
-              props.setPrefillValues((curr:any)=>{
+              props.setFieldValues((curr:any)=>{
                 curr[props.fieldData.id]=e.target.value; 
                 return {...curr};
               })
@@ -60,29 +54,3 @@ function TextField (props:{index:number|string, size:"small"|"medium", fieldData
 };
 
 export default TextField;
-
-
-
-        {/* <input key={props.index+props.fieldData.id+"t_2"} autoComplete="new-password" id={props.fieldData.id} readOnly={props.readonly}
-          type={props.fieldData.type} disabled={props.disabled} required={props.fieldData.required}
-          className={`border rounded-if w-full ${sizes[props.size]} ${props.fieldData.name==""?"mt-7":""} placeholder:text-slate-800`}
-          value={props.repeatFields && props.formIndex!=undefined
-            ?props.prefillValues[props.formIndex] && props.prefillValues[props.formIndex][props.fieldData.id]
-              ?props.prefillValues[props.formIndex][props.fieldData.id]
-              :""
-            :props.prefillValues[props.fieldData.id]|| ""
-          }
-          
-          onChange={props.repeatFields
-            ?(e)=>{
-              props.setPrefillValues((curr:any)=>{
-                curr[props.formIndex||0][props.fieldData.id]=e.target.value; 
-                return [...curr];})}
-            :(e)=>{
-              props.setPrefillValues((curr:any)=>{
-                curr[props.fieldData.id]=e.target.value; 
-                return {...curr};
-              })
-            }
-          }
-        /> */}

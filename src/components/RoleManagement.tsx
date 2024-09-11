@@ -3,19 +3,20 @@ import { FieldAttributesList } from "@/types/FormAttributes";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { PermissionContext } from "@/functions/Contexts";
 import reorganizePermissions from "@/functions/reorganizePermissions";
+import { addRole, getRolesList } from "@/apiFunctions/roleAPIs";
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger, } from "@/components/ui/collapsible";
+
 import FormDialog from "./FormComponents/FormDialog";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-
 import PermissionsField from "./FormFieldComponents/PermissionsField";
 import Toast from "./BasicComponents/Toast";
 import SubmitButton from "./BasicButtons/SubmitButton";
 import AddButton from "./BasicButtons/AddButton";
-import { addRole, getRolesList } from "@/apiFunctions/roleAPIs";
+
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 function RoleManagement(props:{label:string}){
   useEffect(()=>{

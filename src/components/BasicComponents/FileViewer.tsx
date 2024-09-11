@@ -93,7 +93,7 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
         data["R"]=rejectionReason=="Other"?rejectionText:rejectionReason;
       else if (status=="Verified" && data["R"])
         delete data["R"];
-      console.log("DATA",data)
+      console.log("DATA",data);
       res = (await editDocument(data)).status;
     }
     console.log("edit response",res);

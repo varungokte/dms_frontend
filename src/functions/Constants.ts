@@ -16,7 +16,7 @@ const LoanStatusList = ["-","Preliminary", "Document", "Live", "Hold", "Cancel"]
 const allSectionPermissions:FieldValues = {
   team: ["access", "add", "edit", "select"],
   user: ["access","add" ,"edit"],
-  role: ["access","add","edit"],
+  role: ["access","view","add","edit"],
   masters: ["access","add","edit"],
   loan: ["access", "view", "add", "edit", "delete"],
   contact: ["access","add","view","edit","delete"],

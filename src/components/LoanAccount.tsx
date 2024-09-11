@@ -2,21 +2,21 @@ import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
+import { PermissionContext } from "@/functions/Contexts";
+import { deleteLoan, getLoansList } from "@/apiFunctions/loanAPIs";
 
 import { DataTable } from "./BasicTables/Table";
-import view_icon from "@/static/view_icon.svg";
-import edit_icon from "@/static/edit_icon.svg";
-import delete_icon from "@/static/delete_icon.svg";
-
+import AddButton from "./BasicButtons/AddButton";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import Toast from "./BasicComponents/Toast";
 import { Pagination } from "./BasicComponents/Pagination";
-import { PermissionContext } from "@/functions/Contexts";
 import SearchByType from "./BasicComponents/SearchByType";
-import AddButton from "./BasicButtons/AddButton";
-import { deleteLoan, getLoansList } from "@/apiFunctions/loanAPIs";
+
+import view_icon from "@/static/view_icon.svg";
+import edit_icon from "@/static/edit_icon.svg";
+import delete_icon from "@/static/delete_icon.svg";
 
 function LoanAccount(props:{label:string}) {
   useEffect(()=>{

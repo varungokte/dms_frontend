@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
 import { FieldValues } from "@/types/DataTypes";
 import { getDocSecList, getModSecList, getModSecName } from "@/functions/sectionNameAttributes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
+import reorganizePermissions from "@/functions/reorganizePermissions";
+import { allSectionPermissions } from "@/functions/Constants";
+import { FormFieldProps } from "@/types/FormComponentProps";
 
 import FieldLabel from "./FieldLabel";
 import Tabs from "@mui/material/Tabs/Tabs";
 import Tab from "@mui/material/Tab/Tab";
 import Button from "@mui/material/Button/Button";
 import Box from "@mui/material/Box/Box";
-import reorganizePermissions from "@/functions/reorganizePermissions";
-import { allSectionPermissions } from "@/functions/Constants";
 
-function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, permissionSet:FieldValues, setPermissionSet:Function, disabled:boolean}){
+function PermissionsField (props:FormFieldProps){
   try{
-    const [category, setCategory] = useState("admin");
+    const [category, setCategory] = useState("ad");
     const documentSections = getDocSecList("shortname");
     const docSubTypes:FieldValues = {
       docs: "Document Details",
       file: "File"
     }
 
-    useEffect(()=>console.log("permission props",props),[props]);
+    //useEffect(()=>console.log("permission props",props),[props]);
     
     const emptyPermisionSet = () => {
       //if props.prefillValues[props.id] is not there, this function will set it to {}, which is better than being undefined
@@ -35,18 +35,17 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
       });
 
       
-      if (props.fieldData.multiple && props.permissionSet.length==0){
-        props.setPermissionSet((curr:any)=>{
+      if (props.fieldData.multiple && props.fieldValue.length==0){
+        props.setFieldValues((curr:any)=>{
           curr[props.fieldData.id] = obj;
           return {...curr};
         })
       }
 
-      else if (props.permissionSet && Object.keys(props.permissionSet).length==0){
+      else if (props.fieldValue && Object.keys(props.fieldValue).length==0){
         const reorgainzed = reorganizePermissions.incoming(obj);
-        props.setPermissionSet((curr:any)=>{
+        props.setFieldValues((curr:any)=>{
           curr[props.fieldData.id] = reorgainzed;
-          console.log("NEW CURR",{...curr})
           return {...curr};
         }
         );
@@ -54,8 +53,9 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
     }
     useEffect(()=>{
       emptyPermisionSet();
-    },[props.permissionSet]);
-
+    },[props.fieldValue]);
+    
+    console.log("props.permissionSet",props.fieldValue);
     return (
       <div>
         <FieldLabel index={props.index} id={props.fieldData.id} name={props.fieldData.name} required={props.fieldData.required} disabled={props.disabled} />
@@ -64,29 +64,31 @@ function PermissionsField (props:{index:number, fieldData:FormFieldAttributes, p
             sx={{ borderRight: 1, borderColor: "divider", textAlign:"right"}}
             value={category} onChange={(_:any,val:string)=>setCategory(val)}
           >
-            <Tab label="Admin Pages"  value="admin" className="w-full" sx={{alignItems:"end"}}/>
-            <Tab label="Loan Account" value="loan" sx={{alignItems:"end"}} />
-            <Tab label="Documents" value="documents" sx={{alignItems:"end"}} />
-            <Tab label="Reminders" value="reminders" sx={{alignItems:"end"}} />
+            <Tab label="Admin Pages"  value="ad" className="w-full" sx={{alignItems:"end"}}/>
+            <Tab label="Loan Account" value="lo" sx={{alignItems:"end"}} />
+            <Tab label="Documents" value="do" sx={{alignItems:"end"}} />
+            <Tab label="Reminders" value="re" sx={{alignItems:"end"}} />
           </Tabs>
           <div className="mx-5">
-            {props.permissionSet && Object.keys(props.permissionSet).length!=0
-              ?props.permissionSet[category] && Object.keys(props.permissionSet[category]).map((section:string,index:number)=>{
+            {props.fieldValue && Object.keys(props.fieldValue).length!=0
+              ?props.fieldValue[category] && Object.keys(props.fieldValue[category]).map((section:string,index:number)=>{
                 try{
-                  const sectionPermissions = props.permissionSet[category][section];
-                  
+                  const sectionPermissions = props.fieldValue[category][section];
+                  //console.log("section Permissions for",category,section,sectionPermissions);
+                  //console.log("props.permissionSet[category]",props.permissionSet[category]);
+                  //console.log("props.permissionSet[category][section]",props.permissionSet[category][section])
                   return(
                     <div key={index}>
                       <p className="text-xl">{getModSecName({inputName:section, inputType:"shortname",outputType:"fullname"})}</p>
-                      {category=="documents"
+                      {category=="do"
                         ?Object.keys(sectionPermissions).map((subsection,subindex)=>{
                           return <div key={index+"_"+subindex}>
                             <p>{docSubTypes[subsection]}</p>
-                            <RenderPermissions index={props.index} id={props.fieldData.id} sectionName={subsection} documentSection={section} permissionSet={sectionPermissions[subsection]} setPermissionSet={props.setPermissionSet} category={category} disabled={props.disabled} multiple={props.fieldData.multiple} />
+                            <RenderPermissions index={props.index as number} id={props.fieldData.id} sectionName={subsection} documentSection={section} permissionSet={sectionPermissions[subsection]} setPermissionSet={props.setFieldValues} category={category} disabled={props.disabled} multiple={props.fieldData.multiple} />
                             <br />
                           </div>
                         })
-                        :<RenderPermissions index={props.index} id={props.fieldData.id} sectionName={section} permissionSet={sectionPermissions} setPermissionSet={props.setPermissionSet} category={category} disabled={props.disabled} multiple={props.fieldData.multiple} />
+                        :<RenderPermissions index={props.index as number} id={props.fieldData.id} sectionName={section} permissionSet={sectionPermissions} setPermissionSet={props.setFieldValues} category={category} disabled={props.disabled} multiple={props.fieldData.multiple} />
                       }
                       <br />
                     </div>
@@ -125,6 +127,7 @@ function RenderPermissions(props:{index:number, id:string, category:string, sect
   return (
     <div>
       {(allSectionPermissions[props.sectionName]||[]).map((perm:string)=>{
+        //console.log("using props.permissionset.includes",props.permissionSet);
         return (
           <Button key={props.index+perm} id={props.sectionName+props.index}
             disableRipple={props.disabled} className={`${props.disabled?"hover:cursor-default	":""}`} disableFocusRipple={props.disabled}
@@ -136,6 +139,7 @@ function RenderPermissions(props:{index:number, id:string, category:string, sect
                 if (props.disabled)
                   return;
                 props.setPermissionSet((curr:any)=>{
+                  console.log("setPermissionSet");
                   if (!curr) return;
                   let singleSectionPermission;
                   if (props.multiple){

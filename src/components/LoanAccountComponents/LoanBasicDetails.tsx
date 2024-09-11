@@ -4,6 +4,7 @@ import { FieldValues,} from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanStatusList, LoanTypeList, ProjectStatusList, YesOrNoList, ZoneList } from "@/functions/Constants";
+import { createLoan } from "@/apiFunctions/loanAPIs";
 
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
 import RequiredFieldsNote from "../BasicMessages/RequiredFieldsNote";
@@ -12,7 +13,6 @@ import SelectField from "../FormFieldComponents/SelectField";
 import DateField from "../FormFieldComponents/DateField";
 import TextField from "../FormFieldComponents/TextField";
 import IntegerField from "../FormFieldComponents/IntegerField";
-import { createLoan } from "@/apiFunctions/loanAPIs";
 
 function LoanBasicDetails(props:LoanCommonProps) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
@@ -225,14 +225,16 @@ function LoanBasicDetails(props:LoanCommonProps) {
             else if (field.id=="DA")    
               disabled=true;
             
+            const validateDA = (field.id=="HA"|| field.id=="SA")?{HA:fieldValues["HA"], SA:fieldValues["SA"]}:undefined;
+            
             if (field.type=="select")
-              return <SelectField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
+              return <SelectField key={field.id} index={field.id} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
             else if (field.type=="integer")
-              return <IntegerField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
+              return <IntegerField key={field.id} index={field.id} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} validateDA={validateDA} />
             else if (field.type=="date")
-              return <DateField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
+              return <DateField key={field.id} index={field.id} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||disabled} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
             else
-              return <TextField key={field.id} index={field.id} fieldData={field} setPrefillValues={setFieldValues} prefillValues={fieldValues} size="medium" disabled={props.actionType=="VIEW"||disabled} errorMessage={errorMessage} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
+              return <TextField key={field.id} index={field.id} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} size="medium" disabled={props.actionType=="VIEW"||disabled} errorMessage={errorMessage} readonly={props.actionType=="VIEW"} error={requiredErrors?.includes(field.id)} />
           })}
         </div>
         <br/>
@@ -244,6 +246,5 @@ function LoanBasicDetails(props:LoanCommonProps) {
     </div>
   )
 }
-
 
 export default LoanBasicDetails;

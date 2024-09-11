@@ -26,6 +26,14 @@ type DocumentSectionTypes = "document"|"covenant"|"condition"|"payment"|"undefin
 type DocumentSectionKeys = "TD"|"CD"|"C"|"CP"|"CS"|"PD";
 type DocumentSectionDetails = { sectionKeyName:DocumentSectionKeys, sectionType:DocumentSectionTypes };
 
+type DealDetails= {
+  _id:string,
+  AID:string, 
+  CN:string,
+  SD:Date|string,
+  details: {S:DocumentStatus}[],
+}
+
 export {
   type FieldValues,
   type TableDataTypes,
@@ -35,5 +43,6 @@ export {
   type ToastOptionsAttributes,
   type FrequencyTypes as IntervalType,
   type SetStateBoolean,
-  type DocumentSectionTypes, type DocumentSectionKeys, type DocumentSectionDetails
+  type DocumentSectionTypes, type DocumentSectionKeys, type DocumentSectionDetails,
+  type DealDetails,
 };

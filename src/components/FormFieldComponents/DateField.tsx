@@ -1,13 +1,14 @@
-import moment from "moment";
-import FieldLabel from "./FieldLabel";
-import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
 import { useEffect, useState } from "react";
+import moment from "moment";
+import { FormFieldProps } from "@/types/FormComponentProps";
+import FieldLabel from "./FieldLabel";
 
-const getValidMinDate = (id:string, prefillValues:FieldValues):string => {
+const getValidMinDate = (id:string, startDate?:string):string => {
+  if (!startDate)
+    return "";
   let date = moment(new Date()).format("yyyy-MM-DD");
-  if (id!=="SD" && prefillValues["SD"])
-    date = prefillValues["SD"];
+  if (id!=="SD" && startDate)
+    date = startDate;
   return date;
 }
 
@@ -18,14 +19,14 @@ const getValidMinDate = (id:string, prefillValues:FieldValues):string => {
   return date;
 } */
 
-function DateField (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, error?:boolean, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, disabled:boolean, readonly?:boolean }) {
+function DateField (props:FormFieldProps & {repeatFields?:boolean, formIndex?:number, startDate?:string}) {
   const [prefillValue, setPrefillValue] = useState<string>();
   const [error,setError] = useState(props.error);
 
   useEffect(()=>{
-    if (props.prefillValues && props.prefillValues[props.fieldData.id] && !prefillValue)
-      setPrefillValue(props.prefillValues[props.fieldData.id]);
-  },[props.prefillValues]);
+    if (props.fieldValue  && !prefillValue)
+      setPrefillValue(props.fieldValue);
+  },[props.fieldValue]);
 
   useEffect(()=>setError(props.error),[props.error]);
 
@@ -38,13 +39,11 @@ function DateField (props:{index:number|string, fieldData:FormFieldAttributes, p
         disabled={props.disabled} 
         required={props.fieldData.required}
         className={`border bg-white ${error?"border-red-600":"border-neutral-300"} rounded-if w-full p-3.5 text-black ${props.fieldData.name==""?"mt-7":""}`}
-        value={props.prefillValues[props.fieldData.id]
-          ?moment(props.prefillValues[props.fieldData.id]).format("yyyy-MM-DD")
-          :""
-        }
-        min={props.prefillValues && props.prefillValues[props.fieldData.id]
-          ?props.prefillValues[props.fieldData.id]
-          :getValidMinDate(props.fieldData.id, props.prefillValues)
+        value={props.fieldValue? moment(props.fieldValue).format("yyyy-MM-DD"): ""}
+
+        min={props.fieldValue
+          ?props.fieldValue
+          :getValidMinDate(props.fieldData.id, props.startDate)
         } 
         /* max={props.prefillValues && props.prefillValues[props.id]
           ?props.prefillValues[props.id]
@@ -53,14 +52,14 @@ function DateField (props:{index:number|string, fieldData:FormFieldAttributes, p
         onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{
             setError(false);
-            props.setPrefillValues((curr:any)=>{
+            props.setFieldValues((curr:any)=>{
               curr[props.formIndex||0][props.fieldData.id]=e.target.value; 
               return [...curr];
             });
           }
           :(e)=>{
             setError(false);
-            props.setPrefillValues((curr:any)=>{
+            props.setFieldValues((curr:any)=>{
               curr[props.fieldData.id]=e.target.value; 
               return {...curr};
             });

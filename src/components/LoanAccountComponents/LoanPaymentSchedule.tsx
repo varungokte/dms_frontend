@@ -150,16 +150,16 @@ function LoanPaymentSchedule(props:LoanCommonProps){
       <div className="grid grid-cols-2">
         {fieldList.fields.map((field,index)=>{
           if (field.type=="integer")
-            return <IntegerField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
+            return <IntegerField key={index} index={index} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} />
           else if (field.type=="date")
-            return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
+            return <DateField key={index} index={index} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
           else if (field.type=="select")
-            return <SelectField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
+            return <SelectField key={index} index={index} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} error={errorList?.includes(field.id)} readonly={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
           else if (field.type=="radio")
-            return <RadioGroupField key={index} index={index} fieldData={field} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
+            return <RadioGroupField key={index} index={index} fieldData={field} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||(editMode&&(field.immutable||false))} />
         })}
         {fieldValues["T"]!=InterestTypeList[2]
-          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={props.actionType=="VIEW"||editMode}  error={errorList?.includes("I")} readonly={props.actionType=="VIEW"||(editMode)} />
+          ?<FloatNumberField key={5} index={5} fieldData={{id:"I", name:"Interest Rate (%)", type:"float", required:true}} fieldValue={fieldValues["I"]} setFieldValues={setFieldValues} disabled={props.actionType=="VIEW"||editMode}  error={errorList?.includes("I")} readonly={props.actionType=="VIEW"||(editMode)} />
           :<></>
         }
         <div className="my-10">

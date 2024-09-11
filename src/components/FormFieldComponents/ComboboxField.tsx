@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { FormFieldProps } from "@/types/FormComponentProps";
+import { UserSuggestionsList } from "@/types/DataTypes";
 import { Autocomplete, TextField as MUITextField } from "@mui/material";
 import FieldLabel from "./FieldLabel";
-import { FormFieldAttributes } from "@/types/FormAttributes";
 
-function ComboboxField (props:{index:number|string, fieldData:FormFieldAttributes, suggestions:any, prefillValue:any, setPrefillValues:Function, error?:boolean, disabled:boolean, placeholder?:string}){
+function ComboboxField (props:FormFieldProps & {suggestions:UserSuggestionsList, placeholder?:string}){
   const [value, setValue] = useState("");
 	const [results, setResults] = useState<any>([]);
   const [defaultValue,setDefaultValue] = useState<any>();
@@ -15,12 +16,12 @@ function ComboboxField (props:{index:number|string, fieldData:FormFieldAttribute
 
   //useEffect(()=>console.log("combobox props",props),[props]);
   useEffect(()=>{
-    if (props.prefillValue && props.suggestions.length!=0){
+    if (props.fieldValue && props.suggestions.length!=0){
       let values=[];
       for (let i=0 ; i<props.suggestions.length; i++){
-        if (props.fieldData.multiple && props.prefillValue.includes(props.suggestions[i].values["E"]))
+        if (props.fieldData.multiple && props.fieldValue.includes(props.suggestions[i].values["E"]))
           values.push(props.suggestions[i])
-        else if (props.suggestions[i].values["E"]==props.prefillValue)
+        else if (props.suggestions[i].values["E"]==props.fieldValue)
           setDefaultValue(props.suggestions[i])
       }
       if (props.fieldData.multiple && values.length!=0)
@@ -28,26 +29,26 @@ function ComboboxField (props:{index:number|string, fieldData:FormFieldAttribute
     }
     else  
       setDefaultValue(undefined);
-  },[props.prefillValue,props.suggestions])
+  },[props.fieldValue,props.suggestions])
 
 /*   useEffect(()=>{
     setDefaultValue(defaultValue) 
   },[props.suggestions]) */
 
   useEffect(()=>{
-    props.setPrefillValues((curr:any)=>{
+    props.setFieldValues((curr:any)=>{
       curr[props.fieldData.id]=results; 
       return {...curr};
     })
   },[results]);
 
   useEffect(()=>{
-    if (!props.prefillValue)
+    if (!props.fieldValue)
       return;
     for (let i=0; i<props.suggestions.length; i++)
-      if (props.suggestions[i].label==props.prefillValue)
+      if (props.suggestions[i].label==props.fieldValue)
         setValue(props.suggestions[i].label);
-  },[props.prefillValue]);
+  },[props.fieldValue]);
 
   return (
     <div key={props.index} className="mb-5 mx-2">
@@ -91,18 +92,20 @@ function ComboboxField (props:{index:number|string, fieldData:FormFieldAttribute
           }
           return newOptionsList;
         }}
-        renderInput={(vals)=> {
-          return <MUITextField 
+        renderInput={vals=> 
+          <MUITextField 
             {...vals} 
             color="secondary"
             className="bg-white"
             error={error}
             value={value} 
             onChange={(e)=>setValue(e.target.value)}  
-            placeholder={props.placeholder||`Add ${props.fieldData.name.toLowerCase()}${(props.fieldData.multiple?"s":"")}`} />}} 
+            placeholder={props.placeholder||`Add ${props.fieldData.name.toLowerCase()}${(props.fieldData.multiple?"s":"")}`} 
+          />
+        } 
         />
     </div>
   )
 };
 
-export default ComboboxField
+export default ComboboxField;

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
-import { BankAccountTypeList } from "@/functions/Constants";
-import { FieldValues,} from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
-import FormRepeatableGrid from "../FormFieldComponents/FormRepeatableGrid";
+import { FieldValues,} from "@/types/DataTypes";
+
+import { BankAccountTypeList } from "@/functions/Constants";
 import { createLoan } from "@/apiFunctions/loanAPIs";
+
+import FormRepeatableGrid from "../FormComponents/FormRepeatableGrid";
+import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 
 function LoanBankDetails(props:LoanCommonProps) {
 

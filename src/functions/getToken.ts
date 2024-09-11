@@ -3,7 +3,7 @@ import { handleDecryption } from "./handleCryptogaphy";
 
 const getEncryptedToken = () => {
 	const token = localStorage.getItem('Beacon-DMS-token');
-	return token;
+	return token; 
 }
 
 const getDecryptedToken = async () => {

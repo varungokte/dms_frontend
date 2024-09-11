@@ -1,10 +1,12 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import CircularProgress from "@mui/material/CircularProgress";
+
 import { Button, Typography } from "@mui/material";
 import CancelButton from '../BasicButtons/CancelButton';
+
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CircularProgress from "@mui/material/CircularProgress";
 
 function FormSectionNavigation(props: { currentSection:number, goToPreviousSection:Function, sectionCount:number, goToNextSection:Function, isForm:boolean, enableLoadingSign?:boolean, actionType?:"CREATE"|"EDIT"|"VIEW"}) {
   const navigate = useNavigate();

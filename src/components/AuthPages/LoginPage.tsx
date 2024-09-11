@@ -60,8 +60,8 @@ function LoginPage() {
       <div className="m-3" style={{marginTop:"7%", marginLeft:"5%", width:"35%"}}>
         <p className="text-4xl font-bold mb-7 mx-12" style={{color:"slateblue"}}>Welcome!</p>
         <form>
-          <TextField index={0} fieldData={fieldList[0]} size="medium" prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
-          <PasswordField index={1} fieldData={fieldList[1]} prefillValues={fieldValues} size="medium" setPrefillValues={setFieldValues} disabled={false} />
+          <TextField index={0} fieldData={fieldList[0]} size="medium" fieldValue={fieldValues[fieldList[0].id]} setFieldValues={setFieldValues} disabled={false} />
+          <PasswordField index={1} fieldData={fieldList[1]} fieldValue={fieldValues[fieldList[1].id]} size="medium" setFieldValues={setFieldValues} disabled={false} />
           {errorMessage}
           <br/>
           <SubmitButton width="100%" submitFunction={submitData} submitButtonText={"Log in"} />

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
-import { FormFieldAttributes } from "@/types/FormAttributes";
+import { FormFieldProps } from "@/types/FormComponentProps";
 
 import FieldLabel from "./FieldLabel";
 import { FormControl, IconButton, InputAdornment, OutlinedInput } from "@mui/material";
-
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
-function PasswordField(props:{index:number|string, fieldData:FormFieldAttributes, size:"small"|"medium", prefillValues:any, setPrefillValues:Function, error?:boolean, disabled:boolean, readonly?:boolean}){
+function PasswordField(props:FormFieldProps & {size:"small"|"medium"}){
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(props.error);
   
@@ -23,13 +22,13 @@ function PasswordField(props:{index:number|string, fieldData:FormFieldAttributes
             color="secondary"
             type={showPassword ? 'text' : 'password'}
             error={error}
-            value={props.prefillValues[props.fieldData.id]|| ""}
+            value={props.fieldValue || ""}
             className="h-[90%]"
             sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
 
             onChange={(e)=>{
               setError(false);
-              props.setPrefillValues((curr:any)=>{
+              props.setFieldValues((curr:any)=>{
                 curr[props.fieldData.id]=e.target.value; 
                 return {...curr};
               })

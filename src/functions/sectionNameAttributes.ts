@@ -27,21 +27,21 @@ const getDocSecList = (outputType:DocumentNameAttributes) =>{
 
 //MODULE SECTIONS
 const moduleSectionNames = [
-  { fullname:"Masters", shortname:"masters",category:"admin" },
-  { fullname:"Role Management", shortname:"role",category:"admin" },
-  { fullname:"Team Management", shortname:"team",category:"admin" },
-  { fullname:"User Management", shortname:"user",category:"admin" },
+  { fullname:"Masters", shortname:"masters",category:"ad" },
+  { fullname:"Role Management", shortname:"role",category:"ad" },
+  { fullname:"Team Management", shortname:"team",category:"ad" },
+  { fullname:"User Management", shortname:"user",category:"ad" },
 
-  { fullname:"Loan Account", shortname:"loan",category:"loan" },
-  { fullname:"Contact Details", shortname:"contact",category:"loan" },
-  { fullname:"Ratings", shortname:"rating",category:"loan" },
+  { fullname:"Loan Account", shortname:"loan",category:"lo" },
+  { fullname:"Contact Details", shortname:"contact",category:"lo" },
+  { fullname:"Ratings", shortname:"rating",category:"lo" },
   
-  ...documentSectionNames.map(doc=>{return {fullname:doc.fullname, shortname:doc.shortname, category:"documents"}}),
+  ...documentSectionNames.map(doc=>{return {fullname:doc.fullname, shortname:doc.shortname, category:"do"}}),
   
-  { fullname:"Reminders", shortname:"reminders",category:"reminders" },
-  { fullname:"Default Cases", shortname:"default",category:"reminders" },
-  { fullname:"Critical Cases", shortname:"critical",category:"reminders" },
-  { fullname:"Reports", shortname:"reports",category:"reminders" },
+  { fullname:"Reminders", shortname:"reminders",category:"re" },
+  { fullname:"Default Cases", shortname:"default",category:"re" },
+  { fullname:"Critical Cases", shortname:"critical",category:"re" },
+  { fullname:"Reports", shortname:"reports",category:"re" },
 ];
 
 type ModueNameAttributes = "fullname"|"shortname"|"category";

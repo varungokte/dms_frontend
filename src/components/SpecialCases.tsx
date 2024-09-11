@@ -2,21 +2,20 @@ import { useContext, useEffect, useState } from "react";
 import { DocumentStatusList } from "@/functions/Constants";
 import { getDocSecList, getDocSecName, getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
+import { getSpecialList } from "@/apiFunctions/specialCaseAPIs";
+import { PermissionContext } from "@/functions/Contexts";
 
 import { DataTable } from "./BasicTables/Table";
-
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
-//import Tabs from '@mui/material/Tabs';
-//import Tab from '@mui/material/Tab';
-
 import UploadFileButton from "./BasicButtons/UploadFileButton";
 import ViewFileButton from "./BasicButtons/ViewFileButton";
-import { PermissionContext } from "@/functions/Contexts";
 import { Pagination } from "./BasicComponents/Pagination";
 import Filter from "./BasicComponents/Filter";
 import Toast from "./BasicComponents/Toast";
-import { getSpecialList } from "@/apiFunctions/specialCaseAPIs";
+
+//import Tabs from '@mui/material/Tabs';
+//import Tab from '@mui/material/Tab';
 
 function SpecialCases(props:{label:string, panopticPage?:boolean}) {
   useEffect(()=>{

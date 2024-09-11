@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { FieldValues} from "@/types/DataTypes";
-import { FieldAttributesList } from "@/types/FormAttributes";
-import { DocumentSectionTypes } from "@/types/DataTypes";
+import { FormDialogDocumentsProps } from "@/types/FormComponentProps";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -14,17 +13,6 @@ import FileField from "../FormFieldComponents/FileField";
 import FormFieldsRender from "./FormFieldsRender";
 import CloseIcon from '@mui/icons-material/Close';
 import CancelButton from "../BasicButtons/CancelButton";
-
-type FormDialogDocumentsProps = {
-  index:number, type:DocumentSectionTypes, edit:boolean,
-  formOpen:boolean, setFormOpen:React.Dispatch<React.SetStateAction<boolean[]>>,
-  formSize:"sm"|"md"|"lg", formTitle:string,
-  currentFields:FieldValues,
-  detailSubmit:Function, fileSubmit:Function, deleteFile:Function, getFiles:Function, 
-  formFields:FieldAttributesList, 
-  currIndex?:number,
-  setAdded:Function,
-}
 
 //{currentTab=="details"?"Next":"Save"}
 

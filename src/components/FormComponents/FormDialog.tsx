@@ -1,7 +1,14 @@
 import { memo, useEffect, useState } from "react";
 import { FieldValues, FormDialogTypes, UserSuggestionTypes, UserSuggestionsList } from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
+import { FormDialogProps } from "@/types/FormComponentProps";
+import {getFormFieldByType} from "@/functions/getFormField";
+import reorganizePermissions from "@/functions/reorganizePermissions";
+
 import { getUserSuggestions } from "@/apiFunctions/suggestionAPIs";
+import { getSingleUser } from "@/apiFunctions/userAPIs";
+import { getSingleContact } from "@/apiFunctions/contactAPIs";
+import { getRolesList } from "@/apiFunctions/roleAPIs";
 
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -11,21 +18,6 @@ import SubmitButton from "../BasicButtons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
 import CancelButton from "../BasicButtons/CancelButton";
 import CloseIcon from '@mui/icons-material/Close';
-import {getFormFieldByType} from "@/functions/getFormField";
-import reorganizePermissions from "@/functions/reorganizePermissions";
-import { getSingleUser } from "@/apiFunctions/userAPIs";
-import { getSingleContact } from "@/apiFunctions/contactAPIs";
-import { getRolesList } from "@/apiFunctions/roleAPIs";
-
-type FormDialogProps = {
-  index:number, type:FormDialogTypes, edit?:boolean,  
-  formOpen:boolean, setFormOpen:Function,
-  formSize:"sm"|"md"|"lg", formTitle:string, 
-  submitButton:string, formSubmit:Function, 
-  form:FieldAttributesList, 
-  currentFields:FieldValues, repeatFields?:boolean, 
-  suggestions?:UserSuggestionTypes, getRoles?:boolean 
-}
 
 function FormDialog(props:FormDialogProps){
   const [prefillValues, setPrefillValues] = useState<FieldValues>({});

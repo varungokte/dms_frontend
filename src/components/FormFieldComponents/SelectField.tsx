@@ -1,25 +1,21 @@
-import { FormFieldAttributes } from "@/types/FormAttributes";
+import { useEffect, useState } from "react";
+
 import { DocumentSectionTypes } from "@/types/DataTypes";
+import { FormFieldProps } from "@/types/FormComponentProps";
 
 import FieldLabel from "./FieldLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select/Select";
-import { useEffect, useState } from "react";
 
-function SelectField (props:{index:number|string,fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, repeatFields?:boolean, formIndex?:number, sectionType?:DocumentSectionTypes, setFileType?:Function, setCovType?:Function, setOldZone?:Function, disabled:boolean, error?:boolean, readonly?:boolean}){
+
+function SelectField(props:FormFieldProps & {repeatFields?:boolean, formIndex?:number, sectionType?:DocumentSectionTypes, setFileType?:Function, setCovType?:Function, setOldZone?:Function}){
   //useEffect(()=>console.log(props),[props]);
   const [value, setValue] = useState("");
   const [error, setError] = useState(props.error);
 
   useEffect(()=>{
-    setValue(props.repeatFields && props.formIndex!=null
-      ?props.prefillValues[props.formIndex] && props.prefillValues[props.formIndex][props.fieldData.id]
-        ?props.prefillValues[props.formIndex||0][props.fieldData.id]
-        :""
-      :props.prefillValues[props.fieldData.id]
-        ?props.prefillValues[props.fieldData.id]
-        :"")
-  },[props]);
+    setValue(props.fieldValue);
+  },[props.fieldValue]);
 
   useEffect(()=>setError(props.error),[props.error]);
     return(
@@ -36,12 +32,12 @@ function SelectField (props:{index:number|string,fieldData:FormFieldAttributes, 
         displayEmpty
         inputProps={{ 'aria-label': 'Without label' }}
 
-        defaultValue={value}
+        defaultValue={value || ""}
         
         onChange={props.repeatFields && props.formIndex!=null
           ?(e)=>{
             setError(false);
-            props.setPrefillValues((curr:any)=>{
+            props.setFieldValues((curr:any)=>{
               curr[props.formIndex||0][props.fieldData.id]=e.target.value;
               return [...curr];
             })
@@ -49,11 +45,11 @@ function SelectField (props:{index:number|string,fieldData:FormFieldAttributes, 
           :(e)=>{
             setError(false);
             const val = e.target.value;
-            props.setPrefillValues((curr:any)=>{curr[props.fieldData.id]=val; return {...curr}});
+            props.setFieldValues((curr:any)=>{curr[props.fieldData.id]=val; return {...curr}});
             if (props.setCovType && props.sectionType=="covenant" && props.fieldData.id=="T")
               props.setCovType(val);
             else if (props.setOldZone && props.fieldData.id=="Z")
-              props.setOldZone(props.prefillValues["Z"]);
+              props.setOldZone(props.fieldValue);
           }
         }
       >

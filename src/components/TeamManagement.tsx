@@ -3,6 +3,7 @@ import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/Dat
 import { getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { PermissionContext } from "@/functions/Contexts";
+import { addTeam, editTeam, getTeamsList } from "@/apiFunctions/teamAPIs";
 
 import { DataTable } from "./BasicTables/Table";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
@@ -15,7 +16,6 @@ import AddButton from "./BasicButtons/AddButton";
 
 //import DeleteConfirmation from "./BasicComponents/DeleteConfirmation";
 import edit_icon from "@/static/edit_icon.svg";
-import { addTeam, editTeam, getTeamsList } from "@/apiFunctions/teamAPIs";
 
 function TeamManagement(props:{label:string}){
   useEffect(()=>{
@@ -224,7 +224,6 @@ function TeamManagement(props:{label:string}){
                   </div>
                 )
               })}
-
             /> 
           :<LoadingMessage sectionName="teams" />
         }

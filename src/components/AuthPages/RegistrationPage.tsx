@@ -63,9 +63,9 @@ function RegistrationPage(){
 			<form>
 				{fieldList.map((field,index)=>{
 					if (field.type=="password")
-						return <PasswordField key={index} index={index} fieldData={field} size="small" prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
+						return <PasswordField key={index} index={index} fieldData={field} size="small" fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={false} />
 					else
-						return <TextField key={index} index={index} fieldData={field} size="small" padding={2} prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false} />
+						return <TextField key={index} index={index} fieldData={field} size="small" padding={2} fieldValue={fieldValues[field.id]} setFieldValues={setFieldValues} disabled={false} />
 				})}
 				<br />
 				<SubmitButton submitFunction={handleRegister} submitButtonText="Register" />

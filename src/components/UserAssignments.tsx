@@ -29,9 +29,7 @@ function UserAssignments(props:{label:string}){
   const [docData, setDocData] = useState<FieldValues>();
   
   const getData = async () => {
-    console.log("useremail",userEmail, sectionName)
     const res = await getUserDealsList({userEmail:userEmail||"", sectionName:docSections.values[docSections.labels.indexOf(sectionName||"")]});
-    console.log("Responses",res)
     setDocData(res);
   }
 
@@ -54,8 +52,9 @@ function UserAssignments(props:{label:string}){
       setUserEmail(fieldValues["user"].values["E"]);
     if (fieldValues["section"])
       setSectionName(fieldValues["section"]);
-  },[fieldValues])
+  },[fieldValues]);
 
+  useEffect(()=>console.log("fieldvalues",fieldValues),[fieldValues]);
 
   if (!users || users.length==0)
     return<></>;
@@ -69,13 +68,13 @@ function UserAssignments(props:{label:string}){
           <ComboboxField index={0} 
             fieldData={{id:"user",name:"Select a user", type:"combobox"}} 
             suggestions={users}
-            prefillValue={fieldValues} setPrefillValues={setFieldValues} disabled={false}
+            fieldValue={fieldValues["user"]} setFieldValues={setFieldValues} disabled={false}
             placeholder="Search by user name or email"
           />
         </div>
         <SelectField index={1}
           fieldData={{id:"section",name:"Section Name", type:"select",options:docSections.labels, required:true}}
-          prefillValues={fieldValues} setPrefillValues={setFieldValues} disabled={false}
+          fieldValue={fieldValues["section"]} setFieldValues={setFieldValues} disabled={false}
         />
         <Button variant="contained" color="secondary" sx={{height:"55px", margin:"auto"}} disabled={!(fieldValues["user"]&&fieldValues["section"])} onClick={getData}><SendIcon/></Button>
       </div>

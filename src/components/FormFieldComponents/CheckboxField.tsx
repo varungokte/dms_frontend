@@ -1,18 +1,18 @@
-import { Checkbox, FormControlLabel } from "@mui/material";
+import { FormFieldProps } from "@/types/FormComponentProps";
 import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
-const CheckboxField = (props:{index:number|string, fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, disabled:boolean }) => {
+const CheckboxField = (props:FormFieldProps) => {
+  //console.log("checkbox props",props)
   return (
     <div className="mb-5 mx-2">
       <FormControlLabel id={props.fieldData.id}
         control={<Checkbox size="medium" color="secondary" />} 
         label={props.fieldData.name} 
-        
-        checked={(props.prefillValues && props.prefillValues[props.fieldData.id]==true)||false}
+        checked={Boolean(props.fieldValue)||false}
         
         onChange={()=>{
-          props.setPrefillValues((curr:FieldValues)=>{
+          props.setFieldValues((curr:FieldValues)=>{
             const oldVal = curr[props.fieldData.id];
             curr[props.fieldData.id] = !oldVal;
             return {...curr};

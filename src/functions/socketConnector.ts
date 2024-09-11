@@ -1,33 +1,47 @@
-import {socket} from "./socket";
+import { SetStateBoolean } from "@/types/DataTypes";
+//import socket from "./socket";
+import { Socket } from "socket.io-client";
 
-const onConnect = (setSocketIsConnected:Function) => {
+const onConnect = (socket:Socket,setSocketIsConnected:SetStateBoolean) => {
   try{
     setSocketIsConnected(true);
+    //console.log("socket is connected");
+    //console.log("socket.id",socket.id);
     socket.emit("sendMessage", {message:"Connection established"})
     socket.emit("subscribe", "BusinessChannel");
   }
   catch(err){}
 }
 
-const onDisconnect = (setSocketIsConnected:Function) => {
+const onDisconnect = (setSocketIsConnected:SetStateBoolean) => {
   setSocketIsConnected(false);
 }
 
-const socketConnector = (setSocketIsConnected:Function) => {
+const onSocketError = () => {	
+  console.log("socketerror");
+}
+
+const checkSocketIsConnected = () =>{
+  return  //socket.connected;
+}
+
+const socketConnector = (socket:Socket,setSocketIsConnected:SetStateBoolean) => {
   try{
-    socket.on("connect", ()=>onConnect(setSocketIsConnected));
-    socket.on("connect_error",()=>{	
-      console.log("socketerror")
-    });
+    //console.log("socket connector called")
+    socket.on("connect", ()=>onConnect(socket,setSocketIsConnected));
+    
+    socket.on("connect_error",()=>onSocketError());
+    
+    socket.on("disconnect", ()=>onDisconnect(setSocketIsConnected));
+  
     socket.on("connect_failed", ()=>{
       console.log("socketfailed")
-    } )
-    socket.on("disconnect", ()=>onDisconnect(setSocketIsConnected));
+    })
     socket.on("messageReceived", ()=>{
       //console.log("RECIEVE",data)
-    })  
+    });
   }
   catch(e){console.log("socker error",e)}
 }
 
-export default socketConnector;
+export {socketConnector, checkSocketIsConnected};

@@ -1,10 +1,9 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { FormFieldProps } from "@/types/FormComponentProps";
 import FieldLabel from "./FieldLabel";
-import { FieldValues } from "@/types/DataTypes";
-import { FormFieldAttributes } from "@/types/FormAttributes";
 import { TextField } from "@mui/material";
 
-function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData:FormFieldAttributes, prefillValues:any, setPrefillValues:Function, error?:boolean, className?:string, repeatFields?:boolean, formIndex?:number, disabled:boolean, readonly?:boolean }) {
+function IntegerField (props:FormFieldProps & {className?:string, repeatFields?:boolean, formIndex?:number, validateDA?:{SA:number, HA:number},}) {
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [wordsMessage, setWordsMessage] = useState(<div className="m-2"></div>);
   const [error, setError] = useState(props.error);
@@ -22,14 +21,10 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
 
   const [amountFields] = useState(["SA", "HA", "DA", "OA","P","V"]);
   useEffect(()=>{
-    if (!props.prefillValues)
+    if (!props.fieldValue)
       return;
     
-    let num;
-    if (props.repeatFields && props.formIndex!=undefined)
-      num =props.prefillValues[props.formIndex]?props.prefillValues[props.formIndex||0][props.fieldData.id]:undefined;
-    else
-      num = props.prefillValues[props.fieldData.id];
+    let num = props.fieldValue;
     
     if (amountFields.includes(props.fieldData.id) && num!=undefined){
       if (num==0)
@@ -50,12 +45,7 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
         className={props.className || `border rounded-if w-full p-3 ${props.fieldData.name==""?"mt-7":""}`}
         disabled={props.disabled} required={props.fieldData.required}
 
-        value={props.repeatFields && props.formIndex!=undefined
-          ?props.prefillValues[props.formIndex]&&props.prefillValues[props.formIndex||0][props.fieldData.id]
-            ?numberFormatter(Number(props.prefillValues[props.formIndex||0][props.fieldData.id]))
-            :""
-          :props.prefillValues[props.fieldData.id]?numberFormatter(Number(props.prefillValues[props.fieldData.id])):""
-        }
+        value={props.fieldValue?numberFormatter(Number(props.fieldValue)):""}
 
         sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
 
@@ -71,7 +61,7 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
             if (isNaN(Number(val)))
               return;
 
-            props.setPrefillValues((curr:any)=>{
+            props.setFieldValues((curr:any)=>{
               curr[props.formIndex||0][props.fieldData.id]=val;
               return [...curr];
             })
@@ -89,9 +79,9 @@ function IntegerField (props:{index:number|string, type?:"curr"|"rate",fieldData
 
             if (isNaN(Number(val)))
               return;
-            const downsell_amount = validateDownsellAmount(Number(val),props.fieldData.id,props.prefillValues,setErrorMessage);
+            const downsell_amount = props.validateDA?validateDownsellAmount(Number(val),props.fieldData.id,props.validateDA,setErrorMessage):"NO";
           
-            props.setPrefillValues((curr:any)=>{
+            props.setFieldValues((curr:any)=>{
               curr[props.fieldData.id]=val; 
               if (downsell_amount!=="NO")
                 curr["DA"]=downsell_amount;
@@ -241,13 +231,13 @@ const numberToWords = (num:number, setMessage:Function, index:number|string):voi
   setMessage(<p key={index} className={wordsClassName}>{res}</p>);  
 }
 
-const validateDownsellAmount = (value:number, id:string, prefillValues:FieldValues, setMessage:Function) => {
+const validateDownsellAmount = (value:number, id:string, validateDA:{HA:number, SA:number}, setMessage:Function) => {
   let downsell_amount:number|"NO"="NO";
   if (id=="SA"){
-    if (!prefillValues["HA"])
+    if (!validateDA["HA"])
       downsell_amount = value;
     else{
-      const num = value-Number(prefillValues["HA"]);
+      const num = value-Number(validateDA["HA"]);
       if (num<0)
         setMessage(<p className="text-red-600 mx-2 text-sm">This cannot be less than Hold Amount.</p>)
       else{
@@ -257,8 +247,8 @@ const validateDownsellAmount = (value:number, id:string, prefillValues:FieldValu
     }
   }
   else if (id=="HA"){
-    if (prefillValues["SA"]){
-      const num = Number(prefillValues["SA"])-value;
+    if (validateDA["SA"]){
+      const num = Number(validateDA["SA"])-value;
       if (num<0)
         setMessage(<p className="text-red-600 mx-2 text-sm">This cannot be greater than Sanctioned Amount.</p>)
       else{

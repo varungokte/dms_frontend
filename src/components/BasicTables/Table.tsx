@@ -4,10 +4,9 @@ import { Link } from "react-router-dom";
 import { DocumentStatusList, LoanStatusList, PriorityList, TeamStatusList, UserStatusList } from "@/functions/Constants";
 import { DocumentStatus, FieldValues, LoanStatus, Priority, TableDataTypes, TeamStatus, UserStatus } from "@/types/DataTypes";
 
-import { Table as MUITable } from '@mui/material';
-import {TableBody, TableCell, TableHead, TableRow} from '@mui/material';
+import {Table as MUITable,TableBody, TableCell, TableHead, TableRow} from '@mui/material';
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
-//import Checkbox from '@mui/material/Checkbox';
+import Checkbox from '@mui/material/Checkbox';
 import Badge from '@mui/material/Badge';
 
 const PriorityStyling = ["-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100"];
@@ -29,6 +28,7 @@ type BodyRowsMappingProps = {
 }
 
 function DataTable(props:(HeaderRowsProps & BodyRowsMappingProps &{className?:string, style?:FieldValues})){
+  console.log("data table props",props);
   return(
     <MUITable className={`${props.className} rounded-xl border`} sx={{minWidth:700,borderRadius:"13px", ...props.style }}>
       <HeaderRows headingRows={props.headingRows} headingClassNames={props.headingClassNames}/>
@@ -84,6 +84,9 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
             {(()=>{
               if (dataType=="index")
                 return handleIndex(props.indexStartsAt+props.rowIndex+1, cellClassName);
+
+              /* else if (dataType=="checkbox")
+                return handleCheckbox() */
             
               else if (dataType=="action" && props.action)
                 return handleAction(props.action[props.rowIndex], cellClassName)
@@ -91,7 +94,7 @@ function SingleRow(props:{rowIndex:number, dataTypes:TableDataTypes[], columns:s
               else if (dataType=="count-team")
                 return handleCountTeam(props.singleRow, cellClassName);
               
-              const item = props.singleRow[props.columns[props.dataTypes[0]=="index"?index-1:index]];
+              const item = props.singleRow[props.columns[props.dataTypes[0]=="index"||props.dataTypes[0]=="checkbox"?index-1:index]];
               const documentLink=(props.documentLinks && props.documentLinks[props.rowIndex])?props.documentLinks[props.rowIndex]:undefined;
               if (dataType=="date")
                 return handleDate(item, cellClassName);
@@ -166,10 +169,9 @@ const handleUserStatus = (index:string, status:UserStatus, cellClassName:string,
         if (status!="-")
           return <option key={index} className={`${UserStatusStyling[index]}`}>{status}</option>
       })}
-    </select>
+    </select>;
   else
-    return <p className={`${className} p-2`}>{status}</p>
-  
+    return <p className={`${className} p-2`}>{status}</p>;  
 }
 
 const handleTeamStatus = (index:string, status:TeamStatus, cellClassName:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function) => {
@@ -205,9 +207,10 @@ const handleCountTeam = (obj:any, cellClassName:string) => {
   return <div className={cellClassName}>{count}</div>
 }
 const handleTextField = (prefillValue:any, cellClassName:string, tableIndex:number, columnId:string, setPrefillValue:Function) => {
+  console.log()
   return <div className={cellClassName}>
     <FloatNumberField index={tableIndex} fieldData={{id:columnId, name:"", type:"float"}} disabled={false} className={"border-2 rounded-if h-7 mt-5 p-1"}
-      prefillValues={{[tableIndex]:{[columnId]:prefillValue}}} setPrefillValues={setPrefillValue} 
+      fieldValue={prefillValue} setFieldValues={setPrefillValue} 
       repeatFields formIndex={tableIndex}
     /> 
   </div>
@@ -217,8 +220,8 @@ const handleDocumentLink = (item:ReactElement, cellClassName:string, link:{secti
   if (link) return <Link to={link.section} className={cellClassName} state={link.index}>{item}</Link>
 }
 
-/* const handleCheckbox = (id:string, selectedEntity:string, setSelectedEntity:Function) => {
+const handleCheckbox = (id:string, selectedEntity:string, setSelectedEntity:Function) => {
   return <Checkbox color="secondary" checked={id==selectedEntity} onChange={()=>setSelectedEntity(id)} />
 }
- */
+
 export { DataTable, HeaderRows, BodyRowsMapping };

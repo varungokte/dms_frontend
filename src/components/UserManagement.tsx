@@ -136,15 +136,15 @@ function UserManagement(props:{label:string}){
   }
 
   const changeUser = async (userValues:any, index:number) => {
-
-    if (selectedUser==-1 && index==undefined || !userData)
+    //console.log("uservalues",userValues,"index",index, "selectedUser",selectedUser);
+    if (selectedUser==-1 || index==undefined || !userData || index==-1)
       return;
-  
+    
     if (selectedUser!=-1){
       const id = userData[selectedUser]["_id"];
       userValues["_id"] = id;
     }
-
+    console.log("change user userdata",userData);
     for (let i=0; i<Object.keys(userData[index]).length; i++){
       const key = Object.keys(userData[index])[i];
       if (userData[index][key]==userValues[key])
