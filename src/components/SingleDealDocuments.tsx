@@ -1,12 +1,12 @@
 import {  useContext, useEffect, useState } from "react";
-import { PermissionContext } from "@/functions/Contexts";
-import { DocumentStatusList } from "@/functions/Constants";
+import { PermissionContext } from "@/Contexts";
+import { statusValues } from "@/Constants";
 import { SetStateBoolean, ToastOptionsAttributes } from "@/types/DataTypes";
 import { getModSecName, getPanSecName } from "@/functions/sectionNameAttributes";
 import { DocumentSectionDetails } from "@/types/DataTypes";
 import { getDocumentsList } from "@/apiFunctions/documentAPIs";
 
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
 import UploadFileButton from "./BasicButtons/UploadFileButton";
 import ViewFileButton from "./BasicButtons/ViewFileButton";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
@@ -24,6 +24,8 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const {DocumentStatusList} = statusValues
 
   //useEffect(()=>console.log("rendered single deal documents for the first time",props.added),[])
 
@@ -62,10 +64,17 @@ function SingleDealDocuments(props:{label:string, loanId:string, AID:string, sec
         ?docData.length==0
           ?<EmptyPageMessage sectionName="documents" />
           :<DataTable defaultBadges
-            headingRows={["Document Name", "Document Category", "Start Date", "End Date", "Physical Location", "Execution Location", "Priority", "Status", "Action"]}
             tableData={docData} 
-            columnIDs={["N","C","SD","ED","PL","EL","P","S"]} 
-            dataTypes={["text","text","date","date","text","text","priority","doc-status","action"]}
+            columnData={[
+              {id:"N", heading:"Document Name", type:"text"},
+              {id:"C", heading:"Document Category", type:"text"},
+              {id:"SD", heading:"Start Date", type:"date"},
+              {id:"ED", heading:"End Date", type:"date"},
+              {id:"PL", heading:"Physical Location", type:"text"},
+              {id:"EL", heading:"Execution Location", type:"text"},
+              {id:"P", heading:"Priority", type:"priority"},
+              {id:"S", heading:"Status", type:"doc-status"},
+            ]}
             action={
               docData.map((doc:any,index:number)=>{
                 if (doc["S"]==DocumentStatusList[1])

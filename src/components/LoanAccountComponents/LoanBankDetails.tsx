@@ -1,15 +1,19 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
-import { FieldValues,} from "@/types/DataTypes";
-
-import { BankAccountTypeList } from "@/functions/Constants";
+import { FieldValues} from "@/types/DataTypes";
+import { MasterValuesContext } from "@/Contexts";
 import { createLoan } from "@/apiFunctions/loanAPIs";
 
 import FormRepeatableGrid from "../FormComponents/FormRepeatableGrid";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 
 function LoanBankDetails(props:LoanCommonProps) {
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { BankAccountTypeList } = masters;
 
   const fieldList:GridFieldAttributes = {category:"grid", row:4, fields:[
     { id:"AN", name:"Account Name", type:"text", required:false },

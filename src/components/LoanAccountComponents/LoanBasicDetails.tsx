@@ -1,9 +1,10 @@
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useContext, useEffect, useState } from "react";
 import moment from "moment";
 import { FieldValues,} from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
-import { DSRAFormList, IndustryList, LoanProductList, LoanSecuredList, LoanStatusList, LoanTypeList, ProjectStatusList, YesOrNoList, ZoneList } from "@/functions/Constants";
+import { constants, statusValues } from "@/Constants";
+import { MasterValuesContext } from "@/Contexts";
 import { createLoan } from "@/apiFunctions/loanAPIs";
 
 import {FormSectionNavigation} from "../FormComponents/FormSectionNavigation";
@@ -16,6 +17,16 @@ import IntegerField from "../FormFieldComponents/IntegerField";
 
 function LoanBasicDetails(props:LoanCommonProps) {
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
+
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters)
+    return;
+
+  const { DSRAFormList, IndustryList, LoanProductList, LoanTypeList, ProjectStatusList, ZoneList } = masters;
+
+  const {LoanStatusList} = statusValues;
+  const {YesOrNoList, LoanSecuredList} = constants;
   
   const fieldList:GridFieldAttributes = {category:"grid",row:4, fields:[
     { id:"CN", name:"Company Name", type:"text", required: true },

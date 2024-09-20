@@ -1,6 +1,6 @@
 import { FieldValues } from "@/types/DataTypes";
 import { getDocSecList, getModSecList } from "./sectionNameAttributes";
-import { allSectionPermissions } from "./Constants";
+import { allSectionPermissions } from "../Constants";
 
 const giveAllPermissions = () => {
   const permissions:FieldValues = {};

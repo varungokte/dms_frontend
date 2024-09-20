@@ -1,12 +1,11 @@
 import {  useContext, useEffect, useState } from "react";
 import { getModSecName } from "@/functions/sectionNameAttributes";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
+import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import reorganizePermissions from "@/functions/reorganizePermissions";
 import { addUser, editUser, getUsersList } from "@/apiFunctions/userAPIs";
 
-import { DataTable } from "@/components/BasicTables/Table";
-import { ZoneList } from "@/functions/Constants";
+import DataTable from "@/components/BasicTables/Table";
 import FormDialog from "./FormComponents/FormDialog";
 
 import edit_icon from "@/static/edit_icon.svg";
@@ -15,7 +14,7 @@ import EmptyPageMessage from "@/components/BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 
 import Toast from "./BasicComponents/Toast";
-import { PermissionContext } from "@/functions/Contexts";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 import { EntriesPerPage, Pagination } from "./BasicComponents/Pagination";
 import SearchByType from "./BasicComponents/SearchByType";
 import ForbiddenMessage from "./BasicMessages/FobiddenMessage";
@@ -26,6 +25,12 @@ function UserManagement(props:{label:string}){
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
+
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { ZoneList } = masters;
 
   const [userData, setUserData]= useState<FieldValues[]>();
    
@@ -49,8 +54,6 @@ function UserManagement(props:{label:string}){
   const [forbidden, setForbidden] = useState(<></>);
 
   const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
-  const tableHeadings = ["Name", "Email Address","Reporting Manager", "Zone", "Role", "Status"];
-  const tableDataTypes:TableDataTypes[] = ["text", "text", "text", "text","text", "user-status"];
 
   //const [roleFilter] = useState(-1);
   const [searchString, setSearchString] = useState("");
@@ -219,11 +222,17 @@ function UserManagement(props:{label:string}){
           ?userData.length==0
             ?<EmptyPageMessage sectionName="users" emotion />
             :<DataTable className="bg-white rounded-xl" 
-              headingRows={editPermission?tableHeadings.concat("Action"):tableHeadings}
-              tableData={userData} columnIDs={["N","E", "RM", "Z", "R","S"]} dataTypes={editPermission?tableDataTypes.concat("action"):tableDataTypes}
-              cellClassName={["","","","","", userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit")?"editable":"",""]}
+              columnData={[
+                {id:"N", heading:"Name", type:"text"},
+                {id:"E", heading:"Email Address", type:"text"},
+                {id:"RM", heading:"Reporting Manager", type:"text"},
+                {id:"Z", heading:"Zone", type:"text"},
+                {id:"R", heading:"Role", type:"text"},
+                {id:"S", heading:"Status", type:"user-status", cellClassName:editPermission?"editable":""}
+              ]}
+              tableData={userData}
               setEntityStatus={setUserStatus} setSelectedEntity={setSelectedUser}
-              action = {userData.map((_:any, index:number)=>{
+              action = {editPermission?userData.map((_:any, index:number)=>{
                 return(
                   <div className="flex flex-row">
                     {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit")
@@ -243,7 +252,7 @@ function UserManagement(props:{label:string}){
                     {/* <DeleteConfirmation thing="user" deleteFunction={deleteUser} currIndex={index} /> */} 
                   </div>
                 )
-              })}
+              }):undefined}
             />
             
           :<LoadingMessage sectionName="users" />

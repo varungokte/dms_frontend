@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { apiEndpoint } from '@/functions/Constants';
+import { apiEndpoint } from '@/Constants';
 import { getEncryptedToken } from '@/functions/getToken';
 import { handleEncryption, handleDecryption } from '@/functions/handleCryptogaphy';
 import { FieldValues } from '@/types/DataTypes';
@@ -105,4 +105,29 @@ const selectTeam = async (data:any) => {
 	}
 };
 
-export { addTeam, editTeam, getTeamsList, getSingleTeam, selectTeam }
+const getSingleUserTeams = async (params:{email:string,}) => {
+	try {
+		const token = await getEncryptedToken();
+		console.log('get single team params',params.email);
+		const response = await axios.get(`${apiEndpoint}/userteams`, {
+			headers:{ "Authorization": `Bearer ${token}` },
+			params:{value:params.email}
+		});
+		const decryptedObject = await handleDecryption(response.data);
+
+		return {status:response.status,obj:decryptedObject};	
+	}
+	catch(error:any) {
+		if (!error.response)
+			return {status:0, obj:null}
+		else
+			return {status:error.response.status,obj:null};
+	}
+};
+
+export { 
+	addTeam, editTeam, 
+	getTeamsList, getSingleTeam, 
+	selectTeam,
+	getSingleUserTeams,
+}

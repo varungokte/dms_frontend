@@ -3,8 +3,7 @@ import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { FieldAttributesList } from "@/types/FormAttributes";
 
-import { PermissionContext } from "@/functions/Contexts";
-import { ContactTypeList, EmailRecipientList } from "@/functions/Constants";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 import { addContact, deleteContact, getContactsList, getSingleContact } from "@/apiFunctions/contactAPIs";
 import { getModSecName } from "@/functions/sectionNameAttributes";
 
@@ -36,6 +35,12 @@ function LoanContactDetails(props:LoanCommonProps) {
   const [contacts, setContacts] = useState<{[key:string]:FieldValues}>();
 
   const {userPermissions} = useContext(PermissionContext);
+  
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { ContactTypeList, EmailRecipientList } = masters;
   
   const fieldList: FieldAttributesList = [
     { category: "grid", row:3, sectionName:"", fields: [

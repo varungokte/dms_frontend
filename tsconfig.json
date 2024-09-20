@@ -28,6 +28,6 @@
       ]
     }
   },
-  "include": ["src", "src/functions/Constants.ts", "src/types/DataTypes.ts", "src/components/UnusedComponents/StatusLists.ts"],
+  "include": ["src", "src/Constants.ts", "src/types/DataTypes.ts", "src/components/UnusedComponents/StatusLists.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

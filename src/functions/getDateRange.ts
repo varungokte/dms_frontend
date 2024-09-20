@@ -1,4 +1,5 @@
 //given startDate, endDate and intervalType (weekly, monthly or yearly), it will return an array of dates in that range with the specified frequency
+
 const getPeriodicList = (frequency:string,startDate:Date, endDate:Date) => {
   let start = (frequency=="monthly")?startDate.getMonth():startDate.getFullYear();
   let end = (frequency=="monthly")?endDate.getMonth():endDate.getFullYear();

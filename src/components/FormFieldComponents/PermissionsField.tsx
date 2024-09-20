@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { FieldValues } from "@/types/DataTypes";
 import { getDocSecList, getModSecList, getModSecName } from "@/functions/sectionNameAttributes";
 import reorganizePermissions from "@/functions/reorganizePermissions";
-import { allSectionPermissions } from "@/functions/Constants";
+import { allSectionPermissions } from "@/Constants";
 import { FormFieldProps } from "@/types/FormComponentProps";
 
 import FieldLabel from "./FieldLabel";

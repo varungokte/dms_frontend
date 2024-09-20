@@ -1,25 +1,35 @@
-import { useEffect, useState } from "react";
-import { CovenantTypeList } from "@/functions/Constants";
-import { FieldValues, TableDataTypes } from "@/types/DataTypes";
+import { useContext, useEffect, useState } from "react";
+import { FieldValues } from "@/types/DataTypes";
 import { LoanDocSecProps } from "@/types/ComponentProps";
+import { TableColumnData } from "@/types/TableDataAttributes";
+import { MasterValuesContext } from "@/Contexts";
 
-import { DataTable } from "../../BasicTables/Table";
+import DataTable from "../../BasicTables/Table";
 import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 import edit_icon from "@/static/edit_icon.svg";
 import EmptyPageMessage from "@/components/BasicMessages/EmptyPageMessage";
 
 function LoanCovenantView(props:LoanDocSecProps& {type:string}){
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { CovenantTypeList } = masters;
+  
   const [filteredCovData, setFilteredCovData] = useState<FieldValues[]>();
   const [indexToSend, setIndexToSend] = useState<number[]>([]);
 
-  const tableRows = ["Covenant Name", "Physical Location", "Execution Location", "Start Date","End Date", "Priority"];
-  const tableDataTypes:TableDataTypes[] = ["text", "text", "text", "date", "date", "priority"];
-  const tableColumnIDs = ["N","PL","EL", "SD", "ED","P"];
+  const tableColumnData:TableColumnData = [
+    {id:"N", heading:"Covenant Name", type:"text"},
+    {id:"PL", heading:"Physical Location", type:"text"},
+    {id:"EL", heading:"Execution Location", type:"text"},
+    {id:"SD", heading:"Start Date", type:"date"},
+    {id:"ED", heading:"End Date", type:"date"},
+    {id:"P", heading:"Priority", type:"priority"}
+  ];
 
   if(props.type==CovenantTypeList[1]){
-    tableRows.splice(1,0,"Frequency");
-    tableDataTypes.splice(1,0,"text");
-    tableColumnIDs.splice(1,0,"F");
+    tableColumnData.splice(1,0,{id:"F", heading:"Frequency",type:"text"});
   }
   
   useEffect(()=>{
@@ -49,10 +59,9 @@ function LoanCovenantView(props:LoanDocSecProps& {type:string}){
   //if (props.type==CovenantTypeList[1])
     return (
       <DataTable className="border rounded-2xl"
-        headingRows={props.disableEdit?tableRows:tableRows.concat(["Action"])}
-        tableData={filteredCovData.filter((document:any)=>document["T"]==props.type)} columnIDs={tableColumnIDs} dataTypes={props.disableEdit?tableDataTypes:tableDataTypes.concat(["action"])}
-        action = {filteredCovData.filter((document:any)=>document["T"]==props.type).map((item:any, index:number)=>{
-          item;
+        tableData={filteredCovData.filter((document:any)=>document["T"]==props.type)} 
+        columnData={tableColumnData}
+        action = {props.disableEdit?filteredCovData.filter((document:any)=>document["T"]==props.type).map((_:any, index:number)=>{
           return(
             <div className="flex flex-row">
               {props.disableEdit
@@ -72,7 +81,7 @@ function LoanCovenantView(props:LoanDocSecProps& {type:string}){
               {/* <DeleteConfirmation thing="covenant" deleteFunction={props.deleteCovenantFunction} currIndex={index}/> */}
             </div>
           )
-        })}
+        }):undefined}
       />
     )
   /* else

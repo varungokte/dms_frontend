@@ -1,13 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { LoanCommonProps } from "@/types/ComponentProps";
-import { PermissionContext } from "@/functions/Contexts";
+import { PermissionContext } from "@/Contexts";
 import { getTeamsList, selectTeam } from "@/apiFunctions/teamAPIs";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import EmptyPageMessage from "../BasicMessages/EmptyPageMessage";
 import LoadingMessage from "../BasicMessages/LoadingMessage";
 import SearchByType from "../BasicComponents/SearchByType";
-import { DataTable } from "../BasicTables/Table";
+import DataTable from "../BasicTables/Table";
 import { Pagination } from "../BasicComponents/Pagination";
 
 function LoanTeamSelection(props:LoanCommonProps){
@@ -15,7 +15,7 @@ function LoanTeamSelection(props:LoanCommonProps){
   
   const {userPermissions} = useContext(PermissionContext);
 
-  const [selectedTeam, setSelectedTeam] = useState("");
+  const [selectedTeam, setSelectedTeam] = useState([""]);
   const [errorMessage, setErrorMessage] = useState(<div className="text-lg mx-3 text-blue-600">Select one of the following teams</div>);
   
   const [searchString, setSearchString] = useState("");
@@ -32,7 +32,7 @@ function LoanTeamSelection(props:LoanCommonProps){
         console.log("response",res.obj)
         setTotalPages(Math.ceil(Number(res.obj["list"][0]["metadata"][0]["total"])/Number(rowsPerPage)));
         if (res.obj["currentTeam"])
-          setSelectedTeam(res.obj["currentTeam"]["_teamId"]);
+          setSelectedTeam([res.obj["currentTeam"]["_teamId"]]);
         //console.log("teams list",res.obj.list[0]["data"])
         setTeamList(res.obj.list[0]["data"]);
       }
@@ -43,23 +43,23 @@ function LoanTeamSelection(props:LoanCommonProps){
     })
   },[currentPage, rowsPerPage, searchString, searchType]);
 
-  //useEffect(()=>console.log("selected team",selectedTeam),[selectedTeam])
+  useEffect(()=>console.log("selected team",selectedTeam),[selectedTeam])
 
   const sendTeam = async (e:any) =>{
     e.preventDefault();
     if (!userPermissions["team"].includes("select")){
-      if (selectedTeam && selectedTeam!="")
+      if (selectedTeam && selectedTeam[0]!="")
         props.goToNextSection();
       return;
     }
 
-    if (!selectedTeam || selectedTeam==""){
+    if (!selectedTeam || selectedTeam[0]==""){
       setErrorMessage(<div className="text-lg mx-3 text-red-600">You must select one of the following teams.</div>);
       return;
     }
     const data = {
       "_loanId":props.loanId,
-      "_teamId": selectedTeam //teamList[selectedTeam]["_id"]
+      "_teamId": selectedTeam[0] //teamList[selectedTeam]["_id"]
     }
 
     const res = await selectTeam(data);
@@ -81,11 +81,19 @@ function LoanTeamSelection(props:LoanCommonProps){
             ?teamList.length==0
               ?<EmptyPageMessage sectionName="teams" />
               :<DataTable
-                selectable={userPermissions["team"].includes("select")} selectedEntity={selectedTeam} setSelectedEntity={setSelectedTeam} 
-                headingRows={["Team Name", "Team Lead", "Created On", "Status"]}
-                dataTypes={["text", "text","date", "team-status"]}
-                tableData={teamList} columnIDs={["N","L","createdAt","S"]}
-                indexStartsAt={(currentPage-1)*rowsPerPage}
+                tableData={teamList} 
+                columnData={[
+                  {id:"N", heading:"Team Name", type:"text"},
+                  {id:"L", heading:"Team Lead", type:"text"},
+                  {id:"createdAt", heading:"Created On", type:"date"},
+                  {id:"S", heading:"Status", type:"team-status"}
+                ]}
+                selectable={userPermissions["team"].includes("select")?{
+                  type:"row",
+                  selectedRows: selectedTeam,
+                  setSelectedRows: setSelectedTeam,
+                }:undefined}
+                //indexStartsAt={(currentPage-1)*rowsPerPage}
               />
             :<LoadingMessage sectionName="a list of teams" />
           }

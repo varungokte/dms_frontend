@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { DocumentRejectionReasonList } from "@/functions/Constants";
+import { useContext, useEffect, useMemo, useState } from "react";
+import { MasterValuesContext } from "@/Contexts";
 import { DocumentStatus, FieldValues } from "@/types/DataTypes";
 import { CommonFileViewerProps, DocumentFileViewerProps, PaymentFileViewerProps } from "@/types/ComponentProps";
 import { editDocument } from "@/apiFunctions/documentAPIs";
@@ -24,7 +24,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url,
 ).toString();
 
-function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps) & {openDialog:boolean, setOpenDialog:Function, setIsDeleted:Function}){
+function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|PaymentFileViewerProps) & {openDialog:boolean, setOpenDialog:Function, setIsDeleted:Function}){  
   const [verified, setVerified] = useState(false);
   const [rejected, setRejected] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -216,6 +216,11 @@ function FileViewer(props:CommonFileViewerProps & (DocumentFileViewerProps|Payme
 function RejectionDialog(props: {openDialog:boolean, setOpenDialog:Function, rejectionReason:string, setRejectionReason:Function, rejectionText:string, setRejectionText:Function, changeStatus:Function }){
   const otherReasons = "Other";
   const [rejectionError, setRejectionError] = useState(<></>);
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { DocumentRejectionReasonList } = masters;
   
   return (
     <Dialog onClose={()=>props.setOpenDialog(false)} open={props.openDialog} maxWidth="sm" fullWidth>

@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 
 import { getDecryptedToken } from "./functions/getToken";
-import { UserStatusList } from "./functions/Constants";
+import { statusValues } from "./Constants";
 import { FieldValues } from "@/types/DataTypes";
-import { SocketContext } from "./functions/Contexts";
-import socket from "./functions/socket";
+import { SocketContext } from "./Contexts";
 
 import VerificationPage from "./components/AuthPages/VerificationPage";
 import MenuRouter from "./MenuRouter";
+import socket from "./socket";
 
 function PrivateRoutes() {
   const [token, setToken] = useState<any>(null);
@@ -36,12 +36,11 @@ function PrivateRoutes() {
 }
 
 function EmailVerification(props:{token:FieldValues, setCheck:Function}) {
-  //console.log("email verification token",props.token["S"]==UserStatusList[2])
+  const {UserStatusList} = statusValues;
   if (!props.token)
     return <Navigate to="/login" />
   else if (props.token["S"] == UserStatusList[2])
     return <MenuRouter />
-   
   else
     return (
       <SocketContext.Provider value={socket}>

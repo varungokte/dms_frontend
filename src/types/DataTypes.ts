@@ -1,8 +1,19 @@
-import { DocumentStatusList, FileStatusList, LoanStatusList, PriorityList, TeamStatusList, UserStatusList } from "@/functions/Constants";
+import {statusValues} from "@/Constants";
 
 type FieldValues = {[key:string]: any | any[]};
 
-type TableDataTypes = "index" | "text" | "date" | "priority" | "doc-status" | "user-status" | "team-status" | "loan-status" | "obj-name" | "action" | "count-team" | "text-field" | "doc-link" | "checkbox";
+type MastersValues = {
+  [key in 
+    "LoanProductList"| "ZoneList"| "FileTypeList"| "IndustryList"| "LoanTypeList"| "ProjectStatusList"| "DSRAFormList"|
+    "UserRoleList"| 
+    "LoanSecurityTypeList"| "BankAccountTypeList"| 
+    "ContactTypeList"| "EmailRecipientList"|
+    "RatingAgencyList"| "RatingTypeList"| "RatingOutlookList"|
+    "TransactionCategoryList"| "ComplianceCategoryList"| "CovenantCategoryList"| "CovenantTypeList"| "ConditionPrecedentCategoryList"| "ConditionSubsequentCategoryList"|
+    "DocumentRejectionReasonList"|
+    "TableRowsPerPage"
+  ]: string[]
+};
 
 type FormDialogTypes = "team" | "user" | "role" | "cont" | "rate" | "mast";
 
@@ -12,6 +23,8 @@ type UserSuggestionTypes = "AU"|"TL"|"RM";
 type UserSuggestionsList = { label:string, values:FieldValues }[];
 
 type SetStateBoolean = React.Dispatch<React.SetStateAction<boolean>>;
+
+const { DocumentStatusList, FileStatusList, LoanStatusList, PriorityList, TeamStatusList, UserStatusList } = statusValues;
 
 type UserStatus = typeof UserStatusList[number];
 type DocumentStatus = typeof DocumentStatusList[number];
@@ -35,8 +48,7 @@ type DealDetails= {
 }
 
 export {
-  type FieldValues,
-  type TableDataTypes,
+  type FieldValues, type MastersValues,
   type FormDialogTypes, 
   type UserSuggestionTypes, type UserSuggestionsList,
   type UserStatus, type DocumentStatus, type FileStatus, type TeamStatus, type Priority, type LoanStatus,

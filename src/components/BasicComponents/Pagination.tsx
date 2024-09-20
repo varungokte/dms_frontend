@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { TableRowsPerPage } from '@/functions/Constants';
+import { useContext, useEffect } from 'react';
+import { MasterValuesContext } from '@/Contexts';
 
 import { Pagination as PaginationBar} from '@mui/material';
 import PaginationItem from '@mui/material/PaginationItem';
@@ -8,11 +8,16 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 function EntriesPerPage(props:{rowsPerPage:number, setRowsPerPage:Function}){
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { TableRowsPerPage } = masters;
   return (
     <span className="">Rows per page:
       <select value={props.rowsPerPage} className="mx-1 bg-white" onChange={(e)=>props.setRowsPerPage(e.target.value)}>
         {TableRowsPerPage.map((row,index)=>{
-          if (row!=-1)
+          if (row!="-1")
             return <option key={index} value={row}>{row}</option>
         })}
       </select>
@@ -25,7 +30,8 @@ function Pagination(props:{totalPages:number, currentPage:number, setCurrentPage
     /* 
     if (props.currentPage>props.totalPages) */
       props.setCurrentPage(1);
-  },[props.totalPages])
+  },[props.totalPages]);
+
   return (
     <div className={`flex flex-row ${props.className}`}>
       <div className="flex-auto my-1">{props.rowsPerPage&&props.setRowsPerPage?<EntriesPerPage rowsPerPage={props.rowsPerPage} setRowsPerPage={props.setRowsPerPage} />:<></>}</div>

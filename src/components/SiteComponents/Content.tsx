@@ -7,7 +7,7 @@ import { FieldValues, SetStateBoolean } from "@/types/DataTypes";
 import { ComponentList } from "@/types/ComponentProps";
 import UserProfile from "./UserProfile";
 
-function Content(props:{componentList:ComponentList|undefined, masterLists:FieldValues|undefined, mastersIdList:string[]|undefined,setChangeInMasters:SetStateBoolean}){
+function Content(props:{componentList:ComponentList|undefined, masterLists:FieldValues|undefined, mastersIdList:FieldValues|undefined,setChangeInMasters:SetStateBoolean}){
   return (
     <Routes>
       {props.componentList

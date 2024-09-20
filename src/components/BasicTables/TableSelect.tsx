@@ -1,4 +1,4 @@
-import { HeaderRows } from './Table';
+import DataTableHead from './DataTableHead';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -8,7 +8,7 @@ function TableSelect(props:{tableHeading:string, tableValues:string[], selected:
   return (
     <div className={props.className}>
       <Table className="bg-white rounded-xl" >
-        <HeaderRows headingRows={[props.tableHeading]} headingClassNames={[props.textSize=="large"?"text-2xl":"text-lg"]} />
+        <DataTableHead headingRows={[props.tableHeading]} headingClassNames={[props.textSize=="large"?"text-2xl":"text-lg"]} />
         <TableBody className="border-none hover:cursor-pointer">
           {props.tableValues.map((category, index)=>{
             return (

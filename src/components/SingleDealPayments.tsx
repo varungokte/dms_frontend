@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from "react";
 import { getModSecName, getPanSecName } from "@/functions/sectionNameAttributes";
 import { DocumentSectionDetails } from "@/types/DataTypes";
-import { DocumentStatusList } from "@/functions/Constants";
+import { statusValues } from "@/Constants";
 import { getPaymentSchedule } from "@/apiFunctions/paymentAPIs";
 import { ToastOptionsAttributes } from "@/types/DataTypes";
-import { PermissionContext } from "@/functions/Contexts";
+import { PermissionContext } from "@/Contexts";
 
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
 import UploadFileButton from "./BasicButtons/UploadFileButton";
 import ViewFileButton from "./BasicButtons/ViewFileButton";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
@@ -26,6 +26,8 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+
+  const {DocumentStatusList} = statusValues;
 
   useEffect(()=>{
     if (!isDeleted)
@@ -70,9 +72,17 @@ function SingleDealPayments(props:{label:string, loanId:string, AID:string, sect
         ?paymentData.length==0
           ?<EmptyPageMessage sectionName="installments" />
           :<DataTable 
-            headingRows={["Installment Number", "Installment Date", "Interest Rate(%)", "Status", "Action"]} headingClassNames={["w-[100px]","","","",""]}
-            tableData={paymentData} columnIDs={["D","I","S"]} dataTypes={["index","date","text","doc-status","action"]}
-            cellClassName={["w-[100px]","","",""]} 
+            tableData={paymentData}
+            columnData={[
+              {id:"D", heading:"Installment Date", type:"text", headingClassName:"w-[30%]"},
+              {id:"I", heading:"Installment Interest Rate (%)", type:"text-field", headingClassName:"mx-7"},
+              {id:"S", heading:"Status", type:"doc-status"}
+            ]}
+            showIndex={{
+              startsAt:0,
+              heading:"Installment Number",
+              headingClassName:"w-[100px]"
+            }}
             action={
               paymentData.map((inst:any,index:number)=>{
                 if (inst==null)

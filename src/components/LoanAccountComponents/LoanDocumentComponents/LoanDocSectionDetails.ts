@@ -1,10 +1,16 @@
-import { CovenantTypeList, CovenantCategoryList, FrequencyList, TransactionCategoryList, ComplianceCategoryList, ConditionPrecedentCategoryList, ConditionSubsequentCategoryList } from "../../../functions/Constants";
+import { useContext } from "react";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { DocumentSectionDetails, DocumentSectionKeys, DocumentSectionTypes } from "@/types/DataTypes";
 import { getDocSecName } from "@/functions/sectionNameAttributes";
-import { PriorityList } from "@/functions/Constants";
+import { statusValues, constants } from "@/Constants";
+import { MasterValuesContext } from "@/Contexts";
 
-const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAttributesList}) =>{
+const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAttributesList}|undefined) =>{
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return ;
+  const { TransactionCategoryList, ComplianceCategoryList, ConditionPrecedentCategoryList, ConditionSubsequentCategoryList } = masters;
+
   let fieldList;
   const sectionKey = getDocSecName({inputName:label,inputType:"fullname",outputType:"keyname"});
   const sectionType = getDocSecName({inputName:label,inputType: "fullname",outputType:"type"});
@@ -39,6 +45,8 @@ const setSection = (label:string): (DocumentSectionDetails & {fieldList:FieldAtt
 }
 
 const documentFieldList= (documentOptions:string[]):FieldAttributesList =>{
+  const { PriorityList } = statusValues;
+
   return [
     { category:"single", id:"N", name:"Document Name", type:"text", required:true },
     { category:"grid", row:2, fields:[
@@ -52,7 +60,15 @@ const documentFieldList= (documentOptions:string[]):FieldAttributesList =>{
   ]
 }
 
-const covenantFieldList = ():FieldAttributesList => {
+const covenantFieldList = ():FieldAttributesList|undefined => {
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return ;
+
+  const { CovenantTypeList, CovenantCategoryList } = masters;
+  const { PriorityList } = statusValues;
+  const {FrequencyList} = constants;
+
   return [
     { category:"grid", row:2, fields:[
       { id:"N", name:"Covenant Name", type:"text", required:true },
@@ -72,6 +88,8 @@ const covenantFieldList = ():FieldAttributesList => {
 }
 
 const conditionsFieldList = (documentOptions:string[]):FieldAttributesList => {
+  const { PriorityList } = statusValues;
+  
   return [
     { category:"single", id:"N", name:"Condition Name", type:"text", required:true },
     { category:"grid", row:2, fields:[

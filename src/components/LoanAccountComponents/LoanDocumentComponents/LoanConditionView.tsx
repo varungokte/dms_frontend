@@ -1,20 +1,22 @@
-import { DataTable } from "../../BasicTables/Table";
+import DataTable from "../../BasicTables/Table";
 import FormDialogDocuments from "../../FormComponents/FormDialogDocuments";
 //import DeleteConfirmation from "./../../BasicComponents/DeleteConfirmation";
 import edit_icon from "@/static/edit_icon.svg";
-import { TableDataTypes } from "@/types/DataTypes";
 import { LoanDocSecProps } from "@/types/ComponentProps";
 
 function LoanConditionView(props:LoanDocSecProps){
-  const tableRows = ["Condition Name", "Phyical Location", "Execution Location", "Start Date","End Date", "Priority"]; 
-  const tableDataTypes:TableDataTypes[] = ["text","text","text", "date", "date","priority"]
-  
   return(
     <DataTable className="border rounded-2xl" 
-      headingRows={props.disableEdit?tableRows:tableRows.concat(["Action"])}
+      columnData={[
+        {id:"N", heading:"Condition Name", type:"text"},
+        {id:"PL", heading:"Physical Location", type:"text"},
+        {id:"EL", heading:"Execution Location", type:"text"},
+        {id:"SD", heading:"Start Date", type:"date"},
+        {id:"ED", heading:"End Date", type:"date"},
+        {id:"P", heading:"Priority", type:"priority"}
+      ]}
       tableData={props.data}
-      columnIDs={["N","PL","EL", "SD", "ED","P"]} dataTypes={props.disableEdit?tableDataTypes:tableDataTypes.concat(["action"])}
-      action = {props.data.map((_:any, index:number)=>{
+      action = {!props.disableEdit?props.data.map((_:any, index:number)=>{
         return(
           <div className="flex flex-row">
             {props.disableEdit
@@ -34,7 +36,7 @@ function LoanConditionView(props:LoanDocSecProps){
             {/* <DeleteConfirmation thing="covenant" deleteFunction={props.deleteConditionFunction} currIndex={index}/> */}
           </div>
         )
-      })}
+      }):undefined}
 
     />
   )

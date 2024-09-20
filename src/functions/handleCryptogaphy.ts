@@ -1,5 +1,5 @@
 import CryptoJS from "crypto-js";
-import { EncryptionKey } from './Constants';
+import { EncryptionKey } from '../Constants';
 
 const handleEncryption = async (data:object) => {
 	try{

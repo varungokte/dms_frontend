@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getModSecName } from "@/functions/sectionNameAttributes";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
-import { PermissionContext } from "@/functions/Contexts";
+import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
+import { PermissionContext } from "@/Contexts";
 import { deleteLoan, getLoansList } from "@/apiFunctions/loanAPIs";
 
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
 import AddButton from "./BasicButtons/AddButton";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
@@ -33,10 +33,7 @@ function LoanAccount(props:{label:string}) {
   const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
   const viewPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("view");
   const deletePermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("delete");
-
-  const tableHeadings =["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount", "Loan Status"];
-  const tableDataTypes:TableDataTypes[] = ["index","text","text","text","text","loan-status"];
-
+  
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -113,11 +110,20 @@ function LoanAccount(props:{label:string}) {
           ?accountList.length==0
             ?<EmptyPageMessage sectionName="loan accounts"/>
             :<DataTable className="bg-white rounded-xl"
-              headingRows={editPermission||viewPermission||deletePermission?tableHeadings.concat("Action"):tableHeadings} headingClassNames={["w-[100px]"]}
-              tableData={accountList} columnIDs={["AID", "CN", "Z", "SA","S"]} dataTypes={editPermission||viewPermission||deletePermission?tableDataTypes.concat("action"):tableDataTypes} 
-              cellClassName={["font-medium", "text-custom-1","","","","",""]}
-              indexStartsAt={(currentPage-1)*rowsPerPage}
-              action = {accountList.map((item,index)=>{
+              tableData={accountList} 
+              columnData={[
+                {id:"AID", heading:"Agreement ID", type:"text", cellClassName:"text-custom-1"},
+                {id:"CN", heading:"Company Name", type:"text"},
+                {id:"Z", heading:"Zone", type:"text"},
+                {id:"SA", heading:"Sanctioned Amount", type:"text"},
+                {id:"S", heading:"Loan Status", type:"loan-status"}
+              ]}
+              showIndex={{
+                startsAt:(currentPage-1)*rowsPerPage, 
+                heading:"Sr. No.",
+                cellClassName:"font-medium"
+              }}
+              action = {editPermission||viewPermission||deletePermission?accountList.map((item,index)=>{
                 return(
                   <div className="flex flex-row">
                     {userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit")
@@ -136,7 +142,7 @@ function LoanAccount(props:{label:string}) {
                     }
                   </div>
                 )
-              })}
+              }):undefined}
             />
           : <LoadingMessage sectionName="loan accounts"/>
         }

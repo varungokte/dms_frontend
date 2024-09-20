@@ -1,6 +1,7 @@
+import { useContext } from "react";
 import { FormFieldAttributes } from "@/types/FormAttributes";
-import { CovenantTypeList } from "@/functions/Constants";
 import { FormFieldsRenderProps } from "@/types/FormComponentProps";
+import { MasterValuesContext } from "@/Contexts";
 
 import TextField from "../FormFieldComponents/TextField";
 import CheckboxField from "../FormFieldComponents/CheckboxField";
@@ -16,6 +17,12 @@ import TextAreaField from "../FormFieldComponents/TextAreaField";
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 function FormFieldsRender(props:FormFieldsRenderProps){
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { CovenantTypeList } = masters;
+  
   return (
     props.form.map((field,index)=>{
       if (field.category=="label")

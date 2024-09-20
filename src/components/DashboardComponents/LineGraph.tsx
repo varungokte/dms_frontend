@@ -1,4 +1,3 @@
-
 import { ApexOptions } from 'apexcharts';
 import ReactApexChart from 'react-apexcharts';
 import ToggleButton from '@mui/material/ToggleButton';
@@ -13,7 +12,7 @@ function LineGraph (props:{title:string,parameters:{name:string, data:number[]}[
 			position: 'top',
 			horizontalAlign: 'left',
 		},
-		colors: ['#3C50E0', '#80CAEE'],
+		//colors: ['#3C50E0', '#80CAEE'],
 		chart: {
 			fontFamily: 'Satoshi, sans-serif',
 			height: 335,

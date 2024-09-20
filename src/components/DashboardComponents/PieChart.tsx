@@ -1,8 +1,8 @@
 import { ApexOptions } from 'apexcharts';
 import ReactApexChart from 'react-apexcharts';
 
-function PieChart(props:{title:string,parameters:{name:string, value:number}[]}) {
-  const colorsMain = ['#3C50E0', '#6577F3', '#8FD0EF', '#0FADCF'];
+function PieChart(props:{title:string,parameters:{name:string, value:number, color:string}[]}) {
+  //const colorsMain = ['#3C50E0', '#6577F3', '#8FD0EF', '#0FADCF'];
   let totalValue = 0;
   props.parameters.map(param=>{
     totalValue+=param.value;
@@ -13,7 +13,7 @@ function PieChart(props:{title:string,parameters:{name:string, value:number}[]})
       fontFamily: 'Satoshi, sans-serif',
       type: 'donut',
     },
-    colors: colorsMain.slice(0,props.parameters.length) ,
+    colors: props.parameters.map(param=>param.color), //colorsMain.slice(0,props.parameters.length) ,
     labels: props.parameters.map(param=>param.name),
     legend: {
       show: false,
@@ -86,6 +86,15 @@ function PieChart(props:{title:string,parameters:{name:string, value:number}[]})
           />
         </div>
       </div>
+
+      {/* <div className="grid grid-rows-2 grid-flow-col">
+        {props.parameters.map((param,index)=>{
+          return <div key={index} className="flex flex-row">
+            <div>{param.name}</div>
+            <div>{(param.value*100/totalValue).toFixed(2)}%</div>
+          </div>
+        })}
+      </div> */}
 
       <div className="-mx-8 flex flex-wrap items-center justify-center gap-y-3">
         {props.parameters.map((param,index)=>{

@@ -1,13 +1,26 @@
 import { getMastersList } from '@/apiFunctions/masterAPIs';
-import { MastersMapping } from './Constants';
+import { FieldValues } from '@/types/DataTypes';
 
 const getMasters = async (setMasterLists:Function, setMastersIdList:Function,) => {
   const res = await getMastersList();
   if (res.status==200){
-    //console.log("masters response",res);
     const obj:any={};
-    const idArr:string[]=[];
-    res.obj[0]["data"].map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
+    const idObj:FieldValues={};
+    res.obj[0]["data"].map((cat:FieldValues)=>{
+      obj[cat["N"]]=cat["V"];
+      idObj[cat["N"]] = cat["_id"]
+    });
+    
+    setMasterLists(obj);
+    setMastersIdList(idObj);
+  }
+  else
+    setMasterLists({});
+}
+
+export default getMasters;
+
+    /* res.obj[0]["data"].map((cat:any)=>{obj[cat.N]=cat.V; idArr.push(cat._id);});
     for (let i=0; i<Object.keys(obj).length; i++){
 			const cat = Object.keys(obj)[i];
 			const vals = obj[cat];
@@ -16,13 +29,4 @@ const getMasters = async (setMasterLists:Function, setMastersIdList:Function,) =
 					MastersMapping[cat].pop()
 				MastersMapping[cat].push(...vals);
 			}
-		}
-    setMasterLists(obj);
-    //console.log("MASTERS",obj);
-    setMastersIdList(idArr);
-  }
-  else
-    setMasterLists({});
-}
-
-export default getMasters;
+		} */

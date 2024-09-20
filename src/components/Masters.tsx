@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from 'react';
 import { FieldValues } from '@/types/DataTypes';
 import { FieldAttributesList } from "@/types/FormAttributes";
-import { MastersMapping } from '@/functions/Constants';
-import { PermissionContext } from "@/functions/Contexts";
+import { adminEnteredMasters } from '@/Constants';
+import { PermissionContext } from "@/Contexts";
 import { addToMasters } from '@/apiFunctions/masterAPIs';
 
-import { HeaderRows } from './BasicTables/Table';
+import DataTableHead from './BasicTables/DataTableHead';
 import { Table, TableBody, TableCell, TableRow, } from "@/components/ui/table";
 import FormDialog from './FormComponents/FormDialog';
 import LoadingMessage from "./BasicMessages/LoadingMessage";
@@ -16,13 +16,13 @@ import AddButton from './BasicButtons/AddButton';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-function Masters(props:{label:string, masterLists: FieldValues, idList:string[], callMasterLists:Function}){
+function Masters(props:{label:string, masterLists: FieldValues, idList:FieldValues, callMasterLists:Function}){
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
   
   const [fieldList, setFieldList] = useState<FieldAttributesList>([
-    { category: "single", id:"N", name: "Category Name", type:"select", options:Object.keys(MastersMapping), required:true },
+    { category: "single", id:"N", name: "Category Name", type:"select", options:Object.keys(adminEnteredMasters), required:true },
     { category: "single", id:"V", name: "Values", type:"multitext", required:true},
   ]);
 
@@ -43,11 +43,12 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
   const [information, setInformation] =useState<"duplicate"|"empty"|"ok"|"success"|"error">("ok");
 
   useEffect(()=>{
+    console.log("props.mastersList",props.masterLists)
     if (props.masterLists){
-      console.log(props.masterLists)
       setFieldList(curr=>{
         if (curr[0].category=="single")
-          curr[0].options = Object.keys(MastersMapping).filter(option=>!Object.keys(props.masterLists).includes(option))
+          curr[0].options = Object.keys(adminEnteredMasters).filter(option=>{console.log("option",option,adminEnteredMasters[option],Object.keys(props.masterLists).includes(adminEnteredMasters[option])); return !Object.keys(props.masterLists).includes(adminEnteredMasters[option])})
+        console.log("curr",[...curr])
       return [...curr];
       })
     }
@@ -100,7 +101,7 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
     if (!newValues || !props.idList || information=="duplicate")
       return;
     
-    const userValues = {N:newValues.N, V:newValues.V, _id:props.idList[selected]}
+    const userValues = {N:newValues.N, V:newValues.V, _id:props.idList[newValues.N]}
 
     //console.log("userValues",userValues)
     
@@ -179,11 +180,11 @@ function Masters(props:{label:string, masterLists: FieldValues, idList:string[],
             {newValues && newValues["V"]
               ?<div className="mr-28 w-[50%]">
                 <Table className="rounded-2xl bg-white">
-                  <HeaderRows headingRows={[Object.keys(props.masterLists)[selected]]} headingClassNames={["text-2xl"]} />
+                  <DataTableHead headingRows={[Object.keys(props.masterLists)[selected]]} headingClassNames={["text-2xl"]} />
                   <TableBody>
                     {newValues["V"].map((data:any,index:number)=>{
                       if (data==="-")
-                        return <></>
+                        return ""
                       return (
                         <TableRow key={index} className="border-none">
                           <TableCell>

@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
+import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldAttributesList } from "@/types/FormAttributes";
-import { PermissionContext } from "@/functions/Contexts";
+import { PermissionContext } from "@/Contexts";
 import { addTeam, editTeam, getTeamsList } from "@/apiFunctions/teamAPIs";
 
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import FormDialogTeam from "./FormComponents/FormDialogTeam";
@@ -75,9 +75,6 @@ function TeamManagement(props:{label:string}){
   const searchOptions = [{label:"Team Name", value:"N"}, {label:"Team Lead's Email", value:"L"}];
 
   const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
-
-  const tableHeadings = ["Team Name", "Team Lead", "Created On", "Status"];
-  const tableDataTypes:TableDataTypes[]=["text", "text","date", "team-status"];
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -200,11 +197,15 @@ function TeamManagement(props:{label:string}){
           ?teamList.length==0
             ?<EmptyPageMessage sectionName="teams"/>
             :<DataTable className="bg-white rounded-xl"
-              headingRows={editPermission?tableHeadings.concat("Action"):tableHeadings}
-              tableData={teamList} columnIDs={["N","L","createdAt","S"]} dataTypes={editPermission?tableDataTypes.concat("action"):tableDataTypes}
-              cellClassName={["","","", editPermission?"editable":"",""]}
+              tableData={teamList} 
+              columnData={[
+                {id:"N", heading:"Team Name", type:"text"},
+                {id:"L", heading:"Team Lead", type:"text"},
+                {id:"createdAt", heading:"Created On", type:"date"},
+                {id:"S", heading:"Status", type:"team-status",cellClassName:editPermission?"editable":""}
+              ]}
               setEntityStatus={setTeamStatus} setSelectedEntity={setSelectedTeam}
-              action={teamList.map((_:any, index:number)=>{
+              action={editPermission?teamList.map((_:any, index:number)=>{
                 return(
                   <div className="flex flex-row">
                     {editPermission
@@ -223,7 +224,7 @@ function TeamManagement(props:{label:string}){
                     {/* <DeleteConfirmation thing="user" deleteFunction={deleteTeam} currIndex={index} /> */}
                   </div>
                 )
-              })}
+              }):undefined}
             /> 
           :<LoadingMessage sectionName="teams" />
         }

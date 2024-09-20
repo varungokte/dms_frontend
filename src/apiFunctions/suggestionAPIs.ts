@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { apiEndpoint } from '@/functions/Constants';
+import { apiEndpoint } from '@/Constants';
 import { getEncryptedToken } from '@/functions/getToken';
 import { handleDecryption } from '@/functions/handleCryptogaphy';
 import { UserSuggestionTypes, FieldValues } from '@/types/DataTypes';

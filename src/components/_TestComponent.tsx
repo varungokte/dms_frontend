@@ -1,5 +1,4 @@
-import { Skeleton } from "@mui/material";
-import { useReducer } from "react";
+import { useEffect, useReducer } from "react";
 //import { useEffect, useState } from "react";
 
 function _TestComponent(){
@@ -10,6 +9,14 @@ function _TestComponent(){
       return state-1;
   };
 
+  useEffect(()=>{
+    const keyDownEvent = (e:KeyboardEvent)=>console.log("key pressed on page",e.code);
+    document.addEventListener("keydown", keyDownEvent);
+    /* return (()=>{
+      document.removeEventListener("keydown", keyDownEvent);
+    }) */
+  },[]);
+ 
   const [state, dispatch] = useReducer(reducer,0);
   
   return (
@@ -19,17 +26,7 @@ function _TestComponent(){
         {state}
         <button onClick={()=>dispatch("inc")}>+</button>
       </div>
-      <br /> 
-      <div>
-        <div className="flex flex-row">
-          <div className="mx-3">
-            <Skeleton variant="rectangular" width={150} height={200} />
-          </div>
-          <div className="mx-3">
-            <Skeleton variant="rectangular" width={300} height={200} />
-          </div>
-        </div>
-      </div>
+      <br />
       <br />
     </div>
   );

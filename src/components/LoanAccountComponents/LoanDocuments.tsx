@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { LoanCommonProps } from "@/types/ComponentProps";
-import { CovenantTypeList } from "@/functions/Constants";
-import { PermissionContext } from "@/functions/Contexts";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 import { addDocument, editDocument, getDocumentsList } from "@/apiFunctions/documentAPIs";
 import { addFile, deleteFile } from "@/apiFunctions/fileAPIs";
 
@@ -23,16 +22,24 @@ import SearchByType from "../BasicComponents/SearchByType";
 import AddButton from "../BasicButtons/AddButton";
 
 function LoanDocuments(props:LoanCommonProps) {
+  const {userPermissions} = useContext(PermissionContext);
+  
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { CovenantTypeList } = masters;
   const [docData, setDocData] = useState<FieldValues[]>();
   
   const sectionDetails = setSection(props.label);
+  if (sectionDetails==undefined)
+    return;
  
   const [addOpen, setAddOpen] = useState([false]);
   const [editOpen, setEditOpen] = useState<boolean[]>([]);
   const [added, setAdded] = useState(true);
   const [covenantType, setCovenantType] = useState(CovenantTypeList[1]);
 
-  const {userPermissions} = useContext(PermissionContext);
 
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
   const [currentPage, setCurrentPage] = useState(1);

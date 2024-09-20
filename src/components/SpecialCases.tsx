@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react";
-import { DocumentStatusList } from "@/functions/Constants";
+import { statusValues } from "@/Constants";
 import { getDocSecList, getDocSecName, getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { getSpecialList } from "@/apiFunctions/specialCaseAPIs";
-import { PermissionContext } from "@/functions/Contexts";
+import { PermissionContext } from "@/Contexts";
 
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import UploadFileButton from "./BasicButtons/UploadFileButton";
@@ -38,6 +38,8 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
   const [totalPages, setTotalPages] = useState(1);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [isDeleted, setIsDeleted] = useState<number>();
+
+  const {DocumentStatusList} = statusValues;
 
   useEffect(()=>{
     setAdded(true);
@@ -113,10 +115,21 @@ function SpecialCases(props:{label:string, panopticPage?:boolean}) {
           ?allData.length==0
             ?<EmptyPageMessage sectionName={`${props.label}`} />
             :<DataTable className="rounded-xl bg-white"
-              headingRows={["Sr. No.", "Document Name", "Team Name", "Agreement ID", type=="def"?"Default Date":"Priority","Status", "Action"]}
-              cellClassName={["w-[50px]","w-[300px]","","","mr-10","","w-[200px]"]}
-              tableData={allData} dataTypes={["index","doc-link","text","text",type=="def"?"date":"priority","doc-status","action"]} columnIDs={["link","N","AID",type=="def"?"DD":"DP","DS"]}
-              indexStartsAt={(currentPage-1)*rowsPerPage}
+              tableData={allData} 
+              columnData={[
+                {id:"link", heading:"Document Name", type:"doc-link", cellClassName:"w-[300px]"},
+                {id:"N", heading:"Team Name", type:"text"},
+                {id:"AID", heading:"Agreement ID", type:"text"},
+                type=="def"
+                  ?{id:"DD", heading:"Default Date", type:"date",cellClassName:"mr-10"}
+                  :{id:"DP", heading:"Priority", type:"priority",cellClassName:"mr-10"},
+                {id:"DS", heading:"Status", type:"doc-status"}
+              ]}
+              showIndex={{
+                startsAt:(currentPage-1)*rowsPerPage,
+                heading:"Sr. No.",
+                cellClassName:"w-[50px]"
+              }}
               documentLinks={documentLinks}
               action={
                 allData.map((doc:any,index:number)=>{

@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { getUserSuggestions } from "@/apiFunctions/suggestionAPIs";
 import { FieldValues, UserSuggestionsList } from "@/types/DataTypes";
+import { getSingleUserTeams } from "@/apiFunctions/teamAPIs";
 
 import ComboboxField from "./FormFieldComponents/ComboboxField";
 import Button from "@mui/material/Button/Button";
 import SendIcon from '@mui/icons-material/Send';
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
+import Filter from "./BasicComponents/Filter";
+import LoopIcon from '@mui/icons-material/Loop';
 
 function TeamTransfer(props:{label:string}){
   useEffect(()=>{
@@ -16,7 +19,9 @@ function TeamTransfer(props:{label:string}){
 
   const [fieldValues, setFieldValues] = useState<FieldValues>({});
   const [teamList, setTeamList] = useState<FieldValues[]>();
-  
+  const [selectedTeams, setSelectedTeams] = useState<string[]>([]);
+  const [action, setAction] = useState<"Remove"|"Replace">("Remove");
+
   useEffect(()=>{
     getUserSuggestions("AU").then(res=>{
       const arr = res.obj.map((sugg:any)=>{
@@ -28,15 +33,23 @@ function TeamTransfer(props:{label:string}){
       setUsers(arr);
     })
   },[]);
-
-  useEffect(()=>console.log("fieldvalues",fieldValues),[fieldValues]);
+  
+  /* useEffect(()=>{
+    setTeamList([
+      {_id:"DS9", N:"Defiant", L:"Benjamin Sisko", createdAt:new Date(), S:"Active"},
+      {_id:"TOS", N:"Enterprise", L:"James T. Kirk", createdAt:new Date(), S:"Inactive"},
+      {_id:"VOY", N:"Voyager", L:"Kathryn Janeway", createdAt:new Date(), S:"Active"}
+    ])
+  },[]); */
 
   const getData = () => {
-    //get list of teams
-    setTeamList([
-      {N:"Enterprise", L:"Jim Kirk", createdAt:new Date(), S:"Active"},
-      {N:"Defiant", L:"Ben Sisko", createdAt:new Date(), S:"Inactive"}
-    ])
+    getSingleUserTeams({email:fieldValues["user"].values["E"]}).then(res=>{
+      if (res.status==200)
+        setTeamList(res.obj[0]["data"]);
+      else
+        setTeamList([]);
+      console.log("teams response",res);
+    }).catch(()=>setTeamList([]));
   }
   
   if (!users || users.length==0)
@@ -55,15 +68,29 @@ function TeamTransfer(props:{label:string}){
             placeholder="Search by user name or email"
           />
         </div>
-        <Button variant="contained" color="secondary" sx={{ height:"55px", margin:"auto"}} disabled={!(fieldValues["user"] && Object.keys(fieldValues["user"]).length!=0)} onClick={getData}><SendIcon/></Button>
+        <Button variant="contained" color="secondary" sx={{ height:"55px", margin:"auto"}} disabled={!(fieldValues["user"] && Object.keys(fieldValues["user"]).length!=0)} onClick={getData}>
+          <SendIcon/>
+        </Button>
       </div>
-      <div className="m-7">
+      <div className="mx-7">
         {teamList
-          ?<DataTable className="bg-white rounded-xl"
-            headingRows={["Team Name", "Team Lead", "Created On", "Status"]}
-            tableData={teamList} columnIDs={["N","L","createdAt","S"]} dataTypes={["checkbox","text", "text","date", "team-status"]}
-            cellClassName={["","","","text-left"]}
-          />
+          ?<div>
+            <div className="flex flex-row">
+              <div className="flex-auto"></div>
+              <div><Filter value={action} setValue={setAction} options={["Remove","Replace"]} /></div>
+            </div>
+            <br />
+            <DataTable className="bg-white rounded-xl"
+              columnData= {[
+                { id:"N", heading:"Team Name", type:"text" },
+                { id:"L", heading:"Team Lead", type:"text" },
+                { id:"createdAt", heading:"Created On", type:"date" },
+                { id:"S", heading:"Status", type:"team-status", cellClassName:"text-left" },
+              ]}
+              tableData={teamList} 
+              selectable={{type:action=="Remove"?"checkbox":"radio", selectMultiple:action=="Remove", selectedRows:selectedTeams, setSelectedRows:setSelectedTeams, iconOverride:action=="Replace"?<LoopIcon/>:undefined}}
+            />
+          </div>
           :<></>
         }
       </div>      

@@ -1,11 +1,10 @@
 import { useContext, useEffect, useState } from "react";
-import { FieldValues, TableDataTypes, ToastOptionsAttributes } from "@/types/DataTypes";
-import { LoanProductList, ZoneList } from "../functions/Constants";
+import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { Link } from "react-router-dom";
 import { deleteLoan, getLoansList } from "@/apiFunctions/loanAPIs";
-import { PermissionContext } from "@/functions/Contexts";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 
-import { DataTable } from "./BasicTables/Table";
+import DataTable from "./BasicTables/Table";
 import Filter from "./BasicComponents/Filter";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
@@ -18,10 +17,17 @@ import view_icon from "@/static/view_icon.svg";
 import edit_icon from "@/static/edit_icon.svg";
 import delete_icon from "@/static/delete_icon.svg";
 
+
 function FilterPage(props:{label:string}){
   useEffect(()=>{
 		document.title=props.label+" | Beacon DMS"
 	},[]);
+  
+  const masters = useContext(MasterValuesContext);
+  
+  if (!masters) return;
+  
+  const { LoanProductList, ZoneList } = masters;
   
   const filterTypes:{[key:string]:{label:"Z"|"P",options:string[]}} = {
     "Zones":{
@@ -43,9 +49,6 @@ function FilterPage(props:{label:string}){
   const editPermission = userPermissions["loan"].includes("edit");
   const viewPermission = userPermissions["loan"].includes("view");
   const deletePermission = userPermissions["loan"].includes("delete");
-
-  const tableHeadings =["Sr. No.", "Agreement ID", "Company Name", "Zone", "Sanction Amount", "Loan Status"];
-  const tableDataTypes:TableDataTypes[] = ["index","text","text","text","text","loan-status"];
 
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
@@ -104,11 +107,19 @@ function FilterPage(props:{label:string}){
 					?loanList.length==0
 						?<span><br/><EmptyPageMessage sectionName="loans"/></span>
 						:<DataTable className="bg-white"
-              headingRows={editPermission||viewPermission||deletePermission?tableHeadings.concat("Action"):tableHeadings}
-							tableData={loanList} columnIDs={["AID", "CN", "Z", "SA","S"]}
-              dataTypes={editPermission||viewPermission||deletePermission?tableDataTypes.concat("action"):tableDataTypes} 
-              indexStartsAt={(currentPage-1)*rowsPerPage}
-							action = {loanList.map((item,index)=>{
+              tableData={loanList} 
+              columnData={[
+                {id:"AID", heading:"Agreement ID", type:"text"},
+                {id:"CN", heading:"Company Name", type:"text"},
+                {id:"Z", heading:"Zone", type:"text"},
+                {id:"SA", heading:"Sanctioned Amount", type:"text"},
+                {id:"S", heading:"Loan Status", type:"loan-status"}
+              ]} 
+              showIndex = {{
+                startsAt:(currentPage-1)*rowsPerPage, 
+                heading:"Sr. No."
+              }}
+							action = {editPermission||viewPermission||deletePermission?loanList.map((item,index)=>{
 								return(
                   <div className="flex flex-row">
                     {userPermissions["loan"].includes("edit")
@@ -127,7 +138,7 @@ function FilterPage(props:{label:string}){
                     }
                   </div>
 								)
-							})}
+							}):undefined}
 						/>
 					:<LoadingMessage sectionName="data" />
 				}

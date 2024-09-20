@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
-import { PermissionContext } from "@/functions/Contexts";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 import reorganizePermissions from "@/functions/reorganizePermissions";
 import { addRole, getRolesList } from "@/apiFunctions/roleAPIs";
 
@@ -38,6 +38,10 @@ function RoleManagement(props:{label:string}){
   const [toastOptions, setToastOptions] = useState<ToastOptionsAttributes>();
 
   const {userPermissions} = useContext(PermissionContext);
+
+  const masters = useContext(MasterValuesContext);
+
+  useEffect(()=>console.log("MASTERS VALUES DEFAULT", masters),[masters])
   
   useEffect(()=>{
     if (added){
@@ -161,7 +165,7 @@ function RoleManagement(props:{label:string}){
                       <div className="mx-3">
                         <label className="mr-1">Change Role Name:</label> <input className="" value={names[index]||""} onChange={(e)=>setNames(curr=>{curr[index]=e.target.value; return [...curr];})}/>
                       </div>
-                      <div className="m-auto"><PermissionsField key={index} index={index} fieldData={{id:"P", name:"", type:"permissions", required:false, multiple:true}} permissionSet={singleRole.P}  disabled={!userPermissions["role"].includes("edit")} setPermissionSet={setRoleList} />  </div>
+                      <div className="m-auto"><PermissionsField key={index} index={index} fieldData={{id:"P", name:"", type:"permissions", required:false, multiple:true}} fieldValue={singleRole.P}  disabled={!userPermissions["role"].includes("edit")} setFieldValues={setRoleList} />  </div>
                       {userPermissions["role"].includes("edit")
                         ?<SubmitButton submitFunction={editRoles} index={index} submitButtonText={`Save Changes for ${singleRole.N}`} />
                         :<></>

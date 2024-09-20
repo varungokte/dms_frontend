@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
-import { LoanSecurityTypeList } from "@/functions/Constants";
+import { useContext, useEffect, useState } from "react";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { createLoan } from "@/apiFunctions/loanAPIs";
+import { MasterValuesContext } from "@/Contexts";
 
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import DateField from "../FormFieldComponents/DateField";
@@ -10,6 +10,12 @@ import FormRepeatableGrid from "../FormComponents/FormRepeatableGrid";
 import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 function LoanSecurityDetails(props:LoanCommonProps){
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { LoanSecurityTypeList } = masters;
+
   const [fieldValuesFixed, setFieldValuesFixed] = useState<any>({});
   const [fieldValuesRepeatable, setFieldValuesRepeatable] = useState<any>([{}]);
   const [enableLoadingSign,setEnableLoadingSign] = useState(false); 
@@ -140,9 +146,9 @@ function LoanSecurityDetails(props:LoanCommonProps){
           <div className="grid grid-cols-2">
             {fieldListFixed.fields.map((field,index)=>{
               if (field.type=="date")
-                return <DateField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} readonly={props.actionType=="VIEW"} repeatFields={false} formIndex={-1}/>
+                return <DateField key={index} index={index} fieldData={field} fieldValue={fieldValuesFixed[field.id]} setFieldValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} readonly={props.actionType=="VIEW"} repeatFields={false} formIndex={-1}/>
               else if (field.type=="float")
-                return <FloatNumberField key={index} index={index} fieldData={field} prefillValues={fieldValuesFixed} setPrefillValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} readonly={props.actionType=="VIEW"} repeatFields={false} formIndex={-1}/>
+                return <FloatNumberField key={index} index={index} fieldData={field} fieldValue={fieldValuesFixed[field.id]} setFieldValues={setFieldValuesFixed} disabled={props.actionType=="VIEW"||disableFields} readonly={props.actionType=="VIEW"} repeatFields={false} formIndex={-1}/>
             })}
           </div>
           <FormRepeatableGrid key={2} fieldList={fieldListRepeatable.fields} fieldValues={fieldValuesRepeatable} setFieldValues={setFieldValuesRepeatable} submitForm={submitForm} fieldsInRow={2} disabled={props.actionType=="VIEW"} readonly={props.actionType=="VIEW"} />

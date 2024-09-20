@@ -1,7 +1,7 @@
+import { ReactElement } from "react";
 import { TableRow, TableCell, Table, TableBody } from "../ui/table";
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { ReactElement } from "react";
 
 function TableCollapsible(props:{index:number, id:string, topRow:[string,string][], bottomRow:[string|ReactElement,string][], content:ReactElement, selectedTab:number, setSelectedTab:React.Dispatch<React.SetStateAction<number>>}){
   return(

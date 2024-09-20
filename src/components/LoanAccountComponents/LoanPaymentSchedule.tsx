@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import moment from "moment";
-import { FrequencyList, HolidayConventionList, InterestTypeList } from "@/functions/Constants";
+import {constants} from "@/Constants";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { GridFieldAttributes } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { addPaymentSchedule, getPaymentSchedule } from "@/apiFunctions/paymentAPIs";
 
 import {Dialog,DialogTitle,DialogContent} from '@mui/material';
-import { DataTable } from "../BasicTables/Table";
+import DataTable from "../BasicTables/Table";
 
 import DateField from "../FormFieldComponents/DateField";
 import IntegerField from "../FormFieldComponents/IntegerField";
@@ -18,6 +18,8 @@ import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 import Toast from "./../BasicComponents/Toast";
 
 function LoanPaymentSchedule(props:LoanCommonProps){
+  const { FrequencyList, HolidayConventionList, InterestTypeList } = constants;
+  
   const fieldList:GridFieldAttributes = {category:"grid", row:2, fields:[
     {id:"P", name:"Principal", type:"integer", required:true, immutable:true},
     {id:"F", name:"Frequency", type:"select", options:FrequencyList, required:true, immutable:true},
@@ -177,8 +179,16 @@ function LoanPaymentSchedule(props:LoanCommonProps){
             <DialogTitle>Enter Interest Rates</DialogTitle>
             <DialogContent>
               <DataTable 
-                headingRows={["Installment Number","Installment Date", "Installment Interest Rate(%)"]} headingClassNames={["w-[30%]","w-[30%]","mx-7"]}
-                tableData={schedule} columnIDs={["D","I"]} dataTypes={["index","date","text-field"]} cellClassName={["","",""]}
+                tableData={schedule}
+                columnData={[
+                  {id:"D", heading:"Installment Date", type:"text", headingClassName:"w-[30%]"},
+                  {id:"I", heading:"Installment Interest Rate (%)", type:"text-field", headingClassName:"mx-7"}
+                ]}
+                showIndex={{
+                  startsAt:0,
+                  heading:"Installment Number",
+                  headingClassName:"w-[30%]"
+                }}
                 setValues={setSchedule} 
               />
               <button className="float-right my-9 h-[50px] w-[150px] rounded-xl text-white text-md bg-custom-1" onClick={()=>submitSchedule(schedule)}>Generate Schedule</button>

@@ -1,13 +1,12 @@
 import { useContext, useEffect, useState } from "react";
-import { RatingAgencyList, RatingOutlookList, RatingTypeList } from "@/functions/Constants";
 import { FieldValues, ToastOptionsAttributes } from "@/types/DataTypes";
 import { FieldAttributesList } from "@/types/FormAttributes";
 import { LoanCommonProps } from "@/types/ComponentProps";
 import { getModSecName } from "@/functions/sectionNameAttributes";
 import { addRating, getRatingsList } from "@/apiFunctions/ratingAPIs";
-import { PermissionContext } from "@/functions/Contexts";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 
-import { DataTable } from "../BasicTables/Table";
+import DataTable from "../BasicTables/Table";
 import FormDialog from "../FormComponents/FormDialog";
 import { FormSectionNavigation } from "../FormComponents/FormSectionNavigation";
 import EmptyPageMessage from "../BasicMessages/EmptyPageMessage";
@@ -19,6 +18,11 @@ import AddButton from "../BasicButtons/AddButton";
 //import Search from "../BasicComponents/Search";
 
 function LoanRatings(props:LoanCommonProps) {
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { RatingAgencyList, RatingOutlookList, RatingTypeList } = masters;
 
   const fieldList: FieldAttributesList = [
     { category: "grid", row:2, sectionName:"", fields: [
@@ -131,9 +135,18 @@ function LoanRatings(props:LoanCommonProps) {
           ?ratingsList.length==0
             ?<EmptyPageMessage sectionName="ratings" />
             :<DataTable className="border"
-              headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Rating Value", "Link"]} 
-              tableData={ratingsList} columnIDs={["A","T","DT","O","V","L"]} dataTypes={["text", "text", "date", "text", "text", "text"]}
-              cellClassName={["","","","","","text-blue-500"]} 
+              columnData={[
+                {id:"A", heading:"Rating Agency", type:"text"},
+                {id:"T", heading:"Rating Type", type:"text"},
+                {id:"DT", heading:"Date", type:"date"},
+                {id:"O", heading:"Outlook", type:"text"},
+                {id:"V", heading:"Rating Value", type:"text"},
+                {id:"L", heading:"Link", type:"text", cellClassName:"text-blue-500"}
+              ]}
+              //headingRows={["Rating Agency", "Rating Type", "Date", "Outlook", "Rating Value", "Link"]} 
+              //columnIDs={["A","T","DT","O","V","L"]} dataTypes={["text", "text", "date", "text", "text", "text"]}
+              //cellClassName={["","","","","",""]} 
+              tableData={ratingsList} 
             />
           :<LoadingMessage sectionName="ratings" />
         }

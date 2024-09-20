@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { LoanSecurityTypeList } from "@/functions/Constants";
-import { PermissionContext } from "@/functions/Contexts";
+import { MasterValuesContext, PermissionContext } from "@/Contexts";
 
 import { getDocSecList, getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldValues } from "@/types/DataTypes";
@@ -22,12 +21,16 @@ import LoanContactDetails from "./LoanAccountComponents/LoanContactDetails";
 import LoanTeamSelection from "./LoanAccountComponents/LoanTeamSelection";
 import LoanDocuments from "./LoanAccountComponents/LoanDocuments";
 
-
 function CreateLoanAccount() {
   const {state} = useLocation();
 	const navigate = useNavigate();
 
   const {userPermissions} = useContext(PermissionContext);
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { LoanSecurityTypeList } = masters;
 
   if (!state)
     return <Navigate to="../loan" />

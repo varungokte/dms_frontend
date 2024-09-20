@@ -1,15 +1,21 @@
-import { useEffect, useRef, useState } from "react";
-import { FileTypeList } from "@/functions/Constants";
+import { useContext, useEffect, useRef, useState } from "react";
 import { useDropzone } from "react-dropzone";
-
-import { Upload } from "lucide-react";
-import Close from "@mui/icons-material/Close";
-import FileViewer from "../BasicComponents/FileViewer";
+import { MasterValuesContext } from "@/Contexts";
 import { FieldValues } from "@/types/DataTypes";
+
+import FileViewer from "../BasicComponents/FileViewer";
+import FileUploadIcon from '@mui/icons-material/FileUpload';
+import Close from "@mui/icons-material/Close";
 
 function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Function, prefillValues:any, edit?:boolean, docId:string, deleteFile:Function, receivedFilesFromServer:boolean, setReceivedFilesFromServer:Function }) {
 	const {acceptedFiles, getRootProps, getInputProps} = useDropzone({multiple:false, useFsAccessApi:false});
-  
+
+  const masters = useContext(MasterValuesContext);
+
+  if (!masters) return;
+
+  const { FileTypeList } = masters;
+
   const [error, setError] = useState(<></>);
   const [redirect, setRedirect] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
@@ -90,7 +96,7 @@ function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Func
           <div style={{backgroundColor:"rgba(80, 65, 188, 0.06)"}} {...getRootProps({className: 'hover:cursor-default h-[82px] border-2 border-blue-700	 border-dashed rounded-xl dropzone'})}>
             <input {...getInputProps()} multiple={false} id={props.index.toString()} />
             <div className="my-2 text-center">
-              <span className="inline-block align-middle text-custom-1"><Upload/></span>
+              <span className="inline-block align-middle text-custom-1"><FileUploadIcon/></span>
               <p className="text-custom-1">Choose File to {props.fileList && props.fileList.length!=0?"Replace":"Upload"}</p>
             </div>
           </div>
