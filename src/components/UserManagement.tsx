@@ -80,7 +80,7 @@ function UserManagement(props:{label:string}){
       return;
     
     const res = await getUsersList({currentPage, rowsPerPage, searchString, searchType });
-    //console.log("res",res)
+    console.log("res",res)
     if (res.status==200){
       if (res.obj && res.obj[0] && res.obj[0]["data"]){
         setEditOpen(new Array(res.obj[0]["data"].length).fill(false));
@@ -93,7 +93,7 @@ function UserManagement(props:{label:string}){
       setUserData([]);
     setAdded(false);
   }
-
+  
   useEffect(()=>{
     getUsers();
   },[added,searchString]);

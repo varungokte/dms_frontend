@@ -8,7 +8,7 @@ import { FieldValues, MastersValues } from '@/types/DataTypes';
 import { ComponentList } from '@/types/ComponentProps';
 import { getDecryptedToken } from './functions/getToken';
 import { getSingleUser } from './apiFunctions/userAPIs';
-import { getMastersList } from '@/apiFunctions/masterAPIs';
+import { getMastersList } from '@/apiFunctions/masterAPIs';	
 
 import {socketConnector,/* checkSocketIsConnected */} from '@/functions/socketConnector';
 import SidePanel from '@/components/SiteComponents/SidePanel';
@@ -97,10 +97,10 @@ function MenuRouter(){
 			setComponentList(arr);
 			return;
 		}
-		const arr = [];
+		
+			const arr = [];
 		arr.push(allComponents[0]);
 		arr.push(allComponents[5])
-	
 		for (let i=0; i<allComponents.length; i++){
 			const singleComponent = allComponents[i];
 			const componentPermissions = userPermissions[getModSecName({inputName:singleComponent.name, inputType:"fullname",outputType:"shortname"})];
@@ -132,7 +132,7 @@ function MenuRouter(){
 
 	
 	return (
-		<PermissionContext.Provider value={{userPermissions:userPermissions||{}, setUserPermissions}}>
+		<PermissionContext.Provider value={{userPermissions:userPermissions||{}}}>
 			<MasterValuesContext.Provider value={mastersValues}>
 				<div className='relative'>
 					<div style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1">

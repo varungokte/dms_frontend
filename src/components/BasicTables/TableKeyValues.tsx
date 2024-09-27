@@ -5,10 +5,12 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { TextField } from '@mui/material';
+import Chip from '@mui/material/Chip';
+import Tooltip from '@mui/material/Tooltip';
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
+import { useState } from 'react';
 
 function TableKeyValues(props:{prefillValues:FieldValues, setPrefillValues:React.Dispatch<React.SetStateAction<FieldValues>>}){
 
@@ -45,26 +47,37 @@ function TableKeyValues(props:{prefillValues:FieldValues, setPrefillValues:React
             <TableRow key={index}>
               <TableCell>{category}</TableCell>
               <TableCell>
-                <div className="grid grid-cols-5">
-                    {props.prefillValues[category].map((val:string,itemIndex:number)=>{
-                      return(
-                        <div key={itemIndex} className="my-2 mr-2">
-                          {/* <p className="bg-green-700 text-white">{val}</p> */}
-                          {/* <input key={itemIndex} className={`text-xl p-1 rounded-if bg-gray-100 mx-2`} size={30} value={val} onChange={()=>{}} /> */}
-                          <TextField 
-                            size="small" color="secondary" 
-                            value={val}
-                            onChange={(e)=>{
-                              props.setPrefillValues((curr:FieldValues)=>{
-                                const key = Object.keys(props.prefillValues)[index];
-                                curr[key][itemIndex] = e.target.value;
-                                return {...curr}; 
-                              })
-                            }} 
-                          />
-                        </div>
-                      )
-                    })}
+                <div className="flex flex-wrap">
+                  {props.prefillValues[category].map((val:string,itemIndex:number)=>{
+                    const [open, setOpen] = useState(false);
+                    return(
+                      <div key={itemIndex} className="my-2 mr-2">
+                        {/* <p className="bg-green-700 text-white">{val}</p> */}
+                        {/* <input key={itemIndex} className={`text-xl p-1 rounded-if bg-gray-100 mx-2`} size={30} value={val} onChange={()=>{}} /> */}
+                        <Tooltip 
+                          title={<input value={"Some text"} className="text-black" onChange={()=>{}} />} 
+                          disableFocusListener
+                          disableHoverListener
+                          disableTouchListener
+                          onClick={()=>{setOpen(curr=>!curr);console.log("open")}}
+                          open={open}
+                          >
+                          <Chip label={val} onDelete={()=>{console.log("comma")}} />
+                        </Tooltip>
+                        {/* <TextField 
+                          size="small" color="secondary" 
+                          value={val}
+                          onChange={(e)=>{
+                            props.setPrefillValues((curr:FieldValues)=>{
+                              const key = Object.keys(props.prefillValues)[index];
+                              curr[key][itemIndex] = e.target.value;
+                              return {...curr}; 
+                            })
+                          }} 
+                        /> */}
+                      </div>
+                    )
+                  })}
                 
                   <span className="my-4">
                     {props.prefillValues[category].length>1?<button onClick={()=>removeValue(index)}><RemoveCircleIcon fontSize="medium" color="error" className="mx-2" /></button>:<></>}

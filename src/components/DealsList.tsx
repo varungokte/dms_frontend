@@ -1,4 +1,5 @@
 import { ReactElement, useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import moment from "moment";
 import { DealDetails, DocumentSectionKeys, DocumentSectionTypes, FieldValues, SetStateBoolean } from "@/types/DataTypes";
 import { getDocSecName, getModSecName, getPanSecName} from "@/functions/sectionNameAttributes";
@@ -12,7 +13,6 @@ import TableCollapsible from "./BasicTables/TableCollapsible";
 import ProgressBar from "./BasicComponents/ProgressBar";
 import EmptyPageMessage from "./BasicMessages/EmptyPageMessage";
 import LoadingMessage from "./BasicMessages/LoadingMessage";
-import { useLocation } from "react-router-dom";
 import { Pagination } from "./BasicComponents/Pagination";
 //import Filter from "./BasicComponents/Filter";
 

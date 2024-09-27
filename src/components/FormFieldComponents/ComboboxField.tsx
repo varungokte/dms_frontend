@@ -36,10 +36,11 @@ function ComboboxField (props:FormFieldProps & {suggestions:UserSuggestionsList,
   },[props.suggestions]) */
 
   useEffect(()=>{
-    props.setFieldValues((curr:any)=>{
-      curr[props.fieldData.id]=results; 
-      return {...curr};
-    })
+    if (results.length!=0)
+      props.setFieldValues((curr:any)=>{
+        curr[props.fieldData.id]=results; 
+        return {...curr};
+      });
   },[results]);
 
   useEffect(()=>{

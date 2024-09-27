@@ -71,6 +71,7 @@ const getTeamsList = async (data:{loanId?:string, currentPage:number, rowsPerPag
 
 const getSingleTeam = async (teamId:string) => {
 	try {
+		console.log("teamId",teamId);
 		const token = await getEncryptedToken();
 		const response = await axios.get(`${apiEndpoint}/getTeam`, {
 			headers:{ "Authorization": `Bearer ${token}` },
@@ -108,7 +109,7 @@ const selectTeam = async (data:any) => {
 const getSingleUserTeams = async (params:{email:string,}) => {
 	try {
 		const token = await getEncryptedToken();
-		console.log('get single team params',params.email);
+		
 		const response = await axios.get(`${apiEndpoint}/userteams`, {
 			headers:{ "Authorization": `Bearer ${token}` },
 			params:{value:params.email}
@@ -125,9 +126,44 @@ const getSingleUserTeams = async (params:{email:string,}) => {
 	}
 };
 
+const removeFromTeams = async (data:{E:string, V:string[]}) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${apiEndpoint}/removeTeamsMember`, {data:enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return 0;
+		else
+			return error.response.status;
+	}
+}
+
+const replaceInTeam = async (data:{_id:string, new:string, curr:string}) => {
+	try {
+		const token = getEncryptedToken();
+		const enc_data = await handleEncryption(data);
+		const response = await axios.post(`${apiEndpoint}/`, {data: enc_data}, {
+			headers:{ "Authorization": `Bearer ${token}` },
+		});
+		return response.status;
+	}
+	catch(error:any) {
+		if (!error.response)
+			return 0;
+		else
+			return error.response.status;
+	}
+}
+
 export { 
 	addTeam, editTeam, 
 	getTeamsList, getSingleTeam, 
 	selectTeam,
 	getSingleUserTeams,
+	removeFromTeams, replaceInTeam
 }

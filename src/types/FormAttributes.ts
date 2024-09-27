@@ -13,6 +13,7 @@ type FormFieldAttributes = {
   type: FieldDataTypes,
   required?: boolean,
   disabled?:boolean,
+  readonly?:boolean,
   immutable?: boolean,
   hideOnEdit?:boolean,
   suppressCommas?:boolean, //for integer

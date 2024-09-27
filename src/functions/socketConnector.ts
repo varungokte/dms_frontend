@@ -27,7 +27,6 @@ const checkSocketIsConnected = () =>{
 
 const socketConnector = (socket:Socket,setSocketIsConnected:SetStateBoolean) => {
   try{
-    //console.log("socket connector called")
     socket.on("connect", ()=>onConnect(socket,setSocketIsConnected));
     
     socket.on("connect_error",()=>onSocketError());

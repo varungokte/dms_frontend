@@ -1,6 +1,6 @@
 import { FieldValues, MastersValues } from "@/types/DataTypes";
 import { ComponentList } from "@/types/ComponentProps";
-import { DashboardIcon, LoanIcon , ProductIcon, TransIcon, CompIcon , CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, CriticalIcon, /* ReportsIcon,  ReminderIcon */ } from "@/static/PanelIcons";
+import { DashboardIcon, LoanIcon, ProductIcon, TransIcon, CompIcon, CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, CriticalIcon, /* ReportsIcon,  ReminderIcon */ } from "@/static/PanelIcons";
 
 import Dashboard from '@/components/Dashboard';
 import LoanAccount from '@/components/LoanAccount';
@@ -19,8 +19,8 @@ import TeamTransfer from '@/components/TeamTransfer';
 
 
 //Keys and URLs
-//const ServerUrl = import.meta.env.VITE_APP_SERVER_URL;
-const ServerUrl = "http://139.5.190.208:9000";
+const ServerUrl = import.meta.env.VITE_APP_SERVER_URL;
+//const ServerUrl = "http://139.5.190.208:9000";
 const apiEndpoint = `${ServerUrl}/api/v1/allAPI`;
 const EncryptionKey ="JAIBAJRANGBALI";
 
@@ -46,10 +46,10 @@ const statusStyling = {
   PriorityStyling: ["-", "text-green-600 bg-green-100", "text-yellow-600 bg-yellow-50", "text-red-600 bg-red-100"],
   UserStatusStyling: ["-", "text-yellow-600 bg-yellow-100", "text-green-600 bg-green-100", "text-red-600 bg-red-100"],
   TeamStatusStyling: ["-", "text-green-600 bg-green-100", "text-red-600 bg-red-100"],
+  TeamStatusDisabledStyling:["-", "text-green-400 bg-green-50", "text-red-400 bg-red-50"],
   DocumentStatusStyling: ["-", "text-yellow-500", "text-blue-500", "text-green-600", "text-red-600"],
   LoanStatusStyling: ["-", "text-yellow-500", "text-blue-500", "text-green-600","text-orange-600", "text-red-800"],
 }
-
 
 
 const defaultMastersValues:MastersValues = {
@@ -145,7 +145,6 @@ const allComponents:ComponentList = [
 
   { name: "Test", path:"/test", component: _TestComponent },//27
 ];
-
 
 //"Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others"
 

@@ -14,7 +14,7 @@ import SubmitButton from "../BasicButtons/SubmitButton";
 import FormFieldsRender from "./FormFieldsRender";
 
 function FormDialogTeam(props:FormDialogTeamProps){
-  const [prefillValues, setPrefillValues] = useState<FieldValues>({});
+  const [prefillValues, setPrefillValues] = useState<FieldValues>(props.currentFields);
   const [errorMessage, setErrorMessage] = useState(<></>);
   const [errorList, setErrorList] = useState<string[]>([]);
 
@@ -22,6 +22,11 @@ function FormDialogTeam(props:FormDialogTeamProps){
     if (!props.formOpen)
       setPrefillValues({});
   },[props.formOpen]);
+
+  /* useEffect(()=>{
+    if (props.currentFields && Object.keys(props.currentFields).length>0)
+      setPrefillValues(props.currentFields);
+  },[props.currentFields]); */
 
   const teamMembersRenamingWhileSubmitting = () => {
     const data:FieldValues={};
@@ -47,19 +52,19 @@ function FormDialogTeam(props:FormDialogTeamProps){
   }
 
   const findMissingFields = () => {
-    const data:any={};
+    const requiredFields:any={};
     for (let i=0; i<props.form.length; i++){
       const field = props.form[i];
       if (field.category=="single")
-        data[field.id] = field["required"]?true:false;
+        requiredFields[field.id] = field["required"]?true:false;
       else if (field.category=="grid"){
         for (let j=0; j<field.fields.length; j++){
           const gridField = field.fields[j];
-          data[gridField.id] = gridField["required"]?true:false;
+          requiredFields[gridField.id] = gridField["required"]?true:false;
         }
       }
     }
-    return data;
+    return requiredFields;
   }
 
   const validateRequiredFields=()=>{
@@ -71,25 +76,24 @@ function FormDialogTeam(props:FormDialogTeamProps){
       let key = Object.keys(requiredList)[i];
       let value = requiredList[key];
       data = props.edit?teamMembersRenamingWhileSubmitting():{...prefillValues};
-
       if (key=="P" && props.edit)
         continue;
       
       //console.log("RECENTLY ASSIGEND DATA",data);
       if (value && (!(Object.keys(data).includes(key)) || data[key]=="" || data[key]==-1))
         arr.push(key);
+    }
 
-      if (arr.length>0){
-        setErrorList(arr);
-        setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
-        return false;
-      }
-      else{
-        setErrorMessage(<></>);
-        if (props.edit)
-          return data;
-        return true;
-      }
+    if (arr.length>0){
+      setErrorList(arr);
+      setErrorMessage(<p className="text-red-600">Please fill all required fields.</p>);
+      return false;
+    }
+    else{
+      setErrorMessage(<></>);
+      if (props.edit)
+        return data;
+      return true;
     }
   }
 
@@ -161,6 +165,7 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
   }
 
   const getLeaderSuggestions = async () => {
+    console.log("props.prefillvalues",props.prefillValues);
     const res = await getUserSuggestions("RM");
     if (res.status==200){
       const arr = filterSuggestions(res.obj)
@@ -171,19 +176,20 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
   }
 
   const getMemberSuggestions = async () => {
+    console.log("membersuggestions",memberSuggestions)
     const leadName = props.edit?props.prefillValues["L"]:props.prefillValues["L"].values["E"];
     const res = await getUserSuggestions("TL",leadName);
     if (res.status==200){
+      console.log("ARR",res.obj)
       const arr = filterSuggestions(res.obj);
       setMemberSuggestions(arr);
     }
-    else
-      setMemberSuggestions([]);
   }
 
   const getTeamData = async () => {
     const res = await getSingleTeam(props.teamId);
     if (res.status==200){
+      console.log("res.obj",res.obj)
       res.obj["_id"]=props.teamId;
       props.setPrefillValues({...res.obj});
       getLeaderSuggestions();
@@ -211,18 +217,18 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
   useEffect(()=>{
     if (props.edit)
       getTeamData();
-    else
+    else if (!props.prefillValues["L"])
       getLeaderSuggestions();
   },[]);
 
+
   useEffect(()=>{
+    console.log("loading use effect",props.prefillValues)
     if (props.edit && Object.keys(props.prefillValues).length!=0)
       teamMembersCombinedToSeparate();
-
-    if (props.prefillValues && props.prefillValues["L"] && props.prefillValues["L"]!="" && props.prefillValues["L"].length!=0){
-      //console.log("TEAM LEADER",props.prefillValues["L"])
-      getMemberSuggestions();}
-    //console.log("new prefillvalues",props.prefillValues)
+    
+    if (props.prefillValues && props.prefillValues["L"] && props.prefillValues["L"]!="" && props.prefillValues["L"].length!=0 && memberSuggestions.length==0)
+      getMemberSuggestions();
   },[props.prefillValues]);
 
   return <FormFieldsRender form={props.form} formType="team" errorList={props.errorList}
@@ -230,43 +236,6 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
     edit={props.edit} 
     filteredSuggestions={memberSuggestions} leaderSuggestions={leaderSuggestions} teamMembers={teamMembers} 
   />
-
-  /* return (
-    props.form.map((field,index)=>{
-      if (field.category=="label"){
-        return <div key={"label"}>
-        <div key={index} className={field.sectionClassName}>{field.name}</div>
-        </div> 
-      }
-      else if (field.category=="grid"){
-        return(
-          <div key={index+"grid"}>
-            <div key={index+"grid name"} className={field.sectionClassName||""}>{field.sectionName}</div>
-            <div key={index+"gridz"} className={`grid grid-cols-${field.row}`}>
-              {field.fields.map((item, itemIndex)=>{
-                if (item.type=="combobox"){
-                  const immutable = item.immutable==undefined?false:(props.edit &&item.immutable)
-                  const disabled = item.disabled==undefined?false:item.disabled;
-                  return <span key={index+"_"+itemIndex} className="mr-3">
-                    <ComboboxField key={index} index={index} fieldData={item} disabled={disabled||immutable} 
-                      prefillValue={teamMembers[item.id]} setPrefillValues={props.setPrefillValues} suggestions={item.id=="L"?leaderSuggestions:memberSuggestions}
-                    />
-                  </span>
-                }
-                else
-                  return <span key={index+"_"+itemIndex} className="mr-3">
-                    <TextField key={index} index={index}  size="large" fieldData={item}
-                      disabled={(item["disabled"]||false)||((item["immutable"]||false)&&props.edit)} 
-                      prefillValues={props.prefillValues} setPrefillValues={props.setPrefillValues} 
-                    />
-                  </span>
-              })}
-            </div>
-          </div> 
-        )
-      }
-    })
-  ) */
 }
 
 export default FormDialogTeam;

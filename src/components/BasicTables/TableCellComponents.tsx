@@ -81,15 +81,15 @@ function UserStatusCell (props:{index:string, status:UserStatus, cellClassName?:
     return <p className={`${className} p-2`}>{props.status}</p>;  
 }
 
-function TeamStatusCell (props:{index:string, status:TeamStatus, cellClassName?:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function}) {
+function TeamStatusCell (props:{index:string, status:TeamStatus, cellClassName?:string, selectedTeam:number, setSelectedTeam:Function, setTeamStatus:Function, disabled?:boolean}) {
   const {TeamStatusList} = statusValues;
-  const {TeamStatusStyling} = statusStyling;
+  const {TeamStatusStyling, TeamStatusDisabledStyling} = statusStyling;
   
   const editable =props.cellClassName && props.cellClassName.search("editable")!=-1;
-  const className = `${TeamStatusStyling[TeamStatusList.indexOf(props.status)]} w-28 text-center rounded-xl ${props.cellClassName}`
+  const className = `${props.disabled?TeamStatusDisabledStyling[TeamStatusList.indexOf(props.status)]:TeamStatusStyling[TeamStatusList.indexOf(props.status)]} disabled w-28 text-center rounded-xl ${props.cellClassName}`
   
   if (editable)
-    return <select id={props.index} className={`${className} h-10`} 
+    return <select id={props.index} className={`${className} h-10`}
       value={props.status} onChange={e=>{props.setSelectedTeam(props.selectedTeam); props.setTeamStatus(e.target.value)}}>
       {TeamStatusList.map((status,index)=>{
         if (status!="-")
@@ -97,13 +97,11 @@ function TeamStatusCell (props:{index:string, status:TeamStatus, cellClassName?:
       })}
     </select>
   else
-    return <p className={`${className} p-2`}>{props.status}</p>
+    return <div className={`${className} p-2`}><p>{props.status}</p></div>
 }
 
 function ActionCell (props:{action:ReactElement, cellClassName?:string}) {
-  return <div className={props.cellClassName}>
-    {props.action}
-  </div>
+  return props.action;
 }
 
 function ObjNameCell (props:{item:FieldValues, cellClassName?:string}){
@@ -128,8 +126,8 @@ function DocumentLinkCell (props:{item:ReactElement, cellClassName?:string, link
     </Link>
 }
 
-function CheckboxCell (props:{id:string, selectedRow:string[]}) {
-  return <Checkbox color="secondary" checked={props.selectedRow.includes(props.id)} />
+function CheckboxCell (props:{id:string, selectedRow:string[], disabled?:boolean, className?:string}) {
+  return <Checkbox color="secondary" checked={props.selectedRow.includes(props.id)} disabled={props.disabled} className={props.className} />
 }
 
 function RadioCell (props:{id:string, selectedRow:string[], iconOverride?:ReactElement}){

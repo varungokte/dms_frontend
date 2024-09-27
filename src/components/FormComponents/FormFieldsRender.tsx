@@ -18,11 +18,10 @@ import FloatNumberField from "../FormFieldComponents/FloatNumberField";
 
 function FormFieldsRender(props:FormFieldsRenderProps){
   const masters = useContext(MasterValuesContext);
-
   if (!masters) return;
 
   const { CovenantTypeList } = masters;
-  
+
   return (
     props.form.map((field,index)=>{
       if (field.category=="label")
@@ -59,7 +58,6 @@ function FormFieldsRender(props:FormFieldsRenderProps){
 }
 
 function RenderFields (props:{index:number, field:FormFieldAttributes, error?:boolean} & FormFieldsRenderProps){
-  //useEffect(()=>console.log("props.prefill values",props.prefillValues),[props.prefillValues])
   if (props.field.type=="combobox")
     return <ComboboxField key={props.index} index={props.index} fieldData={props.field} 
       fieldValue={props.formType=="team"&&props.teamMembers?props.teamMembers[props.field.id]:props.prefillValues[props.field.id]} 
@@ -83,7 +81,7 @@ function RenderFields (props:{index:number, field:FormFieldAttributes, error?:bo
   else if (props.field["type"]=="textarea")
     return <TextAreaField key={props.index} index={props.index} fieldData={props.field} 
       fieldValue={props.prefillValues[props.field.id]} setFieldValues={props.setPrefillValues} 
-      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))} 
+      disabled={(props.field.disabled||false) || ((props.field.immutable||false) && (props.edit||false))}
     />
   else if (props.field["type"]=="date")
     return <DateField key={props.index} index={props.index} fieldData={props.field} 

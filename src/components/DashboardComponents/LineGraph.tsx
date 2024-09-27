@@ -2,13 +2,11 @@ import { ApexOptions } from 'apexcharts';
 import ReactApexChart from 'react-apexcharts';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { IntervalType } from '@/types/DataTypes';
 
-function LineGraph (props:{title:string,parameters:{name:string, data:number[]}[], xAxisLabels:string[], intervalType?:IntervalType, setIntervalType?:Function}) {
-
+function LineGraph (props:{title:string,parameters:{name:string, data:number[]}[], xAxisLabels:string[], toggleOptions?:{type:string, setType:Function, options:string[]}}) {
 	const options: ApexOptions = {
 		legend: {
-			show: true,
+			show: false,
 			position: 'top',
 			horizontalAlign: 'left',
 		},
@@ -82,36 +80,50 @@ function LineGraph (props:{title:string,parameters:{name:string, data:number[]}[
 		yaxis: {
 			title: {style: {fontSize: '0px'}},
 			min: 0,
-			max: 100,
+			//max: 100,
+			decimalsInFloat:2,
+			labels:{
+				formatter:(val)=>val.toFixed(0)
+			}
 		},
 	};
 
- 
-  return (
+	let noData = true;
+	for (let i=0; i<props.parameters.length; i++){
+		if (props.parameters[i].data.length!=0){
+			noData=false;
+			break;
+		}
+	}
+
+	return (
     <div className="col-span-12 rounded-sm border border-stroke w-100 p-5 bg-white px-5 pt-7.5 pb-5 shadow-default dark:border-strokedark dark:bg-boxdark sm:px-7.5 xl:col-span-8">
       <div className="m-auto flex flex-wrap items-start justify-between gap-3 sm:flex-nowrap">
 				<div className="font-semibold">{props.title}</div>
-				{props.intervalType
+				{props.toggleOptions
 					?<div className="flex justify-end">
-						<ToggleButtonGroup exclusive color="secondary" value={props.intervalType} onChange={(_,val)=>{if (props.setIntervalType && val) props.setIntervalType(val)}}>
-							<ToggleButton value="monthly">Monthly</ToggleButton>
-							<ToggleButton value="yearly">Yearly</ToggleButton>
+						<ToggleButtonGroup exclusive color="secondary" value={props.toggleOptions.type} onChange={(_,val)=>{props.toggleOptions && props.toggleOptions.setType(val)}}>
+							{props.toggleOptions.options.map((op,ind)=>{
+								return <ToggleButton key={ind} value={op}>{op}</ToggleButton> 
+							})}
 						</ToggleButtonGroup>
 					</div>
 					:<></>
 				}
       </div>
-
-      <div>
-        <div id="chartOne" className="-ml-5">
-          <ReactApexChart
-            options={options}
-            series={props.parameters}
-            type="area"
-						height={350}
-          />
-        </div>
-      </div>
+			{noData
+				?<div>No Data Available</div>
+				:<div>
+					<div id="chartOne" className="-ml-5">
+						<ReactApexChart
+							options={options}
+							series={props.parameters}
+							type="area"
+							height={350}
+						/>
+					</div>
+      	</div>
+			}
     </div>
   );
 };

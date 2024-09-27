@@ -18,7 +18,8 @@ type TableSelectableType = {
   selectMultiple?:boolean,
   selectedRows:string[], 
   setSelectedRows:React.Dispatch<SetStateAction<string[]>>,
-  iconOverride?:ReactElement
+  iconOverride?:ReactElement,
+  className?:string
 };
 
 type TableShowIndexType = { 
@@ -31,18 +32,20 @@ type TableShowIndexType = {
 type TableDocumentLinksType = {
   section:string,
   index:string|number
-}[]
+}[];
 
 type CommonTableProps = {
   columnData:TableColumnData, //replacing columnIDs, dataTypes, headingClassName 
   showIndex?:TableShowIndexType,
   selectable?:TableSelectableType|undefined,
-  action?:ReactElement[],  
-  
+  action?:ReactElement[],
+  actionAtStart?:boolean, actionHeading?:string,
   setEntityStatus?:Function, setSelectedEntity?:Function, //datatype=="team-status" and "user-status"
   setValues?:Function, //datatype=="text-field"
   documentLinks?:TableDocumentLinksType, //when linking to another page
   defaultBadges?:boolean,
+  disabledRows?:boolean[],
+  tooltipMessages?:string[],
 }
 type DataTableProps = CommonTableProps & { tableData:FieldValues[]};
 type SingleRowProps = CommonTableProps & { rowIndex:number, singleRow:FieldValues};
@@ -53,10 +56,12 @@ type SingleCellProps = {
   columnID:string, 
   columnType:TableDataTypes, 
   cellClassName?:string, 
+  disabled?:boolean,
   defaultBadges?:boolean, isDefault?:boolean,
   documentLinks?:TableDocumentLinksType,
   setSelectedEntity?:Function, setEntityStatus?:Function, 
-  setValues?:Function};
+  setValues?:Function
+};
 
 export {
   type TableDataTypes, type TableColumnData,

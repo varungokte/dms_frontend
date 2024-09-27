@@ -2,7 +2,7 @@ import {TableCell, TableHead, TableRow} from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import { TableSelectableType, TableShowIndexType } from '@/types/TableDataAttributes';
 
-function DataTableHead(props:{headingRows:string[], headingClassNames?:string[], selectable?:TableSelectableType&{idList:string[]}, tableLength?:number, showIndex?:TableShowIndexType, action?:boolean}){
+function DataTableHead(props:{headingRows:string[], headingClassNames?:string[], selectable?:TableSelectableType&{idList:string[]}, tableLength?:number, showIndex?:TableShowIndexType, action?:boolean, actionAtStart?:boolean,actionHeading?:string, className?:string}){
   const handleSelectAll = () => {
     if (!props.selectable)
       return;
@@ -15,7 +15,7 @@ function DataTableHead(props:{headingRows:string[], headingClassNames?:string[],
   
   return(
     <TableHead>
-      <TableRow>
+      <TableRow className="h-216">
         {props.selectable && props.selectable.type=="checkbox"
           ?<TableCell>
             <Checkbox 
@@ -28,6 +28,7 @@ function DataTableHead(props:{headingRows:string[], headingClassNames?:string[],
           :<></>
         }
         {props.selectable && props.selectable.type=="radio"?<TableCell></TableCell>:<></>}
+        {props.action&&props.actionAtStart &&<TableCell>{props.actionHeading}</TableCell>}
         {props.showIndex
           ?<TableCell className={props.showIndex.headingClassName}>
             <div className={props.showIndex.headingClassName}>{props.showIndex.heading}</div>
@@ -39,7 +40,7 @@ function DataTableHead(props:{headingRows:string[], headingClassNames?:string[],
             <div className={(props.headingClassNames && props.headingClassNames[index])?props.headingClassNames[index]:""}>{heading}</div>
           </TableCell>
         })}
-        {props.action?<TableCell>Action</TableCell>:<></>}
+        {props.action && !props.actionAtStart && <TableCell>Action</TableCell>}
       </TableRow>
     </TableHead>
   )

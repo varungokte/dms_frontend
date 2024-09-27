@@ -9,6 +9,7 @@ function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Funct
     edit:"edited",
     save:"saved",
     sent:"sent",
+    remove:"removed"
   };
 
   const handleClose = () => {
@@ -19,14 +20,10 @@ function Toast(props:{toastOptions:ToastOptionsAttributes, setToastOptions:Funct
   }
   
   return (
-    <Snackbar open={props.toastOptions.open} 
-      onClose={handleClose}
-      anchorOrigin={{vertical:"bottom", horizontal:"right"}} 
-      autoHideDuration={5000}
-    >
+    <Snackbar open={props.toastOptions.open} anchorOrigin={{vertical:"bottom", horizontal:"right"}} onClose={handleClose} autoHideDuration={5000}>
       <Alert onClose={handleClose} severity={props.toastOptions.type} variant="filled" sx={{ width: '100%' }} >
         <Typography textTransform={"capitalize"}>
-          {props.toastOptions.section} {props.toastOptions.type=="error"?"could not be":""} {actions[props.toastOptions.action]}
+          {props.toastOptions.custom || `${props.toastOptions.section} ${props.toastOptions.type=="error"?"could not be":""} ${actions[props.toastOptions.action]}`}
         </Typography>
       </Alert>
     </Snackbar>

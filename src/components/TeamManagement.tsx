@@ -74,6 +74,9 @@ function TeamManagement(props:{label:string}){
   const [searchType, setSearchType] = useState("");
   const searchOptions = [{label:"Team Name", value:"N"}, {label:"Team Lead's Email", value:"L"}];
 
+  if (!userPermissions)
+    return;
+
   const editPermission = userPermissions[getModSecName({inputName:props.label, inputType:"fullname", outputType:"shortname"})].includes("edit");
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,7 +90,7 @@ function TeamManagement(props:{label:string}){
   useEffect(()=>{
     if (added){
       getTeamsList({currentPage, rowsPerPage, searchString, searchType}).then(res=>{
-          console.log("res",res)
+        console.log("res",res)
         if (res.status==200){
           try{
             const data = res["obj"]["list"][0]["data"];

@@ -24,7 +24,7 @@ function TextField(props:FormFieldProps & {size:"small"|"medium", padding?:numbe
           size={props.size} color="secondary"
           type={props.fieldData.type} disabled={props.disabled} required={props.fieldData.required}
           className={`bg-white w-[100%] ${props.fieldData.name==""?"mt-7":""}`}
-          sx={props.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
+          sx={props.readonly||props.fieldData.readonly?{"& .MuiOutlinedInput-input.Mui-disabled":{WebkitTextFillColor:"black"}}:{}}
           value={props.fieldValue || ""}
           
           onChange={props.repeatFields

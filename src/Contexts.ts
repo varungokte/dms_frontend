@@ -2,10 +2,7 @@ import { createContext } from 'react';
 import socket from './socket';
 import { FieldValues, MastersValues } from '@/types/DataTypes';
 
-const PermissionContext = createContext<{userPermissions:FieldValues, setUserPermissions:React.Dispatch<React.SetStateAction<FieldValues|undefined>>}>({
-  userPermissions:{},
-  setUserPermissions:()=>{}
-});
+const PermissionContext = createContext<{userPermissions:FieldValues}>({userPermissions:{}});
 
 const SocketContext = createContext(socket);
 

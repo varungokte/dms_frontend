@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Navigate, useLocation, useNavigate } from "react-router-dom";
-import { MasterValuesContext, PermissionContext } from "@/Contexts";
+import { PermissionContext } from "@/Contexts";
+import { constants } from "@/Constants";
 
 import { getDocSecList, getModSecName } from "@/functions/sectionNameAttributes";
 import { FieldValues } from "@/types/DataTypes";
@@ -26,11 +27,7 @@ function CreateLoanAccount() {
 	const navigate = useNavigate();
 
   const {userPermissions} = useContext(PermissionContext);
-  const masters = useContext(MasterValuesContext);
-
-  if (!masters) return;
-
-  const { LoanSecurityTypeList } = masters;
+  const {LoanSecuredList} = constants
 
   if (!state)
     return <Navigate to="../loan" />
@@ -84,7 +81,8 @@ function CreateLoanAccount() {
     if (res.status==200){
       if (res.obj["STV"] && res.obj["STV"].length==0)
         res.obj["STV"]=[{}];
-      if (res.obj["ST"] && res.obj["ST"]==LoanSecurityTypeList[2])
+      
+      if (res.obj["ST"] && res.obj["ST"]==LoanSecuredList[2])
         setShowSecurityDetails(false);
       if (res.obj["CN"])
         setPreexistingData(res.obj);

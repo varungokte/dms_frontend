@@ -33,7 +33,7 @@ type TeamStatus = typeof TeamStatusList[number];
 type LoanStatus = typeof LoanStatusList[number];
 type Priority = typeof PriorityList[number];
 
-type ToastOptionsAttributes ={open:boolean, type:"error"|"success", action:"add"|"delete"|"edit"|"save"|"sent",section:string};
+type ToastOptionsAttributes ={open:boolean, type:"error"|"success", action:"add"|"delete"|"edit"|"save"|"sent"|"remove",section:string, custom?:string};
 
 type DocumentSectionTypes = "document"|"covenant"|"condition"|"payment"|"undefined";
 type DocumentSectionKeys = "TD"|"CD"|"C"|"CP"|"CS"|"PD";

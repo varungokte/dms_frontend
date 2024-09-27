@@ -5,6 +5,17 @@ import { ApexOptions } from 'apexcharts';
 import { IntervalType } from '@/types/DataTypes';
 import ReactApexChart from 'react-apexcharts';
 
+
+	/* 
+    const parametersBarGraph = [
+      {name: 'Sales',data: [44, 55, 41, 67, 22, 43, 65]},
+      {name: 'Revenue',data: [13, 23, 20, 8, 13, 27, 15]},
+	  ]; 
+  */
+
+
+/* <BarGraph title="Revenue this week" parameters={parametersBarGraph} xAxisLabels={['M', 'T', 'W', 'T', 'F', 'S', 'S']} /> */
+
 function BarGraph(props:{title:string, parameters:{name:string, data:number[]}[], xAxisLabels:string[], intervalType?:IntervalType, setIntervalType?:Function}){
   const options: ApexOptions = {
     colors: ['#3C50E0', '#80CAEE'],

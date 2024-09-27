@@ -1,5 +1,5 @@
 import { DataTableProps, SingleCellProps, SingleRowProps } from "@/types/TableDataAttributes";
-import {TableBody, TableCell, TableRow} from '@mui/material';
+import {TableBody, TableCell, TableRow, Tooltip} from '@mui/material';
 
 import { ActionCell, CheckboxCell, DateCell, DocStatusCell, DocumentLinkCell, FloatFieldCell, IndexCell, LoanStatusCell, ObjNameCell, PriorityCell, RadioCell, TeamStatusCell, TextCell, UserStatusCell } from "./TableCellComponents";
 
@@ -8,11 +8,13 @@ function DataTableBody(props:DataTableProps){
   return(
     <TableBody>
       {props.tableData.map((singleRow,index)=>{
-        return <SingleRow key={index} 
-          rowIndex={index} 
-          singleRow={singleRow}
-          {...newProps}
-        />
+        return (
+          <SingleRow key={index} 
+            rowIndex={index} 
+            singleRow={singleRow}
+            {...newProps}
+          />
+        )
       })}
     </TableBody>
   )
@@ -21,6 +23,9 @@ function DataTableBody(props:DataTableProps){
 function SingleRow (props:SingleRowProps){
   const handleRowClick = ()=>{
     if (!props.selectable)
+      return;
+
+    if (props.disabledRows && props.disabledRows[props.rowIndex])
       return;
 
     if (props.selectable.selectedRows.includes(props.singleRow["_id"])){
@@ -43,42 +48,48 @@ function SingleRow (props:SingleRowProps){
       else
         props.selectable.setSelectedRows([props.singleRow["_id"]]);
     }
-  }
-  
+  } 
+
   return (
-    <TableRow key={props.rowIndex} hover 
-      selected={props.selectable&&props.selectable.selectedRows.includes(props.singleRow["_id"])}
-      onClick={handleRowClick} 
-      sx={{
-        backgroundColor:"rgba(251, 251, 255, 1)", 
-        cursor:props.selectable?"pointer":"default", 
-        border:props.selectable&&props.selectable.type=="row"&&props.selectable.selectedRows.includes(props.singleRow["_id"])?"solid rgba(80, 65, 188, 1)":""}} 
-    >
-      {props.selectable && props.selectable.type=="checkbox" && <TableCell>
-        <CheckboxCell id={props.singleRow["_id"]} selectedRow={props.selectable.selectedRows} />
-      </TableCell>}
+    <Tooltip title={props.tooltipMessages&&props.tooltipMessages[props.rowIndex]?<p className="text-base">{props.tooltipMessages[props.rowIndex]}</p>:""} placement="top-start" followCursor arrow>
+      <TableRow key={props.rowIndex} hover={!props.disabledRows || !props.disabledRows[props.rowIndex]}
+        selected={props.selectable && props.selectable.selectedRows.includes(props.singleRow["_id"]) && (!props.disabledRows || (props.disabledRows && !props.disabledRows[props.rowIndex]))}
+        onClick={handleRowClick} 
+        sx={{
+          backgroundColor:"rgba(251, 251, 255, 1)", 
+          cursor:props.selectable&&(!props.disabledRows||props.disabledRows&&!props.disabledRows[props.rowIndex])?"pointer":"default", 
+          border:props.selectable&&props.selectable.type=="row"&&props.selectable.selectedRows.includes(props.singleRow["_id"])?"solid rgba(80, 65, 188, 1)":""}} 
+      >
+        {props.selectable && props.selectable.type=="checkbox" && <TableCell>
+          <CheckboxCell id={props.singleRow["_id"]} selectedRow={props.selectable.selectedRows} disabled={props.disabledRows&&props.disabledRows[props.rowIndex]} className={props.selectable.className} />
+        </TableCell>}
 
-      {props.selectable && props.selectable.type=="radio" && <TableCell>
-        <RadioCell id={props.singleRow["_id"]} selectedRow={props.selectable.selectedRows} iconOverride={props.selectable.iconOverride} />
-      </TableCell>}
-      
-      {props.showIndex && <TableCell>
-        <IndexCell index={(props.showIndex.startsAt||0)+props.rowIndex+1} cellClassName={props.showIndex.cellClassName} />
-      </TableCell>}
+        {props.selectable && props.selectable.type=="radio" && <TableCell>
+          <RadioCell id={props.singleRow["_id"]} selectedRow={props.selectable.selectedRows} iconOverride={props.selectable.iconOverride} />
+        </TableCell>}
 
-      {props.columnData.map(({id,type,cellClassName},index)=>{
-        return <SingleCell key={props.rowIndex+"_"+index} index={index} rowIndex={props.rowIndex} 
-          item={props.singleRow[id]} 
-          columnID={id} columnType={type} cellClassName={cellClassName} 
-          defaultBadges={props.defaultBadges} isDefault={props.singleRow["DEF"]==1} 
-          documentLinks={props.documentLinks} 
-          setSelectedEntity={props.setSelectedEntity} setEntityStatus={props.setEntityStatus}
-          setValues={props.setValues}
-        />
-      })}
+        {props.action && props.actionAtStart && <TableCell>
+          <ActionCell action={props.action[props.rowIndex]} cellClassName="w-[100px]" /> </TableCell>}
+        
+        {props.showIndex && <TableCell>
+          <IndexCell index={(props.showIndex.startsAt||0)+props.rowIndex+1} cellClassName={props.showIndex.cellClassName} />
+        </TableCell>}
 
-      {props.action && <TableCell><ActionCell action={props.action[props.rowIndex]} /></TableCell>}
-    </TableRow>
+        {props.columnData.map(({id,type,cellClassName},index)=>{
+          return <SingleCell key={props.rowIndex+"_"+index} index={index} rowIndex={props.rowIndex} 
+            item={props.singleRow[id]} 
+            columnID={id} columnType={type} cellClassName={cellClassName} 
+            defaultBadges={props.defaultBadges} isDefault={props.singleRow["DEF"]==1} 
+            documentLinks={props.documentLinks} 
+            setSelectedEntity={props.setSelectedEntity} setEntityStatus={props.setEntityStatus}
+            setValues={props.setValues}
+            disabled={props.disabledRows&&props.disabledRows[props.rowIndex]}
+          />
+        })}
+
+        {props.action && !props.actionAtStart && <TableCell><ActionCell action={props.action[props.rowIndex]} /></TableCell>}
+      </TableRow>
+    </Tooltip>
   )
 }
 
@@ -86,7 +97,7 @@ function SingleCell (props:SingleCellProps){
   const setBadge=props.defaultBadges && props.isDefault && props.index==0;
   const textOverflow = props.columnType=="text"?" break-words	max-w-[200px]":"";
   return (
-    <TableCell key={props.rowIndex+"_"+props.index} className={`${props.cellClassName} ${textOverflow}`}>
+    <TableCell key={props.rowIndex+"_"+props.index} className={`${props.cellClassName} ${textOverflow}`} sx={{color:props.disabled?"grey":""}}>
       {(()=>{
         //const item = props.singleRow[props.columnID];
         const documentLink=(props.documentLinks && props.documentLinks[props.rowIndex])?props.documentLinks[props.rowIndex]:undefined;
@@ -99,7 +110,7 @@ function SingleCell (props:SingleCellProps){
         else if (props.columnType=="user-status")
           return <UserStatusCell index={props.rowIndex+"_"+props.index} status={props.item} cellClassName={props.cellClassName} selectedUser={props.rowIndex} setSelectedUser={props.setSelectedEntity||(()=>{})} setUserStatus={props.setEntityStatus||(()=>{})} />;
         else if (props.columnType=="team-status")
-          return <TeamStatusCell index={props.rowIndex+"_"+props.index} status={props.item} cellClassName={props.cellClassName} selectedTeam={props.rowIndex} setSelectedTeam={props.setSelectedEntity||(()=>{})} setTeamStatus={props.setEntityStatus||(()=>{})} />;
+          return <TeamStatusCell index={props.rowIndex+"_"+props.index} status={props.item} cellClassName={props.cellClassName} selectedTeam={props.rowIndex} setSelectedTeam={props.setSelectedEntity||(()=>{})} setTeamStatus={props.setEntityStatus||(()=>{})} disabled={props.disabled} />;
         else if (props.columnType=="loan-status")
           return <LoanStatusCell status={props.item} cellClassName={props.cellClassName} />;
         else if (props.columnType=="obj-name")
