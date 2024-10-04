@@ -9,4 +9,4 @@ const SocketContext = createContext(socket);
 const MasterValuesContext = createContext<MastersValues|undefined>(undefined);
 
 
-export  { PermissionContext, SocketContext, MasterValuesContext } 
+export  { PermissionContext, SocketContext, MasterValuesContext };

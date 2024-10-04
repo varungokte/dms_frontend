@@ -1,6 +1,6 @@
 import { FieldValues, MastersValues } from "@/types/DataTypes";
 import { ComponentList } from "@/types/ComponentProps";
-import { DashboardIcon, LoanIcon, ProductIcon, TransIcon, CompIcon, CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, CriticalIcon, /* ReportsIcon,  ReminderIcon */ } from "@/static/PanelIcons";
+import { DashboardIcon, LoanIcon, ProductIcon, TransactionIcon, ComplianceIcon, CovenantIcon, ConditionsIcon, MembersIcon, ManagementIcon, RoleIcon, MastersIcon, ZoneIcon, ScheduleIcon, DefaultIcon, CriticalIcon, TeamTransferIcon, /* ReportsIcon,  ReminderIcon */ } from "@/static/PanelIcons";
 
 import Dashboard from '@/components/Dashboard';
 import LoanAccount from '@/components/LoanAccount';
@@ -17,13 +17,11 @@ import _TestComponent from '@/components/_TestComponent';
 import UserAssignments from '@/components/UserAssignments';
 import TeamTransfer from '@/components/TeamTransfer';
 
-
 //Keys and URLs
-const ServerUrl = import.meta.env.VITE_APP_SERVER_URL;
+const ServerUrl = "http://192.168.18.117:9000"// import.meta.env.VITE_APP_SERVER_URL;
 //const ServerUrl = "http://139.5.190.208:9000";
 const apiEndpoint = `${ServerUrl}/api/v1/allAPI`;
 const EncryptionKey ="JAIBAJRANGBALI";
-
 
 const constants = {
   FrequencyList: ["-", "Monthly", "Quarterly", "Half-Yearly", "Yearly"],
@@ -53,14 +51,13 @@ const statusStyling = {
 
 
 const defaultMastersValues:MastersValues = {
-  LoanProductList: ["-","Product3","product 4"],
-  ZoneList: ["-"],
+  LoanProductList: ["-","Product 1","product 2"],
+  ZoneList: ["-","North","South","East","West"],
   FileTypeList: ["-", "PDF", "DOCX", "XLSX", "CSV", "PNG", "JPEG"],
-  UserRoleList: ["-"],
-  IndustryList: ["-",""],
+  IndustryList: ["-","Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others"],
   LoanTypeList: ["-", "Long Term", "Short Term"],
   DocumentRejectionReasonList: ["-","Document is expired", "Document is incomplete", "Document is irrelevant"],
-  TableRowsPerPage: ["-1","2","5","10"],
+  TableRowsPerPage: ["-","2","5","10"],
 
   ProjectStatusList: ["-","Not Started","In Progress","Finished"],
   DSRAFormList: ["-","LC","BG", "FD"],
@@ -109,7 +106,56 @@ const allSectionPermissions:FieldValues = {
   reminders:["access"],
   reports:["access"],
 }
+const mastersKeyToLabels:{[key:string]:string} = {
+  LP: "LoanProductList",
+  ZL: "ZoneList",
+  FT: "FileTypeList",
+  IN: "IndustryList",
+  LT: "LoanTypeList",
+  DRR: "DocumentRejectionReasonList",
+  TRP: "TableRowsPerPage",
+  PS: "ProjectStatusList",
+  DF: "DSRAFormList",
+  LST: "LoanSecurityTypeList",
+  BAT: "BankAccountTypeList",
+  CT: "ContactTypeList",
+  ER: "EmailRecipientList",
+  RA: "RatingAgencyList",
+  RT: "RatingTypeList",
+  RO: "RatingOutlookList",
+  TC: "TransactionCategoryList",
+  CC: "ComplianceCategoryList",
+  CV: "CovenantCategoryList",
+  CTY: "CovenantTypeList",
+  CPC: "ConditionPrecedentCategoryList",
+  CSC: "ConditionSubsequentCategoryList",
+};
 
+
+const mastersNames = [
+  {key:"LP", label:"Loan Product", variableName:"LoanProductList" },
+  {key:"ZL", label:"Zones", variableName:"ZoneList" },
+  {key:"FT", label:"File Types", variableName:"FileTypeList" },
+  {key:"IN", label:"Industry List", variableName:"IndustryList" },
+  {key:"LT", label:"Loan Types", variableName:"LoanTypeList" },
+  {key:"DRR", label:"Document Rejection Reason", variableName:"DocumentRejectionReasonList" },
+  {key:"TRP", label:"Table Rows Per Page", variableName:"TableRowsPerPage" },
+  {key:"PS", label:"Project Status", variableName:"ProjectStatusList" },
+  {key:"DF", label:"DSRA Form", variableName:"DSRAFormList" },
+  {key:"LST", label:"Loan Security Type", variableName:"LoanSecurityTypeList" },
+  {key:"BAT", label:"Bank Account Type", variableName:"BankAccountTypeList" },
+  {key:"CT", label:"Contact Type", variableName:"ContactTypeList" },
+  {key:"ER", label:"Email Recipient", variableName:"EmailRecipientList" },
+  {key:"RA", label:"Rating Agency", variableName:"RatingAgencyList" },
+  {key:"RT", label:"Rating Type", variableName:"RatingTypeList" },
+  {key:"RO", label:"Rating Outlook", variableName:"RatingOutlookList" },
+  {key:"TC", label:"Transaction Category", variableName:"TransactionCategoryList" },
+  {key:"CC", label:"Compliance Category", variableName:"ComplianceCategoryList" },
+  {key:"CV", label:"Covenant Category", variableName:"CovenantCategoryList" },
+  {key:"CTY", label:"Covenant Type", variableName:"CovenantTypeList" },
+  {key:"CPC", label:"Condition Precedent Category", variableName:"ConditionPrecedentCategoryList" },
+  {key:"CSC", label:"Condition Subsequent Category", variableName:"ConditionSubsequentCategoryList" },
+]
 
 const allComponents:ComponentList = [
   { name: "Dashboard", path:"/", component: Dashboard, icon: DashboardIcon },//0
@@ -117,10 +163,10 @@ const allComponents:ComponentList = [
   { name: "Role Management", path:"/roles", component: RoleManagement, icon:RoleIcon },//2
   { name: "User Management", path:"/users", component: UserManagement, icon: ManagementIcon },//3
   { name: "Team Management", path:"/teams", component: TeamManagement, icon: MembersIcon },//4
-  { name: "Team Transfer", path:"/transfer", component:TeamTransfer }, //5
+  { name: "Team Transfer", path:"/transfer", component:TeamTransfer, icon:TeamTransferIcon }, //5
   { name: "Loan Account", path:"/loan", component: LoanAccount, icon: LoanIcon },//6
-  { name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransIcon },//7
-  { name: "Compliance Documents", path:"/compliance", component: DealsList, icon: CompIcon },//8
+  { name: "Transaction Documents", path:"/transaction", component: DealsList, icon: TransactionIcon },//7
+  { name: "Compliance Documents", path:"/compliance", component: DealsList, icon: ComplianceIcon },//8
   { name: "Covenants", path:"/covenants", component: DealsList, icon: CovenantIcon },//9
   { name: "Condition Precedent", path:"/precedent", component: DealsList, icon: ConditionsIcon },//10
   { name: "Condition Subsequent", path:"/subsequent", component: DealsList, icon: ConditionsIcon },//11
@@ -132,21 +178,20 @@ const allComponents:ComponentList = [
   { name: "Critical Cases", path:"/critical", component: SpecialCases, icon: CriticalIcon },//16
   /* { name: "Reports", path:"/reports", component: Reports, icon: ReportsIcon },//17 */
 
-  { name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransIcon, panopticPage:true },//18
-  { name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: CompIcon, panopticPage:true },//19
+  { name: "Master Transaction Documents", path:"/admin/transaction", component: DealsList, icon: TransactionIcon, panopticPage:true },//18
+  { name: "Master Compliance Documents", path:"/admin/compliance", component: DealsList, icon: ComplianceIcon, panopticPage:true },//19
   { name: "Master Covenants", path:"/admin/covenants", component: DealsList, icon: CovenantIcon, panopticPage:true },//20
   { name: "Master Condition Precedent", path:"/admin/precedent", component: DealsList, icon: ConditionsIcon, panopticPage:true },//21
   { name: "Master Condition Subsequent", path:"/admin/subsequent", component: DealsList, icon: ConditionsIcon, panopticPage:true },//22
   { name: "Master Payment Schedule", path:"/admin/schedule", component: DealsList, icon: ScheduleIcon, panopticPage:true },//23
   { name: "Master Default Cases", path:"/admin/default", component:SpecialCases, icon:DefaultIcon, panopticPage:true },//24
   { name: "Master Critical Cases", path:"/admin/critical", component:SpecialCases, icon:CriticalIcon, panopticPage:true },//25
-
+  
   { name: "User Assignments", path:"/assign", component:UserAssignments},//26
 
   { name: "Test", path:"/test", component: _TestComponent },//27
 ];
 
-//"Real Estate","NBFC", "NBFC-MFI", "Bank", "Diversified Conglomerate", "Education", "Healthcare & Pharma", "Hospitality Manufacturing", "Renewable Energy", "Roads", "Commercial Space", "Others"
 
 export { 
   ServerUrl, EncryptionKey, apiEndpoint,
@@ -154,4 +199,6 @@ export {
   defaultMastersValues, adminEnteredMasters,
   allSectionPermissions,
   allComponents,
+  mastersKeyToLabels,
+  mastersNames,
 };

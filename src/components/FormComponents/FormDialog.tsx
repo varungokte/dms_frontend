@@ -91,7 +91,7 @@ function FormDialog(props:FormDialogProps){
       
       const res = await props.formSubmit(obj,props.index);
 
-      //console.log("submitFunction response",res,prefillValues);
+      console.log("submitFunction response",res,prefillValues);
 
       if (res==200 || res==403)
         closeDialog();
@@ -128,7 +128,7 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   , errorList:string[], suggestions?:UserSuggestionTypes, getRoles?:boolean, formSubmit?:Function}){
   const [roles, setRoles] = useState<FieldValues[]>();
 
-  const [allSuggestions, setAllSuggestions] = useState<UserSuggestionsList>([]);
+  const [allSuggestions, setAllSuggestions] = useState<FieldValues[]>([]);
   const [filteredSuggestions, setFilteredSuggestions] = useState<UserSuggestionsList>([]);
   const [oldZone, setOldZone] = useState("");
 
@@ -148,15 +148,15 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
 
   const listSuggestions = async (suggestionType?:UserSuggestionTypes) => {
     const res = await getUserSuggestions(suggestionType?suggestionType:props.suggestions||"RM");
-    //console.log("sugg",props.suggestions, res.obj)
+    console.log("sugg",props.suggestions, res.obj)
     if (res.status==200)
       setAllSuggestions(res.obj);
     else
       return [];
   }
 
-  const filterSuggestions = (suggestionsList:any) => {
-    const arr:any=[];
+  const filterSuggestions = (suggestionsList:FieldValues[]) => {
+    const arr=[];
     let restrictedByZone = false;
     if (props.formType=="user"){
       arr.push({label:"root",values:{E:"root", N:"root"}});
@@ -176,7 +176,6 @@ function RenderForm(props:{ edit:boolean, formType:FormDialogTypes, currentField
   const getUserData = async () => {
     const res = await getSingleUser(props.currentFields["_id"]);
     if (res.status==200){
-      console.log("single user data",res.obj);
       let permissionsField = getFormFieldByType(props.form,"permissions");
       if (!permissionsField)
         permissionsField = getFormFieldByType(props.form,"role");

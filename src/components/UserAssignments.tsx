@@ -36,9 +36,10 @@ function UserAssignments(props:{label:string}){
   useEffect(()=>{
     getUserSuggestions("AU").then(res=>{
       const arr = res.obj.map((sugg:any)=>{
-        const temp:FieldValues={};
-        temp["label"]=sugg["N"]+`<${sugg["E"]}>`;
-        temp["values"] = sugg;
+        const temp={
+          label:sugg["N"]+`<${sugg["E"]}>`,
+          values:sugg
+        };
         return temp;
       });
       setUsers(arr);
@@ -66,10 +67,9 @@ function UserAssignments(props:{label:string}){
       <div className="w-[50%] flex flex-row mx-7">
         <div className="flex-auto">
           <ComboboxField index={0} 
-            fieldData={{id:"user",name:"Select a user", type:"combobox"}} 
+            fieldData={{id:"user",name:"Select a user", type:"combobox",placeholder:"Search by user name or email"}} 
             suggestions={users}
             fieldValue={fieldValues["user"]} setFieldValues={setFieldValues} disabled={false}
-            placeholder="Search by user name or email"
           />
         </div>
         <SelectField index={1}

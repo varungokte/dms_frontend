@@ -2,8 +2,9 @@ import axios from 'axios';
 import { apiEndpoint } from '@/Constants';
 import { getEncryptedToken } from '@/functions/getToken';
 import { handleEncryption, handleDecryption } from '@/functions/handleCryptogaphy';
+import { FieldValues } from '@/types/DataTypes';
 
-const addToMasters = async (data:any) => {
+const addToMasters = async (data:FieldValues) => {
 	try {
 		const token = getEncryptedToken();
 		const enc_data = await handleEncryption(data);
@@ -28,7 +29,7 @@ const getMastersList = async () =>  {
 		});
 		const decryptedObject = await handleDecryption(response.data);
 		
-		return {status: response.status, obj:decryptedObject||null};
+		return {status: response.status, obj:decryptedObject||[]};
 	}
 	catch(error:any) {
 		if (!error.response)

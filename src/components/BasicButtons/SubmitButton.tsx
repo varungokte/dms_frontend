@@ -2,7 +2,7 @@ import { useState } from "react";
 import CircularProgress from "@mui/material/CircularProgress/CircularProgress";
 import { Button, Typography } from "@mui/material";
 
-function SubmitButton(props:{width?:string, submitFunction:Function, submitButtonText:string, index?:number, disabled?:boolean, reset?:boolean}){
+function SubmitButton(props:{width?:string, submitFunction:Function, submitButtonText:string, index?:number, disabled?:boolean}){
   const [submitted, setSubmitted] = useState(false);
   const defaultWidth = "150px";
 

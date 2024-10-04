@@ -4,17 +4,18 @@ import { UserSuggestionsList } from "@/types/DataTypes";
 import { Autocomplete, TextField as MUITextField } from "@mui/material";
 import FieldLabel from "./FieldLabel";
 
-function ComboboxField (props:FormFieldProps & {suggestions:UserSuggestionsList, placeholder?:string}){
+function ComboboxField (props:FormFieldProps & {suggestions:UserSuggestionsList}){
   const [value, setValue] = useState("");
 	const [results, setResults] = useState<any>([]);
   const [defaultValue,setDefaultValue] = useState<any>();
   const [error, setError] = useState(props.error);
 
-  const [parameterToBeSent] = useState("E"); //Later this will be a prop
+  const parameterToBeSent = "E"; //Later this will be a prop
 
   useEffect(()=>setError(props.error),[props.error]);
 
   //useEffect(()=>console.log("combobox props",props),[props]);
+
   useEffect(()=>{
     if (props.fieldValue && props.suggestions.length!=0){
       let values=[];
@@ -36,9 +37,10 @@ function ComboboxField (props:FormFieldProps & {suggestions:UserSuggestionsList,
   },[props.suggestions]) */
 
   useEffect(()=>{
-    if (results.length!=0)
+    //if (results && results.length!=0)
       props.setFieldValues((curr:any)=>{
-        curr[props.fieldData.id]=results; 
+        if (!props.disabled)
+          curr[props.fieldData.id]=results||"";
         return {...curr};
       });
   },[results]);
@@ -101,7 +103,7 @@ function ComboboxField (props:FormFieldProps & {suggestions:UserSuggestionsList,
             error={error}
             value={value} 
             onChange={(e)=>setValue(e.target.value)}  
-            placeholder={props.placeholder||`Add ${props.fieldData.name.toLowerCase()}${(props.fieldData.multiple?"s":"")}`} 
+            placeholder={props.fieldData.placeholder||`Add ${props.fieldData.name.toLowerCase()}${(props.fieldData.multiple?"s":"")}`} 
           />
         } 
         />

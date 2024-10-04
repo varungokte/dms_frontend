@@ -86,7 +86,7 @@ function FileField (props:{index:number, fileList:FieldValues[], fileSetter:Func
       fileRef.current.click();
       setRedirect(false);
     }
-  },[redirect])
+  },[redirect]);
 
   return (
     <div>

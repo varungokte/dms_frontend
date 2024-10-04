@@ -2,7 +2,7 @@ import { FormFieldProps } from "@/types/FormComponentProps";
 import { FieldValues } from "@/types/DataTypes";
 import { Checkbox, FormControlLabel } from "@mui/material";
 
-const CheckboxField = (props:FormFieldProps) => {
+function CheckboxField (props:FormFieldProps){
   //console.log("checkbox props",props)
   return (
     <div className="mb-5 mx-2">

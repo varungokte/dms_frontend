@@ -1,5 +1,4 @@
 import { useEffect, useState, useReducer } from "react";
-import { FieldValues } from "@/types/DataTypes";
 import TableKeyValues from "./BasicTables/TableKeyValues";
 
 function _TestComponent(){
@@ -18,13 +17,13 @@ function _TestComponent(){
     }) */
   },[]);
 
-  const [prefillValues, setPrefillValues] = useState<FieldValues>();
+  const [prefillValues, setPrefillValues] = useState<{[key:string]: {V:string, S?:string}[]}>({});
   
   useEffect(()=>{
     setPrefillValues({
-      Planets: ["Vulcan","Mandalore","Krypton","Raxacoricofallapatorius","Skaro","Mondas","Kwenn", "Cardassia", "Tatooine","Bajor","Trill","Kashyyyk"],
-      Species: ["Time Lords","Klingons","Trandoshans","Wookies","Cardassians"],
-      Vehicles: ["USS Enterprise","Millenium Falcon","TARDIS","Batmobile"],
+      Planets: [{V:"Vulcan"},{V:"Mandalore"},{V:"Krypton"},{V:"Raxacoricofallapatorius"},{V:"Skaro"},{V:"Mondas"},{V:"Kwenn"}, {V:"Cardassia"}, {V:"Tatooine"},{V:"Bajor"},{V:"Trill"},{V:"Kashyyyk"}],
+      Species: [{V:"Time Lords"},{V:"Klingons"},{V:"Trandoshans"},{V:"Wookies"},{V:"Cardassians"}],
+      Vehicles: [{V:"USS Enterprise"},{V:"Millenium Falcon"},{V:"TARDIS"},{V:"Batmobile"}],
     })
   },[]);
  

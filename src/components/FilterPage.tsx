@@ -73,7 +73,7 @@ function FilterPage(props:{label:string}){
         setTotalPages(Math.ceil(Number(res.arr[0]["metadata"][0]["total"])/Number(rowsPerPage)));
       }
 			else
-				setLoanList([])
+				setLoanList([]);
 		})
 	},[filtersList,currentPage,rowsPerPage, searchString]);
 

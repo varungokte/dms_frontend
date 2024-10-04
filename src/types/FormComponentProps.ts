@@ -1,5 +1,5 @@
 import { FormEventHandler, SetStateAction } from "react";
-import { FieldValues, FormDialogTypes, UserSuggestionTypes, DocumentSectionTypes, UserSuggestionsList } from "./DataTypes";
+import { FieldValues, FormDialogTypes, UserSuggestionTypes, DocumentSectionTypes, UserSuggestionsList, SetStateBoolean } from "./DataTypes";
 import { FieldAttributesList,FormFieldAttributes } from "./FormAttributes";
 
 
@@ -33,7 +33,16 @@ type FormDialogTeamProps = {
   formSize:"sm"|"md"|"lg", formTitle:string, 
   submitButton:string, formSubmit:Function, 
   form:FieldAttributesList, 
-  currentFields:FieldValues, repeatFields?:boolean,
+  currentFields:FieldValues
+}
+
+type FormDialogTransferProps = {
+  formOpen:boolean, setFormOpen:SetStateBoolean,
+  formSize:"sm"|"md"|"lg", formTitle:string, 
+  submitButton:string, formSubmit:Function, 
+  form:FieldAttributesList, 
+  selectedTeams:string[], teamLeader:string,
+  currentFields:FieldValues
 }
 
 //FormFieldsRender.tsx
@@ -76,7 +85,7 @@ type FormFieldProps = {
 }
 
 export {
-  type FormDialogProps, type FormDialogDocumentsProps, type FormDialogTeamProps, type FormFieldsRenderProps,
+  type FormDialogProps, type FormDialogDocumentsProps, type FormDialogTeamProps, type FormDialogTransferProps, type FormFieldsRenderProps,
   type FormRepeatableGridProps, type RenderFormGridProps,
   type FormFieldProps,
 }

@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react';
 import '@/styling.css';
 import { MasterValuesContext, PermissionContext, SocketContext } from '@/Contexts';
-import { adminEnteredMasters, allComponents, defaultMastersValues } from './Constants';
+import { allComponents, mastersKeyToLabels } from './Constants';
 
 import { getDocSecList, getModSecName } from '@/functions/sectionNameAttributes';
 import { FieldValues, MastersValues } from '@/types/DataTypes';
 import { ComponentList } from '@/types/ComponentProps';
-import { getDecryptedToken } from './functions/getToken';
+import { getDecryptedToken } from '@/functions/getToken';
 import { getSingleUser } from './apiFunctions/userAPIs';
 import { getMastersList } from '@/apiFunctions/masterAPIs';	
 
@@ -20,11 +20,12 @@ import _TestComponent from '@/components/_TestComponent';
 
 function MenuRouter(){
 	const socket = useContext(SocketContext);
+  
+	const [mastersValues, setMastersValues] = useState<FieldValues>();
+	const [mastersId, setMastersId] = useState<string>();
+	const [changeInMasters,setChangeInMasters] = useState(true);
 	
 	const [socketIsConnected, setSocketIsConnected] = useState(false);
-  const [mastersValues, setMastersValues] = useState<MastersValues|undefined>(defaultMastersValues);
-  const [mastersIdList, setMastersIdList] = useState<FieldValues>();
-	const [changeInMasters,setChangeInMasters] = useState(true);
 	const [token, setToken] = useState<FieldValues>();	
 	const [componentList, setComponentList] = useState<ComponentList>();
 	const [userPermissions, setUserPermissions] = useState<FieldValues>();
@@ -36,26 +37,23 @@ function MenuRouter(){
 			return decodedToken;
 		}
 	}
-
+	
 	const getMasters = async () => {
 		const res = await getMastersList();
 		if (res.status==200){
 			const obj:any={};
-			const idObj:FieldValues={};			
+			const mastersFromServer = res.obj;
 
-			res.obj[0]["data"].map((cat:FieldValues)=>{
-				const label = adminEnteredMasters[cat.N];
-				obj[label] = ["-"].concat(cat.V);
-				idObj[label] = cat["_id"]
+			setMastersId(mastersFromServer["_id"]);
+			
+			Object.keys(mastersFromServer).map((cat)=>{
+				const valueArray = mastersFromServer[cat];
+				if (Array.isArray(valueArray)){
+					obj[cat] = valueArray //["-"].concat(valueArray);
+				}
 			});
 
-			Object.keys(defaultMastersValues).map(cat=>{
-				if (!obj[cat] && !Object.values(adminEnteredMasters).includes(cat))
-					obj[cat] = defaultMastersValues[cat as keyof MastersValues];
-			})
-			
 			setMastersValues(obj);
-			setMastersIdList(idObj);
 		}
 		else
 			setMastersValues(undefined);
@@ -130,10 +128,45 @@ function MenuRouter(){
 		setComponentList(arr);
 	},[userPermissions]);
 
-	
+	const removeStatusFromMasters = (ipObj:FieldValues):MastersValues => {
+		const opObj:MastersValues = {
+			LoanProductList: [],
+			ZoneList: [],
+			FileTypeList: [],
+			IndustryList: [],
+			LoanTypeList: [],
+			ProjectStatusList: [],
+			DSRAFormList: [],
+			LoanSecurityTypeList: [],
+			BankAccountTypeList: [],
+			ContactTypeList: [],
+			EmailRecipientList: [],
+			RatingAgencyList: [],
+			RatingTypeList: [],
+			RatingOutlookList: [],
+			TransactionCategoryList: [],
+			ComplianceCategoryList: [],
+			CovenantCategoryList: [],
+			CovenantTypeList: [],
+			ConditionPrecedentCategoryList: [],
+			ConditionSubsequentCategoryList: [],
+			DocumentRejectionReasonList: [],
+			TableRowsPerPage: []
+		};
+
+		for (let i=0; i<Object.keys(ipObj).length; i++){
+			const key = Object.keys(ipObj)[i];
+			const val = ipObj[key];
+			const label = mastersKeyToLabels[key] as keyof MastersValues;
+			opObj[label] =["-"].concat(val.map((v:FieldValues)=>v.V));
+		}
+
+		return opObj;
+	}
+
 	return (
 		<PermissionContext.Provider value={{userPermissions:userPermissions||{}}}>
-			<MasterValuesContext.Provider value={mastersValues}>
+			<MasterValuesContext.Provider value={removeStatusFromMasters(mastersValues||{})}>
 				<div className='relative'>
 					<div style={{ width:"280px", float: "left", height: "100vh", position: "fixed", overflow:"auto" }} className="bg-custom-1">
 						<SidePanel componentList={componentList} token={token} />
@@ -142,7 +175,7 @@ function MenuRouter(){
 					<div style={{marginLeft:"280px"}}>
 						<TopPanel token={token} socketIsConnected={socketIsConnected} />
 						<hr />
-						<Content componentList={componentList} masterLists={mastersValues} mastersIdList={mastersIdList} setChangeInMasters={setChangeInMasters} />
+						<Content componentList={componentList} masterLists={mastersValues} mastersId={mastersId} setChangeInMasters={setChangeInMasters} />
 					</div>
 				</div>
 			</MasterValuesContext.Provider>

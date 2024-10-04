@@ -45,7 +45,6 @@ function FormDialogTeam(props:FormDialogTeamProps){
         data[`${section}C`] = obj["C"];
       else
       data[`${section}C`] = prefillValues[`${section}C`].map((obj:any)=>obj.values["E"])
-
     }
     //console.log("teamMembersRenamingWhileSubmitting result",data);
     return data;
@@ -137,7 +136,8 @@ function FormDialogTeam(props:FormDialogTeamProps){
       <hr/>
       <div className="p-5">
         <RequiredFieldsNote />
-          <RenderForm key={"f0"} edit={props.edit||false} teamId={props.currentFields["_id"]} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} errorList={errorList} />
+        <br />
+        <RenderForm key={"f0"} edit={props.edit||false} teamId={props.currentFields["_id"]} form={props.form} prefillValues={{...prefillValues}} setPrefillValues={setPrefillValues} errorList={errorList} />
         {errorMessage}
         <br/>
         <div className="flex flex-row">
@@ -165,7 +165,6 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
   }
 
   const getLeaderSuggestions = async () => {
-    console.log("props.prefillvalues",props.prefillValues);
     const res = await getUserSuggestions("RM");
     if (res.status==200){
       const arr = filterSuggestions(res.obj)
@@ -176,11 +175,9 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
   }
 
   const getMemberSuggestions = async () => {
-    console.log("membersuggestions",memberSuggestions)
     const leadName = props.edit?props.prefillValues["L"]:props.prefillValues["L"].values["E"];
     const res = await getUserSuggestions("TL",leadName);
     if (res.status==200){
-      console.log("ARR",res.obj)
       const arr = filterSuggestions(res.obj);
       setMemberSuggestions(arr);
     }
@@ -223,7 +220,6 @@ function RenderForm(props:{ edit:boolean, teamId:string, form:FieldAttributesLis
 
 
   useEffect(()=>{
-    console.log("loading use effect",props.prefillValues)
     if (props.edit && Object.keys(props.prefillValues).length!=0)
       teamMembersCombinedToSeparate();
     

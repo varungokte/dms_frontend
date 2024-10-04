@@ -10,7 +10,7 @@ function DataTable(props:(DataTableProps & {className?:string, style?:FieldValue
   const selectableIdList = props.tableData.map((entry,index)=>{
     if (!props.disabledRows || (props.disabledRows && !props.disabledRows[index]))
       return entry["_id"];
-  });
+  }).filter(id=>id);
   
   return(
     <MUITable className={`${props.className} rounded-xl border`} sx={{minWidth:700,borderRadius:"13px", ...props.style }} >

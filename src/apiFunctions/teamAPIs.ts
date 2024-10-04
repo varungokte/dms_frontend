@@ -143,11 +143,12 @@ const removeFromTeams = async (data:{E:string, V:string[]}) => {
 	}
 }
 
-const replaceInTeam = async (data:{_id:string, new:string, curr:string}) => {
+const replaceInTeam = async (data:{V:/* {_id:string, roles: */string[]/* }[] */, E:string, NE:string}) => {
 	try {
 		const token = getEncryptedToken();
+		console.log("api data",data)
 		const enc_data = await handleEncryption(data);
-		const response = await axios.post(`${apiEndpoint}/`, {data: enc_data}, {
+		const response = await axios.post(`${apiEndpoint}/replaceTeamsMember`, {data: enc_data}, {
 			headers:{ "Authorization": `Bearer ${token}` },
 		});
 		return response.status;

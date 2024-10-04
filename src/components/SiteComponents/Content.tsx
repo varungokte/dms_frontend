@@ -7,7 +7,7 @@ import { FieldValues, SetStateBoolean } from "@/types/DataTypes";
 import { ComponentList } from "@/types/ComponentProps";
 import UserProfile from "./UserProfile";
 
-function Content(props:{componentList:ComponentList|undefined, masterLists:FieldValues|undefined, mastersIdList:FieldValues|undefined,setChangeInMasters:SetStateBoolean}){
+function Content(props:{componentList:ComponentList|undefined, masterLists:FieldValues|undefined, mastersId:string|undefined,setChangeInMasters:SetStateBoolean}){
   return (
     <Routes>
       {props.componentList
@@ -17,14 +17,14 @@ function Content(props:{componentList:ComponentList|undefined, masterLists:Field
             componentProps["panopticPage"] = item.panopticPage;
           if (item.name=="Masters"){
             componentProps["masterLists"] = props.masterLists;
-            componentProps["idList"] = props.mastersIdList;
-            componentProps["callMasterLists"] = props.setChangeInMasters
+            componentProps["id"] = props.mastersId;
+            componentProps["callMasterLists"] = props.setChangeInMasters;
           }
           return <Route key={index} path={item.path} element={createElement(item.component, componentProps)} />
         })
         :<></>
       }
-      <Route key={"V"} path="/verify" element={<Navigate to="/"/>} />
+      <Route key={"V"} path="/verify" element={<Navigate to="/"/>}  />
       <Route key={"C"} path="/loan/create/*" element={<CreateLoanAccount/>} />
       <Route key={"P"} path="/user" element={<UserProfile/>} />
       <Route key={"N"} path="/*" element={<PageNotFound/>} />

@@ -1,3 +1,5 @@
+import { ReactElement } from "react";
+
 type FieldDataTypes = 
   "text" | "email" | "password" | "textarea" | 
   "integer" | "float" | "number" |
@@ -21,6 +23,7 @@ type FormFieldAttributes = {
   multiple?:boolean, //for combobox 
   newRole?:boolean, //for permissions/role
   permissionId?:string, //for role
+  placeholder?:string, //for combobox
 };
 
 type SingleFieldAttributes = {category:"single"} & FormFieldAttributes;
@@ -36,7 +39,7 @@ type GridFieldAttributes = {
 
 type LabelFieldAttributes = {
   category:"label", 
-  name: string,
+  name: string|ReactElement,
   sectionClassName:string,
 };
 

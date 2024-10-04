@@ -139,8 +139,8 @@ function UserManagement(props:{label:string}){
   }
 
   const changeUser = async (userValues:any, index:number) => {
-    //console.log("uservalues",userValues,"index",index, "selectedUser",selectedUser);
-    if (selectedUser==-1 || index==undefined || !userData || index==-1)
+    console.log("uservalues",userValues,"index",index, "selectedUser",selectedUser);
+    if (/* selectedUser==-1 || */ index==undefined || !userData || index==-1)
       return;
     
     if (selectedUser!=-1){
@@ -169,7 +169,7 @@ function UserManagement(props:{label:string}){
 
     const res = await editUser(userValues);
 
-    //console.log("Response",res);
+    console.log("Response",res);
 
     if (res==200){
       setAdded(true);

@@ -1,96 +1,102 @@
-import { FieldValues } from '@/types/DataTypes';
+import { useState, useEffect } from 'react';
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+
 import Chip from '@mui/material/Chip';
-import Tooltip from '@mui/material/Tooltip';
+import TextField from '@mui/material/TextField';
+//Simport Tooltip from '@mui/material/Tooltip';
+import Button from "@mui/material/Button";
 
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
-import { useState } from 'react';
+import SendIcon from '@mui/icons-material/Send';
+import { mastersKeyToLabels } from '@/Constants';
 
-function TableKeyValues(props:{prefillValues:FieldValues, setPrefillValues:React.Dispatch<React.SetStateAction<FieldValues>>}){
+function TableKeyValues(props:{prefillValues:{[key:string]: {V:string, S?:string}[]}, setPrefillValues:React.Dispatch<React.SetStateAction<{[key:string]: {V:string, S?:string}[]}>>}){
+  //console.log("table key value props",props);
+  if (!props.prefillValues)
+    return<>ERROR! ERROR! CANNOT COMPUTE!</>;
 
-  const addNewValue = (index:number) => {
-    const key = Object.keys(props.prefillValues)[index];
-    props.setPrefillValues((curr:FieldValues)=>{
-      curr[key].push("");
-      return {...curr};
-    });
-  };
+  const [addNew, setAddNew] = useState<boolean[]>(new Array(Object.keys(props.prefillValues).length));
+  const [newValues, setNewValues] = useState<string[]>(new Array(Object.keys(props.prefillValues).length));
 
-  const removeValue = (index:number) => {
-    const key = Object.keys(props.prefillValues)[index];
-    props.setPrefillValues((curr:FieldValues)=>{
-      curr[key].pop();
-      return {...curr};
-    });
-  };
+  useEffect(()=>{
+    setAddNew(new Array(Object.keys(props.prefillValues).length).fill(false));
+    setNewValues(new Array(Object.keys(props.prefillValues).length).fill(""));
+  },[props.prefillValues]);
 
   if (Object.keys(props.prefillValues).length==0)
     return <></>;
-
+  
   return (
     <Table className="bg-white rounded-xl">
       <TableHead>
-        <TableRow>
+      {/*<TableRow>
           <TableCell>Category</TableCell>
           <TableCell>Values</TableCell>
-        </TableRow>
+        </TableRow> */}
       </TableHead>
       <TableBody>
         {Object.keys(props.prefillValues).map((category,index)=>{
           return (
             <TableRow key={index}>
-              <TableCell>{category}</TableCell>
+              <TableCell>{mastersKeyToLabels[category]}</TableCell>
               <TableCell>
                 <div className="flex flex-wrap">
-                  {props.prefillValues[category].map((val:string,itemIndex:number)=>{
-                    const [open, setOpen] = useState(false);
-                    return(
-                      <div key={itemIndex} className="my-2 mr-2">
-                        {/* <p className="bg-green-700 text-white">{val}</p> */}
-                        {/* <input key={itemIndex} className={`text-xl p-1 rounded-if bg-gray-100 mx-2`} size={30} value={val} onChange={()=>{}} /> */}
-                        <Tooltip 
-                          title={<input value={"Some text"} className="text-black" onChange={()=>{}} />} 
-                          disableFocusListener
-                          disableHoverListener
-                          disableTouchListener
-                          onClick={()=>{setOpen(curr=>!curr);console.log("open")}}
-                          open={open}
-                          >
-                          <Chip label={val} onDelete={()=>{console.log("comma")}} />
-                        </Tooltip>
-                        {/* <TextField 
-                          size="small" color="secondary" 
-                          value={val}
-                          onChange={(e)=>{
-                            props.setPrefillValues((curr:FieldValues)=>{
-                              const key = Object.keys(props.prefillValues)[index];
-                              curr[key][itemIndex] = e.target.value;
-                              return {...curr}; 
-                            })
-                          }} 
-                        /> */}
+                  {props.prefillValues[category].map((val,valIndex)=>{
+                    const status = val.S;
+                    return (
+                      <div key={valIndex} className="m-2">
+                        <Chip  variant={status=="inactive"?"filled":"outlined"}
+                          label={<p className={status=="inactive"?"text-gray-500":""}>{val.V}</p>} 
+                          onDelete={()=>props.setPrefillValues(curr=>{
+                            if (!status||status=="active")
+                              curr[category][valIndex].S = "inactive";
+                            else
+                              curr[category][valIndex].S = "active";
+                            return {...curr};
+                          })} 
+                          deleteIcon={!status||status=="active"
+                            ?<RemoveCircleIcon fontSize="medium" color="error" className="mx-2" />
+                            :<AddCircleIcon fontSize="medium" color="error" className="mx-2" />
+                          }
+                        />
                       </div>
                     )
                   })}
-                
-                  <span className="my-4">
-                    {props.prefillValues[category].length>1?<button onClick={()=>removeValue(index)}><RemoveCircleIcon fontSize="medium" color="error" className="mx-2" /></button>:<></>}
-                    <button className="mx-2" onClick={()=>addNewValue(index)}><AddCircleIcon fontSize="medium" color="secondary" /></button>
-                  </span>
+                  {addNew&&addNew[index]
+                    ?<div className="flex flex-row">
+                      <TextField size="small" onChange={(e)=>setNewValues(curr=>{curr[index]=e.target.value; return [...curr]})}  />
+                      <div>
+                        <Button 
+                          variant="outlined" 
+                          color="secondary" 
+                          size="large" 
+                          onClick={()=>props.setPrefillValues(curr=>{
+                            console.log("curr",curr,"category",category);
+                            if (newValues[index]!="")
+                              curr[category].push({V:newValues[index]});
+                            return {...curr};
+                          })}
+                        >
+                            <SendIcon />
+                        </Button>
+                      </div>
+                    </div>
+                    :<button className="my-3 mx-2" onClick={()=>setAddNew(curr=>{curr[index]=true; return[...curr]})}><AddCircleIcon fontSize="medium" color="secondary" />Add New</button>
+                  }
                 </div>
               </TableCell>
-              </TableRow>
+            </TableRow>
           )
         })}
       </TableBody>
     </Table>
   )
 }
-//<MultiTextField index={1} fieldData={fieldData as FormFieldAttributes} prefillValues={prefillValues} setPrefillValues={setPrefillValues} disabled={false}  />
+
 export default TableKeyValues;

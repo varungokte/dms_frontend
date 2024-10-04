@@ -8,7 +8,7 @@ import { TextField } from "@mui/material";
 import RemoveCircleIcon from '@mui/icons-material/RemoveCircle';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-const MultiTextField = (props:FormFieldProps) => {
+function MultiTextField (props:FormFieldProps){
   const [results,setResults] = useState<string[]>();
   const [error, setError] = useState(props.error);
 

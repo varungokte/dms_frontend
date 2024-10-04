@@ -5,7 +5,6 @@ type FieldValues = {[key:string]: any | any[]};
 type MastersValues = {
   [key in 
     "LoanProductList"| "ZoneList"| "FileTypeList"| "IndustryList"| "LoanTypeList"| "ProjectStatusList"| "DSRAFormList"|
-    "UserRoleList"| 
     "LoanSecurityTypeList"| "BankAccountTypeList"| 
     "ContactTypeList"| "EmailRecipientList"|
     "RatingAgencyList"| "RatingTypeList"| "RatingOutlookList"|
@@ -14,6 +13,7 @@ type MastersValues = {
     "TableRowsPerPage"
   ]: string[]
 };
+
 
 type FormDialogTypes = "team" | "user" | "role" | "cont" | "rate" | "mast";
 
